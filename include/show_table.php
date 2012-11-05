@@ -1,5 +1,5 @@
 <?php
-$dir = __DIR__."/../";
+$dir = dirname(__FILE__)."/../";
 include_once $dir."config.php";
 include_once $dir."class/System.class.php";
 include_once $dir."class/Database.class.php";
@@ -117,7 +117,7 @@ if ( ! empty($torrents_list))
 
 <div class="update">Последний запуск:
 <?php
-$lasrStart = @file_get_contents(__DIR__.'/../laststart.txt');
+$lasrStart = @file_get_contents(dirname(__FILE__).'/../laststart.txt');
 if ( ! empty($lasrStart))
 {
 	$date = explode('-', $lasrStart);

@@ -1,5 +1,5 @@
 <?php
-$dir = __DIR__."/";
+$dir = dirname(__FILE__)."/";
 include_once $dir."config.php";
 include_once $dir."class/System.class.php";
 include_once $dir."class/Database.class.php";
@@ -49,7 +49,7 @@ if (isset($_POST["action"]))
 					$class = $class[0];
 					$class = str_replace('-', '', $class);
 					
-					if ($class::checkRule($threme))
+					if(call_user_func(array($class, 'checkRule'), $threme))
 					{
 						if (Database::checkThremExist($tracker, $threme))
 						{
@@ -114,7 +114,7 @@ if (isset($_POST["action"]))
 				$class = explode('.', $tracker);
 				$class = $class[0];
 				$class = str_replace('-', '', $class);
-				if ($class::checkRule($_POST["name"]))
+				if(call_user_func(array($class, 'checkRule'), $_POST["name"]))
 				{
 					if ( ! empty($_POST["hd"]))
 						$hd = 1;

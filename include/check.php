@@ -1,5 +1,5 @@
 <?php 
-$dir = __DIR__."/../";
+$dir = dirname(__FILE__)."/../";
 include_once $dir."class/System.class.php";
 ?>
 <table class="test">
@@ -50,11 +50,11 @@ if (Sys::checkInternet())
 		<tr>			
 			<?php	
 			}
-			if (Sys::checkWriteToTorrentPath(__DIR__.'/'))
+			if (Sys::checkWriteToTorrentPath(dirname(__FILE__).'/'))
 			{
 			?>
 		<tr>
-			<td>Запись в системную директорию <?php echo __DIR__?> разрешена.</td>
+			<td>Запись в системную директорию <?php echo dirname(__FILE__)?> разрешена.</td>
 		<tr>
 			<?php	
 			}
@@ -62,7 +62,7 @@ if (Sys::checkInternet())
 			{
 			?>
 		<tr>
-			<td class="test-error">Запись в системную директорию <?php echo __DIR__?> запрещена.</td>
+			<td class="test-error">Запись в системную директорию <?php echo dirname(__FILE__)?> запрещена.</td>
 		<tr>
 			<?php	
 			}
