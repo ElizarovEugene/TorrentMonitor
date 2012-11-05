@@ -21,29 +21,55 @@ class lostfilm
     }
     
 	//получаем куки для доступа к сайту
-	private static function login($login, $password)
+	private static function login($type, $login, $password)
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
+		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:16.0) Gecko/20100101 Firefox/16.0");
 		curl_setopt($ch, CURLOPT_HEADER, 1); 
 		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, "http://lostfilm.tv/useri.php");
-		curl_setopt($ch, CURLOPT_POSTFIELDS, "FormLogin={$login}&FormPassword={$password}&module=1&repage=user&act=login");
+		if ($type == 'simple')
+		{
+			curl_setopt($ch, CURLOPT_URL, "http://lostfilm.tv/useri.php");
+			curl_setopt($ch, CURLOPT_POSTFIELDS, "FormLogin={$login}&FormPassword={$password}&module=1&repage=user&act=login");
+		}
+		if ($type == 'hard')
+		{
+			curl_setopt($ch, CURLOPT_URL, "http://login.bogi.ru/login.php?referer=http%3A%2F%2Fwww.lostfilm.tv%2F");
+			curl_setopt($ch, CURLOPT_POSTFIELDS, "login={$login}&password={$password}&module=1&target=http%3A%2F%2Flostfilm.tv%2F&repage=user&act=login");
+		}
+		$result = curl_exec($ch);
+		curl_close($ch);
+		
+		return $result;
+	}
+	
+	//получаем куки для доступа к сайту
+	private static function loginBogi($post)
+	{
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:16.0) Gecko/20100101 Firefox/16.0");
+		curl_setopt($ch, CURLOPT_HEADER, 1); 
+		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_URL, "http://www.lostfilm.tv/blg.php?ref=aHR0cDovL3d3dy5sb3N0ZmlsbS50di8=");
+		curl_setopt($ch, CURLOPT_POSTFIELDS, "{$post}");
 		$result = curl_exec($ch);
 		curl_close($ch);
 		
 		$result = iconv("windows-1251", "utf-8", $result);
 		return $result;
-	}
+	}	
+
 	
 	//получаем страницу для парсинга
 	private static function getPage($sess_cookie)
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, "http://lostfilm.tv/my.php");
-		curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_HEADER, 1);
 		$header[] = "Host: lostfilm.tv\r\n";
@@ -55,13 +81,37 @@ class lostfilm
 			
 		$result = iconv("windows-1251", "utf-8", $result);
 		return $result;
+	}
+	
+	//получаем куки для доступа к сайту
+	private static function getCookies($array)
+	{
+		if ( ! empty($array))
+		{
+			lostfilm::$sess_cookie = $array[1][0]."=".$array[2][0]." ".$array[1][1]."=".$array[2][1];
+			$page = lostfilm::getPage(lostfilm::$sess_cookie);
+			preg_match("/<td align=\"left\">(.*)<br >/", $page, $out);
+			lostfilm::$sess_cookie .= " usess=".$out[1];
+			Database::clearWarnings('lostfilm.tv');
+		}
+		else 
+		{
+			//устанавливаем варнинг
+			if (lostfilm::$warning == NULL)
+   			{
+   				lostfilm::$warning = TRUE;
+   				Errors::setWarnings($tracker, 'credential_miss');
+   			}
+			//останавливаем выполнение цепочки
+			lostfilm::$exucution = FALSE;		
+		}
 	}	
 	
 	//получаем страницу для парсинга
 	private static function getContent()
 	{
 		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
+		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1");
 		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_URL, "http://lostfilm.tv/rssdd.xml");
@@ -76,7 +126,7 @@ class lostfilm
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
+		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1");
 		curl_setopt($ch, CURLOPT_TIMEOUT, 5);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_URL, "{$link}");
@@ -175,66 +225,34 @@ class lostfilm
 					$login = $credentials['login'];
 					$password = $credentials['password'];
 					
-					lostfilm::$page = lostfilm::login($login, $password);
+					$page = lostfilm::login('simple', $login, $password);
 					
-					if ( ! empty(lostfilm::$page))
+					if (preg_match_all("/Set-Cookie: (\w*)=(\S*)/", $page, $array))
 					{
-						//проверяем подходят ли учётные данные
-						if (preg_match_all("/Set-Cookie: (\w*)=(\S*)/", lostfilm::$page, $array))
-						{
-							lostfilm::$sess_cookie = $array[1][0]."=".$array[2][0]." ".$array[1][1]."=".$array[2][1];
-							lostfilm::$page = lostfilm::getPage(lostfilm::$sess_cookie);
-							preg_match("/<td align=\"left\">(.*)<br >/", lostfilm::$page, $out);
-							lostfilm::$sess_cookie .= " usess=".$out[1];
-							//запускам процесс выполнения, т.к. не может работать без кук
-							lostfilm::$exucution = TRUE;
-						}
-						//проверяем нет ли сообщения о неправильном логине
-						elseif (preg_match("/\D{24}\s\D{4}\s\D{12}/", lostfilm::$page, $out))
-						{
-							//устанавливаем варнинг
-    						if (lostfilm::$warning == NULL)
-                			{
-                				lostfilm::$warning = TRUE;
-                				Errors::setWarnings($tracker, 'credential_wrong');
-                			}
-							//останавливаем выполнение цепочки
-							lostfilm::$exucution = FALSE;
-						} 
-						//проверяем нет ли сообщения о неправильном пароле
-						elseif (preg_match("/recover\.php/", lostfilm::$page, $out)) 
-						{
-							//устанавливаем варнинг
-							if (lostfilm::$warning == NULL)
-                			{
-                				lostfilm::$warning = TRUE;
-                				Errors::setWarnings($tracker, 'credential_wrong');
-                			}							//останавливаем выполнение цепочки
-							lostfilm::$exucution = FALSE;
-						}
-						//если не удалось получить никаких данных со страницы, значит трекер не доступен
-						else 
-						{
-							//устанавливаем варнинг
-							if (lostfilm::$warning == NULL)
-                			{
-                				lostfilm::$warning = TRUE;
-                				Errors::setWarnings($tracker, 'not_available');
-                			}
-							//останавливаем выполнение цепочки
-							lostfilm::$exucution = FALSE;
-						}
+						lostfilm::getCookies($array);
+						lostfilm::$exucution = TRUE;
 					}
 					else
 					{
-						//устанавливаем варнинг
-						if (lostfilm::$warning == NULL)
-            			{
-            				lostfilm::$warning = TRUE;
-            				Errors::setWarnings($tracker, 'not_available');
-            			}
-						//останавливаем выполнение цепочки
-						lostfilm::$exucution = FALSE;	
+						$page = lostfilm::login('hard', $login, $password);
+
+						preg_match_all('/name=\"(.+)\"/iU', $page, $array_names);
+						preg_match_all('/value=\"(.+)\"/iU', $page, $array_values);
+						
+						if ( ! empty($array_names) &&  ! empty($array_values))
+						{
+							$post = '';
+							for($i=0; $i<count($array_values[1]); $i++)
+								$post .= $array_names[1][$i+1].'='.$array_values[1][$i].'&';
+						}
+						$post = substr($post, 0, -1);
+						$page = lostfilm::loginBogi($post);
+						
+						if (preg_match_all("/Set-Cookie: (\w*)=(\S*)/", $page, $array))
+						{
+							lostfilm::getCookies($array);
+							lostfilm::$exucution = TRUE;
+						}	
 					}
 				}
 				else

@@ -11,7 +11,7 @@
 - добавляем в cron engine.php
 	*/10 * * * * php -q /path/to/folder/torrent_monitor/engine.php 2> /path/to/log/torrent_monitor_error.log
 
-Так же, в php.ini стоит увеличить значение параметра max_execution_time (я рекомендую установить значение — 300), и правильно выставить параметр 
-date.timezone (оговорюсь что это нужно делать в php.ini для CLI!).
-
-Пароль по-умолчанию: torrentmonitor
+Так же, в php.ini (для CLI) необходимо изменить следующие параметры:
+max_execution_time = 300
+allow_url_fopen = on (эту опцию желательно включить в php.ini как для CLI, так и для веб-сервера)
+выставить date.timezone
