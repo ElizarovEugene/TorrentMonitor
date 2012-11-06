@@ -92,6 +92,7 @@ class lostfilm
 			$page = lostfilm::getPage(lostfilm::$sess_cookie);
 			preg_match("/<td align=\"left\">(.*)<br >/", $page, $out);
 			lostfilm::$sess_cookie .= " usess=".$out[1];
+			echo lostfilm::$sess_cookie;
 			Database::clearWarnings('lostfilm.tv');
 		}
 		else 
@@ -236,8 +237,8 @@ class lostfilm
 					{
 						$page = lostfilm::login('hard', $login, $password);
 
-						preg_match_all('/name=\"(.+)\"/iU', $page, $array_names);
-						preg_match_all('/value=\"(.+)\"/iU', $page, $array_values);
+						preg_match_all('/name=\"(.*)\"/iU', $page, $array_names);
+						preg_match_all('/value=\"(.*)\"/iU', $page, $array_values);
 						
 						if ( ! empty($array_names) &&  ! empty($array_values))
 						{
