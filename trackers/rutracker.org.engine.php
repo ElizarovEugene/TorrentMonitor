@@ -109,7 +109,7 @@ class rutracker
 		{
 			//получаем учётные данные
 			$credentials = Database::getCredentials($tracker);
-			$login = $credentials['login'];
+			$login = iconv("utf-8", "windows-1251", $credentials['login']);
 			$password = $credentials['password'];
 			
 			$page = rutracker::login($login, $password);

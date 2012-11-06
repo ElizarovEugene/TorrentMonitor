@@ -180,7 +180,7 @@ Content-Disposition: form-data; name=\"login\"
 				{
 					//получаем учётные данные
 					$credentials = Database::getCredentials($tracker);
-					$login = $credentials['login'];
+					$login = iconv("utf-8", "windows-1251", $credentials['login']);
 					$password = $credentials['password'];
 					
 					novafilm::$page = novafilm::login($login, $password);
