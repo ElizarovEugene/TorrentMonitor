@@ -12,7 +12,7 @@ TorrentMonitor
 - слежение за релизерами на rutracker.org
 - поиск новых серий на lostfilm.tv
 - поиск новых серий на novafilm.tv
-<img src="http://blog.korphome.ru/wp-content/uploads/2011/02/Новый11.png">
+
 Системные требования:
 PHP 5.3 и выше, должен быть собран с поддержкой cURL и PDO.
 Так же, в php.ini (для CLI) необходимо изменить следующие параметры:
