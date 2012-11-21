@@ -60,43 +60,32 @@ if (isset($_POST["action"]))
 								$name = Sys::getHeader($_POST["url"]);
 
 							Database::setThreme($tracker, $name, $threme);
-							?>
-							Тема добавлена для мониторинга.
-							<?php
+							
+							echo 'Тема добавлена для мониторинга.';
 						}
 						else
 						{
-						?>
-							Вы уже следите за данной темой на трекере <b><?php echo $tracker?></b>.
-						<?php
+							echo 'Вы уже следите за данной темой на трекере <b>'.$tracker.'</b>.';
 						}
 					}
 					else
 					{
-					?>
-						Не верная ссылка.
-					<?php
+						echo 'Не верная ссылка.';
 					}
 				}
 				else
 				{
-				?>
-					Отсутствует модуль для трекера - <b><?php echo $tracker?></b>.
-				<?php
+					echo 'Отсутствует модуль для трекера - <b>'.$tracker.'</b>.';
 				}
 			}
 			else
 			{
-			?>
-				Вы не можете следить за этим сериалом на трекере - <b><?php echo $tracker?></b>, пока не введёте свои учётные данные!
-			<?php
+				echo 'Вы не можете следить за этим сериалом на трекере - <b>'.$tracker.'</b>, пока не введёте свои учётные данные!';
 			}
 		}
 		else
 		{
-		?>
-			Не верная ссылка.
-		<?php
+			echo 'Не верная ссылка.';
 		}
 		return TRUE;
 	}
@@ -123,36 +112,26 @@ if (isset($_POST["action"]))
 					if (Database::checkSerialExist($tracker, $_POST["name"], $hd))	
 					{
 						Database::setSerial($tracker, $_POST["name"], $hd);
-						?>
-						Сериал добавлен для мониторинга.
-						<?php
+						echo 'Сериал добавлен для мониторинга.';
 					}
 					else
 					{
-					?>
-						Вы уже следите за данным сериалом на этом трекере - <b><?php echo $tracker?></b>.
-					<?php
+						echo 'Вы уже следите за данным сериалом на этом трекере - <b>'.$tracker.'</b>.';
 					}
 				}
 				else
 				{
-				?>
-					Название содержит недопустимые символы.
-				<?php
+					echo 'Название содержит недопустимые символы.';
 				}
 			}
 			else
 			{
-			?>
-				Отсутствует модуль для трекера - <b><?php echo $tracker?></b>.
-			<?php
+				echo 'Отсутствует модуль для трекера - <b>'.$tracker.'</b>.';
 			}
 		}
 		else
 		{
-		?>
-			Вы не можете следить за этим сериалом на трекере - <b><?php echo $tracker?></b>, пока не введёте свои учётные данные!
-		<?php
+			echo 'Вы не можете следить за этим сериалом на трекере - <b>'.$tracker.'</b>, пока не введёте свои учётные данные!';
 		}
 		return TRUE;
 	}
@@ -169,29 +148,21 @@ if (isset($_POST["action"]))
 				if (Database::checkUserExist($tracker, $_POST["name"]))	
 				{
 					Database::setUser($tracker, $_POST["name"]);
-					?>
-					Пользователь добавлен для мониторинга.
-					<?php
+					echo 'Пользователь добавлен для мониторинга.';
 				}
 				else
 				{
-				?>
-					Вы уже следите за данным пользователем на этом трекере - <b><?php echo $tracker?></b>.
-				<?php
+					echo 'Вы уже следите за данным пользователем на этом трекере - <b>'.$tracker.'</b>.';
 				}
 			}
 			else
 			{
-			?>
-				Отсутствует модуль для трекера - <b><?php echo $tracker?></b>.
-			<?php
+				echo 'Отсутствует модуль для трекера - <b>'.$tracker.'</b>.';
 			}
 		}
 		else
 		{
-		?>
-			Вы не можете следить за этим пользователем на трекере - <b><?php echo $tracker?></b>, пока не введёте свои учётные данные!
-		<?php
+			echo 'Вы не можете следить за этим пользователем на трекере - <b>'.$tracker.'</b>, пока не введёте свои учётные данные!';
 		}
 		return TRUE;
 	}
@@ -200,40 +171,34 @@ if (isset($_POST["action"]))
 	if ($_POST['action'] == 'delete_user')
 	{
     	Database::deletUser($_POST['user_id']);
-    	?>
-		Удаляю...
-		<?php
+		echo 'Удаляю...';
 		return TRUE;
 	}
 	
 	//Удаляем тему из буфера
 	if ($_POST['action'] == 'delete_from_buffer')
 	{
-    	Database::deleteFromBuffer($_POST['id']);
-    	?>
-		Удаляю...
-		<?php
+    		Database::deleteFromBuffer($_POST['id']);
+		echo 'Удаляю...';
 		return TRUE;
 	}
 	
 	//Очищаем весь список тем
 	if ($_POST['action'] == 'threme_clear')
 	{
-    	$array = Database::selectAllFromBuffer();
-    	for($i=0; $i<count($array); $i++)
-    	{
-        	Database::deleteFromBuffer($array[$i]['id']);
-    	}
+	    	$array = Database::selectAllFromBuffer();
+	    	for($i=0; $i<count($array); $i++)
+	    	{
+	        	Database::deleteFromBuffer($array[$i]['id']);
+	    	}
 
 	}	
 	
 	//Перемещаем тему из буфера в мониторинг постоянный
 	if ($_POST['action'] == 'transfer_from_buffer')
 	{
-    	Database::transferFromBuffer($_POST['id']);
-    	?>
-		Переношу...
-		<?php
+    		Database::transferFromBuffer($_POST['id']);
+		echo 'Переношу...';
 		return TRUE;
 	}
 	
@@ -257,9 +222,7 @@ if (isset($_POST["action"]))
 	if ($_POST["action"] == "del")
 	{
 		Database::deletItem($_POST["id"]);
-		?>
-		Удаляю...
-		<?php
+		echo 'Удаляю...';
 		return TRUE;
 	}
 	
@@ -267,9 +230,7 @@ if (isset($_POST["action"]))
 	if ($_POST["action"] == "del_user")
 	{
 		Database::deletUser($_POST["id"]);
-		?>
-		Удаляю...
-		<?php
+		echo 'Удаляю...';
 		return TRUE;
 	}
 	
@@ -277,9 +238,7 @@ if (isset($_POST["action"]))
 	if ($_POST["action"] == "update_credentials")
 	{
 		Database::setCredentials($_POST["id"], $_POST["log"], $_POST["pass"]);
-		?>
-		Данные для трекера обновлены!
-		<?php
+		echo 'Данные для трекера обновлены!';
 		return TRUE;
 	}
 	
@@ -306,9 +265,7 @@ if (isset($_POST["action"]))
 		else 
 			$auth = 0;
 		Database::updateSettings('auth', $auth);
-		?>
-		Настройки монитора обновлены.
-		<?php
+		echo 'Настройки монитора обновлены.';
 		return TRUE;
 	}
 	
