@@ -12,7 +12,7 @@ class Sys
 
 	public static function checkConfig()
 	{
-		$configFile = __DIR__.'/../config.php';
+		$configFile = dirname(__FILE__).'/../config.php';
 		if (file_exists($configFile))
 		{
 			include_once($configFile);
@@ -119,7 +119,7 @@ class Sys
 	public static function lastStart()
 	{
 		$date = date("d-m-Y H:i:s");
-		file_put_contents(__DIR__.'/../laststart.txt', $date);
+		file_put_contents(dirname(__FILE__).'/../laststart.txt', $date);
 	}
 }
 ?>
