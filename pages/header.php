@@ -12,7 +12,7 @@
 <body>
 <?php
 //Проверка обновления
-$dir = __DIR__.'/';
+$dir = dirname(__FILE__).'/';
 include_once $dir.'../class/System.class.php';
 $update = Sys::checkUpdate();
 if ($update)
