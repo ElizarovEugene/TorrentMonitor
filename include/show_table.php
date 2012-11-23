@@ -1,5 +1,5 @@
 <?php
-$dir = dirname(__FILE__)."/../";
+$dir = __DIR__."/../";
 include_once $dir."config.php";
 include_once $dir."class/System.class.php";
 include_once $dir."class/Database.class.php";
@@ -51,7 +51,13 @@ if ( ! empty($torrents_list))
     		if ($tracker == "rutracker.org" || $tracker == "nnm-club.ru")
     		{
     		?>
-    		      <a href="http://www.<?php echo $tracker ?>/forum/viewtopic.php?t=<?php echo $torrent_id ?>" target="_blank"><?php echo $name ?></a>
+				<a href="http://www.<?php echo $tracker ?>/forum/viewtopic.php?t=<?php echo $torrent_id ?>" target="_blank"><?php echo $name ?></a>
+    		<?php
+    		}
+    		elseif ($tracker == "rutor.org")
+    		{
+    		?>
+    			<a href="http://rutor.org/torrent/<?php echo $torrent_id ?>/" target="_blank"><?php echo $name ?></a>
     		<?php
     		}
     		else
@@ -117,7 +123,7 @@ if ( ! empty($torrents_list))
 
 <div class="update">Последний запуск:
 <?php
-$lasrStart = @file_get_contents(dirname(__FILE__).'/../laststart.txt');
+$lasrStart = @file_get_contents(__DIR__.'/../laststart.txt');
 if ( ! empty($lasrStart))
 {
 	$date = explode('-', $lasrStart);

@@ -2,7 +2,7 @@
 ////////////////////////////////////
 ///////////TorrentMonitor///////////
 ////////////////////////////////////
-$dir = dirname(__FILE__).'/';
+$dir = __DIR__.'/';
 include_once $dir.'config.php';
 include_once $dir.'class/System.class.php';
 include_once $dir.'class/Database.class.php';
@@ -37,7 +37,7 @@ if (Sys::checkConfig())
 					{
     				    call_user_func($functionClass .'::main', $torrentsList[$i]['id'], $tracker, $torrentsList[$i]['name'], $torrentsList[$i]['hd'], $torrentsList[$i]['ep'], $torrentsList[$i]['timestamp']);
 					}
-					if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.ru')
+					if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.ru' || $tracker == 'rutor.org')
 					{
     					call_user_func($functionClass .'::main', $torrentsList[$i]['id'], $tracker, $torrentsList[$i]['name'], $torrentsList[$i]['torrent_id'], $torrentsList[$i]['timestamp']);
 					}

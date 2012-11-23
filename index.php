@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-$dir = dirname(__FILE__)."/";
+$dir = __DIR__."/";
 include_once $dir."config.php";
 include_once $dir."class/Database.class.php";
 

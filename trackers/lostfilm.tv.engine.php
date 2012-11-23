@@ -92,7 +92,6 @@ class lostfilm
 			$page = lostfilm::getPage(lostfilm::$sess_cookie);
 			preg_match("/<td align=\"left\">(.*)<br >/", $page, $out);
 			lostfilm::$sess_cookie .= " usess=".$out[1];
-			echo lostfilm::$sess_cookie;
 			Database::clearWarnings('lostfilm.tv');
 		}
 		else 

@@ -1,5 +1,5 @@
 <?php
-$dir = dirname(__FILE__)."/";
+$dir = __DIR__."/";
 include_once $dir."config.php";
 include_once $dir."class/System.class.php";
 include_once $dir."class/Database.class.php";
@@ -36,9 +36,18 @@ if (isset($_POST["action"]))
 			$tracker = $url["host"];
 			if (strpos($tracker, 'www\.'))
 				$tracker = substr($tracker, 4);
-
-			$query = explode("=", $url["query"]);
-			$threme = $query[1];
+			
+			if ($tracker != 'rutor.org')
+			{
+				$query = explode("=", $url["query"]);
+				$threme = $query[1];
+			}
+			else
+			{
+				preg_match('/\d{4,8}/', $url["path"], $array);
+				$threme = $array[0];
+			}
+			
 			if (is_array(Database::getCredentials($tracker)))
 			{
 				$engineFile = $dir."/trackers/{$tracker}.engine.php";
@@ -48,8 +57,8 @@ if (isset($_POST["action"]))
 					$class = explode('.', $tracker);
 					$class = $class[0];
 					$class = str_replace('-', '', $class);
-					
-					if(call_user_func(array($class, 'checkRule'), $threme))
+					echo $threme;
+					if ($class::checkRule($threme))
 					{
 						if (Database::checkThremExist($tracker, $threme))
 						{
@@ -114,7 +123,7 @@ if (isset($_POST["action"]))
 				$class = explode('.', $tracker);
 				$class = $class[0];
 				$class = str_replace('-', '', $class);
-				if(call_user_func(array($class, 'checkRule'), $_POST["name"]))
+				if ($class::checkRule($_POST["name"]))
 				{
 					if ( ! empty($_POST["hd"]))
 						$hd = 1;

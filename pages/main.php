@@ -8,7 +8,7 @@ window.onload = function(){
 <div id="wrapper">
     <header id="header">
     <?php
-    $dir = dirname(__FILE__)."/../";
+    $dir = __DIR__."/../";
     include_once $dir."class/System.class.php";
     ?>
         <h1 class="h-title">TorrentMonitor v.

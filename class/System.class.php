@@ -12,7 +12,7 @@ class Sys
 
 	public static function checkConfig()
 	{
-		$configFile = dirname(__FILE__).'/../config.php';
+		$configFile = __DIR__.'/../config.php';
 		if (file_exists($configFile))
 		{
 			include_once($configFile);
@@ -55,7 +55,7 @@ class Sys
 	
 	public static function version()
 	{
-		return '0.7';
+		return '0.7.1';
 	}
 
 	public static function checkUpdate()
@@ -70,6 +70,11 @@ class Sys
 	//Получаем заголовок страницы
 	public static function getHeader($url)
 	{
+		$Purl = parse_url($url);
+		$tracker = $Purl["host"];
+		if (strpos($tracker, 'www\.'))
+			$tracker = substr($tracker, 4);
+	
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, "{$url}");
 		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
@@ -78,17 +83,19 @@ class Sys
 		$result = curl_exec($ch);
 		curl_close($ch);
 		
-		$result = iconv("windows-1251", "utf-8", $result);
+		if ($tracker != 'rutor.org')
+			$result = iconv("windows-1251", "utf-8", $result);
 		
 		preg_match("/<title>(.+?.)<\/title>/is", $result, $array);
 		if ( ! empty($array[1]))
 		{
 			$name = $array[1];
-			$url = parse_url($url);
-			if ($url["host"] == 'nnm-club.ru')
+			if ($Purl["host"] == 'nnm-club.ru')
 				$name = substr($name, 0, -23);
-			if ($url["host"] == 'rutracker.org')
+			if ($Purl["host"] == 'rutracker.org')
 				$name = substr($name, 0, -34);
+			if ($Purl["host"] == 'rutor.org')
+				$name = substr($name, 13);
 		}
 		else
 			$name = "Неизвестный";
@@ -119,7 +126,7 @@ class Sys
 	public static function lastStart()
 	{
 		$date = date("d-m-Y H:i:s");
-		file_put_contents(dirname(__FILE__).'/../laststart.txt', $date);
+		file_put_contents(__DIR__.'/../laststart.txt', $date);
 	}
 }
 ?>
