@@ -30,3 +30,6 @@ allow_url_fopen = on (эту опцию желательно включить в
 выставить date.timezone
 Так же стоит проверить - разрешена ли запись в сторонние каталоги
 open_basedir = /srv/http/:/home/:/tmp/:/usr/share/pear/:/share/gettorrent/
+
+Страница проекта:
+http://blog.korphome.ru/torrentmonitor/
