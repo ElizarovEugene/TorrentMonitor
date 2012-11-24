@@ -190,9 +190,12 @@ class lostfilm
 				if (preg_match_all('/720p|HD/', $item->title, $matches))
 				{
 					preg_match('/\w\d{2}\.?\w\d{2}/', $item->link, $matches);
-					$episode = $matches[0];
-					$date = lostfilm::dateStringToNum($item->pubDate);
-					return array('episode'=>$episode, 'date'=>$date, 'link'=>(string)$item->link);
+					if (isset($matches[0]))
+					{
+						$episode = $matches[0];
+						$date = lostfilm::dateStringToNum($item->pubDate);
+						return array('episode'=>$episode, 'date'=>$date, 'link'=>(string)$item->link);
+					}
 				}
 			}
 			else
@@ -200,9 +203,12 @@ class lostfilm
 				if (preg_match_all('/^(?!(.*720p|.*HD))/', $item->link, $matches))
 				{
 					preg_match('/\w\d{2}\.?\w\d{2}/', $item->link, $matches);
-					$episode = $matches[0];
-					$date = lostfilm::dateStringToNum($item->pubDate);
-					return array('episode'=>$episode, 'date'=>$date, 'link'=>(string)$item->link);
+					if (isset($matches[0]))
+					{
+						$episode = $matches[0];
+						$date = lostfilm::dateStringToNum($item->pubDate);
+						return array('episode'=>$episode, 'date'=>$date, 'link'=>(string)$item->link);
+					}
 				}
 			}
 		}
@@ -328,7 +334,7 @@ class lostfilm
 						{
 							$episode = substr($serial['episode'], 4, 2);
 							$season = substr($serial['episode'], 1, 2);
-							
+						
 							if ( ! empty($ep))
 							{
 								if ($season == substr($ep, 1, 2) && $episode > substr($ep, 4, 2))
@@ -338,9 +344,11 @@ class lostfilm
 								else
 									$download = FALSE;
 							}
+							elseif ($ep == NULL)
+								$download = FALSE;
 							else
 								$download = TRUE;
-
+							
 							if ($download)
 							{
 								$amp = ($hd) ? 'HD' : NULL;

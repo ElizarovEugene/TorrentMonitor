@@ -315,6 +315,8 @@ Content-Disposition: form-data; name=\"login\"
 							else
 								$download = FALSE;
 						}
+						elseif ($ep == NULL)
+							$download = FALSE;
 						else
 							$download = TRUE;
 
