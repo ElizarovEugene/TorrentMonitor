@@ -514,7 +514,7 @@ class Database
     
     public static function checkThremExist($tracker, $id)
     {
-    	$stmt = Database::getInstance()->dbh->prepare("SELECT COUNT(*) AS `count` FROM `torrent` WHERE `tracker` = :tracker AND `id` = :id");
+    	$stmt = Database::getInstance()->dbh->prepare("SELECT COUNT(*) AS `count` FROM `torrent` WHERE `tracker` = :tracker AND `torrent_id` = :id");
     	$stmt->bindParam(':tracker', $tracker);
     	$stmt->bindParam(':id', $id);
 		if ($stmt->execute())

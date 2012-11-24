@@ -57,7 +57,7 @@ if (isset($_POST["action"]))
 					$class = explode('.', $tracker);
 					$class = $class[0];
 					$class = str_replace('-', '', $class);
-					echo $threme;
+
 					if ($class::checkRule($threme))
 					{
 						if (Database::checkThremExist($tracker, $threme))
