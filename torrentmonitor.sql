@@ -42,8 +42,8 @@ VALUES
 	(1,'rutracker.org','',''),
 	(2,'nnm-club.ru','',''),
 	(3,'lostfilm.tv','',''),
-	(4,'novafilm.tv','','');
-	(5,'rutor.org', ' ', ' ')
+	(4,'novafilm.tv','',''),
+	(5,'rutor.org','','');
 
 /*!40000 ALTER TABLE `credentials` ENABLE KEYS */;
 UNLOCK TABLES;
