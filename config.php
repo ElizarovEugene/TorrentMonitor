@@ -19,6 +19,6 @@ Config::write('db.type', 'mysql');
 Config::write('db.charset', 'utf8');
 Config::write('db.port', '3306');
 Config::write('db.basename', 'torrentmonitor');
-Config::write('db.user', 'root');
-Config::write('db.password', 'k1985p');
+Config::write('db.user', '');
+Config::write('db.password', '');
 ?>
