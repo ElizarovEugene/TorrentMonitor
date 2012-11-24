@@ -71,7 +71,7 @@ if ( ! empty($torrents_list))
             <?php
             if ($timestamp != "0000-00-00 00:00:00")
             {
-            	if ($tracker != "rutracker.org" && $tracker != "nnm-club.ru")
+            	if ($tracker != "rutracker.org" && $tracker != "nnm-club.ru" && $tracker != "rutor.org")
             	{
             	?>
             	<div onclick="expand('div<?php echo $id ?>')" class="cut" style="cursor: pointer;">
