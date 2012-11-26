@@ -47,11 +47,12 @@ allow_url_fopen = on
 ; проверить - разрешена ли запись в сторонние каталоги. 
 ; Нужно разрешить запись в каталог с самим приложением TorrentMonitor 
 ; и каталог куда будут сохраняться *.torrent файлы для torrent клиента
-open_basedir = /tmp/:/path/to/folder/torrent_monitor/:/path/to/folder/torrent_watch/
+open_basedir = /tmp/:/path/to/folder/torrent_monitor/:/path/to/folder/torrent_client_watch/
 
 Обновление:
 
 Наилучшим, и самым простым, способом обновления приложения является удаление всех файлов, кроме config.php и заливкой новой версии. Также, если в обновлении имеется update.sql, его необходимо выполнить в вашей базе данных.
 
 Страница проекта:
+
 http://blog.korphome.ru/torrentmonitor/
