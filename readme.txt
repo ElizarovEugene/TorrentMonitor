@@ -29,7 +29,7 @@ max_execution_time = 300
 allow_url_fopen = on (эту опцию желательно включить в php.ini как для CLI, так и для веб-сервера)
 выставить date.timezone
 Так же стоит проверить - разрешена ли запись в сторонние каталоги
-open_basedir = /srv/http/:/home/:/tmp/:/usr/share/pear/:/share/gettorrent/
+open_basedir = /srv/http/:/home/:/tmp/:/usr/share/pear/:/share/gettorrent/:/instalation/of/directory/torrentmonitor/
 
 Страница проекта:
 http://blog.korphome.ru/torrentmonitor/
