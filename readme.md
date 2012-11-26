@@ -22,12 +22,12 @@
 * Импортировать дамп базы torrentmonitor.sql
 * Перенести все файлы в папку на вашем сервере (например /path/to/folder/torrent_monitor/)
 * Внести изменения в config.php и указать данные для доступа к БД
-* Добавить в cron engine.php (*проверьте права на запись в каталог /path/to/log/*)
+* Добавить в cron engine.php ( *проверьте права на запись в каталог /path/to/log/* )
 
 ```
 */10 * * * * php -q /path/to/folder/torrent_monitor/engine.php >> /path/to/log/torrent_monitor_error.log 2>&1
 ```
-* Зайти в веб-интерфейс (**пароль по умолчанию — torrentmonitor, смените(!) его после первого входа**)
+* Зайти в веб-интерфейс ( **пароль по умолчанию — torrentmonitor, смените(!) его после первого входа** )
 * Указать учётные данные от трекеров
 * Указать в настройках путь для сохранения торрентов (папка, которая мониторится вашим торрент-клиентом), e-mail и разрешить/запретить отправку 
 уведомлений
@@ -52,7 +52,7 @@ allow_url_fopen = on
 ; проверить - разрешена ли запись в сторонние каталоги. 
 ; Нужно разрешить запись в каталог с самим приложением TorrentMonitor 
 ; и каталог куда будут сохраняться *.torrent файлы для torrent клиента
-open_basedir = /tmp/:/path/to/folder/torrent_monitor/:/path/to/folder/torrent_watch/
+open_basedir = /tmp/:/path/to/folder/torrent_monitor/:/path/to/folder/torrent_client_watch/
 ```
 
 ###Обновление:
