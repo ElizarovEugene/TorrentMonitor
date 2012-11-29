@@ -253,7 +253,7 @@ class Database
     {
     	if ($tracker == 'lostfilm.tv' || $tracker == 'novafilm.tv')
     		$fields = '`hd`, `ep`';
-    	if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.ru')
+    	if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.ru' || $tracker == 'rutor.org')
     		$fields = '`torrent_id`';
     		
     	$stmt = Database::getInstance()->dbh->prepare("SELECT `name`, `timestamp`, ".$fields." FROM `torrent` WHERE `tracker` = :tracker ORDER BY `id`");
@@ -270,7 +270,7 @@ class Database
 					$resultArray[$i]['hd'] = $row['hd'];
 					$resultArray[$i]['ep'] = $row['ep'];
 				}
-				if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.ru')
+				if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.ru' || $tracker == 'rutor.org')
 					$resultArray[$i]['torrent_id'] = $row['torrent_id'];
 				$i++;
 			}
