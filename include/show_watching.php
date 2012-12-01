@@ -22,7 +22,7 @@ if ( ! empty($users))
 <table class="user-table">
     <thead>
         <tr>
-            <th>Скачать/Удалить</th>
+            <th>Скачать</th>
             <th>Раздел</th>
             <th>Тема</th>
             <th>Удалить</th>

@@ -11,7 +11,7 @@ class nnmclubSearch extends nnmclub
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
 		curl_setopt($ch, CURLOPT_HEADER, 1);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_URL, "http://nnm-club.ru/forum/tracker.php");
 		$header[] = "Host: nnm-club.ru\r\n";
@@ -32,7 +32,7 @@ class nnmclubSearch extends nnmclub
 		$page = nnmclubSearch::getSearchPage($user, nnmclub::$sess_cookie);
 		
 		preg_match_all('/<a class=\"gen\" href=\"tracker\.php\?f=\d{3,9}\">(.*)<\/a>/', $page, $section);
-		preg_match_all('/<a class=\"(genmed|leechmed) (topicpremod|topictitle)\" href=\"viewtopic\.php\?t=(\d{3,9})\"><b>(.*)<\/b><\/a>/', $page, $threme);
+		preg_match_all('/<a class=\"(genmed|leechmed|seedmed) (topicpremod|topictitle)\" href=\"viewtopic\.php\?t=(\d{3,9})\"><b>(.*)<\/b><\/a>/', $page, $threme);
 		
 		for ($i=0; $i<count($threme[1]); $i++)
 			Database::addThremeToBuffer($user_id, $section[1][$i], $threme[3][$i], $threme[4][$i], $tracker);
