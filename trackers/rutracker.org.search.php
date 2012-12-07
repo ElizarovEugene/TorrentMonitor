@@ -31,7 +31,7 @@ class rutrackerSearch extends rutracker
 		$user = iconv("utf-8", "windows-1251", $user);
 		$page = rutrackerSearch::getSearchPage($user, rutracker::$sess_cookie);
 
-		preg_match_all('/<a class=\"gen f\" href=\"tracker\.php\?f=\d{3,9}\">(.*)<\/a>/', $page, $section);
+		preg_match_all('/<a class=\"gen f\" href=\"tracker\.php\?f=\d{1,9}\">(.*)<\/a>/', $page, $section);
 		preg_match_all('/<a data-topic_id=\"\d{3,9}\" class=\"med tLink hl-tags bold\" href=\"\.\/viewtopic.php\?t=(\d{3,9})\">(.*)<\/a>/', $page, $threme);
 		
 		for ($i=0; $i<count($threme[1]); $i++)
