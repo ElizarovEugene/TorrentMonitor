@@ -345,9 +345,9 @@ class lostfilm
 									$download = FALSE;
 							}
 							elseif ($ep == NULL)
-								$download = FALSE;
-							else
 								$download = TRUE;
+							else
+								$download = FALSE;
 							
 							if ($download)
 							{
