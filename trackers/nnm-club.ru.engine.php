@@ -27,6 +27,7 @@ class nnmclub
 		curl_setopt($ch, CURLOPT_HEADER, 1); 
 		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_URL, "http://nnm-club.ru/forum/login.php");
 		curl_setopt($ch, CURLOPT_POSTFIELDS, "username={$login}&password={$password}&login=%C2%F5%EE%E4");
 		$result = curl_exec($ch);
@@ -146,7 +147,7 @@ class nnmclub
 					//если подходят - получаем куки
 					if (preg_match_all("/Set-Cookie: (.*);/iU", nnmclub::$page, $array))
 					{
-						nnmclub::$sess_cookie = $array[1][0]."; ".$array[1][3];
+						nnmclub::$sess_cookie = implode("; ", $array[1]);
 						//запускам процесс выполнения, т.к. не может работать без кук
 						nnmclub::$exucution = TRUE;
 					}
