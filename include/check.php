@@ -50,7 +50,7 @@ if (Sys::checkInternet())
 		<tr>			
 			<?php	
 			}
-			if (Sys::checkWriteToTorrentPath(__DIR__.'/'))
+			if (Sys::checkWriteToTorrentPath(__DIR__.'/../'))
 			{
 			?>
 		<tr>

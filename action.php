@@ -295,7 +295,8 @@ if (isset($_POST["action"]))
 	//Обновляем настройки
 	if ($_POST["action"] == "update_settings")
 	{
-		Database::updateSettings('path', $_POST["path"]);
+		$path = Sys::checkPath($_POST["path"]);   
+		Database::updateSettings('path', $path    );
 		Database::updateSettings('email', $_POST["email"]);
 		
 		if ( ! empty($_POST["send"]))

@@ -36,17 +36,20 @@ class Sys
 			return FALSE;
 	}
 	
-	public static function checkWriteToTorrentPath($path)
+	public static function checkPath($path)
 	{
 		if (substr($path, -1) == '/')
 			$path = $path;
 		else
 			$path = $path.'/';
-			
-		//грабли!? почему ! даёт true?
-		if (!file_put_contents($path.'file', ''))
+		return $path;
+	}
+	
+	public static function checkWriteToTorrentPath($path)
+	{
+		if (file_put_contents($path.'file.txt', ' '))
 		{
-			unlink($path.'file');
+			unlink($path.'file.txt');
 			return TRUE;
 		}
 		else
