@@ -143,7 +143,7 @@ class lostfilm
 	//функция проверки введёного названия
 	public static function checkRule($data)
 	{
-		if (preg_match("/^[\.\+\sa-zA-Z0-9]+$/", $data))
+		if (preg_match("/^[\.\+\s\'a-zA-Z0-9]+$/", $data))
 			return TRUE;
 		else
 			return FALSE;
