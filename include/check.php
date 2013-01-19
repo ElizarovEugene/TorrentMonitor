@@ -122,8 +122,8 @@ if (Sys::checkInternet())
 		<tr>
 				<?php	
 				}
-				$page = @file_get_contents('http://'.$tracker);
-				if (preg_match('/<title>(.+)<\/title>/', $page))
+				$headers = @get_headers('http://'.$tracker);
+				if(preg_match('/200/', $headers[0]) || preg_match('/200/', $headers[7]))
 				{
 				?>
 		<tr>
