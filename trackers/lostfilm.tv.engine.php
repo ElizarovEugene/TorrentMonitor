@@ -187,7 +187,7 @@ class lostfilm
 		{
 			if ($hd)
 			{
-				if (preg_match_all('/720p|HD/', $item->title, $matches))
+				if (preg_match_all('/720|HD/', $item->title, $matches))
 				{
 					preg_match('/\w\d{2}\.?\w\d{2}/', $item->link, $matches);
 					if (isset($matches[0]))
@@ -200,7 +200,7 @@ class lostfilm
 			}
 			else
 			{
-				if (preg_match_all('/^(?!(.*720p|.*HD))/', $item->link, $matches))
+				if (preg_match_all('/^(?!(.*720|.*HD))/', $item->link, $matches))
 				{
 					preg_match('/\w\d{2}\.?\w\d{2}/', $item->link, $matches);
 					if (isset($matches[0]))
