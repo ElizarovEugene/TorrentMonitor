@@ -616,7 +616,7 @@ class Database
 						DATE_FORMAT(`time`, '%d') as 'day',
 						DATE_FORMAT(`time`, '%m') as 'month', 
 						DATE_FORMAT(`time`, '%Y') as 'year', 
-						DATE_FORMAT(`time`, '%H:%i') as 'time'
+						DATE_FORMAT(`time`, '%H:%i') as 'hours'
 						FROM `warning` 
 						WHERE `where` = :tracker
 						ORDER BY `time` DESC");
@@ -632,7 +632,7 @@ class Database
 				$resultArray[$i]['day'] = $row['day'];
 				$resultArray[$i]['month'] = $row['month'];
 				$resultArray[$i]['year'] = $row['year'];
-				$resultArray[$i]['time'] = $row['time'];
+				$resultArray[$i]['time'] = $row['hours'];
 				$i++;
 			}
 			if ( ! empty($resultArray))
