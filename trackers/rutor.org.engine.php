@@ -88,7 +88,7 @@ class rutor
 			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
-				if (preg_match("/<tr><td class='header'>Добавлен<\/td><td>(.+)  \((.+) назад\)<\/td><\/tr>/", $page, $array))
+				if (preg_match("/<tr><td class=\"header\">Добавлен<\/td><td>(.+)  \((.+) назад\)<\/td><\/tr>/", $page, $array))
 				{
 					//проверяем удалось ли получить дату со страницы
 					if (isset($array[1]))
