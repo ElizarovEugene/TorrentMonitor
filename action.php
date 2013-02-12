@@ -126,7 +126,7 @@ if (isset($_POST["action"]))
 				if ($class::checkRule($_POST["name"]))
 				{
 					if ( ! empty($_POST["hd"]))
-						$hd = 1;
+						$hd = $_POST["hd"];
 					else 
 						$hd = 0;
 					if (Database::checkSerialExist($tracker, $_POST["name"], $hd))	

@@ -125,7 +125,13 @@ $("#serial_add").submit(function()
 		n_f = $form.find('input[name="name"]'),
 		n = $(n_f).val(),
 		h_f = $form.find('input[name="hd"]'),
-		h = $(h_f).attr('checked');
+                h=0;
+        for(var i = 0; i < h_f.length; i++) { 
+            if(h_f[i].checked) {
+                h = h_f[i].value;
+            }
+        }
+        if(h == 2 && t == 'novafilm.tv') h = 1;
 		
 	$(s).attr('disabled', 'disabled');
 	

@@ -31,8 +31,12 @@
         <span class="subinput-text">На английском языке<br/>Пример: House, Lie to me</span>
     </p>
     <p>
-        <label class="label-name"></label>
-        <label><input type="checkbox" name="hd"> HD качество</label>
+        <label class="label-name quality">Качество</label>
+        <span class="quality">
+             <input type="radio" name="hd" value="0"> SD качество<br/>
+             <input type="radio" name="hd" value="1"> HD качество<br/>
+             <input type="radio" name="hd" value="2"> HD MP4
+        </span>
     </p>
     <button class="form-button">Добавить</button>
 </form>

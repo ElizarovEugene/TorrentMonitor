@@ -1,6 +1,5 @@
-
 laststart.txt
-.DC_Store
 config.php
-
+torrent_monitor_error.log
 .DS_Store
+/nbproject
