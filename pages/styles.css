@@ -22,9 +22,9 @@ ol, ul,
 table { margin-bottom: 10px; }
 
     h1 { font-size: 22px; }
-    
+
     h2 { font-size: 18px; }
-    
+
     h3 {
         font-weight: bold;
         font-size: 14px;
@@ -39,9 +39,9 @@ ol,
 ul { list-style-position: outside; }
 
     ol { list-style-type: decimal; }
-    
+
     ul { list-style-type: disc; }
-    
+
         ul ul {
             margin: 0;
             list-style-type: circle;
@@ -58,7 +58,7 @@ sub,
 sup { font-size: 11px; }
 
     sub { vertical-align: sub; }
-    
+
     sup { vertical-align: super; }
 
 strong,
@@ -89,7 +89,7 @@ select {
 
     input[type="checkbox"],
     input[type="radio"] { vertical-align: bottom; }
-    
+
     button::-moz-focus-inner,
     input::-moz-focus-inner {
         padding: 0;
@@ -132,7 +132,7 @@ select {
         outline: none;
         resize: vertical;
         }
-    
+
     select {
         padding: 5px 6px 5px 7px;
         width: 316px;
@@ -155,15 +155,15 @@ body {
     font: 14px/18px Arial, Helvetica, sans-serif;
     cursor: default;
     }
-    
+
     html { overflow-y: scroll; }
-    
+
     html,
     body {
         width: 100%;
         height: 100%;
         }
-        
+
         #wrapper {
             margin: 0 auto;
             min-width: 1000px;
@@ -181,16 +181,16 @@ body {
     padding: 20px 20px 35px 0;
     height: 32px;
     }
-    
+
     .h-title {
         float: right;
         margin: 7px 0 0;
         color: #000;
         font-size: 24px;
         }
-    
+
     .h-menu { margin: 0; }
-        
+
         .h-menu li {
             position: relative;
             float: left;
@@ -201,11 +201,11 @@ body {
             list-style: none;
             text-transform: uppercase;
             }
-            
+
             .h-menu .active { width: 235px; }
-                
+
                 .h-menu .active a { background-color: #F1F4FD; }
-            
+
             .h-menu a {
                 display: block;
                 padding-left: 32px;
@@ -215,9 +215,9 @@ body {
                 text-decoration: none;
                 line-height: 32px;
                 }
-                
+
                 .h-menu a:hover { background-color: #F1F4FD; }
-                
+
                 .h-menu-item1,
                 .h-menu-item2,
                 .h-menu-item3,
@@ -229,7 +229,7 @@ body {
                     background-position: 4px 4px;
                     background-repeat: no-repeat;
                     }
-                    
+
                     .h-menu-item2 {    background-image: url(../img/icon2.png); }
                     .h-menu-item3 {    background-image: url(../img/icon3.png); }
                     .h-menu-item4 {    background-image: url(../img/icon4.png); }
@@ -245,22 +245,22 @@ body {
     padding: 0 20px 20px;
     min-height: 100px;
     }
-    
+
     table {
         margin-bottom: 20px;
         width: 100%;
         border: 1px #E2E6EF solid;
         color: #595959;
         }
-        
+
         thead {
             background: #89b1b9 url(../img/bg.png) 0 0 repeat;
             color: #FFF;
             }
-            
+
             thead a { color: #FFF !important; }
                 thead a:hover { text-decoration: none; }
-            
+
             .arr {
                 display: inline-block;
                 margin-top: 9px;
@@ -269,7 +269,7 @@ body {
                 font-size: 8px;
                 line-height: 0;
                 }
-            
+
             .icon-torrent {
                 display: inline-block;
                 margin-right: 15px;
@@ -281,18 +281,18 @@ body {
 				vertical-align: middle;
 				margin-top: -3px;
                 }
-            
+
             th,
             td {
                 padding: 5px;
                 vertical-align: middle;
                 text-align: center;
                 }
-        
+
             tr:nth-child(even) { background: #f1f4fd; }
-                
+
                 td { border-right: 1px #E2E6EF solid; }
-                    
+
                     .delete,
                     .add {
                         display: block;
@@ -301,34 +301,34 @@ body {
                         height: 18px;
                         background: url(../img/delete.png) 0 0 no-repeat;
                         }
-                        
+
                         .add { background: url(../img/add.png) 2px 2px no-repeat; }
-    
+
     .update {
         float: right;
         padding: 5px 10px;
         background: #89b1b9 url(../img/bg.png) 0 0 repeat;
         color: #FFF;
         }
-    
+
 	.user-torrent-del {
 		margin-bottom: -16px;
 		background: url(../img/delete_small.png) 0 0 no-repeat;
 		height: 14px;
 		width: 14px;
         }
-	
+
     .user-torrent {
         margin-bottom: 15px;
 		margin-left: 22px;
         padding-left: 20px;
         background: url(../img/plus.png) 0 2px no-repeat;
         }
-        
+
         .user-torrent.active { background-image: url(../img/minus.png); }
-    
+
     .user-table { display: none; }
-    
+
     .monitoring-title,
     .account-title,
     .settings-title {
@@ -339,19 +339,19 @@ body {
         text-transform: uppercase;
         font-size: 14px;
         }
-        
+
         .account-title { background: url(../img/edit.png) 0 0 no-repeat; }
-        
+
         .settings-title {
             padding: 0;
             background: none;
             }
-        
+
         .label-name {
             display: inline-block;
             width: 125px;
             }
-        
+
         .subinput-text {
             display: block;
             margin-left: 125px;
@@ -359,26 +359,26 @@ body {
             color: #999;
             font-size: 11px;
             }
-        
+
         .form-button { margin-left: 125px; }
-    
+
     .test {
         margin: auto;
         width: 600px;
         }
-        
+
         .test td {
             border: 0;
             background: #FFF;
             color: #7ea875;
             text-align: left;
             }
-            
+
             .test-error {
                 background: #c99785 !important;
                 color: #FFF !important;
                 }
-	
+
 	.enter {
 		margin: auto;
 		width: 450px;
@@ -441,6 +441,13 @@ div.cut_box {
 }
 
 div.result {
-	display: none; 
+	display: none;
+}
+
+span.quality {
+    display: inline-block;
+}
+label.quality {
+    vertical-align: top;
 }
 
