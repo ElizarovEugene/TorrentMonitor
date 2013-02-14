@@ -8,8 +8,11 @@
     <meta name="viewport" content="width=1000">
     <link rel="stylesheet" href="pages/styles.css">
     <!--[if lt IE 9]><script src="js/html5shiv-3.5.min.js"></script><![endif]-->
+    <script type="text/javascript">
+        function FocusOnInput() { document.getElementById("password").focus(); }
+    </script>
 </head>
-<body>
+<body onload="FocusOnInput()">
 <?php
 //Проверка обновления
 $dir = __DIR__.'/';
