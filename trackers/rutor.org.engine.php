@@ -33,7 +33,7 @@ class rutor
 	}
 
 	//получаем содержимое torrent файла
-	public static function getTorrent($threme, $sess_cookie, $where)
+	public static function getTorrent($threme, $sess_cookie)
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
@@ -44,7 +44,7 @@ class rutor
 		$result = curl_exec($ch);
 		curl_close($ch);
 
-		file_put_contents($where, $result);
+		return $result;
 	}
 
 	//функция проверки введёного URL`а
@@ -104,10 +104,11 @@ class rutor
 							//если даты не совпадают, перекачиваем торрент
 							if ($date != $timestamp)
 							{
+								$torrent = rutor::getTorrent($torrent_id, rutor::$sess_cookie);
 								//сохраняем торрент в файл
 								$path = Database::getSetting('path');
 								$file = $path.'[rutor.org]_'.$torrent_id.'.torrent';
-								rutor::getTorrent($torrent_id, rutor::$sess_cookie, $file);
+								file_put_contents($file, $torrent);
 								//обновляем время регистрации торрента в базе
 								Database::setNewDate($id, $date);
 								//отправляем уведомлении о новом торренте

@@ -57,7 +57,7 @@ class nnmclub
 	}
 	
 	//получаем содержимое torrent файла
-	public static function getTorrent($threme, $sess_cookie, $where)
+	public static function getTorrent($threme, $sess_cookie)
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_POST, 1);
@@ -73,7 +73,7 @@ class nnmclub
 		$result = curl_exec($ch);
 		curl_close($ch);
 		
-		file_put_contents($where, $result);
+		return $result;
 	}
 	
 	public static function checkRule($data)
@@ -209,11 +209,12 @@ class nnmclub
 								//если даты не совпадают, перекачиваем торрент
 								if ($date != $timestamp)
 								{
-									//сохраняем торрент в файл
 									$torrent_id = $link[1];
+									$torrent = nnmclub::getTorrent($torrent_id, nnmclub::$sess_cookie);
+									//сохраняем торрент в файл
 									$path = Database::getSetting('path');
 									$file = $path.'[nnm-club.ru]_'.$torrent_id.'.torrent';
-									nnmclub::getTorrent($torrent_id, nnmclub::$sess_cookie, $file);
+									file_put_contents($file, $torrent);
 									//обновляем время регистрации торрента в базе
 									Database::setNewDate($id, $date);
 									//отправляем уведомлении о новом торренте

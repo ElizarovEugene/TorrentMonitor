@@ -76,7 +76,7 @@ Content-Disposition: form-data; name=\"login\"
 	}
 	
 	//получаем содержимое torrent файла
-	private static function getTorrent($link, $sess_cookie, $where)
+	private static function getTorrent($link, $sess_cookie)
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_POST, 1);
@@ -91,7 +91,7 @@ Content-Disposition: form-data; name=\"login\"
 		$result = curl_exec($ch);
 		curl_close($ch);
 		
-		file_put_contents($where, $result);
+		return $result;
 	}
 	
 	public static function checkRule($data)
@@ -323,10 +323,11 @@ Content-Disposition: form-data; name=\"login\"
 						if ($download)
 						{
 							$amp = ($hd) ? 'HD' : NULL;
+							$torrent = novafilm::getTorrent($serial['link'], novafilm::$sess_cookie);
 							//сохраняем торрент в файл
 							$path = Database::getSetting('path');
 							$file = $path.'[novafilm.tv]_'.$name.'_'.$serial['episode'].'_'.$amp.'.torrent';
-							novafilm::getTorrent($serial['link'], novafilm::$sess_cookie, $file);
+							file_put_contents($file, $torrent);
 							//обновляем время регистрации торрента в базе
 							Database::setNewDate($id, $serial['date']);
 							//обновляем сведения о последнем эпизоде

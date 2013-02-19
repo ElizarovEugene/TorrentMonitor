@@ -43,10 +43,11 @@ class nnmclubSearch extends nnmclub
     		nnmclub::getCookie($tracker);
             for ($i=0; $i<count($toDownload); $i++)
             {
-                //сохраняем торрент в файл
+				$torrent = nnmclub::getTorrent($toDownload[$i]['threme_id'], nnmclub::$sess_cookie);
+				//сохраняем торрент в файл
 				$path = Database::getSetting('path');
 				$file = $path.'[nnm-club.ru]_'.$toDownload[$i]['threme_id'].'.torrent';
-				nnmclub::getTorrent($toDownload[$i]['threme_id'], nnmclub::$sess_cookie, $file);
+				file_put_contents($file, $torrent);
 				//обновляем время регистрации торрента в базе
 				Database::setDownloaded($toDownload[$i]['id']);
 				//отправляем уведомлении о новом торренте
