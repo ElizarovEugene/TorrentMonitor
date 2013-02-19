@@ -353,10 +353,9 @@ class lostfilm
 							{
 								$amp = ($hd) ? 'HD' : NULL;
 								$torrent = lostfilm::getTorrent($serial['link'], lostfilm::$sess_cookie);
-								//сохраняем торрент в файл
-								$path = Database::getSetting('path');
-								$file = $path.'[lostfilm.tv]_'.$name.'_'.$serial['episode'].'_'.$amp.'.torrent';
-								file_put_contents($file, $torrent);
+								$client = ClientAdapterFactory::getStorage('file');
+								$client->store($torrent, $id, $tracker, $name, $id, $timestamp,
+												array('filename' => '[lostfilm.tv]_'.$name.'_'.$serial['episode'].'_'.$amp.'.torrent'));
 								//обновляем время регистрации торрента в базе
 								Database::setNewDate($id, $serial['date']);
 								//обновляем сведения о последнем эпизоде

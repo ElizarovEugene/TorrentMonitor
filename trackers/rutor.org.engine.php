@@ -105,10 +105,8 @@ class rutor
 							if ($date != $timestamp)
 							{
 								$torrent = rutor::getTorrent($torrent_id, rutor::$sess_cookie);
-								//сохраняем торрент в файл
-								$path = Database::getSetting('path');
-								$file = $path.'[rutor.org]_'.$torrent_id.'.torrent';
-								file_put_contents($file, $torrent);
+								$client = ClientAdapterFactory::getStorage('file');
+								$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
 								//обновляем время регистрации торрента в базе
 								Database::setNewDate($id, $date);
 								//отправляем уведомлении о новом торренте

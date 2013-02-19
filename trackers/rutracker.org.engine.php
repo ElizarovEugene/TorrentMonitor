@@ -200,9 +200,8 @@ class rutracker
 							{
 								//сохраняем торрент в файл
 								$torrent = rutracker::getTorrent($torrent_id, rutracker::$sess_cookie);
-								$path = Database::getSetting('path');
-								$file = $path.'[rutracker.org]_'.$torrent_id.'.torrent';
-								file_put_contents($file, $torrent);
+								$client = ClientAdapterFactory::getStorage('file');
+								$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
 								//обновляем время регистрации торрента в базе
 								Database::setNewDate($id, $date);
 								//отправляем уведомлении о новом торренте

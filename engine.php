@@ -8,6 +8,7 @@ include_once $dir.'class/System.class.php';
 include_once $dir.'class/Database.class.php';
 include_once $dir.'class/Errors.class.php';
 include_once $dir.'class/Notification.class.php';
+include_once $dir.'adapters/ClientAdapterFactory.class.php';
 
 if (Sys::checkConfig())
 {

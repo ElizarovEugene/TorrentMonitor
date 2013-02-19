@@ -324,10 +324,9 @@ Content-Disposition: form-data; name=\"login\"
 						{
 							$amp = ($hd) ? 'HD' : NULL;
 							$torrent = novafilm::getTorrent($serial['link'], novafilm::$sess_cookie);
-							//сохраняем торрент в файл
-							$path = Database::getSetting('path');
-							$file = $path.'[novafilm.tv]_'.$name.'_'.$serial['episode'].'_'.$amp.'.torrent';
-							file_put_contents($file, $torrent);
+							$client = ClientAdapterFactory::getStorage('file');
+							$client->store($torrent, $id, $tracker, $name, $id, $timestamp,
+											array('filename' => '[novafilm.tv]_'.$name.'_'.$serial['episode'].'_'.$amp.'.torrent'));
 							//обновляем время регистрации торрента в базе
 							Database::setNewDate($id, $serial['date']);
 							//обновляем сведения о последнем эпизоде
