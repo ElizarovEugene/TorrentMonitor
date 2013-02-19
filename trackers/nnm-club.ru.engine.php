@@ -88,8 +88,8 @@ class nnmclub
 	public static function getTitle($torrent_id)
 	{
 		//получаем страницу для парсинга
-		$page = nnmclub::getContent($torrent_id);
 		
+		$page = nnmclub::getContent($torrent_id, nnmclub::$sess_cookie);
 		//ищем на странице дату регистрации торрента
 		if (preg_match("/<title>(.+)<\/title>/", $page, $array))
 			$name = str_replace(" :: NNM-Club.ru", "", $array[1]);
