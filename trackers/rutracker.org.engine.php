@@ -54,7 +54,7 @@ class rutracker
 	}
 	
 	//получаем содержимое torrent файла
-	public static function getTorrent($threme, $sess_cookie, $where)
+	public static function getTorrent($threme, $sess_cookie)
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_POST, 1);
@@ -68,7 +68,7 @@ class rutracker
 		$result = curl_exec($ch);
 		curl_close($ch);
 		
-		file_put_contents($where, $result);
+		return $result;
 	}
 	
 	//функция проверки введёного URL`а
@@ -199,9 +199,9 @@ class rutracker
 							if ($date != $timestamp)
 							{
 								//сохраняем торрент в файл
-								$path = Database::getSetting('path');
-								$file = $path.'[rutracker.org]_'.$torrent_id.'.torrent';
-								rutracker::getTorrent($torrent_id, rutracker::$sess_cookie, $file);
+								$torrent = rutracker::getTorrent($torrent_id, rutracker::$sess_cookie);
+								$client = ClientAdapterFactory::getStorage('file');
+								$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
 								//обновляем время регистрации торрента в базе
 								Database::setNewDate($id, $date);
 								//отправляем уведомлении о новом торренте

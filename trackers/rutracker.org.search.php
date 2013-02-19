@@ -43,10 +43,10 @@ class rutrackerSearch extends rutracker
     		rutracker::getCookie($tracker);
             for ($i=0; $i<count($toDownload); $i++)
             {
-                //сохраняем торрент в файл
-				$path = Database::getSetting('path');
-				$file = $path.'[rutracker.org]_'.$toDownload[$i]['threme_id'].'.torrent';
-				rutracker::getTorrent($toDownload[$i]['threme_id'], rutracker::$sess_cookie, $file);
+				//сохраняем торрент в файл
+				$torrent = rutracker::getTorrent($toDownload[$i]['threme_id'], rutracker::$sess_cookie);
+				$client = ClientAdapterFactory::getStorage('file');
+				$client->store($torrent, $user_id, $tracker, $toDownload[$i]['threme'], $toDownload[$i]['threme_id'], time());
 				//обновляем время регистрации торрента в базе
 				Database::setDownloaded($toDownload[$i]['id']);
 				//отправляем уведомлении о новом торренте
