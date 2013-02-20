@@ -33,7 +33,7 @@ class rutrackerSearch extends rutracker
 
 		preg_match_all('/<a class=\"gen f\" href=\"tracker\.php\?f=\d{1,9}\">(.*)<\/a>/', $page, $section);
 		preg_match_all('/<a data-topic_id=\"\d{3,9}\" class=\"med tLink hl-tags bold\" href=\"\.\/viewtopic.php\?t=(\d{3,9})\">(.*)<\/a>/', $page, $threme);
-		
+
 		for ($i=0; $i<count($threme[1]); $i++)
 			Database::addThremeToBuffer($user_id, $section[1][$i], $threme[1][$i], $threme[2][$i], $tracker);
 
@@ -44,9 +44,9 @@ class rutrackerSearch extends rutracker
             for ($i=0; $i<count($toDownload); $i++)
             {
                 //сохраняем торрент в файл
-				$path = Database::getSetting('path');
-				$file = $path.'[rutracker.org]_'.$toDownload[$i]['threme_id'].'.torrent';
-				rutracker::getTorrent($toDownload[$i]['threme_id'], rutracker::$sess_cookie, $file);
+				$torrent = rutracker::getTorrent($toDownload[$i]['threme_id'], rutracker::$sess_cookie);
+				$client = ClientAdapterFactory::getStorage('file');
+				$client->store($torrent, $id, $tracker, $name, $id, time());				
 				//обновляем время регистрации торрента в базе
 				Database::setDownloaded($toDownload[$i]['id']);
 				//отправляем уведомлении о новом торренте

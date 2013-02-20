@@ -57,7 +57,7 @@ class nnmclub
 	}
 	
 	//получаем содержимое torrent файла
-	public static function getTorrent($threme, $sess_cookie, $where)
+	public static function getTorrent($threme, $sess_cookie)
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_POST, 1);
@@ -73,7 +73,7 @@ class nnmclub
 		$result = curl_exec($ch);
 		curl_close($ch);
 		
-		file_put_contents($where, $result);
+		return $result;
 	}
 	
 	public static function checkRule($data)
@@ -82,20 +82,6 @@ class nnmclub
 			return FALSE;
 		else
 			return TRUE;
-	}
-	
-	//функция получения заголовка страницы
-	public static function getTitle($torrent_id)
-	{
-		//получаем страницу для парсинга
-		$page = nnmclub::getContent($torrent_id);
-		
-		//ищем на странице дату регистрации торрента
-		if (preg_match("/<title>(.+)<\/title>/", $page, $array))
-			$name = str_replace(" :: NNM-Club.ru", "", $array[1]);
-		else
-			$name = "Неизвестно";
-		return $name;
 	}
 	
 	private static function dateStringToNum($data)
@@ -211,9 +197,9 @@ class nnmclub
 								{
 									//сохраняем торрент в файл
 									$torrent_id = $link[1];
-									$path = Database::getSetting('path');
-									$file = $path.'[nnm-club.ru]_'.$torrent_id.'.torrent';
-									nnmclub::getTorrent($torrent_id, nnmclub::$sess_cookie, $file);
+									$torrent = nnmclub::getTorrent($torrent_id, nnmclub::$sess_cookie);
+									$client = ClientAdapterFactory::getStorage('file');
+									$client->store($torrent, $id, $tracker, $name, $id, $timestamp);
 									//обновляем время регистрации торрента в базе
 									Database::setNewDate($id, $date);
 									//отправляем уведомлении о новом торренте

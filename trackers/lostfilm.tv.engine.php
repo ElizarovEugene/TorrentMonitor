@@ -122,7 +122,7 @@ class lostfilm
 	}
 	
 	//получаем содержимое torrent файла
-	private static function getTorrent($link, $sess_cookie, $where)
+	private static function getTorrent($link, $sess_cookie)
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_POST, 1);
@@ -137,7 +137,7 @@ class lostfilm
 		$result = curl_exec($ch);
 		curl_close($ch);
 		
-		file_put_contents($where, $result);
+		return $result;
 	}
 	
 	//функция проверки введёного названия
@@ -351,11 +351,12 @@ class lostfilm
 							
 							if ($download)
 							{
+								$torrent = lostfilm::getTorrent($serial['link'], lostfilm::$sess_cookie);
 								$amp = ($hd) ? 'HD' : NULL;
+								$file = '[lostfilm.tv]_'.$name.'_'.$serial['episode'].'_'.$amp.'.torrent';
 								//сохраняем торрент в файл
-								$path = Database::getSetting('path');
-								$file = $path.'[lostfilm.tv]_'.$name.'_'.$serial['episode'].'_'.$amp.'.torrent';
-								lostfilm::getTorrent($serial['link'], lostfilm::$sess_cookie, $file);
+								$client = ClientAdapterFactory::getStorage('file');
+								$client->store($torrent, $id, $tracker, $name, $id, $timestamp, array('filename' => $file));
 								//обновляем время регистрации торрента в базе
 								Database::setNewDate($id, $serial['date']);
 								//обновляем сведения о последнем эпизоде
