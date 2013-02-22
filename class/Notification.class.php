@@ -8,12 +8,12 @@ class Notification
     {
     	$this->headers = "From: TorrentMonitor 0.6\r\n";
 		$this->headers .= "MIME-Version: 1.0\r\n";
-		$this->headers .= "Content-type: text/html; charset=utf-8\r\n"; 	
+		$this->headers .= "Content-type: text/html; charset=utf-8\r\n";
     }
     
     public static function getInstance()
     {
-        if (!isset(self::$instance))
+        if ( ! isset(self::$instance))
         {
             $object = __CLASS__;
             self::$instance = new $object;
@@ -35,25 +35,31 @@ class Notification
     	}
 	}
 	
+	public static function send($settingEmail, $date, $tracker, $message, $header_message)
+	{
+		$msg = "Дата: {$date}\nТрекер: {$tracker}\nСообщение: {$message}";
+		mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor 2: ".$header_message).'?=', $msg, self::$headers);		
+	}
+	
 	public static function sendNotification($type, $date, $tracker, $message)
 	{
 		if ($type == 'warning')
 			$header_message = 'Предупреждение.';
 		if ($type == 'notification')
 			$header_message = 'Обновление.';
-			
-		$sendWarning = Database::getSetting('send_warning');
+
 		$settingEmail = Database::getSetting('email');
-		
 		if ( ! empty($settingEmail))
 		{
-			if (Database::getSetting('send'))
+			if ($type == 'warning')
 			{
-				if ($type == 'warning' && $sendWarning == FALSE) {}
-				else 
-				{
-					mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor 2: ".$header_message).'?=', "Дата: {$date}\nТрекер: {$tracker}\nСообщение: {$message}", self::$headers);
-				}
+				if (Database::getSetting('send_warning'))
+					Notification::send($settingEmail, $date, $tracker, $message, $header_message);
+			}
+			if ($type == 'notification')
+			{
+				if (Database::getSetting('send'))
+					Notification::send($settingEmail, $date, $tracker, $message, $header_message);
 			}
 		}
 	}
