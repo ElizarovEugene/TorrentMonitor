@@ -122,6 +122,7 @@ if (Sys::checkInternet())
 		<tr>
 				<?php	
 				}
+				ini_set('default_socket_timeout', 15);
 				$headers = @get_headers('http://'.$tracker);
 				if(preg_match('/200/', $headers[0]) || preg_match('/200/', $headers[7]))
 				{
