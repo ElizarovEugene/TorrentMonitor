@@ -25,12 +25,13 @@ window.onload = function(){
             <li id="show_warnings"><a href="#" onclick="show('show_warnings')" class="h-menu-item6">Ошибки
             <?php
             $errors = Database::getWarningsCount();
-            $count = 0;
+            
             if ( ! empty($errors))
             {
+                $count = 0;
                 for ($i=0; $i<count($errors); $i++)
-                    $count =+ $errors[$i]['count'];
-                
+                    $count += $errors[$i]['count'];
+
                 if ($count > 0)
                     echo ' ('.$count.')';
             }
