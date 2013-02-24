@@ -25,7 +25,7 @@
 
 * Веб-сервер (Apache, nginx, lighttpd)
 * PHP (5.2 или выше) с поддержкой cURL и PDO
-* MySQL
+* MySQL, PostgreSQL
 
 ###Установка:
 
