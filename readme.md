@@ -25,13 +25,40 @@
 
 * Веб-сервер (Apache, nginx, lighttpd)
 * PHP (5.2 или выше) с поддержкой cURL и PDO
-* MySQL, PostgreSQL
+* MySQL, PostgreSQL, SQLite
 
 ###Установка:
 
 * Импортировать дамп базы из директории db_schema в зависимости от используемой БД - *.sql
 * Перенести все файлы в папку на вашем сервере (например /path/to/folder/torrent_monitor/)
 * Внести изменения в config.php и указать данные для доступа к БД
+
+Для MySQL:
+```
+Config::write('db.host', 'localhost');
+Config::write('db.type', 'mysql');
+Config::write('db.charset', 'utf8');
+Config::write('db.port', '3306');
+Config::write('db.basename', 'torrentmonitor');
+Config::write('db.user', 'torrentmonitor');
+Config::write('db.password', 'torrentmonitor');
+```
+Для PostgreSQL:
+```
+Config::write('db.host', 'localhost');
+Config::write('db.type', 'pgsql');
+Config::write('db.port', '5432');
+Config::write('db.basename', 'torrentmonitor');
+Config::write('db.user', 'torrentmonitor');
+Config::write('db.password', 'torrentmonitor');
+```
+Для SQLite:
+```
+Config::write('db.type', 'sqlite');
+Config::write('db.basename', '/var/www/htdocs/TorrentMonitor/torrentmonitor.sqlite'); #Указывайте _абсолютный_ путь до файла с базой и не забудьте выставить на него верные права доступа.
+```
+
+
 * Добавить в cron engine.php ( *проверьте права на запись в каталог /path/to/log/* )
 
 ```

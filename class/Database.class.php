@@ -16,6 +16,14 @@ class Database
                 $password = Config::read('db.password');
                 $options = array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES ".Config::read('db.charset'));
                 break;
+			case 'sqlite':
+				$dsn = "sqlite:".Config::read('db.basename');
+				$options = array(PDO::ATTR_PERSISTENT => true);
+				break;
+			case 'sqlite2':
+				$dsn = "sqlite2:".Config::read('db.basename');
+				$options = array(PDO::ATTR_PERSISTENT => true);
+				break;
             case 'pgsql':
                 $dsn = "pgsql:host=".Config::read('db.host').";port=".Config::read('db.port').";dbname=".Config::read('db.basename').";user=".Config::read('db.user').";password=".Config::read('db.password');
                 break;
@@ -24,7 +32,9 @@ class Database
         try {
             if ($this->dbType == 'pgsql')
                $this->dbh = new PDO($dsn);
-            else
+            elseif ($this->dbType == 'sqlite')
+               $this->dbh = new PDO($dsn, NULL, NULL, $options);
+            elseif ($this->dbType == 'mysql')
                $this->dbh = new PDO($dsn, $username, $password, $options);
         } catch (PDOException $e) {
             print 'Error!: '.$e->getMessage().'<br/>';
@@ -253,7 +263,7 @@ class Database
                             FROM torrent 
                             ORDER BY tracker, name");
         }
-        else
+        elseif (Database::getDbType() == 'mysql')
         {
             $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `tracker`, `name`, `hd`, `torrent_id`, `ep`, `timestamp`, 
                             DATE_FORMAT(`timestamp`, '%d') AS `day`, 
@@ -262,6 +272,16 @@ class Database
                             DATE_FORMAT(`timestamp`, '%T') AS `time` 
                             FROM `torrent` 
                             ORDER BY tracker, name");
+        }
+        elseif (Database::getDbType() == 'sqlite')
+        {
+            $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `tracker`, `name`, `hd`, `torrent_id`, `ep`, `timestamp`, 
+                            strftime('%d', `timestamp`) AS `day`, 
+                            strftime('%m', `timestamp`) AS `month`, 
+                            strftime('%Y', `timestamp`) AS `year`, 
+                            strftime('%H:%M', `timestamp`) AS `time` 
+                            FROM `torrent` 
+                            ORDER BY tracker, name");    		
         }
         if ($stmt->execute())
         {
@@ -725,13 +745,24 @@ class Database
                             WHERE \"where\" = :tracker
                             ORDER BY time DESC");
         }
-        else
+        elseif (Database::getDbType() == 'mysql')
         {
             $stmt = Database::getInstance()->dbh->prepare("SELECT `time`, `reason`, `where`,
                             DATE_FORMAT(`time`, '%d') as 'day',
                             DATE_FORMAT(`time`, '%m') as 'month', 
                             DATE_FORMAT(`time`, '%Y') as 'year', 
                             DATE_FORMAT(`time`, '%H:%i') as 'hours'
+                            FROM `warning` 
+                            WHERE `where` = :tracker
+                            ORDER BY `time` DESC");
+        }
+        elseif (Database::getDbType() == 'sqlite')
+        {
+            $stmt = Database::getInstance()->dbh->prepare("SELECT `time`, `reason`, `where`,
+                            strftime('%d', `time`) as 'day',
+                            strftime('%m', `time`) as 'month', 
+                            strftime('%Y', `time`) as 'year', 
+                            strftime('%H:%M', `time`) as 'hours'
                             FROM `warning` 
                             WHERE `where` = :tracker
                             ORDER BY `time` DESC");
