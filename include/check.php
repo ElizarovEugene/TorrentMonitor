@@ -1,5 +1,5 @@
 <?php 
-$dir = __DIR__."/../";
+$dir = dirname(__FILE__)."/../";
 include_once $dir."class/System.class.php";
 ?>
 <table class="test">
@@ -124,7 +124,7 @@ if (Sys::checkInternet())
 				}
 				ini_set('default_socket_timeout', 15);
 				$headers = @get_headers('http://'.$tracker);
-				if(preg_match('/200/', $headers[0]) || preg_match('/200/', $headers[7]))
+				if(@preg_match('/200/', $headers[0]) || @preg_match('/200/', $headers[7]))
 				{
 				?>
 		<tr>

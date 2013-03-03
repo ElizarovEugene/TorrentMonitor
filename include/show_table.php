@@ -1,5 +1,5 @@
 <?php
-$dir = __DIR__."/../";
+$dir = dirname(__FILE__)."/../";
 include_once $dir."config.php";
 include_once $dir."class/System.class.php";
 include_once $dir."class/Database.class.php";
@@ -69,7 +69,8 @@ if ( ! empty($torrents_list))
     		</td>
             <td>
             <?php
-            if ($timestamp != "0000-00-00 00:00:00")
+            if ($timestamp == "0000-00-00 00:00:00" || $timestamp == NULL) {}
+            else
             {
             	if ($tracker != "rutracker.org" && $tracker != "nnm-club.ru" && $tracker != "rutor.org")
             	{
