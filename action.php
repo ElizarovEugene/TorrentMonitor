@@ -62,7 +62,6 @@ if (isset($_POST["action"]))
 					{
 						if (Database::checkThremExist($tracker, $threme))
 						{
-						  
 							if ( ! empty($_POST["name"]))
 								$name = $_POST["name"];
 							else

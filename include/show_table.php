@@ -48,7 +48,7 @@ if ( ! empty($torrents_list))
             <td class="text-align-left"><span class="icon-torrent" style="background-image: url(img/<?php echo $tracker ?>.ico);"></span><?php echo $tracker ?></td>
             <td class="text-align-left">
     	  	<?php 
-    		if ($tracker == "rutracker.org" || $tracker == "nnm-club.ru")
+    		if ($tracker == "rutracker.org" || $tracker == "nnm-club.ru" || $tracker == "tfile.me")
     		{
     		?>
 				<a href="http://www.<?php echo $tracker ?>/forum/viewtopic.php?t=<?php echo $torrent_id ?>" target="_blank"><?php echo $name ?></a>
