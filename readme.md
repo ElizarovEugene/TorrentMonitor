@@ -21,7 +21,6 @@
 ![Screenshot6](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый5.png "Screenshot6")
 ![Screenshot7](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый6.png "Screenshot7")
 
-
 ###Требования для установки:
 
 * Веб-сервер (Apache, nginx, lighttpd)
@@ -59,7 +58,6 @@ Config::write('db.type', 'sqlite');
 Config::write('db.basename', '/var/www/htdocs/TorrentMonitor/torrentmonitor.sqlite'); #Указывайте _абсолютный_ путь до файла с базой и не забудьте выставить на него верные права доступа.
 ```
 
-
 * Добавить в cron engine.php ( *проверьте права на запись в каталог /path/to/log/* )
 
 ```
@@ -71,7 +69,6 @@ Config::write('db.basename', '/var/www/htdocs/TorrentMonitor/torrentmonitor.sqli
 уведомлений
 * Добавить торренты для мониторинга
 * Перейти на вкладку «Тест» и проверить — всё ли верно работает
-
 
 ###Настройки:
 

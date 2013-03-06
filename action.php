@@ -124,13 +124,9 @@ if (isset($_POST["action"]))
 				$class = str_replace('-', '', $class);
 				if (call_user_func(array($class, 'checkRule'), $_POST["name"]))
 				{
-					if ( ! empty($_POST["hd"]))
-						$hd = 1;
-					else 
-						$hd = 0;
-					if (Database::checkSerialExist($tracker, $_POST["name"], $hd))	
+					if (Database::checkSerialExist($tracker, $_POST["name"], $_POST["hd"]))	
 					{
-						Database::setSerial($tracker, $_POST["name"], $hd);
+						Database::setSerial($tracker, $_POST["name"], $_POST["hd"]);
 						?>
 						Сериал добавлен для мониторинга.
 						<?php

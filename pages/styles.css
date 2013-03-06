@@ -444,3 +444,6 @@ div.result {
 	display: none; 
 }
 
+span.quality {
+	display: inline-block;
+}

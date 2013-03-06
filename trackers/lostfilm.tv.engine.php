@@ -180,36 +180,37 @@ class lostfilm
 		return $date;
 	}
 	
+	//функция анализа эпизода
+	private static function analysisEpisode($item)
+	{
+		preg_match('/\w\d{2}\.?\w\d{2}/', $item->link, $matches);
+		if (isset($matches[0]))
+		{
+			$episode = $matches[0];
+			$date = lostfilm::dateStringToNum($item->pubDate);
+			return array('episode'=>$episode, 'date'=>$date, 'link'=>(string)$item->link);
+		}
+	}
+	
 	//функция анализа xml ленты
 	private static function analysis($name, $hd, $item)
 	{
 		if (preg_match('/\b'.$name.'\b/i', $item->title))
 		{
-			if ($hd)
+			if ($hd == 1)
 			{
 				if (preg_match_all('/720|HD/', $item->title, $matches))
-				{
-					preg_match('/\w\d{2}\.?\w\d{2}/', $item->link, $matches);
-					if (isset($matches[0]))
-					{
-						$episode = $matches[0];
-						$date = lostfilm::dateStringToNum($item->pubDate);
-						return array('episode'=>$episode, 'date'=>$date, 'link'=>(string)$item->link);
-					}
-				}
+					return lostfilm::analysisEpisode($item);
+			}
+			elseif ($hd == 2)
+			{
+				if (preg_match_all('/MP4/', $item->title, $matches))
+					return lostfilm::analysisEpisode($item);
 			}
 			else
 			{
 				if (preg_match_all('/^(?!(.*720|.*HD))/', $item->link, $matches))
-				{
-					preg_match('/\w\d{2}\.?\w\d{2}/', $item->link, $matches);
-					if (isset($matches[0]))
-					{
-						$episode = $matches[0];
-						$date = lostfilm::dateStringToNum($item->pubDate);
-						return array('episode'=>$episode, 'date'=>$date, 'link'=>(string)$item->link);
-					}
-				}
+					return lostfilm::analysisEpisode($item);
 			}
 		}
 	}
@@ -352,7 +353,12 @@ class lostfilm
 							if ($download)
 							{
 								$torrent = lostfilm::getTorrent($serial['link'], lostfilm::$sess_cookie);
-								$amp = ($hd) ? 'HD' : NULL;
+								if ($hd == 1)
+									$amp = 'HD';
+								elseif ($hd == 2)
+									$amp = 'MP4';
+								else
+									$amp = NULL;
 								$file = '[lostfilm.tv]_'.$name.'_'.$serial['episode'].'_'.$amp.'.torrent';
 								//сохраняем торрент в файл
 								$client = ClientAdapterFactory::getStorage('file');

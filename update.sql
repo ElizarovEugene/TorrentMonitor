@@ -1,1 +1,0 @@
-INSERT INTO credentials (id, tracker, log, pass) VALUES ('6', 'tfile.me', ' ', ' ')

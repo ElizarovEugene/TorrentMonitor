@@ -14,8 +14,6 @@ if (Sys::checkConfig())
 {
 	if (Sys::checkCurl())
 	{
-		Sys::lastStart();
-	
 		$torrentsList = Database::getTorrentsList('name');
 		$count = count($torrentsList);
 		
@@ -83,6 +81,8 @@ if (Sys::checkConfig())
 			else
 				Errors::setWarnings('system', 'credential_miss');
 		}
+		
+		Sys::lastStart();
 	}	
 	else
 		Errors::setWarnings('system', 'curl');

@@ -124,11 +124,30 @@ $("#serial_add").submit(function()
 		t = $form.find('select[name="tracker"]').val(),
 		n_f = $form.find('input[name="name"]'),
 		n = $(n_f).val(),
-		h_f = $form.find('input[name="hd"]'),
-		h = $(h_f).attr('checked');
+		h_f = $form.find('input[name="hd"]');
 		
+		if (t == 'novafilm.tv')
+		{
+			h = $(h_f).attr('checked');
+			if (h == 'checked')
+				var $form = $(this), h = 1;
+			else
+				var $form = $(this), h = 0;
+		}
+		if (t == 'lostfilm.tv')
+		{
+			h = $(h_f).val();
+			for (var i = 0; i < h_f.length; i++)
+			{
+				if (h_f[i].checked)
+				{
+					var $form = $(this), h = h_f[i].value
+				}
+			}
+		}
+
 	$(s).attr('disabled', 'disabled');
-	
+
 	if (t != '' && n != '') 
 	{
 		$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
@@ -416,4 +435,14 @@ function changefunc()
 			var d = "none";
 		document.getElementById(e + "_label").style.display = d;
 	}
+}
+
+//Меняем checkbox на radiobutton
+function changeField()
+{
+	var tracker = document.getElementById("tracker").value;
+	if (tracker == 'lostfilm.tv')
+		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD качество<br/><input type="radio" name="hd" value="1"> HD качество<br/><input type="radio" name="hd" value="2"> HD MP4</span>');
+	if (tracker == 'novafilm.tv')
+		$('#changedField').empty().append('<input type="checkbox" name="hd"> HD качество</label>');
 }

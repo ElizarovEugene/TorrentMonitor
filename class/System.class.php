@@ -58,7 +58,7 @@ class Sys
 	
 	public static function version()
 	{
-		return '0.7.4';
+		return '0.7.5';
 	}
 
 	public static function checkUpdate()

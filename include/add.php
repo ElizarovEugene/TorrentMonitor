@@ -19,10 +19,10 @@
 <form id="serial_add">
     <p>
         <label class="label-name">Трекер</label>
-        <select name="tracker">
+        <select id="tracker" name="tracker" onchange="changeField()">
             <option></option>
-            <option>lostfilm.tv</option>
-            <option>novafilm.tv</option>
+            <option value="lostfilm.tv">lostfilm.tv</option>
+            <option value="novafilm.tv">novafilm.tv</option>
         </select>
     </p>
     <p>
@@ -32,7 +32,7 @@
     </p>
     <p>
         <label class="label-name"></label>
-        <label><input type="checkbox" name="hd"> HD качество</label>
+        <label id="changedField"></label>
     </p>
     <button class="form-button">Добавить</button>
 </form>

@@ -22,6 +22,7 @@ INSERT INTO "credentials" VALUES (2, 'nnm-club.ru', '', '');
 INSERT INTO "credentials" VALUES (3, 'lostfilm.tv', '', '');
 INSERT INTO "credentials" VALUES (4, 'novafilm.tv', '', '');
 INSERT INTO "credentials" VALUES (5, 'rutor.org', ' ', ' ');
+INSERT INTO "credentials" VALUES (6, 'tfile.me', ' ', ' ');
 
 CREATE TABLE `settings` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,

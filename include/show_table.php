@@ -62,9 +62,11 @@ if ( ! empty($torrents_list))
     		}
     		else
     			echo $name;
-    		
-    		if ($hd)
+
+    		if ($hd == 1)
     			echo '&nbsp;(HD)';
+    		if ($hd == 2)
+    			echo '&nbsp;(MP4)';
     		?>
     		</td>
             <td>
