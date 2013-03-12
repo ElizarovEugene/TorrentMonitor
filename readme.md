@@ -10,8 +10,8 @@
 * Слежение за темами на tfile.me
 * Слежение за релизерами на nnm-club.ru
 * Слежение за релизерами на rutracker.org
-* Поиск новых серий на lostfilm.tv
-* Поиск новых серий на novafilm.tv
+* Поиск новых серий на lostfilm.tv (SD/HD/MP4 версии на выбор)
+* Поиск новых серий на novafilm.tv (SD/HD версии на выбор)
 
 ###Скриншоты:
 ![Screenshot1](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый11.png "Screenshot1")
