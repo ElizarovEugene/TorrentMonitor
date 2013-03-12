@@ -1,1 +1,1 @@
-INSERT INTO credentials VALUES (6, 'tfile.me', ' ', ' ');
+INSERT INTO credentials VALUES (7, 'kinozal.tv', '', '');

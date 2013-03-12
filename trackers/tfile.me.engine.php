@@ -42,7 +42,6 @@ class tfile
 		curl_setopt($ch, CURLOPT_REFERER, "http://tfile.me/forum/viewtopic.php?t={$threme}");
 		$result = curl_exec($ch);
 		curl_close($ch);
-		echo "http://tfile.me/forum/download.php?id={$threme}&uk=1111111111";
 
 		return $result;
 	}

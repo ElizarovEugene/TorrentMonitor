@@ -36,7 +36,7 @@ if (Sys::checkConfig())
 					{
     				    call_user_func($functionClass .'::main', $torrentsList[$i]['id'], $tracker, $torrentsList[$i]['name'], $torrentsList[$i]['hd'], $torrentsList[$i]['ep'], $torrentsList[$i]['timestamp']);
 					}
-					if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.ru' || $tracker == 'rutor.org' || $tracker == 'tfile.me')
+					if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.ru' || $tracker == 'rutor.org' || $tracker == 'tfile.me' || $tracker == 'kinozal.tv')
 					{
     					call_user_func($functionClass .'::main', $torrentsList[$i]['id'], $tracker, $torrentsList[$i]['name'], $torrentsList[$i]['torrent_id'], $torrentsList[$i]['timestamp']);
 					}
