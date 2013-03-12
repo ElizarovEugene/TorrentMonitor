@@ -28,9 +28,9 @@ if ( ! empty($torrents_list))
 <table>
     <thead>
         <tr>
-            <th>Трекер</th> <!--<span class="arr">▲</span>-->
-            <th>Название</th>
-            <th>Последнее обновление</th>
+            <th>Трекер</th>
+            <th>Название &nbsp;&nbsp;&nbsp;<span class="arr"><a href="action.php?action=order&order=name">▲</a></span></th>
+            <th>Последнее обновление &nbsp;&nbsp;&nbsp;<span class="arr"><a href="action.php?action=order&order=date">▲</a></span></th>
             <th>Действие</th>
         </tr>
     </thead>

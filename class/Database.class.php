@@ -253,6 +253,11 @@ class Database
     
     public static function getTorrentsList($order)
     {
+    	if ($order == 'date')
+    		$order = 'timestamp';
+    	else
+    		$order = 'tracker, name';
+    		
         if (Database::getDbType() == 'pgsql')
         {
             $stmt = Database::getInstance()->dbh->prepare("SELECT id, tracker, name, hd, torrent_id, ep, timestamp, 
@@ -261,7 +266,7 @@ class Database
                             to_char(timestamp, 'YYYY') AS year,
                             to_char(timestamp, 'HH24:MI:SS') AS time
                             FROM torrent 
-                            ORDER BY tracker, name");
+                            ORDER BY {$order}");
         }
         elseif (Database::getDbType() == 'mysql')
         {
@@ -271,7 +276,7 @@ class Database
                             DATE_FORMAT(`timestamp`, '%Y') AS `year`, 
                             DATE_FORMAT(`timestamp`, '%T') AS `time` 
                             FROM `torrent` 
-                            ORDER BY tracker, name");
+                            ORDER BY {$order}");
         }
         elseif (Database::getDbType() == 'sqlite')
         {
@@ -281,7 +286,7 @@ class Database
                             strftime('%Y', `timestamp`) AS `year`, 
                             strftime('%H:%M', `timestamp`) AS `time` 
                             FROM `torrent` 
-                            ORDER BY tracker, name");    		
+                            ORDER BY {$order}");    		
         }
         if ($stmt->execute())
         {
