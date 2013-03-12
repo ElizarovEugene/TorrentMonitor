@@ -7,11 +7,12 @@ class Errors
     private function __construct()
     {
     	Errors::write('curl', 'Для работы системы необходимо включить <a href=\"http://php.net/manual/en/book.curl.php\">расширение cURL</a>.');
-    	Errors::write('missing_files', 'Нет хватает системных файлов.');
+    	Errors::write('missing_files', 'Не хватает системных файлов.');
     	Errors::write('not_available', 'Не могу получить доступ к трекеру.');
     	Errors::write('credential_miss', 'Не указаны учётные данные для данного трекера.');
     	Errors::write('credential_wrong', 'Неправильные учётные данные.');
     	Errors::write('rss_parse_false', 'Ошибка при чтении XML файла RSS ленты.');
+    	Errors::write('max_torrent', 'Вы использовали доступное Вам количество торрент-файлов в сутки.');
 	}
 	
 	public static function getInstance()

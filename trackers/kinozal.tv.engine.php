@@ -113,7 +113,22 @@ class kinozal
 	{
 	    $data = explode(' ', $data);
 	    $date = explode('-', $data[0]);
-	    $date = $date[2].'.'.$date[1].'.'.$date[0];
+		switch ($date[1])
+		{
+			case 01: $m="Янв"; break;
+			case 02: $m="Фев"; break;
+			case 03: $m="Мар"; break;
+			case 04: $m="Апр"; break;
+			case 05: $m="Мая"; break;
+			case 06: $m="Июн"; break;
+			case 07: $m="Июл"; break;
+			case 08: $m="Авг"; break;
+			case 09: $m="Сен"; break;
+			case 10: $m="Окт"; break;
+			case 11: $m="Ноя"; break;
+			case 12: $m="Дек"; break;
+		}
+		$date = $date[2].' '.$m.' '.$date[0];
 	    $time = substr($data[1], 0, -3);
 	    return $date.' '.$time;		
 	}
@@ -186,6 +201,72 @@ class kinozal
 		}
 	}
 	
+    public static function work($array, $id, $tracker, $name, $torrent_id, $timestamp)
+    {
+		//проверяем удалось ли получить дату со страницы
+		if (isset($array[1]))
+		{
+			//если дата не равна ничему
+			if ( ! empty($array[1]))
+			{
+				//сбрасываем варнинг
+				Database::clearWarnings($tracker);
+				//приводим дату к общему виду
+				$date = kinozal::dateStringToNum($array[1]);
+				//если даты не совпадают, перекачиваем торрент
+				if ($date != $timestamp)
+				{
+					//сохраняем торрент в файл
+					$torrent = kinozal::getTorrent($torrent_id, kinozal::$sess_cookie);
+					#echo $torrent;
+					if (preg_match('/<a href=\'\/pay_mode\.php\#tcounter\' class=sbab>/', $torrent))
+					{
+        				//устанавливаем варнинг
+        				if (kinozal::$warning == NULL)
+        				{
+        					kinozal::$warning = TRUE;
+        					Errors::setWarnings($tracker, 'max_torrent');
+        				}
+        				//останавливаем процесс выполнения
+        				kinozal::$exucution = FALSE;
+					}
+					else
+					{
+    					$client = ClientAdapterFactory::getStorage('file');
+    					$client->store($torrent, $id, $tracker, $name, $id, $timestamp);
+    					//обновляем время регистрации торрента в базе
+    					Database::setNewDate($id, $date);
+    					//отправляем уведомлении о новом торренте
+    					$message = $name.' обновлён.';
+    					Notification::sendNotification('notification', kinozal::dateNumToString($date), $tracker, $message);
+    				}
+				}
+			}
+			else
+			{
+				//устанавливаем варнинг
+				if (kinozal::$warning == NULL)
+				{
+					kinozal::$warning = TRUE;
+					Errors::setWarnings($tracker, 'not_available');
+				}
+				//останавливаем процесс выполнения, т.к. не может работать без кук
+				kinozal::$exucution = FALSE;
+			}
+		}
+		else
+		{
+			//устанавливаем варнинг
+			if (kinozal::$warning == NULL)
+			{
+				kinozal::$warning = TRUE;
+				Errors::setWarnings($tracker, 'not_available');
+			}
+			//останавливаем процесс выполнения, т.к. не может работать без кук
+			kinozal::$exucution = FALSE;
+		}
+    }
+	
 	//основная функция
 	public static function main($id, $tracker, $name, $torrent_id, $timestamp)
 	{
@@ -200,55 +281,9 @@ class kinozal
 			{
 				//ищем на странице дату регистрации торрента
 				if (preg_match("/<li>Обновлен<span class=\"floatright green n\">(.*)<\/span><\/li>/", $page, $array))
-				{
-					//проверяем удалось ли получить дату со страницы
-					if (isset($array[1]))
-					{
-						//если дата не равна ничему
-						if ( ! empty($array[1]))
-						{
-							//сбрасываем варнинг
-							Database::clearWarnings($tracker);
-							//приводим дату к общему виду
-							$date = kinozal::dateStringToNum($array[1]);
-							//если даты не совпадают, перекачиваем торрент
-							if ($date != $timestamp)
-							{
-								//сохраняем торрент в файл
-								$torrent = kinozal::getTorrent($torrent_id, kinozal::$sess_cookie);
-								$client = ClientAdapterFactory::getStorage('file');
-								$client->store($torrent, $id, $tracker, $name, $id, $timestamp);
-								//обновляем время регистрации торрента в базе
-								Database::setNewDate($id, $date);
-								//отправляем уведомлении о новом торренте
-								$message = $name.' обновлён.';
-								Notification::sendNotification('notification', kinozal::dateNumToString($date), $tracker, $message);
-							}
-						}
-						else
-						{
-							//устанавливаем варнинг
-							if (kinozal::$warning == NULL)
-							{
-								kinozal::$warning = TRUE;
-								Errors::setWarnings($tracker, 'not_available');
-							}
-							//останавливаем процесс выполнения, т.к. не может работать без кук
-							kinozal::$exucution = FALSE;
-						}
-					}
-					else
-					{
-						//устанавливаем варнинг
-						if (kinozal::$warning == NULL)
-						{
-							kinozal::$warning = TRUE;
-							Errors::setWarnings($tracker, 'not_available');
-						}
-						//останавливаем процесс выполнения, т.к. не может работать без кук
-						kinozal::$exucution = FALSE;
-					}
-				}
+    				kinozal::work($array, $id, $tracker, $name, $torrent_id, $timestamp);
+				elseif (preg_match("/<li>Залит<span class=\"floatright green n\">(.*)<\/span><\/li>/", $page, $array))
+				    kinozal::work($array, $id, $tracker, $name, $torrent_id, $timestamp);
 				else
 				{
 					//устанавливаем варнинг
@@ -257,7 +292,7 @@ class kinozal
 						kinozal::$warning = TRUE;
 						Errors::setWarnings($tracker, 'not_available');
 					}
-					//останавливаем процесс выполнения, т.к. не может работать без кук
+					//останавливаем процесс выполнения, т.к. не может работать без даты
 					kinozal::$exucution = FALSE;
 				}
 			}			
