@@ -97,40 +97,29 @@ class kinozal
 	        $dateTime = $date.' '.$time;
 	        return $dateTime;
 	    }
-	    elseif (preg_match('/\d{2}\.\d{2}\.\d{4} в \d{2}:\d{2}/', $data))
+	    elseif (preg_match('/\d{2} \D* \d{4} в \d{2}:\d{2}/', $data))
 	    {
-	        $pieces = explode(' ', $str);
-	        $data = explode('.', $pieces[0]);
-	        $date = $data[2].'-'.$data[1].'-'.$data[0];
-	        $time = $pieces[2].':00';
-	        $dateTime = $date.' '.$time;
-	        return $dateTime;
+			$pieces = explode(' ', $data);
+			switch ($pieces[1])
+			{
+			    case "января": $m='01'; break;
+			    case "февраля": $m='02'; break;
+			    case "марта": $m='03'; break;
+			    case "апреля": $m='04'; break;
+			    case "мая": $m='05'; break;
+			    case "июня": $m='06'; break;
+			    case "июля": $m='07'; break;
+			    case "августа": $m='08'; break;
+			    case "сентября": $m='09'; break;
+			    case "октября": $m='10'; break;
+			    case "ноября": $m='11'; break;
+			    case "декабря": $m='12'; break;
+			}
+			$date = $pieces[2].'-'.$m.'-'.$pieces[0];
+			$time = $pieces[4].':00';
+			$dateTime = $date.' '.$time;
+			return $dateTime;
 	    }
-	}
-	
-	//функция преобразования даты
-	private static function dateNumToString($data)
-	{
-	    $data = explode(' ', $data);
-	    $date = explode('-', $data[0]);
-		switch ($date[1])
-		{
-			case 01: $m="Янв"; break;
-			case 02: $m="Фев"; break;
-			case 03: $m="Мар"; break;
-			case 04: $m="Апр"; break;
-			case 05: $m="Мая"; break;
-			case 06: $m="Июн"; break;
-			case 07: $m="Июл"; break;
-			case 08: $m="Авг"; break;
-			case 09: $m="Сен"; break;
-			case 10: $m="Окт"; break;
-			case 11: $m="Ноя"; break;
-			case 12: $m="Дек"; break;
-		}
-		$date = $date[2].' '.$m.' '.$date[0];
-	    $time = substr($data[1], 0, -3);
-	    return $date.' '.$time;		
 	}
 	
 	//функция получения кук
@@ -213,12 +202,12 @@ class kinozal
 				Database::clearWarnings($tracker);
 				//приводим дату к общему виду
 				$date = kinozal::dateStringToNum($array[1]);
+				$date_str = $array[1];
 				//если даты не совпадают, перекачиваем торрент
 				if ($date != $timestamp)
 				{
 					//сохраняем торрент в файл
 					$torrent = kinozal::getTorrent($torrent_id, kinozal::$sess_cookie);
-					#echo $torrent;
 					if (preg_match('/<a href=\'\/pay_mode\.php\#tcounter\' class=sbab>/', $torrent))
 					{
         				//устанавливаем варнинг
@@ -238,7 +227,7 @@ class kinozal
     					Database::setNewDate($id, $date);
     					//отправляем уведомлении о новом торренте
     					$message = $name.' обновлён.';
-    					Notification::sendNotification('notification', kinozal::dateNumToString($date), $tracker, $message);
+    					Notification::sendNotification('notification', $date_str, $tracker, $message);
     				}
 				}
 			}
