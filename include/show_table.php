@@ -51,14 +51,26 @@ if ( ! empty($torrents_list))
     		if ($tracker == "rutracker.org" || $tracker == "nnm-club.ru" || $tracker == "tfile.me")
     		{
     		?>
-				<a href="http://www.<?php echo $tracker ?>/forum/viewtopic.php?t=<?php echo $torrent_id ?>" target="_blank"><?php echo $name ?></a>
+				<a href="http://<?php echo $tracker ?>/forum/viewtopic.php?t=<?php echo $torrent_id ?>" target="_blank"><?php echo $name ?></a>
     		<?php
     		}
     		elseif ($tracker == "rutor.org")
     		{
     		?>
-    			<a href="http://rutor.org/torrent/<?php echo $torrent_id ?>/" target="_blank"><?php echo $name ?></a>
+    			<a href="http://<?php echo $tracker ?>/torrent/<?php echo $torrent_id ?>/" target="_blank"><?php echo $name ?></a>
     		<?php
+    		}
+    		elseif ($tracker == "kinozal.tv")
+    		{
+	    	?>
+	    		<a href="http://<?php echo $tracker ?>/details.php?id=<?php echo $torrent_id ?>" target="_blank"><?php echo $name ?></a>
+	    	<?php	
+    		}
+    		elseif ($tracker == "tapochek.net")
+    		{
+	    	?>
+	    		<a href="http://<?php echo $tracker ?>/viewtopic.php?t=<?php echo $torrent_id ?>" target="_blank"><?php echo $name ?></a>
+	    	<?php	
     		}
     		else
     			echo $name;

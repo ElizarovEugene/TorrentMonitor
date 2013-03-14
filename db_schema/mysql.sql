@@ -44,7 +44,9 @@ VALUES
 	(3,'lostfilm.tv','',''),
 	(4,'novafilm.tv','',''),
 	(5,'rutor.org', ' ', ' '),
-	(6,'tfile.me', ' ', ' ');
+	(6,'tfile.me', ' ', ' '),
+	(7,'kinozal.tv', '', ''),
+	(8,'tapochek.net', '', '');
 
 /*!40000 ALTER TABLE `credentials` ENABLE KEYS */;
 UNLOCK TABLES;

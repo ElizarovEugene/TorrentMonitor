@@ -93,12 +93,16 @@ class Sys
 		if ( ! empty($array[1]))
 		{
 			$name = $array[1];
-			if ($Purl["host"] == 'nnm-club.ru')
+			if ($tracker == 'nnm-club.ru')
 				$name = substr($name, 0, -23);
-			if ($Purl["host"] == 'rutracker.org')
+			if ($tracker == 'rutracker.org')
 				$name = substr($name, 0, -34);
-			if ($Purl["host"] == 'rutor.org')
+			if ($tracker == 'rutor.org')
 				$name = substr($name, 13);
+			if ($tracker == 'kinozal.tv')
+				$name = substr($name, 0, -22);
+			if ($tracker == 'tapochek.net')
+				$name = substr($name, 0, -16);
 		}
 		else
 			$name = "Неизвестный";
