@@ -65,7 +65,24 @@ class tfile
 	//функция преобразования даты
 	private static function dateNumToString($data)
 	{
-		$data = preg_replace("/(\d\d\d\d)-(\d\d)-(\d\d)/", "$3-$2-$1", $data);
+        $data = preg_replace("/(\d\d\d\d)-(\d\d)-(\d\d)/", "$3-$2-$1", $data);
+        $data = explode('-', $data);
+        switch ($data[1])
+        {
+            case 01: $m="Янв"; break;
+            case 02: $m="Фев"; break;
+            case 03: $m="Мар"; break;
+            case 04: $m="Апр"; break;
+            case 05: $m="Мая"; break;
+            case 06: $m="Июн"; break;
+            case 07: $m="Июл"; break;
+            case 08: $m="Авг"; break;
+            case 09: $m="Сен"; break;
+            case 10: $m="Окт"; break;
+            case 11: $m="Ноя"; break;
+            case 12: $m="Дек"; break;
+        }
+        $dateTime = $data[0].' '.$m.' '.$data[2];
 		return $data;
 	}
 
@@ -101,7 +118,6 @@ class tfile
 								//ищем на странице id торрента
 								if (preg_match("/download\.php\?id=(\d+)&uk=1111111111/", $page, $arrayId))
 								{
-									echo $arrayId[1];
 									$torrent_id = $arrayId[1];
 									//сохраняем торрент в файл
 									$torrent = tfile::getTorrent($torrent_id);
