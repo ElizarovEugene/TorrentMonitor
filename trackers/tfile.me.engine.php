@@ -16,7 +16,7 @@ class tfile
     }
 
 	//получаем страницу для парсинга
-	private static function getContent($threme)
+	public static function getContent($threme)
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, "http://tfile.me/forum/viewtopic.php?t={$threme}");
@@ -83,7 +83,16 @@ class tfile
             case 12: $m="Дек"; break;
         }
         $dateTime = $data[0].' '.$m.' '.$data[2];
-		return $data;
+		return $dateTime;
+	}
+	
+	//функция нахождения id для скачивания
+	public static function findId($page)
+	{
+		if (preg_match("/download\.php\?id=(\d+)&uk=1111111111/", $page, $arrayId))
+			return $arrayId[1];
+		else
+			return FALSE;
 	}
 
 	//основная функция
@@ -116,18 +125,18 @@ class tfile
 							if ($date != $timestamp)
 							{
 								//ищем на странице id торрента
-								if (preg_match("/download\.php\?id=(\d+)&uk=1111111111/", $page, $arrayId))
+								$torrent_id = tfile::findId($page);
+								if (is_string($torrent_id))
 								{
-									$torrent_id = $arrayId[1];
 									//сохраняем торрент в файл
 									$torrent = tfile::getTorrent($torrent_id);
 									$client = ClientAdapterFactory::getStorage('file');
-									$client->store($torrent, $id, $tracker, $name, $id, $timestamp);
+									$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
 									//обновляем время регистрации торрента в базе
 									Database::setNewDate($id, $date);
 									//отправляем уведомлении о новом торренте
 									$message = $name.' обновлён.';
-									Notification::sendNotification('notification', tfile::dateNumToString($date_str), $tracker, $message);
+									Notification::sendNotification('notification', $date_str, $tracker, $message);
 								}
 								else
 								{

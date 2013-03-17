@@ -7,18 +7,15 @@ include_once $dir."class/Database.class.php";
 $date_today = date("d-m-Y");
 
 @session_start();
-if (isset($_SESSION['order']) && ($_SESSION['order'] == "date"))
+if (isset($_SESSION['order']))
 {
-	$torrents_list = Database::getTorrentsList('date');
-	$name_href = true;
-	$date_href = false;
+    if ($_SESSION['order'] == "date")
+        $torrents_list = Database::getTorrentsList('date');
+    elseif ($_SESSION['order'] == "dateDesc")
+        $torrents_list = Database::getTorrentsList('dateDesc');
 }
 else
-{
-	$torrents_list = Database::getTorrentsList('name');
-	$name_href = false;
-	$date_href = true;
-}
+    $torrents_list = Database::getTorrentsList('name');
 
 $i=0;
 
@@ -29,8 +26,8 @@ if ( ! empty($torrents_list))
     <thead>
         <tr>
             <th>Трекер</th>
-            <th>Название &nbsp;&nbsp;&nbsp;<span class="arr"><a href="action.php?action=order&order=name">▲</a></span></th>
-            <th>Последнее обновление &nbsp;&nbsp;&nbsp;<span class="arr"><a href="action.php?action=order&order=date">▲</a></span></th>
+            <th>Название &nbsp;&nbsp;&nbsp;<span class="arr"><a href="action.php?action=order&order=name">&#9650;</a></span></th>
+            <th>Последнее обновление &nbsp;&nbsp;&nbsp;<span class="arr"><a href="action.php?action=order&order=date">&#9650;</a></span>&nbsp;<span class="arr"><a href="action.php?action=order&order=dateDesc">&#9660;</a></span></th>
             <th>Действие</th>
         </tr>
     </thead>
@@ -70,7 +67,13 @@ if ( ! empty($torrents_list))
     		{
 	    	?>
 	    		<a href="http://<?php echo $tracker ?>/viewtopic.php?t=<?php echo $torrent_id ?>" target="_blank"><?php echo $name ?></a>
-	    	<?php	
+	    	<?php
+    		}
+    		elseif ($tracker == 'anidub.com')
+    		{
+	    	?>        		
+	    		<a href="http://tr.<?php echo $tracker ?>/details.php?id=<?php echo $torrent_id ?>" target="_blank"><?php echo $name ?></a>	    	
+	    	<?php        		
     		}
     		else
     			echo $name;

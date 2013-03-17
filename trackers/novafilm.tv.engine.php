@@ -94,6 +94,28 @@ Content-Disposition: form-data; name=\"login\"
 		return $result;
 	}
 	
+	//проверяем cookie
+	public static function checkCookie($sess_cookie)
+	{
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
+		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_URL, "http://novafilm.tv");
+		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
+		$header[] = "Host: novafilm.tv\r\n";
+		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+		$result = curl_exec($ch);
+		curl_close($ch);
+		
+		if (preg_match('/<p>Здравствуйте, <a href=\"\/user\/.*">.*<\/a>/U', $result))
+			return TRUE;
+		else
+			return FALSE;		  
+	}
+
 	public static function checkRule($data)
 	{
 		if (preg_match("/^[\.\+\s\'a-zA-Z0-9]+$/", $data))
@@ -166,6 +188,79 @@ Content-Disposition: form-data; name=\"login\"
 		}
 	}
 	
+	//функция получения кук
+	public static function getCookie($tracker)
+	{	
+		//проверяем заполнены ли учётные данные
+		if (Database::checkTrackersCredentialsExist($tracker))
+		{
+			//получаем учётные данные
+			$credentials = Database::getCredentials($tracker);
+			$login = iconv("utf-8", "windows-1251", $credentials['login']);
+			$password = $credentials['password'];
+			
+			novafilm::$page = novafilm::login($login, $password);
+		
+			if ( ! empty(novafilm::$page))
+			{
+				//проверяем подходят ли учётные данные
+				if (preg_match_all("/Set-Cookie: (\w*)=(\S*)/", novafilm::$page, $array))
+				{
+					novafilm::$sess_cookie = $array[1][2]."=".$array[2][2];
+					Database::setCookie($tracker, novafilm::$sess_cookie);
+					//запускам процесс выполнения, т.к. не может работать без кук
+					novafilm::$exucution = TRUE;
+				}
+				//проверяем нет ли сообщения о неправильном логине/пароле
+				elseif (preg_match("/\/do\/recover/", novafilm::$page, $out))
+				{
+					//устанавливаем варнинг
+					if (novafilm::$warning == NULL)
+        			{
+        				novafilm::$warning = TRUE;
+        				Errors::setWarnings($tracker, 'credential_wrong');
+        			}
+					//останавливаем выполнение цепочки
+					novafilm::$exucution = FALSE;
+				}
+				//если не удалось получить никаких данных со страницы, значит трекер не доступен
+				else
+				{
+					//устанавливаем варнинг
+					if (novafilm::$warning == NULL)
+        			{
+        				novafilm::$warning = TRUE;
+        				Errors::setWarnings($tracker, 'not_available');
+        			}
+					//останавливаем выполнение цепочки
+					novafilm::$exucution = FALSE;
+				}
+			}
+			else
+			{
+				//устанавливаем варнинг
+				if (novafilm::$warning == NULL)
+    			{
+    				novafilm::$warning = TRUE;
+    				Errors::setWarnings($tracker, 'not_available');
+    			}
+				//останавливаем выполнение цепочки
+				novafilm::$exucution = FALSE;
+			}
+		}
+		else
+		{
+			//устанавливаем варнинг
+			if (novafilm::$warning == NULL)
+			{
+				novafilm::$warning = TRUE;
+				Errors::setWarnings($tracker, 'credential_miss');
+			}
+			//останавливаем выполнение цепочки
+			novafilm::$exucution = FALSE;						
+		}	
+	}
+	
 	//основная функция
 	public static function main($id, $tracker, $name, $hd, $ep, $timestamp)
 	{
@@ -175,77 +270,19 @@ Content-Disposition: form-data; name=\"login\"
 			//проверяем получена ли уже кука
 			if (empty(novafilm::$sess_cookie))
 			{
-				//проверяем заполнены ли учётные данные
-				if (Database::checkTrackersCredentialsExist($tracker))
-				{
-					//получаем учётные данные
-					$credentials = Database::getCredentials($tracker);
-					$login = iconv("utf-8", "windows-1251", $credentials['login']);
-					$password = $credentials['password'];
-					
-					novafilm::$page = novafilm::login($login, $password);
-				
-					if ( ! empty(novafilm::$page))
-					{
-						//проверяем подходят ли учётные данные
-						if (preg_match_all("/Set-Cookie: (\w*)=(\S*)/", novafilm::$page, $array))
-						{
-							novafilm::$sess_cookie = $array[1][2]."=".$array[2][2];
-							//запускам процесс выполнения, т.к. не может работать без кук
-							novafilm::$exucution = TRUE;
-						}
-						//проверяем нет ли сообщения о неправильном логине/пароле
-						elseif (preg_match("/\/do\/recover/", novafilm::$page, $out))
-						{
-							//устанавливаем варнинг
-							if (novafilm::$warning == NULL)
-                			{
-                				novafilm::$warning = TRUE;
-                				Errors::setWarnings($tracker, 'credential_wrong');
-                			}
-							//останавливаем выполнение цепочки
-							novafilm::$exucution = FALSE;
-						}
-						//если не удалось получить никаких данных со страницы, значит трекер не доступен
-						else
-						{
-							//устанавливаем варнинг
-							if (novafilm::$warning == NULL)
-                			{
-                				novafilm::$warning = TRUE;
-                				Errors::setWarnings($tracker, 'not_available');
-                			}
-							//останавливаем выполнение цепочки
-							novafilm::$exucution = FALSE;
-						}
-					}
-					else
-					{
-						//устанавливаем варнинг
-						if (novafilm::$warning == NULL)
-            			{
-            				novafilm::$warning = TRUE;
-            				Errors::setWarnings($tracker, 'not_available');
-            			}
-						//останавливаем выполнение цепочки
-						novafilm::$exucution = FALSE;
-					}
-				}
-				else
-				{
-					//устанавливаем варнинг
-					if (novafilm::$warning == NULL)
-        			{
-        				novafilm::$warning = TRUE;
-        				Errors::setWarnings($tracker, 'credential_miss');
-        			}
-					//останавливаем выполнение цепочки
-					novafilm::$exucution = FALSE;						
-				}	
+        		$cookie = Database::getCookie($tracker);
+        		if (novafilm::checkCookie($cookie))
+        		{
+        			novafilm::$sess_cookie = $cookie;
+        			//запускам процесс выполнения
+        			novafilm::$exucution = TRUE;
+        		}			
+        		else
+            		novafilm::getCookie($tracker);
 			}
 			
 			//проверяем получена ли уже RSS лента
-			if( ! novafilm::$log_page)
+			if ( ! novafilm::$log_page)
 			{
 				if (novafilm::$exucution)
 				{

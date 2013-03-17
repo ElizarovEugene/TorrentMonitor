@@ -7,7 +7,7 @@ class Errors
     private function __construct()
     {
     	Errors::write('curl', 'Для работы системы необходимо включить <a href=\"http://php.net/manual/en/book.curl.php\">расширение cURL</a>.');
-    	Errors::write('missing_files', 'Не хватает системных файлов.');
+    	Errors::write('missing_files', 'Не хватает файлов для работы системы.');
     	Errors::write('not_available', 'Не могу получить доступ к трекеру.');
     	Errors::write('credential_miss', 'Не указаны учётные данные для данного трекера.');
     	Errors::write('credential_wrong', 'Неправильные учётные данные.');

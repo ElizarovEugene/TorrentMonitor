@@ -36,6 +36,8 @@ if (isset($_POST["action"]))
 			$tracker = $url["host"];
 			if (strpos($tracker, 'www\.'))
 				$tracker = substr($tracker, 4);
+			if ($tracker == 'tr.anidub.com')
+				$tracker = 'anidub.com';
 			
 			if ($tracker != 'rutor.org')
 			{
@@ -359,7 +361,9 @@ if (isset($_GET["action"]))
 		session_start();
 		if ($_GET["order"] == "date")
 			$_SESSION["order"] = "date";
-		if ($_GET["order"] == "name")
+		elseif ($_GET["order"] == "dateDesc")
+			$_SESSION["order"] = "dateDesc";			
+		elseif ($_GET["order"] == "name")
 			unset($_SESSION["order"]);
 		header("Location: index.php");
 	}	

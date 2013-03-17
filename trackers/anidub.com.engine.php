@@ -1,5 +1,5 @@
 <?php
-class rutracker
+class anidub
 {
 	protected static $sess_cookie;
 	protected static $exucution;
@@ -19,30 +19,30 @@ class rutracker
 	//получаем куки для доступа к сайту
 	protected static function login($login, $password)
 	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
-		curl_setopt($ch, CURLOPT_HEADER, 1);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, "http://login.rutracker.org/forum/login.php");
-		curl_setopt($ch, CURLOPT_POSTFIELDS, "login_username={$login}&login_password={$password}&login=%C2%F5%EE%E4");
-		$result = curl_exec($ch);
-		curl_close($ch);
-		
-		$result = iconv("windows-1251", "utf-8", $result);
-		return $result;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
+        curl_setopt($ch, CURLOPT_HEADER, 1);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_URL, "http://tr.anidub.com/takelogin.php");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, "username={$login}&password={$password}");
+        $result = curl_exec($ch);
+        curl_close($ch);
+        
+        $result = iconv("windows-1251", "utf-8", $result);
+        return $result;
 	}
 	
 	//получаем страницу для парсинга
 	private static function getContent($threme, $sess_cookie)
 	{
 		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, "http://rutracker.org/forum/viewtopic.php?t={$threme}");
+		curl_setopt($ch, CURLOPT_URL, "http://tr.anidub.com/details.php?id={$threme}");
 		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_HEADER, 1);
-		$header[] = "Host: rutracker.org\r\n";
+		$header[] = "Host: tr.anidub.com\r\n";
 		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
 		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
@@ -54,17 +54,18 @@ class rutracker
 	}
 	
 	//получаем содержимое torrent файла
-	public static function getTorrent($threme, $sess_cookie)
+	public static function getTorrent($threme, $name, $sess_cookie)
 	{
 		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_URL, "http://tr.anidub.com/download.php?id={$threme}&name={$name}");
 		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
 		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, "http://dl.rutracker.org/forum/dl.php?t={$threme}");
-		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie."; bb_dl={$threme}");
-		curl_setopt($ch, CURLOPT_REFERER, "http://dl.rutracker.org/forum/dl.php?t={$threme}");
-		curl_setopt($ch, CURLOPT_POSTFIELDS, "t={$threme}");
+		$header[] = "Host: tr.anidub.com";
+		$header[] = "Cookie: {$sess_cookie}; PHPSESSID=doshd24p6q83gdd78v12b7ht13; PHPSESSID=69m9e5ggnpqr1c017592krq0s5";
+		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
+		curl_setopt($ch, CURLOPT_REFERER, "http://tr.anidub.com/details.php?id={$threme}");
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
 		$result = curl_exec($ch);
 		curl_close($ch);
 		
@@ -75,12 +76,12 @@ class rutracker
 	public static function checkCookie($sess_cookie)
 	{
 		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, "http://tr.anidub.com/");		
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
 		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, "http://rutracker.org/forum/index.php");
-		$header[] = "Host: rutracker.org\r\n";
+		$header[] = "Host: tr.anidub.com\r\n";
 		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
 		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
@@ -88,7 +89,7 @@ class rutracker
 		curl_close($ch);
 		
 		$result = iconv("windows-1251", "utf-8", $result);
-		if (preg_match('/Вы зашли как: &nbsp;/', $result))
+		if (preg_match('/<span style=\"color:#000000;\" title=\"Пользователь\">.*<\/span>/', $result))
 			return TRUE;
 		else
 			return FALSE;		  
@@ -105,24 +106,29 @@ class rutracker
 	}
 	
 	//функция преобразования даты
-	private static function dateStringToNum($data)
-	{
-		$monthes = array("Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек");
-		$month = substr($data, 3, 6);
-		$date = preg_replace("/(\d\d)-(\d\d)-(\d\d)/", "$3-$2-$1", str_replace($month, str_pad(array_search($month, $monthes)+1, 2, 0, STR_PAD_LEFT), $data));
-		$date = date("Y-m-d H:i:s", strtotime($date));
-		
-		return $date;
-	}
-	
-	//функция преобразования даты
 	private static function dateNumToString($data)
 	{
-		$data = str_replace('-', ' ', $data);
-		$arr = preg_split("/\s/", $data);
-		$date = $arr[0].' '.$arr[1].' 20'.$arr[2].' '.$arr[3];
-		
-		return $date;		
+        $pieces = explode(' ', $data);
+        $dates = explode('-', $pieces[0]);
+        switch ($dates[1])
+        {
+            case '01': $m="янв"; break;
+            case '02': $m="фев"; break;
+            case '03': $m="мар"; break;
+            case '04': $m="апр"; break;
+            case '05': $m="мая"; break;
+            case '06': $m="июн"; break;
+            case '07': $m="июл"; break;
+            case '08': $m="авг"; break;
+            case '09': $m="сен"; break;
+            case '10': $m="окт"; break;
+            case '11': $m="ноя"; break;
+            case '12': $m="дек"; break;
+        }    
+        $date = $dates[2].' '.$m.' '.$dates[0];
+        $time = substr($pieces[1], 0, -3);
+        $dateTime = $date.' '.$time;
+        return $dateTime;
 	}
 	
 	//функция получения кук
@@ -136,61 +142,61 @@ class rutracker
 			$login = iconv("utf-8", "windows-1251", $credentials['login']);
 			$password = $credentials['password'];
 			
-			$page = rutracker::login($login, $password);
+			$page = anidub::login($login, $password);
 			
 			if ( ! empty($page))
 			{
 				//проверяем подходят ли учётные данные
-				if (preg_match("/profile\.php\?mode=register/", $page, $array))
+				if (preg_match("/<td class=\"embedded\">Вы не зарегистрированы в системе\.<\/td>/", $page, $array))
 				{
 					//устанавливаем варнинг
 					Errors::setWarnings($tracker, 'credential_wrong');
 					//останавливаем процесс выполнения, т.к. не может работать без кук
-					rutracker::$exucution = FALSE;
+					anidub::$exucution = FALSE;
 				}
 				//если подходят - получаем куки
-				elseif (preg_match("/bb_data=(.+);/iU", $page, $array))
+				elseif (preg_match_all("/Set-Cookie: (.*);/U", $page, $array))
 				{
-					rutracker::$sess_cookie = 'bb_data='.$array[1].';';
-					Database::setCookie($tracker, rutracker::$sess_cookie);
+					anidub::$sess_cookie = $array[1][1].'; '.$array[1][2];
+					Database::setCookie($tracker, anidub::$sess_cookie);
 					//запускам процесс выполнения, т.к. не может работать без кук
-					rutracker::$exucution = TRUE;
+					anidub::$exucution = TRUE;
 				}
 				else
 				{
 					//устанавливаем варнинг
-					if (rutracker::$warning == NULL)
+					if (anidub::$warning == NULL)
 					{
-						rutracker::$warning = TRUE;
+						anidub::$warning = TRUE;
 						Errors::setWarnings($tracker, 'not_available');
 					}
 					//останавливаем процесс выполнения, т.к. не может работать без кук
-					rutracker::$exucution = FALSE;
+					anidub::$exucution = FALSE;
 				}
 			}
 			//если вообще ничего не найдено
 			else
 			{
 				//устанавливаем варнинг
-				if (rutracker::$warning == NULL)
+				if (anidub::$warning == NULL)
 				{
-					rutracker::$warning = TRUE;
+					anidub::$warning = TRUE;
 					Errors::setWarnings($tracker, 'not_available');
 				}
 				//останавливаем процесс выполнения, т.к. не может работать без кук
-				rutracker::$exucution = FALSE;
+				anidub::$exucution = FALSE;
 			}
 		}
 		else
 		{
 			//устанавливаем варнинг
-			if (rutracker::$warning == NULL)
+			if (anidub::$warning == NULL)
 			{
-				rutracker::$warning = TRUE;
+				anidub::$warning = TRUE;
 				Errors::setWarnings($tracker, 'credential_miss');
 			}
 			//останавливаем процесс выполнения, т.к. не может работать без кук
-			rutracker::$exucution = FALSE;
+			anidub::$exucution = FALSE;
 		}
 	}
 	
@@ -198,24 +204,24 @@ class rutracker
 	public static function main($id, $tracker, $name, $torrent_id, $timestamp)
 	{
 		$cookie = Database::getCookie($tracker);
-		if (rutracker::checkCookie($cookie))
+		if (anidub::checkCookie($cookie))
 		{
-			rutracker::$sess_cookie = $cookie;
+			anidub::$sess_cookie = $cookie;
 			//запускам процесс выполнения
-			rutracker::$exucution = TRUE;
+			anidub::$exucution = TRUE;
 		}			
 		else
-    		rutracker::getCookie($tracker);
-
-		if (rutracker::$exucution)
+    		anidub::getCookie($tracker);
+    		
+		if (anidub::$exucution)
 		{
 			//получаем страницу для парсинга
-			$page = rutracker::getContent($torrent_id, rutracker::$sess_cookie);
-			
+			$page = anidub::getContent($torrent_id, anidub::$sess_cookie);
+
 			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
-				if (preg_match("/<span title=\"Когда зарегистрирован\">\[ (.+) \]<\/span>/", $page, $array))
+				if (preg_match("/<td width=\"\" class=\"heading\" valign=\"top\" align=\"right\">Добавлен<\/td><td valign=\"top\" align=\"left\">(.*)<\/td>/", $page, $array))
 				{
 					//проверяем удалось ли получить дату со страницы
 					if (isset($array[1]))
@@ -226,68 +232,71 @@ class rutracker
 							//сбрасываем варнинг
 							Database::clearWarnings($tracker);
 							//приводим дату к общему виду
-							$date = rutracker::dateStringToNum($array[1]);
-							$date_str = $array[1];
+							$date = $array[1];
+							$date_str = anidub::dateNumToString($array[1]);
 							//если даты не совпадают, перекачиваем торрент
 							if ($date != $timestamp)
 							{
+                                preg_match('/<a href=\"download\.php\?id=(\d{2,6})&amp;name=(.*)\">/U', $page, $array);
+                                $torrent_id = $array[1];
+                                $torrent_id_name = $array[2];
 								//сохраняем торрент в файл
-								$torrent = rutracker::getTorrent($torrent_id, rutracker::$sess_cookie);
+								$torrent = anidub::getTorrent($torrent_id, $torrent_id_name, anidub::$sess_cookie);
 								$client = ClientAdapterFactory::getStorage('file');
 								$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
 								//обновляем время регистрации торрента в базе
 								Database::setNewDate($id, $date);
 								//отправляем уведомлении о новом торренте
 								$message = $name.' обновлён.';
-								Notification::sendNotification('notification', rutracker::dateNumToString($date_str), $tracker, $message);
+								Notification::sendNotification('notification', $date_str, $tracker, $message);
 							}
 						}
 						else
 						{
 							//устанавливаем варнинг
-							if (rutracker::$warning == NULL)
+							if (anidub::$warning == NULL)
 							{
-								rutracker::$warning = TRUE;
+								anidub::$warning = TRUE;
 								Errors::setWarnings($tracker, 'not_available');
 							}
 							//останавливаем процесс выполнения, т.к. не может работать без кук
-							rutracker::$exucution = FALSE;
+							anidub::$exucution = FALSE;
 						}
 					}
 					else
 					{
 						//устанавливаем варнинг
-						if (rutracker::$warning == NULL)
+						if (anidub::$warning == NULL)
 						{
-							rutracker::$warning = TRUE;
+							anidub::$warning = TRUE;
 							Errors::setWarnings($tracker, 'not_available');
 						}
 						//останавливаем процесс выполнения, т.к. не может работать без кук
-						rutracker::$exucution = FALSE;
+						anidub::$exucution = FALSE;
 					}
 				}
 				else
 				{
 					//устанавливаем варнинг
-					if (rutracker::$warning == NULL)
+					if (anidub::$warning == NULL)
 					{
-						rutracker::$warning = TRUE;
+						anidub::$warning = TRUE;
 						Errors::setWarnings($tracker, 'not_available');
 					}
 					//останавливаем процесс выполнения, т.к. не может работать без кук
-					rutracker::$exucution = FALSE;
+					anidub::$exucution = FALSE;
 				}
 			}			
 			else
 			{
 				//устанавливаем варнинг
-				if (rutracker::$warning == NULL)
+				if (anidub::$warning == NULL)
 				{
-					rutracker::$warning = TRUE;
+					anidub::$warning = TRUE;
 					Errors::setWarnings($tracker, 'not_available');
 				}
 				//останавливаем процесс выполнения, т.к. не может работать без кук
-				rutracker::$exucution = FALSE;
+				anidub::$exucution = FALSE;
 			}
 		}
 	}

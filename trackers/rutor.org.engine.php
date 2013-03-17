@@ -107,7 +107,7 @@ class rutor
 								//сохраняем торрент в файл
 								$torrent = rutor::getTorrent($torrent_id, rutor::$sess_cookie);
 								$client = ClientAdapterFactory::getStorage('file');
-								$client->store($torrent, $id, $tracker, $name, $id, $timestamp);
+								$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
 								//обновляем время регистрации торрента в базе
 								Database::setNewDate($id, $date);
 								//отправляем уведомлении о новом торренте

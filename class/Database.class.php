@@ -255,6 +255,8 @@ class Database
     {
     	if ($order == 'date')
     		$order = 'timestamp';
+    	elseif ($order == 'dateDesc')
+    		$order = 'timestamp DESC';
     	else
     		$order = 'tracker, name';
     		
@@ -823,5 +825,42 @@ class Database
             return FALSE;
         $stmt = NULL;    
     }
+    
+    public static function getCookie($tracker)
+    {
+        if (Database::getDbType() == 'pgsql')
+           $stmt = Database::getInstance()->dbh->prepare("SELECT cookie FROM credentials WHERE tracker = :tracker");
+        else
+           $stmt = Database::getInstance()->dbh->prepare("SELECT `cookie` FROM `credentials` WHERE `tracker` = :tracker");
+        $stmt->bindParam(':tracker', $tracker);
+        if ($stmt->execute())
+        {
+            foreach ($stmt as $row)
+            {
+                return $row['cookie'];
+            }
+            return $resultArray;
+        }
+        $stmt = NULL;
+        $resultArray = NULL;
+    }
+    
+    public static function setCookie($tracker, $cookie)
+    {
+        if (Database::getDbType() == 'pgsql')
+            $stmt = Database::getInstance()->dbh->prepare("UPDATE credentials SET cookie = :cookie WHERE tracker = :tracker");
+        else
+            $stmt = Database::getInstance()->dbh->prepare("UPDATE `credentials` SET `cookie` = :cookie WHERE `tracker` = :tracker");
+        $stmt->bindParam(':cookie', $cookie);
+        $stmt->bindParam(':tracker', $tracker);
+        if ($stmt->execute())
+            return TRUE;
+        else
+            return FALSE;
+        $stmt = NULL;
+    }
+    
+    
+    
 }
 ?>

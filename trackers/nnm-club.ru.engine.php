@@ -38,7 +38,7 @@ class nnmclub
 	}
 	
 	//получаем страницу для парсинга
-	private static function getContent($threme, $sess_cookie)
+	public static function getContent($threme, $sess_cookie)
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, "http://nnm-club.ru/forum/viewtopic.php?t={$threme}");
@@ -75,6 +75,30 @@ class nnmclub
 		
 		return $result;
 	}
+	
+	//проверяем cookie
+	public static function checkCookie($sess_cookie)
+	{
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
+		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_URL, "http://nnm-club.ru/forum/index.php");
+		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
+		$header[] = "Host: nnm-club.ru\r\n";
+		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+		$result = curl_exec($ch);
+		curl_close($ch);
+		
+		$result = iconv("windows-1251", "utf-8", $result);
+		if (preg_match('/class=\"mainmenu\">Выход [ .* ]<\/a>/U', $result))
+			return TRUE;
+		else
+			return FALSE;		  
+	}
+	
 	
 	public static function checkRule($data)
 	{
@@ -134,6 +158,7 @@ class nnmclub
 					if (preg_match_all("/Set-Cookie: (.*);/iU", nnmclub::$page, $array))
 					{
 						nnmclub::$sess_cookie = implode("; ", $array[1]);
+						Database::setCookie($tracker, nnmclub::$sess_cookie);
 						//запускам процесс выполнения, т.к. не может работать без кук
 						nnmclub::$exucution = TRUE;
 					}
@@ -167,7 +192,15 @@ class nnmclub
 	
 	public static function main($id, $tracker, $name, $torrent_id, $timestamp)
 	{
-		nnmclub::getCookie($tracker);	
+		$cookie = Database::getCookie($tracker);
+		if (nnmclub::checkCookie($cookie))
+		{
+			nnmclub::$sess_cookie = $cookie;
+			//запускам процесс выполнения
+			nnmclub::$exucution = TRUE;
+		}			
+		else
+    		nnmclub::getCookie($tracker);
 		
 		if (nnmclub::$exucution)
 		{
@@ -199,7 +232,7 @@ class nnmclub
 									$torrent_id = $link[1];
 									$torrent = nnmclub::getTorrent($torrent_id, nnmclub::$sess_cookie);
 									$client = ClientAdapterFactory::getStorage('file');
-									$client->store($torrent, $id, $tracker, $name, $id, $timestamp);
+									$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
 									//обновляем время регистрации торрента в базе
 									Database::setNewDate($id, $date);
 									//отправляем уведомлении о новом торренте

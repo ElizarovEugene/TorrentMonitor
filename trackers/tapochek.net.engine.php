@@ -37,7 +37,7 @@ class tapochek
 	}
 	
 	//получаем страницу для парсинга
-	private static function getContent($threme, $sess_cookie)
+	public static function getContent($threme, $sess_cookie)
 	{
 	    $ch = curl_init();
 	    curl_setopt($ch, CURLOPT_URL, "http://tapochek.net/viewtopic.php?t={$threme}");
@@ -66,13 +66,36 @@ class tapochek
 		curl_setopt($ch, CURLOPT_URL, "http://tapochek.net/download.php?id={$threme}");
 		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
 		curl_setopt($ch, CURLOPT_REFERER, "http://tapochek.net/viewtopic.php?t={$threme}");
-		$header[] = "Host: nnm-club.ru\r\n";
+		$header[] = "Host: tapochek.net\r\n";
 		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
 		$result = curl_exec($ch);
 		curl_close($ch);
 		
 		return $result;
+	}
+	
+	//проверяем cookie
+	public static function checkCookie($sess_cookie)
+	{
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
+		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_URL, "http://tapochek.net/profile.php?mode=viewprofile");
+		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
+		$header[] = "Host: tapochek.net\r\n";
+		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+		$result = curl_exec($ch);
+		curl_close($ch);
+		
+		$result = iconv("windows-1251", "utf-8", $result);
+		if (preg_match('/<h1 class=\"pagetitle\">Профиль пользователя .*<\/h1>/', $result))
+			return TRUE;
+		else
+			return FALSE;		  
 	}
 	
 	public static function checkRule($data)
@@ -110,7 +133,7 @@ class tapochek
 	}
 	
 	//функция получения кук
-	private static function getCookie($tracker)
+	public static function getCookie($tracker)
 	{
 		//проверяем заполнены ли учётные данные
 		if (Database::checkTrackersCredentialsExist($tracker))
@@ -121,6 +144,7 @@ class tapochek
 			$password = $credentials['password'];
 			
 			tapochek::$page = tapochek::login($login, $password);
+			echo tapochek::$page;
 			
 			if ( ! empty(tapochek::$page))
 			{
@@ -149,6 +173,7 @@ class tapochek
 			            else
 			            {
 			                tapochek::$sess_cookie = $array[1][0].'; '.$array[1][1].';';
+			                Database::setCookie($tracker, tapochek::$sess_cookie);
 			                //запускам процесс выполнения, т.к. не может работать без кук
 			                tapochek::$exucution = TRUE;
 			            }
@@ -204,9 +229,19 @@ class tapochek
 
 	public static function main($id, $tracker, $name, $torrent_id, $timestamp)
 	{
-		tapochek::getCookie($tracker);
-		if (tapochek::$sess_cookie == 'deleted')
-			tapochek::getCookie($tracker);
+		$cookie = Database::getCookie($tracker);
+		if (tapochek::checkCookie($cookie))
+		{
+			tapochek::$sess_cookie = $cookie;
+			//запускам процесс выполнения
+			tapochek::$exucution = TRUE;
+		}			
+		else
+		{
+    		tapochek::getCookie($tracker);
+    		if (tapochek::$sess_cookie == 'deleted')
+    			tapochek::getCookie($tracker);
+		}
 		
 		if (tapochek::$exucution)
 		{
@@ -236,7 +271,7 @@ class tapochek
 									$torrent_id = $link[1];
 									$torrent = tapochek::getTorrent($torrent_id, tapochek::$sess_cookie);
 									$client = ClientAdapterFactory::getStorage('file');
-									$client->store($torrent, $id, $tracker, $name, $id, $timestamp);
+									$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
 									//обновляем время регистрации торрента в базе
 									Database::setNewDate($id, $date);
 									//отправляем уведомлении о новом торренте

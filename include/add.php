@@ -45,8 +45,10 @@
         <label class="label-name">Трекер</label>
         <select name="tracker">
             <option></option>
-            <option>rutracker.org</option>
             <option>nnm-club.ru</option>
+            <option>rutracker.org</option>
+            <option>tapochek.net</option>
+            <option>tfile.me</option>
         </select>
     </p>
     <p>

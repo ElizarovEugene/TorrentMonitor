@@ -15,7 +15,7 @@ class rutrackerSearch extends rutracker
 		curl_setopt($ch, CURLOPT_URL, "http://rutracker.org/forum/tracker.php");
 		$header[] = "Host: rutracker.org\r\n";
 		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
-		curl_setopt($ch, CURLOPT_COOKIE, "bb_data=".$sess_cookie);
+		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, "prev_my=0&prev_new=0&prev_oop=0&f%5B%5D=-1&o=1&s=2&tm=-1&pn={$user}&nm=");
 		$result = curl_exec($ch);
 		curl_close($ch);
@@ -27,32 +27,43 @@ class rutrackerSearch extends rutracker
 	//ищем темы пользователя	
 	public static function mainSearch($user_id, $tracker, $user)
 	{
-		rutracker::getCookie($tracker);
-		$user = iconv("utf-8", "windows-1251", $user);
-		$page = rutrackerSearch::getSearchPage($user, rutracker::$sess_cookie);
-
-		preg_match_all('/<a class=\"gen f\" href=\"tracker\.php\?f=\d{1,9}\">(.*)<\/a>/', $page, $section);
-		preg_match_all('/<a data-topic_id=\"\d{3,9}\" class=\"med tLink hl-tags bold\" href=\"\.\/viewtopic.php\?t=(\d{3,9})\">(.*)<\/a>/', $page, $threme);
-
-		for ($i=0; $i<count($threme[1]); $i++)
-			Database::addThremeToBuffer($user_id, $section[1][$i], $threme[1][$i], $threme[2][$i], $tracker);
-
-		$toDownload = Database::takeToDownload($tracker);
-		if(count($toDownload) > 0)
+		$cookie = Database::getCookie($tracker);
+		if (rutracker::checkCookie($cookie))
 		{
+			rutracker::$sess_cookie = $cookie;
+			//запускам процесс выполнения
+			rutracker::$exucution = TRUE;
+		}			
+		else
     		rutracker::getCookie($tracker);
-            for ($i=0; $i<count($toDownload); $i++)
-            {
-                //сохраняем торрент в файл
-				$torrent = rutracker::getTorrent($toDownload[$i]['threme_id'], rutracker::$sess_cookie);
-				$client = ClientAdapterFactory::getStorage('file');
-				$client->store($torrent, $id, $tracker, $name, $id, time());				
-				//обновляем время регистрации торрента в базе
-				Database::setDownloaded($toDownload[$i]['id']);
-				//отправляем уведомлении о новом торренте
-				$message = $toDownload[$i]['threme'].' добавлена для скачивания.';
-				$date = date('d M Y H:i');
-				Notification::sendNotification('notification', $date, $tracker, $message);
+
+		if (rutracker::$exucution)
+		{    		
+    		$user = iconv("utf-8", "windows-1251", $user);
+    		$page = rutrackerSearch::getSearchPage($user, rutracker::$sess_cookie);
+    
+    		preg_match_all('/<a class=\"gen f\" href=\"tracker\.php\?f=\d{1,9}\">(.*)<\/a>/', $page, $section);
+    		preg_match_all('/<a data-topic_id=\"\d{3,9}\" class=\"med tLink hl-tags bold\" href=\"\.\/viewtopic.php\?t=(\d{3,9})\">(.*)<\/a>/', $page, $threme);
+    
+    		for ($i=0; $i<count($threme[1]); $i++)
+    			Database::addThremeToBuffer($user_id, $section[1][$i], $threme[1][$i], $threme[2][$i], $tracker);
+    
+    		$toDownload = Database::takeToDownload($tracker);
+    		if (count($toDownload) > 0)
+    		{
+                for ($i=0; $i<count($toDownload); $i++)
+                {
+                    //сохраняем торрент в файл
+    				$torrent = rutracker::getTorrent($toDownload[$i]['threme_id'], rutracker::$sess_cookie);
+    				$client = ClientAdapterFactory::getStorage('file');
+    				$client->store($torrent, $id, $tracker, $name, $id, time());				
+    				//обновляем время регистрации торрента в базе
+    				Database::setDownloaded($toDownload[$i]['id']);
+    				//отправляем уведомлении о новом торренте
+    				$message = $toDownload[$i]['threme'].' добавлена для скачивания.';
+    				$date = date('d M Y H:i');
+    				Notification::sendNotification('notification', $date, $tracker, $message);
+                }
             }
         }
 	}

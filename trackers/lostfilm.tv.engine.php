@@ -84,7 +84,7 @@ class lostfilm
 	}
 	
 	//получаем куки для доступа к сайту
-	private static function getCookies($array)
+	private static function getCookies($tracker, $array)
 	{
 		if ( ! empty($array))
 		{
@@ -92,6 +92,7 @@ class lostfilm
 			$page = lostfilm::getPage(lostfilm::$sess_cookie);
 			preg_match("/<td align=\"left\">(.*)<br >/", $page, $out);
 			lostfilm::$sess_cookie .= " usess=".$out[1];
+			Database::setCookie($tracker, lostfilm::$sess_cookie);
 			Database::clearWarnings('lostfilm.tv');
 		}
 		else 
@@ -139,6 +140,29 @@ class lostfilm
 		
 		return $result;
 	}
+	
+	//проверяем cookie
+	public static function checkCookie($sess_cookie)
+	{
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
+		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_URL, "http://www.lostfilm.tv/");
+		$header[] = "Host: lostfilm.tv\r\n";
+		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
+		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+		$result = curl_exec($ch);
+		curl_close($ch);
+		
+		$result = iconv("windows-1251", "utf-8", $result);
+		if (preg_match('/ПРИВЕТ, <span class=\"wh\">.* <!-- (ID: \d*) --><\/span>/U', $result))
+			return TRUE;
+		else
+			return FALSE;		  
+	}	
 	
 	//функция проверки введёного названия
 	public static function checkRule($data)
@@ -215,6 +239,59 @@ class lostfilm
 		}
 	}
 	
+	private static function getCookie($tracker)
+	{
+		//проверяем заполнены ли учётные данные
+		if (Database::checkTrackersCredentialsExist($tracker))
+		{
+			//получаем учётные данные
+			$credentials = Database::getCredentials($tracker);
+			$login = iconv("utf-8", "windows-1251", $credentials['login']);
+			$password = $credentials['password'];
+			
+			$page = lostfilm::login('simple', $login, $password);
+			
+			if (preg_match_all("/Set-Cookie: (\w*)=(\S*)/", $page, $array))
+			{
+				lostfilm::getCookies($tracker, $array);
+				lostfilm::$exucution = TRUE;
+			}
+			else
+			{
+				$page = lostfilm::login('hard', $login, $password);
+
+				preg_match_all('/name=\"(.*)\"/iU', $page, $array_names);
+				preg_match_all('/value=\"(.*)\"/iU', $page, $array_values);
+				
+				if ( ! empty($array_names) &&  ! empty($array_values))
+				{
+					$post = '';
+					for($i=0; $i<count($array_values[1]); $i++)
+						$post .= $array_names[1][$i+1].'='.$array_values[1][$i].'&';
+				}
+				$post = substr($post, 0, -1);
+				$page = lostfilm::loginBogi($post);
+				
+				if (preg_match_all("/Set-Cookie: (\w*)=(\S*)/", $page, $array))
+				{
+					lostfilm::getCookies($array);
+					lostfilm::$exucution = TRUE;
+				}	
+			}
+		}
+		else
+		{
+			//устанавливаем варнинг
+			if (lostfilm::$warning == NULL)
+			{
+				lostfilm::$warning = TRUE;
+				Errors::setWarnings($tracker, 'credential_miss');
+			}
+			//останавливаем выполнение цепочки
+			lostfilm::$exucution = FALSE;						
+		}	    	
+	}
+	
 	//основная функция
 	public static function main($id, $tracker, $name, $hd, $ep, $timestamp)
 	{
@@ -224,55 +301,15 @@ class lostfilm
 			//проверяем получена ли уже кука
 			if (empty(lostfilm::$sess_cookie))
 			{
-				//проверяем заполнены ли учётные данные
-				if (Database::checkTrackersCredentialsExist($tracker))
-				{
-					//получаем учётные данные
-					$credentials = Database::getCredentials($tracker);
-					$login = iconv("utf-8", "windows-1251", $credentials['login']);
-					$password = $credentials['password'];
-					
-					$page = lostfilm::login('simple', $login, $password);
-					
-					if (preg_match_all("/Set-Cookie: (\w*)=(\S*)/", $page, $array))
-					{
-						lostfilm::getCookies($array);
-						lostfilm::$exucution = TRUE;
-					}
-					else
-					{
-						$page = lostfilm::login('hard', $login, $password);
-
-						preg_match_all('/name=\"(.*)\"/iU', $page, $array_names);
-						preg_match_all('/value=\"(.*)\"/iU', $page, $array_values);
-						
-						if ( ! empty($array_names) &&  ! empty($array_values))
-						{
-							$post = '';
-							for($i=0; $i<count($array_values[1]); $i++)
-								$post .= $array_names[1][$i+1].'='.$array_values[1][$i].'&';
-						}
-						$post = substr($post, 0, -1);
-						$page = lostfilm::loginBogi($post);
-						
-						if (preg_match_all("/Set-Cookie: (\w*)=(\S*)/", $page, $array))
-						{
-							lostfilm::getCookies($array);
-							lostfilm::$exucution = TRUE;
-						}	
-					}
-				}
-				else
-				{
-					//устанавливаем варнинг
-    				if (lostfilm::$warning == NULL)
-        			{
-        				lostfilm::$warning = TRUE;
-        				Errors::setWarnings($tracker, 'credential_miss');
-        			}
-					//останавливаем выполнение цепочки
-					lostfilm::$exucution = FALSE;						
-				}	
+        		$cookie = Database::getCookie($tracker);
+        		if (lostfilm::checkCookie($cookie))
+        		{
+        			lostfilm::$sess_cookie = $cookie;
+        			//запускам процесс выполнения
+        			lostfilm::$exucution = TRUE;
+        		}			
+        		else
+            		lostfilm::getCookie($tracker);
 			}
 	
 			//проверяем получена ли уже RSS лента

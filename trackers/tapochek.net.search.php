@@ -1,8 +1,9 @@
 <?php
-include_once('nnm-club.ru.engine.php');
+include_once('tapochek.net.engine.php');
 
-class nnmclubSearch extends nnmclub
+class tapochekSearch extends tapochek
 {
+	
 	//получаем страницу для парсинга
 	private static function getSearchPage($user, $sess_cookie)
 	{
@@ -12,11 +13,11 @@ class nnmclubSearch extends nnmclub
 		curl_setopt($ch, CURLOPT_HEADER, 1);
 		curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, "http://nnm-club.ru/forum/tracker.php");
-		$header[] = "Host: nnm-club.ru\r\n";
+		curl_setopt($ch, CURLOPT_URL, "http://tapochek.net/tracker.php");
+		$header[] = "Host: tapochek.net\r\n";
 		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
 		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, "prev_sd=0&prev_a=0&prev_my=0&prev_n=0&prev_shc=0&prev_shf=1&prev_sha=1&prev_shs=0&prev_shr=0&prev_sht=0&f%5B%5D=-1&o=1&s=2&tm=-1&shf=1&sha=1&ta=-1&sns=-1&sds=-1&nm=&pn={$user}&submit=%CF%EE%E8%F1%EA");
+		curl_setopt($ch, CURLOPT_POSTFIELDS, "prev_allw=1&prev_a=0&prev_ts_checked=0&prev_ts_not_checked=0&prev_ts_closed=0&prev_ts_d=0&prev_ts_not_perfect=0&prev_ts_part_perfect=0&prev_ts_fishily=0&prev_ts_copy=0&prev_ts_pogl=0&prev_ts_proverka=0&prev_ts_ideal_rip=0&prev_ts_toch_rip=0&prev_ts_mb_ne_toch_rip=0&prev_ts_ne_toch_rip=0&prev_ts_tmp=0&prev_gold=0&prev_silver=0&prev_dla=0&prev_dlc=0&prev_dld=0&prev_dlw=0&prev_my=0&prev_new=0&prev_sd=0&prev_da=1&prev_dc=0&prev_df=1&prev_ds=0&save_profile=0&profile_name=&f%5B%5D=-1&o=1&s=2&tm=-1&sns=-1&df=1&da=1&pn={$user}&nm=&allw=1&submit=%A0%A0%CF%EE%E8%F1%EA%A0%A0");
 		$result = curl_exec($ch);
 		curl_close($ch);
 		
@@ -27,41 +28,47 @@ class nnmclubSearch extends nnmclub
 	public static function mainSearch($user_id, $tracker, $user)
 	{
 		$cookie = Database::getCookie($tracker);
-		if (nnmclub::checkCookie($cookie))
+		if (tapochek::checkCookie($cookie))
 		{
-			nnmclub::$sess_cookie = $cookie;
+			tapochek::$sess_cookie = $cookie;
 			//запускам процесс выполнения
-			nnmclub::$exucution = TRUE;
+			tapochek::$exucution = TRUE;
 		}			
 		else
-    		nnmclub::getCookie($tracker);
-    		
-		if (nnmclub::$exucution)
 		{
+    		tapochek::getCookie($tracker);
+    		if (tapochek::$sess_cookie == 'deleted')
+    			tapochek::getCookie($tracker);
+		}
+		
+        if (tapochek::$exucution)
+		{			
     		$user = iconv("utf-8", "windows-1251", $user);
-    		$page = nnmclubSearch::getSearchPage($user, nnmclub::$sess_cookie);
+    		$page = tapochekSearch::getSearchPage($user, tapochek::$sess_cookie);
     		
-    		preg_match_all('/<a class=\"gen\" href=\"tracker\.php\?f=\d{3,9}\">(.*)<\/a>/', $page, $section);
-    		preg_match_all('/<a class=\"(genmed|leechmed|seedmed) (topicpremod|topictitle)\" href=\"viewtopic\.php\?t=(\d{3,9})\"><b>(.*)<\/b><\/a>/', $page, $threme);
+    		preg_match_all('/<a class=\"gen\" href=\"tracker\.php\?f=\d{1,9}&nm=&pid=\d{1,9}\">(.*)<\/a>/', $page, $section);
+    		preg_match_all('/<a class=\"genmed\"  href=\"\.\/viewtopic\.php\?t=(\d{3,9})\"><b>(.*)<\/b><\/a>/', $page, $threme);
     		
     		for ($i=0; $i<count($threme[1]); $i++)
-    			Database::addThremeToBuffer($user_id, $section[1][$i], $threme[3][$i], $threme[4][$i], $tracker);
-    
+    		{
+    			Database::addThremeToBuffer($user_id, $section[1][$i], $threme[1][$i], $threme[2][$i], $tracker);
+    		}
+
     		$toDownload = Database::takeToDownload($tracker);
     		if (count($toDownload) > 0)
     		{
                 for ($i=0; $i<count($toDownload); $i++)
                 {
-                    nnmclub::$page = nnmclub::getContent($toDownload[$i]['threme_id'], nnmclub::$sess_cookie);
+                    tapochek::$page = tapochek::getContent($toDownload[$i]['threme_id'], tapochek::$sess_cookie);
 			
-        			if ( ! empty(nnmclub::$page))
+        			if ( ! empty(tapochek::$page))
         			{
                         //находим имя торрента для скачивания		
-                        if (preg_match("/download\.php\?id=(\d{2,8})/", nnmclub::$page, $link))
+                        if (preg_match("/download\.php\?id=(\d{2,8})/", tapochek::$page, $link))
                         {
                             //сохраняем торрент в файл
                             $torrent_id = $link[1];
-            				$torrent = nnmclub::getTorrent($torrent_id, nnmclub::$sess_cookie);
+            				$torrent = tapochek::getTorrent($torrent_id, tapochek::$sess_cookie);
             				$client = ClientAdapterFactory::getStorage('file');
             				$client->store($torrent, $toDownload[$i]['threme_id'], $tracker, $toDownload[$i]['threme'], $torrent_id, time());
             				//обновляем время регистрации торрента в базе
@@ -71,7 +78,7 @@ class nnmclubSearch extends nnmclub
             				$date = date('d M Y H:i');
             				Notification::sendNotification('notification', $date, $tracker, $message);
                         }
-                    }            
+                    }
                 }
             }
         }

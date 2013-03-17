@@ -86,7 +86,7 @@ if (Sys::checkInternet())
 		<tr>
 				<?php	
 				}
-				if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.ru')
+				if ($tracker == 'nnm-club.ru' || $tracker == 'rutracker.org' || $tracker == 'tapochek.net' || $tracker == 'tfile.me')
 				{
 					if (file_exists($dir.'trackers/'.$tracker.'.search.php'))
 					{
@@ -124,7 +124,7 @@ if (Sys::checkInternet())
 				}
 				ini_set('default_socket_timeout', 15);
 				$headers = @get_headers('http://'.$tracker);
-				if(@preg_match('/200/', $headers[0]) || @preg_match('/200/', $headers[7]))
+				if (@preg_match('/200/', $headers[0]) || @preg_match('/200/', $headers[7]))
 				{
 				?>
 		<tr>

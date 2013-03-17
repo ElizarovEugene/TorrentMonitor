@@ -58,7 +58,7 @@ class Sys
 	
 	public static function version()
 	{
-		return '0.7.5';
+		return '0.7.6';
 	}
 
 	public static function checkUpdate()
@@ -88,11 +88,16 @@ class Sys
 		
 		if ($tracker != 'rutor.org')
 			$result = iconv("windows-1251", "utf-8", $result);
+			
+		if ($tracker == 'tr.anidub.com')
+			$tracker = 'anidub.com';
 		
 		preg_match("/<title>(.+?.)<\/title>/is", $result, $array);
 		if ( ! empty($array[1]))
 		{
 			$name = $array[1];
+			if ($tracker == 'anidub.com')
+				$name = substr($name, 15, -50);
 			if ($tracker == 'nnm-club.ru')
 				$name = substr($name, 0, -23);
 			if ($tracker == 'rutracker.org')

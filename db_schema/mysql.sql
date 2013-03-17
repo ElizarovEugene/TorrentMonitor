@@ -31,6 +31,7 @@ CREATE TABLE `credentials` (
   `tracker` varchar(30) DEFAULT NULL,
   `log` varchar(30) DEFAULT NULL,
   `pass` varchar(30) DEFAULT NULL,
+  `cookie` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -39,14 +40,15 @@ LOCK TABLES `credentials` WRITE;
 
 INSERT INTO `credentials` (`id`, `tracker`, `log`, `pass`)
 VALUES
-	(1,'rutracker.org','',''),
-	(2,'nnm-club.ru','',''),
-	(3,'lostfilm.tv','',''),
-	(4,'novafilm.tv','',''),
-	(5,'rutor.org', ' ', ' '),
-	(6,'tfile.me', ' ', ' '),
-	(7,'kinozal.tv', '', ''),
-	(8,'tapochek.net', '', '');
+	(1,'rutracker.org','','',''),
+	(2,'nnm-club.ru','','',''),
+	(3,'lostfilm.tv','','',''),
+	(4,'novafilm.tv','','',''),
+	(5,'rutor.org', ' ', ' ',''),
+	(6,'tfile.me', ' ', ' ',''),
+	(7,'kinozal.tv', '', '',''),
+	(8,'tapochek.net', '', '',''),
+	(9,'anidub.com', '', '','');
 
 /*!40000 ALTER TABLE `credentials` ENABLE KEYS */;
 UNLOCK TABLES;
