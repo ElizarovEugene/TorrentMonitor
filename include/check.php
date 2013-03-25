@@ -50,11 +50,12 @@ if (Sys::checkInternet())
 		<tr>			
 			<?php	
 			}
-			if (Sys::checkWriteToPath(__DIR__.'/../'))
+			$dir = str_replace('include', '', __DIR__);
+			if (Sys::checkWriteToPath($dir))
 			{
 			?>
 		<tr>
-			<td>Запись в системную директорию <?php echo __DIR__?> разрешена.</td>
+			<td>Запись в системную директорию <?php echo $dir?> разрешена.</td>
 		<tr>
 			<?php	
 			}
@@ -62,7 +63,7 @@ if (Sys::checkInternet())
 			{
 			?>
 		<tr>
-			<td class="test-error">Запись в системную директорию <?php echo __DIR__?> запрещена.</td>
+			<td class="test-error">Запись в системную директорию <?php echo $dir?> запрещена.</td>
 		<tr>
 			<?php	
 			}
