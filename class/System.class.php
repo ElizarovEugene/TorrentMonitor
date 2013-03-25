@@ -45,15 +45,9 @@ class Sys
 		return $path;
 	}
 	
-	public static function checkWriteToTorrentPath($path)
+	public static function checkWriteToPath($path)
 	{
-		if (file_put_contents($path.'file.txt', ' '))
-		{
-			unlink($path.'file.txt');
-			return TRUE;
-		}
-		else
-			return FALSE;
+		return is_writable($path);
 	}
 	
 	public static function version()

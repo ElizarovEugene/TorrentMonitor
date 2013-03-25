@@ -34,7 +34,7 @@ if (Sys::checkInternet())
 			include_once $dir."class/Database.class.php";
 			
 			$torrentPath = Database::getSetting('path');
-			if (Sys::checkWriteToTorrentPath($torrentPath))
+			if (Sys::checkWriteToPath($torrentPath))
 			{
 			?>
 		<tr>
@@ -50,7 +50,7 @@ if (Sys::checkInternet())
 		<tr>			
 			<?php	
 			}
-			if (Sys::checkWriteToTorrentPath(__DIR__.'/../'))
+			if (Sys::checkWriteToPath(__DIR__.'/../'))
 			{
 			?>
 		<tr>
