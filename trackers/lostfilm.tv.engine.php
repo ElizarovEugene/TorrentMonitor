@@ -274,7 +274,7 @@ class lostfilm
 				
 				if (preg_match_all("/Set-Cookie: (\w*)=(\S*)/", $page, $array))
 				{
-					lostfilm::getCookies($array);
+					lostfilm::getCookies($tracker, $array);
 					lostfilm::$exucution = TRUE;
 				}	
 			}
