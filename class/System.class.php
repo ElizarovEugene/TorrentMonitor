@@ -76,32 +76,29 @@ class Sys
 		curl_setopt($ch, CURLOPT_URL, "{$url}");
 		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HEADER, 1);
 		$result = curl_exec($ch);
 		curl_close($ch);
-		
+
 		if ($tracker != 'rutor.org')
-			$result = iconv("windows-1251", "utf-8", $result);
-			
+			$result = iconv("windows-1251", "utf-8//IGNORE", $result);
+
 		if ($tracker == 'tr.anidub.com')
 			$tracker = 'anidub.com';
 		
-		preg_match("/<title>(.+?.)<\/title>/is", $result, $array);
+		preg_match("/<title>(.*)<\/title>/is", $result, $array);
 		if ( ! empty($array[1]))
 		{
 			$name = $array[1];
 			if ($tracker == 'anidub.com')
 				$name = substr($name, 15, -50);
+			if ($tracker == 'kinozal.tv')
+				$name = substr($name, 0, -22);
 			if ($tracker == 'nnm-club.ru')
 				$name = substr($name, 0, -23);
 			if ($tracker == 'rutracker.org')
 				$name = substr($name, 0, -34);
 			if ($tracker == 'rutor.org')
 				$name = substr($name, 13);
-			if ($tracker == 'kinozal.tv')
-				$name = substr($name, 0, -22);
-			if ($tracker == 'tapochek.net')
-				$name = substr($name, 0, -16);
 		}
 		else
 			$name = "Неизвестный";
