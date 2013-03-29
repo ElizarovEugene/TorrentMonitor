@@ -16,6 +16,7 @@
 * Поиск новых серий на novafilm.tv (SD/HD версии на выбор)
 
 ###Скриншоты:
+![Screenshot0](http://blog.korphome.ru/wp-content/uploads/2011/02/IMG_0003.png "Screenshot0")
 ![Screenshot1](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый11.png "Screenshot1")
 ![Screenshot2](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый.png "Screenshot2")
 ![Screenshot3](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый21.png "Screenshot3")
