@@ -119,6 +119,7 @@ class lostfilm
 		$result = curl_exec($ch);
 		curl_close($ch);
 		
+		$result = iconv("windows-1251", "utf-8", $result);		
 		return $result;
 	}
 	
@@ -319,6 +320,7 @@ class lostfilm
 				{
 					//получаем страницу
 					lostfilm::$page = lostfilm::getContent();
+					lostfilm::$page = str_replace('<?xml version="1.0" encoding="windows-1251" ?>','<?xml version="1.0" encoding="utf-8"?>', lostfilm::$page);
 					if ( ! empty(lostfilm::$page))
 					{
 						//читаем xml
