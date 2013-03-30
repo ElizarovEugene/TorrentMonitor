@@ -425,10 +425,10 @@ function del_user(id)
 function changefunc() 
 {
 	var select = document.getElementById("selectfunc");
-	var a = ['anidub.com', 'kinozal.tv', 'lostfilm.tv', 'nnm-club.ru', 'novafilm.tv', 'rutracker.org'];
-	for (var i = 0; i < a.length; i++)
+	var a = select.options;
+	for (var i = 1; i < a.length; i++)
 	{
-		var e = a[i];
+		var e = a[i].value;
 		if (select.value == e)
 			var d = "block";    
 		else
