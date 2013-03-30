@@ -425,7 +425,7 @@ function del_user(id)
 function changefunc() 
 {
 	var select = document.getElementById("selectfunc");
-	var a = ['anidub.com', 'kinozal.tv', 'lostfilm.tv', 'nnm-club.ru', 'novafilm.tv', 'rutracker.org'];
+	var a = ['anidub.com', 'kinozal.tv', 'lostfilm.tv', 'nnm-club.ru', 'novafilm.tv', 'rutracker.org', 'rutor.org'];
 	for (var i = 0; i < a.length; i++)
 	{
 		var e = a[i];
