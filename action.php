@@ -34,8 +34,7 @@ if (isset($_POST["action"]))
 		if ($url = parse_url($_POST["url"]))
 		{
 			$tracker = $url["host"];
-			if (strpos($tracker, 'www\.'))
-				$tracker = substr($tracker, 4);
+			$tracker = preg_replace('/www\./', '', $tracker);
 			if ($tracker == 'tr.anidub.com')
 				$tracker = 'anidub.com';
 			

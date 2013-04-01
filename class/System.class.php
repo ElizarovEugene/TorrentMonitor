@@ -69,8 +69,7 @@ class Sys
 	{
 		$Purl = parse_url($url);
 		$tracker = $Purl["host"];
-		if (strpos($tracker, 'www\.'))
-			$tracker = substr($tracker, 4);
+		$tracker = preg_replace('/www\./', '', $tracker);
 	
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, "{$url}");
