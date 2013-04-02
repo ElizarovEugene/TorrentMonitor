@@ -268,16 +268,6 @@ if (isset($_POST["action"]))
 		return TRUE;
 	}
 	
-	//Удаляем пользователя
-	if ($_POST["action"] == "del_user")
-	{
-		Database::deletUser($_POST["id"]);
-		?>
-		Удаляю...
-		<?php
-		return TRUE;
-	}
-	
 	//Обновляем личные данные
 	if ($_POST["action"] == "update_credentials")
 	{

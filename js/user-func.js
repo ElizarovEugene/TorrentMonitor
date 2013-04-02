@@ -32,7 +32,7 @@ $(".h-menu li").click(function() {
 //Подгрузка страниц
 function show(name)
 {
-	$.post("include/"+name+".php",
+	$.get("include/"+name+".php",
 		function(data) {
 			$('#content').empty().append(data);
 		}
@@ -219,7 +219,7 @@ function delete_user(id)
 	$.post("action.php",{action: 'delete_user', user_id: id},
 		function(data) {
 			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
-			$.post("include/show_watching.php",
+			$.get("include/show_watching.php",
         		function(data) {
         			$('#content').delay(3000).empty().append(data);
         		}
@@ -236,7 +236,7 @@ function delete_from_buffer(id)
 	$.post("action.php",{action: 'delete_from_buffer', id: id},
 		function(data) {
 			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
-			$.post("include/show_watching.php",
+			$.get("include/show_watching.php",
         		function(data) {
         			$('#content').delay(3000).empty().append(data);
         		}
@@ -253,7 +253,7 @@ function transfer_from_buffer(id)
 	$.post("action.php",{action: 'transfer_from_buffer', id: id},
 		function(data) {
 			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
-			$.post("include/show_watching.php",
+			$.get("include/show_watching.php",
         		function(data) {
         			$('#content').delay(3000).empty().append(data);
         		}
@@ -275,7 +275,7 @@ function threme_add(id, user_id)
 			}
 			else
 			{
-				$.post("include/show_watching.php",
+				$.get("include/show_watching.php",
 					function(data) {
 						$('#content').empty().append(data);
 					}
@@ -294,7 +294,7 @@ $("#threme_clear").submit(function()
 	$.post("action.php",{action: 'threme_clear'},
 		function(data) {
 			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
-			$.post("include/show_watching.php",
+			$.get("include/show_watching.php",
 				function(data) {
 					$('#content').empty().append(data);
 				}
@@ -404,20 +404,13 @@ function del(id)
 	$.post("action.php",{action: 'del', id: id},
 		function(data) {
 			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+			$.get("include/show_table.php",
+        		function(data) {
+        			$('#content').delay(3000).empty().append(data);
+        		}
+        	);
 		}
-	);
-	return false;
-}
-
-//Удаляем пользователя
-function del_user(id)
-{
-	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-	$.post("action.php",{action: 'del_user', id: id},
-		function(data) {
-			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
-		}
-	);
+	);	
 	return false;
 }
 
