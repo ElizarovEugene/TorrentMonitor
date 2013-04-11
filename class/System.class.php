@@ -9,23 +9,27 @@ class Sys
 		else
 			return FALSE;
 	}
+	
+	public static function checkConfigExist()
+	{
+		$configFile = __DIR__.'/../config.php';
+		if (file_exists($configFile))
+			return TRUE;
+		else
+			return FALSE;
+	}
 
 	public static function checkConfig()
 	{
 		$configFile = __DIR__.'/../config.php';
-		if (file_exists($configFile))
+		include_once($configFile);
+		$confArray = Config::$confArray;
+		foreach ($confArray as $key => $val)
 		{
-			include_once($configFile);
-			$confArray = Config::$confArray;
-			foreach ($confArray as $key => $val)
-			{
-				if (empty($val))
-					return FALSE;
-			}
-			return TRUE;
+			if (empty($val))
+				return FALSE;
 		}
-		else
-			return FALSE;
+		return TRUE;
 	}
 
 	public static function checkCurl()
