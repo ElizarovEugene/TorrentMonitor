@@ -1,6 +1,7 @@
 <form id="threme_clear" method="post">
 <?php
-$dir = dirname(__FILE__)."/../";
+$dir = dirname(__FILE__);
+$dir = str_replace('include', '', $dir);
 include_once $dir."config.php";
 include_once $dir."class/System.class.php";
 include_once $dir."class/Database.class.php";

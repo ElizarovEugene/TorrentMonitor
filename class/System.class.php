@@ -1,6 +1,13 @@
 <?php
 class Sys
 {
+	public static function configPath()
+	{
+		$dir = dirname(__FILE__);
+		$dir = str_replace('class', '', $dir);
+		return $dir.'/config.php';
+	}
+
 	public static function checkInternet()
 	{
 		$page = file_get_contents('http://ya.ru');
@@ -12,8 +19,7 @@ class Sys
 	
 	public static function checkConfigExist()
 	{
-		$configFile = __DIR__.'/../config.php';
-		if (file_exists($configFile))
+		if (file_exists(Sys::configPath()))
 			return TRUE;
 		else
 			return FALSE;
@@ -21,8 +27,7 @@ class Sys
 
 	public static function checkConfig()
 	{
-		$configFile = __DIR__.'/../config.php';
-		include_once($configFile);
+		include_once(Sys::configPath());
 		$confArray = Config::$confArray;
 		foreach ($confArray as $key => $val)
 		{

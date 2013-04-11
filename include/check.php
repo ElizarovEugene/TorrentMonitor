@@ -1,5 +1,6 @@
 <?php 
-$dir = dirname(__FILE__)."/../";
+$dir = dirname(__FILE__);
+$dir = str_replace('include', '', $dir);
 include_once $dir."class/System.class.php";
 ?>
 <table class="test">
@@ -57,7 +58,7 @@ if (Sys::checkInternet())
 			<tr>			
 				<?php	
 				}
-				$dir = str_replace('include', '', __DIR__);
+				$dir = str_replace('include', '', $dir);
 				if (Sys::checkWriteToPath($dir))
 				{
 				?>
