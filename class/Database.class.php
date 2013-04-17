@@ -11,7 +11,7 @@ class Database
         switch ($this->dbType)
         {
             case 'mysql':
-                $dsn = "mysql:host=".Config::read('db.host').";dbname=".Config::read('db.basename');
+                $dsn = "mysql:host=".Config::read('db.host').";port=".Config::read('db.port').";dbname=".Config::read('db.basename');
                 $username = Config::read('db.user');
                 $password = Config::read('db.password');
                 $options = array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES ".Config::read('db.charset'));
