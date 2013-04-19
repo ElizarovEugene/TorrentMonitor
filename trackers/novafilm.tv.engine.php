@@ -118,7 +118,7 @@ Content-Disposition: form-data; name=\"login\"
 
 	public static function checkRule($data)
 	{
-		if (preg_match("/^[\.\+\s\'a-zA-Z0-9]+$/", $data))
+		if (preg_match("/^[\.\+\s\'\`\:\;\-a-zA-Z0-9]+$/", $data))
 			return TRUE;
 		else
 			return FALSE;
