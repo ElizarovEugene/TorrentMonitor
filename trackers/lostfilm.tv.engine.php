@@ -251,16 +251,25 @@ class lostfilm
 			$password = $credentials['password'];
 			
 			$page = lostfilm::login('simple', $login, $password);
-			
 			if (preg_match_all("/Set-Cookie: (\w*)=(\S*)/", $page, $array))
 			{
 				lostfilm::getCookies($tracker, $array);
 				lostfilm::$exucution = TRUE;
 			}
+			elseif (preg_match_all("/\/recover\.php/", $page, $array))
+			{
+    			//устанавливаем варнинг
+    			if (lostfilm::$warning == NULL)
+    			{
+    				lostfilm::$warning = TRUE;
+    				Errors::setWarnings($tracker, 'credential_wrong');
+    			}
+    			//останавливаем выполнение цепочки
+    			lostfilm::$exucution = FALSE;	
+			}
 			else
 			{
 				$page = lostfilm::login('hard', $login, $password);
-
 				preg_match_all('/name=\"(.*)\"/iU', $page, $array_names);
 				preg_match_all('/value=\"(.*)\"/iU', $page, $array_values);
 				
