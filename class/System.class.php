@@ -136,8 +136,10 @@ class Sys
 	
 	public static function lastStart()
 	{
+        $dir = dirname(__FILE__);
+		$dir = str_replace('class', '', $dir);	   
 		$date = date("d-m-Y H:i:s");
-		file_put_contents(__DIR__.'/../laststart.txt', $date);
+		file_put_contents($dir.'/laststart.txt', $date);
 	}
 }
 ?>
