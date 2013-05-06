@@ -41,7 +41,7 @@ class lostfilm
 		}
 		$result = curl_exec($ch);
 		curl_close($ch);
-		
+
 		return $result;
 	}
 	
@@ -255,17 +255,6 @@ class lostfilm
 			{
 				lostfilm::getCookies($tracker, $array);
 				lostfilm::$exucution = TRUE;
-			}
-			elseif (preg_match_all("/\/recover\.php/", $page, $array))
-			{
-    			//устанавливаем варнинг
-    			if (lostfilm::$warning == NULL)
-    			{
-    				lostfilm::$warning = TRUE;
-    				Errors::setWarnings($tracker, 'credential_wrong');
-    			}
-    			//останавливаем выполнение цепочки
-    			lostfilm::$exucution = FALSE;	
 			}
 			else
 			{
