@@ -237,13 +237,18 @@ class anidub
 							//если даты не совпадают, перекачиваем торрент
 							if ($date != $timestamp)
 							{
-                                preg_match('/<a href=\"download\.php\?id=(\d{2,6})&amp;name=(.*)\">/U', $page, $array);
-                                $torrent_id = $array[1];
-                                $torrent_id_name = $array[2];
-								//сохраняем торрент в файл
-								$torrent = anidub::getTorrent($torrent_id, $torrent_id_name, anidub::$sess_cookie);
-								$client = ClientAdapterFactory::getStorage('file');
-								$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
+								preg_match('/<a href=\"download\.php\?id=(\d{2,6})&amp;name=(.*)\">/U', $page, $array);
+								$torrent_id = $array[1];
+								$torrent_id_name = $array[2];
+
+								if (Database::getSetting('download'))
+								{
+									//сохраняем торрент в файл
+									$torrent = anidub::getTorrent($torrent_id, $torrent_id_name, anidub::$sess_cookie);
+									$client = ClientAdapterFactory::getStorage('file');
+									$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
+								}
+
 								//обновляем время регистрации торрента в базе
 								Database::setNewDate($id, $date);
 								//отправляем уведомлении о новом торренте

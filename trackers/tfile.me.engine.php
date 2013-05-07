@@ -128,10 +128,14 @@ class tfile
 								$torrent_id = tfile::findId($page);
 								if (is_string($torrent_id))
 								{
-									//сохраняем торрент в файл
-									$torrent = tfile::getTorrent($torrent_id);
-									$client = ClientAdapterFactory::getStorage('file');
-									$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
+									if (Database::getSetting('download'))
+									{
+										//сохраняем торрент в файл
+										$torrent = tfile::getTorrent($torrent_id);
+										$client = ClientAdapterFactory::getStorage('file');
+										$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
+									}
+
 									//обновляем время регистрации торрента в базе
 									Database::setNewDate($id, $date);
 									//отправляем уведомлении о новом торренте

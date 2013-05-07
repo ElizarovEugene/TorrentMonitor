@@ -230,9 +230,14 @@ class nnmclub
 								{
 									//сохраняем торрент в файл
 									$torrent_id = $link[1];
-									$torrent = nnmclub::getTorrent($torrent_id, nnmclub::$sess_cookie);
-									$client = ClientAdapterFactory::getStorage('file');
-									$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
+
+									if (Database::getSetting('download'))
+									{
+										$torrent = nnmclub::getTorrent($torrent_id, nnmclub::$sess_cookie);
+										$client = ClientAdapterFactory::getStorage('file');
+										$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
+									}
+
 									//обновляем время регистрации торрента в базе
 									Database::setNewDate($id, $date);
 									//отправляем уведомлении о новом торренте

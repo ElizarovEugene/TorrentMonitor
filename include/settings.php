@@ -19,6 +19,10 @@ foreach ($settings as $row)
         <span class="subinput-text">Например: /var/torrent/upload/</span>
     </p>
     <p>
+        <label class="label-name"></label>
+        <label><input type="checkbox" name="download" <?php if ($download) echo "checked" ?>> Загружать .torrent файлы</label>
+    </p>
+    <p>
         <label class="label-name">Эл. ящик для уведомлений</label>
         <input type="text" name="email" value="<?php echo $email ?>">
         <span class="subinput-text">Например: vasia@mail.ru</span>

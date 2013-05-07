@@ -302,6 +302,12 @@ if (isset($_POST["action"]))
 		else 
 			$auth = 0;
 		Database::updateSettings('auth', $auth);
+
+		if ( ! empty($_POST["download"]))
+			$download = 1;
+		else
+			$download = 0;
+		Database::updateSettings('download', $download);
 		?>
 		Настройки монитора обновлены.
 		<?php

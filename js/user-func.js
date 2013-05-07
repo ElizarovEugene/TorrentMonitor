@@ -343,14 +343,15 @@ $("#setting").submit(function()
 		s = $form.find('input[type=submit]'),
 		p = $form.find('input[name="path"]').val(),
 		e = $form.find('input[name="email"]').val(),
-		s = $form.find('input[name="send"]').attr('checked');
-		s_w = $form.find('input[name="send_warning"]').attr('checked');
-		a = $form.find('input[name="auth"]').attr('checked');
+		s = $form.find('input[name="send"]').attr('checked'),
+		s_w = $form.find('input[name="send_warning"]').attr('checked'),
+		a = $form.find('input[name="auth"]').attr('checked'),
+		dl = $form.find('input[name="download"]').attr('checked');
 	
 	$(s).attr('disabled', 'disabled');
 	
 	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-	$.post("action.php",{action: 'update_settings', path: p, email: e, send: s, send_warning: s_w, auth: a},
+	$.post("action.php",{action: 'update_settings', path: p, email: e, send: s, send_warning: s_w, auth: a, download: dl},
 		function(data) {
 			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
 			$(s).removeAttr('disabled');
