@@ -231,29 +231,40 @@ class kinozal
 				//если даты не совпадают, перекачиваем торрент
 				if ($date != $timestamp)
 				{
-					//сохраняем торрент в файл
-					$torrent = kinozal::getTorrent($torrent_id, kinozal::$sess_cookie);
-					if (preg_match('/<a href=\'\/pay_mode\.php\#tcounter\' class=sbab>/', $torrent))
+					if (Database::getSetting('download'))
 					{
-        				//устанавливаем варнинг
-        				if (kinozal::$warning == NULL)
-        				{
-        					kinozal::$warning = TRUE;
-        					Errors::setWarnings($tracker, 'max_torrent');
-        				}
-        				//останавливаем процесс выполнения
-        				kinozal::$exucution = FALSE;
+						//сохраняем торрент в файл
+						$torrent = kinozal::getTorrent($torrent_id, kinozal::$sess_cookie);
+						if (preg_match('/<a href=\'\/pay_mode\.php\#tcounter\' class=sbab>/', $torrent))
+						{
+							//устанавливаем варнинг
+							if (kinozal::$warning == NULL)
+							{
+								kinozal::$warning = TRUE;
+								Errors::setWarnings($tracker, 'max_torrent');
+							}
+							//останавливаем процесс выполнения
+							kinozal::$exucution = FALSE;
+						}
+						else
+						{
+							$client = ClientAdapterFactory::getStorage('file');
+							$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
+							//обновляем время регистрации торрента в базе
+							Database::setNewDate($id, $date);
+							//отправляем уведомлении о новом торренте
+							$message = $name.' обновлён.';
+							Notification::sendNotification('notification', $date_str, $tracker, $message);
+						}
 					}
 					else
 					{
-    					$client = ClientAdapterFactory::getStorage('file');
-    					$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
-    					//обновляем время регистрации торрента в базе
-    					Database::setNewDate($id, $date);
-    					//отправляем уведомлении о новом торренте
-    					$message = $name.' обновлён.';
-    					Notification::sendNotification('notification', $date_str, $tracker, $message);
-    				}
+						//обновляем время регистрации торрента в базе
+						Database::setNewDate($id, $date);
+						//отправляем уведомлении о новом торренте
+						$message = $name.' обновлён.';
+						Notification::sendNotification('notification', $date_str, $tracker, $message);
+					}
 				}
 			}
 			else

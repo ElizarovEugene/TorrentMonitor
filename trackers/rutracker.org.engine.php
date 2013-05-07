@@ -231,10 +231,14 @@ class rutracker
 							//если даты не совпадают, перекачиваем торрент
 							if ($date != $timestamp)
 							{
-								//сохраняем торрент в файл
-								$torrent = rutracker::getTorrent($torrent_id, rutracker::$sess_cookie);
-								$client = ClientAdapterFactory::getStorage('file');
-								$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
+								if (Database::getSetting('download'))
+								{
+									//сохраняем торрент в файл
+									$torrent = rutracker::getTorrent($torrent_id, rutracker::$sess_cookie);
+									$client = ClientAdapterFactory::getStorage('file');
+									$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
+								}
+
 								//обновляем время регистрации торрента в базе
 								Database::setNewDate($id, $date);
 								//отправляем уведомлении о новом торренте
