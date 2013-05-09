@@ -46,8 +46,8 @@ class Errors
         $date = date('Y-m-d H:i:s');
     	Database::setWarnings($date, $tracker, $warning);
     	$countErrors = Database::getWarningsCount($tracker);
-    	if ($countErrors == 1)
-			Notification::sendNotification('warning', $date, $tracker, $message);
+    	if ($countErrors[0]['count'] == 1)
+			Notification::sendNotification('warning', $date, $tracker, Errors::getWarning($warning));
     }
 }
 ?>
