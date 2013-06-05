@@ -361,6 +361,7 @@ Content-Disposition: form-data; name=\"login\"
 						{
 							$torrent = novafilm::getTorrent($serial['link'], novafilm::$sess_cookie);
 							$amp = ($hd) ? 'HD' : NULL;
+							$file = '[novafilm.tv]_'.$name.'_'.$serial['episode'].'_'.$amp.'.torrent';
 							//сохраняем торрент в файл
 							$client = ClientAdapterFactory::getStorage('file');
 							$client->store($torrent, $id, $tracker, $name, $id, $timestamp, array('filename' => $file));							
