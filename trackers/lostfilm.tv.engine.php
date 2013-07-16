@@ -2,11 +2,11 @@
 class lostfilm
 {
 	protected static $sess_cookie;
-	protected static $exucution;
+	protected static $exucution = TRUE;
 	protected static $warning;
 	
 	protected static $page;	
-	protected static $log_page;
+	protected static $log_page = FALSE;
 	protected static $xml_page;
 
 	//инициализируем класс
