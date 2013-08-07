@@ -1,7 +1,6 @@
 <form id="threme_clear" method="post">
 <?php
-$dir = dirname(__FILE__);
-$dir = str_replace('include', '', $dir);
+$dir = dirname(__FILE__)."/../";
 include_once $dir."config.php";
 include_once $dir."class/System.class.php";
 include_once $dir."class/Database.class.php";
@@ -34,8 +33,8 @@ if ( ! empty($users))
 			<?php
 			for ($x=0; $x<count($thremes); $x++)
 			{
-			    if ($users[$i]['tracker'] == 'nnm-club.ru')
-					$url = 'http://nnm-club.ru/forum/viewtopic.php?t='; 
+			    if ($users[$i]['tracker'] == 'nnm-club.me')
+					$url = 'http://nnm-club.me/forum/viewtopic.php?t='; 
 				elseif ($users[$i]['tracker'] == 'rutracker.org')
 					$url = 'http://rutracker.org/forum/viewtopic.php?t=';
 				elseif ($users[$i]['tracker'] == 'tapochek.net')

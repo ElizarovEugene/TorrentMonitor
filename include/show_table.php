@@ -1,6 +1,5 @@
 <?php
-$dir = dirname(__FILE__);
-$dir = str_replace('include', '', $dir);
+$dir = dirname(__FILE__)."/../";
 include_once $dir."config.php";
 include_once $dir."class/System.class.php";
 include_once $dir."class/Database.class.php";
@@ -46,7 +45,7 @@ if ( ! empty($torrents_list))
             <td class="text-align-left"><span class="icon-torrent" style="background-image: url(img/<?php echo $tracker ?>.ico);"></span><?php echo $tracker ?></td>
             <td class="text-align-left">
     	  	<?php 
-    		if ($tracker == "rutracker.org" || $tracker == "nnm-club.ru" || $tracker == "tfile.me")
+    		if ($tracker == "rutracker.org" || $tracker == "nnm-club.me" || $tracker == "tfile.me")
     		{
     		?>
 				<a href="http://<?php echo $tracker ?>/forum/viewtopic.php?t=<?php echo $torrent_id ?>" target="_blank"><?php echo $name ?></a>
@@ -90,7 +89,7 @@ if ( ! empty($torrents_list))
             if ($timestamp == "0000-00-00 00:00:00" || $timestamp == NULL) {}
             else
             {
-            	if ($tracker != "rutracker.org" && $tracker != "nnm-club.ru" && $tracker != "rutor.org")
+            	if ($tracker != "rutracker.org" && $tracker != "nnm-club.me" && $tracker != "rutor.org")
             	{
             	?>
             	<div onclick="expand('div<?php echo $id ?>')" class="cut" style="cursor: pointer;">
@@ -116,7 +115,7 @@ if ( ! empty($torrents_list))
             		$season = substr($ep, 1, 2);
             		$episode = substr($ep, -2);
 
-                	if ($tracker != "rutracker.org" && $tracker != "nnm-club.ru")
+                	if ($tracker != "rutracker.org" && $tracker != "nnm-club.me")
                 	{
                 	?>
             		<div id="div<?php echo $id ?>" class="result">

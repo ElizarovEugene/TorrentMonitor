@@ -66,12 +66,68 @@ class Sys
 
 	public static function checkUpdate()
 	{
-		$xml = simplexml_load_file('http://korphome.ru/torrent_monitor/version.xml');
-		if (Sys::version() < $xml->current_version)
-			return TRUE;
+		$xml = @simplexml_load_file('http://korphome.ru/torrent_monitor/version.xml');
+		if (false !== $xml)
+		{
+			if (Sys::version() < $xml->current_version)
+				return TRUE;
+			else
+				return FALSE;
+		}
 		else
-			return FALSE;
+			Errors::setWarnings($tracker, 'update');
 	}
+	
+	public static function getUrlContent($param = null)
+    {
+    	if (is_array($param))
+    	{
+    		$ch = curl_init();
+    		if ($param['type'] == 'POST')
+    			curl_setopt($ch, CURLOPT_POST, 1);
+
+    		if ($param['type'] == 'GET')
+    			curl_setopt($ch, CURLOPT_HTTPGET, 1);
+
+    		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:16.0) Gecko/20100101 Firefox/16.0");
+
+    		if (isset($param['header']))
+    			curl_setopt($ch, CURLOPT_HEADER, 1);
+
+   			curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+
+    		if (isset($param['returntransfer']))
+    			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+    		curl_setopt($ch, CURLOPT_URL, $param['url']);
+
+    		if (isset($param['postfields']))
+    			curl_setopt($ch, CURLOPT_POSTFIELDS, $param['postfields']);
+
+    		if (isset($param['cookie']))
+    			curl_setopt($ch, CURLOPT_COOKIE, $param['cookie']);
+
+    		if (isset($param['sendHeader']))
+    		{
+    			foreach ($param['sendHeader'] as $k => $v)
+    			{
+    				$header[] = $k.': '.$v."\r\n";
+    			}
+    			curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+    		}		
+
+    		if (isset($param['referer']))
+    			curl_setopt($ch, CURLOPT_REFERER, $param['referer']);
+
+    		$result = curl_exec($ch);
+    		curl_close($ch);
+
+    		if (isset($param['convert']))
+    			$result = iconv($param['convert'][0], $param['convert'][1], $result);
+
+    		return $result;
+    	}
+    }
 	
 	//Получаем заголовок страницы
 	public static function getHeader($url)
@@ -80,20 +136,21 @@ class Sys
 		$tracker = $Purl["host"];
 		$tracker = preg_replace('/www\./', '', $tracker);
 	
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, "{$url}");
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		$result = curl_exec($ch);
-		curl_close($ch);
+		$forumPage = Sys::getUrlContent(
+            array(
+                'type'           => 'GET',
+                'returntransfer' => 1,
+                'url'            => $url,
+            )
+		);
 
 		if ($tracker != 'rutor.org')
-			$result = iconv("windows-1251", "utf-8//IGNORE", $result);
+			$forumPage = iconv("windows-1251", "utf-8//IGNORE", $forumPage);
 
 		if ($tracker == 'tr.anidub.com')
 			$tracker = 'anidub.com';
 		
-		preg_match("/<title>(.*)<\/title>/is", $result, $array);
+		preg_match("/<title>(.*)<\/title>/is", $forumPage, $array);
 		if ( ! empty($array[1]))
 		{
 			$name = $array[1];
@@ -101,8 +158,8 @@ class Sys
 				$name = substr($name, 15, -50);
 			if ($tracker == 'kinozal.tv')
 				$name = substr($name, 0, -22);
-			if ($tracker == 'nnm-club.ru')
-				$name = substr($name, 0, -23);
+			if ($tracker == 'nnm-club.me')
+				$name = substr($name, 0, -20);
 			if ($tracker == 'rutracker.org')
 				$name = substr($name, 0, -34);
 			if ($tracker == 'rutor.org')

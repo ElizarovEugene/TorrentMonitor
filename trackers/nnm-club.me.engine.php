@@ -28,7 +28,7 @@ class nnmclub
 		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_URL, "http://nnm-club.ru/forum/login.php");
+		curl_setopt($ch, CURLOPT_URL, "http://nnm-club.me/forum/login.php");
 		curl_setopt($ch, CURLOPT_POSTFIELDS, "username={$login}&password={$password}&login=%C2%F5%EE%E4");
 		$result = curl_exec($ch);
 		curl_close($ch);
@@ -41,11 +41,11 @@ class nnmclub
 	public static function getContent($threme, $sess_cookie)
 	{
 		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, "http://nnm-club.ru/forum/viewtopic.php?t={$threme}");
+		curl_setopt($ch, CURLOPT_URL, "http://nnm-club.me/forum/viewtopic.php?t={$threme}");
 		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_HEADER, 1);
-		$header[] = "Host: nnm-club.ru\r\n";
+		$header[] = "Host: nnm-club.me\r\n";
 		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
 		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
@@ -64,10 +64,10 @@ class nnmclub
 		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
 		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, "http://nnm-club.ru/forum/download.php?id={$threme}");
+		curl_setopt($ch, CURLOPT_URL, "http://nnm-club.me/forum/download.php?id={$threme}");
 		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
-		curl_setopt($ch, CURLOPT_REFERER, "http://nnm-club.ru/forum/viewtopic.php?t={$threme}");
-		$header[] = "Host: nnm-club.ru\r\n";
+		curl_setopt($ch, CURLOPT_REFERER, "http://nnm-club.me/forum/viewtopic.php?t={$threme}");
+		$header[] = "Host: nnm-club.me\r\n";
 		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
 		$result = curl_exec($ch);
@@ -84,9 +84,9 @@ class nnmclub
 		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
 		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, "http://nnm-club.ru/forum/index.php");
+		curl_setopt($ch, CURLOPT_URL, "http://nnm-club.me/forum/index.php");
 		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
-		$header[] = "Host: nnm-club.ru\r\n";
+		$header[] = "Host: nnm-club.me\r\n";
 		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
 		$result = curl_exec($ch);
