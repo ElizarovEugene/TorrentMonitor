@@ -15,37 +15,6 @@ class tfile
         return self::$instance;
     }
 
-	//получаем страницу для парсинга
-	public static function getContent($threme)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, "http://tfile.me/forum/viewtopic.php?t={$threme}");
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HEADER, 1);
-		$header[] = "Host: tfile.me\r\n";
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-		$result = curl_exec($ch);
-		curl_close($ch);
-
-		return $result;
-	}
-
-	//получаем содержимое torrent файла
-	public static function getTorrent($threme)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, "http://tfile.me/forum/download.php?id={$threme}&uk=1111111111");
-		curl_setopt($ch, CURLOPT_REFERER, "http://tfile.me/forum/viewtopic.php?t={$threme}");
-		$result = curl_exec($ch);
-		curl_close($ch);
-
-		return $result;
-	}
-
 	//функция проверки введёного URL`а
 	public static function checkRule($data)
 	{
@@ -65,36 +34,15 @@ class tfile
 	//функция преобразования даты
 	private static function dateNumToString($data)
 	{
-        $data = preg_replace("/(\d\d\d\d)-(\d\d)-(\d\d)/", "$3-$2-$1", $data);
-        $data = explode('-', $data);
-        switch ($data[1])
-        {
-            case 01: $m="Янв"; break;
-            case 02: $m="Фев"; break;
-            case 03: $m="Мар"; break;
-            case 04: $m="Апр"; break;
-            case 05: $m="Мая"; break;
-            case 06: $m="Июн"; break;
-            case 07: $m="Июл"; break;
-            case 08: $m="Авг"; break;
-            case 09: $m="Сен"; break;
-            case 10: $m="Окт"; break;
-            case 11: $m="Ноя"; break;
-            case 12: $m="Дек"; break;
-        }
-        $dateTime = $data[0].' '.$m.' '.$data[2];
+		$data = preg_replace('/(\d\d\d\d)-(\d\d)-(\d\d)/', '$3-$2-$1', $data);
+		$data = explode(' ', $data);
+		$time = $data[1];
+		$data = explode('-', $data[0]);
+		$m = Sys::dateNumToString($data[1]);
+		$dateTime = $data[0].' '.$m.' '.$data[2].' '.$time;
 		return $dateTime;
 	}
 	
-	//функция нахождения id для скачивания
-	public static function findId($page)
-	{
-		if (preg_match("/download\.php\?id=(\d+)&uk=1111111111/", $page, $arrayId))
-			return $arrayId[1];
-		else
-			return FALSE;
-	}
-
 	//основная функция
 	public static function main($id, $tracker, $name, $torrent_id, $timestamp)
 	{
@@ -103,7 +51,14 @@ class tfile
 		if (tfile::$exucution)
 		{
 			//получаем страницу для парсинга
-			$page = tfile::getContent($torrent_id);
+			$page = Sys::getUrlContent(
+            	array(
+            		'type'           => 'GET',
+            		'header'         => 0,
+            		'returntransfer' => 1,
+            		'url'            => 'http://tfile.me/forum/viewtopic.php?t='.$torrent_id
+            	)
+            );
 			
 			if ( ! empty($page))
 			{
@@ -116,38 +71,50 @@ class tfile
 						//если дата не равна ничему
 						if ( ! empty($array[1]))
 						{
-							//сбрасываем варнинг
-							Database::clearWarnings($tracker);
-							//приводим дату к общему виду
-							$date = tfile::dateStringToNum($array[1]);
-							$date_str = tfile::dateNumToString($array[1]);
-							//если даты не совпадают, перекачиваем торрент
-							if ($date != $timestamp)
+							//находим имя торрента для скачивания		
+							if (preg_match("/download\.php\?id=(\d+)&uk=1111111111/", $page, $link))
 							{
-								//ищем на странице id торрента
-								$torrent_id = tfile::findId($page);
-								if (is_string($torrent_id))
+								//сбрасываем варнинг
+								Database::clearWarnings($tracker);
+								//приводим дату к общему виду
+								$date = tfile::dateStringToNum($array[1]);
+								$date_str = tfile::dateNumToString($array[1]);
+								//если даты не совпадают, перекачиваем торрент
+								if ($date != $timestamp)
 								{
-									//сохраняем торрент в файл
-									$torrent = tfile::getTorrent($torrent_id);
-									$client = ClientAdapterFactory::getStorage('file');
-									$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
-									//обновляем время регистрации торрента в базе
-									Database::setNewDate($id, $date);
-									//отправляем уведомлении о новом торренте
-									$message = $name.' обновлён.';
-									Notification::sendNotification('notification', $date_str, $tracker, $message);
-								}
-								else
-								{
-									//устанавливаем варнинг
-									if (tfile::$warning == NULL)
+									//ищем на странице id торрента
+									$torrent_id = $link[1];
+									if (is_string($torrent_id))
 									{
-										tfile::$warning = TRUE;
-										Errors::setWarnings($tracker, 'not_available');
+										//сохраняем торрент в файл
+										$torrent = Sys::getUrlContent(
+		                                	array(
+		                                		'type'           => 'GET',
+		                                		'returntransfer' => 1,
+		                                		'url'            => "http://tfile.me/forum/download.php?id={$torrent_id}&uk=1111111111",
+		                                		'sendHeader'     => array('Host' => 'tfile.me'),
+		                                		'referer'        => 'http://tfile.me/forum/viewtopic.php?t='.$torrent_id,
+		                                	)
+		                                );
+										$client = ClientAdapterFactory::getStorage('file');
+										$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
+										//обновляем время регистрации торрента в базе
+										Database::setNewDate($id, $date);
+										//отправляем уведомлении о новом торренте
+										$message = $name.' обновлён.';
+										Notification::sendNotification('notification', $date_str, $tracker, $message);
 									}
-									//останавливаем процесс выполнения, т.к. не может работать без кук
-									tfile::$exucution = FALSE;
+									else
+									{
+										//устанавливаем варнинг
+										if (tfile::$warning == NULL)
+										{
+											tfile::$warning = TRUE;
+											Errors::setWarnings($tracker, 'not_available');
+										}
+										//останавливаем процесс выполнения, т.к. не может работать без кук
+										tfile::$exucution = FALSE;
+									}
 								}
 							}
 						}

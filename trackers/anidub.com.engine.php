@@ -15,86 +15,26 @@ class anidub
         }
         return self::$instance;
     }
-    
-	//получаем куки для доступа к сайту
-	protected static function login($login, $password)
-	{
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
-        curl_setopt($ch, CURLOPT_HEADER, 1);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_URL, "http://tr.anidub.com/takelogin.php");
-        curl_setopt($ch, CURLOPT_POSTFIELDS, "username={$login}&password={$password}");
-        $result = curl_exec($ch);
-        curl_close($ch);
-        
-        $result = iconv("windows-1251", "utf-8", $result);
-        return $result;
-	}
-	
-	//получаем страницу для парсинга
-	private static function getContent($threme, $sess_cookie)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, "http://tr.anidub.com/details.php?id={$threme}");
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HEADER, 1);
-		$header[] = "Host: tr.anidub.com\r\n";
-		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
-		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-		$result = curl_exec($ch);
-		curl_close($ch);
-		
-		$result = iconv("windows-1251", "utf-8", $result);
-		return $result;
-	}
-	
-	//получаем содержимое torrent файла
-	public static function getTorrent($threme, $name, $sess_cookie)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, "http://tr.anidub.com/download.php?id={$threme}&name={$name}");
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		$header[] = "Host: tr.anidub.com";
-		$header[] = "Cookie: {$sess_cookie}; PHPSESSID=doshd24p6q83gdd78v12b7ht13; PHPSESSID=69m9e5ggnpqr1c017592krq0s5";
-		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
-		curl_setopt($ch, CURLOPT_REFERER, "http://tr.anidub.com/details.php?id={$threme}");
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-		$result = curl_exec($ch);
-		curl_close($ch);
-		
-		return $result;
-	}
-	
+
 	//проверяем cookie
 	public static function checkCookie($sess_cookie)
 	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, "http://tr.anidub.com/");		
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		$header[] = "Host: tr.anidub.com\r\n";
-		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
-		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-		$result = curl_exec($ch);
-		curl_close($ch);
-		
-		$result = iconv("windows-1251", "utf-8", $result);
+        $result = Sys::getUrlContent(
+        	array(
+        		'type'           => 'POST',
+        		'returntransfer' => 1,
+        		'url'            => 'http://tr.anidub.com',
+        		'cookie'         => $sess_cookie,
+        		'sendHeader'     => array('Host' => 'tr.anidub.com', 'Content-length' => strlen($sess_cookie)),
+        		'convert'        => array('windows-1251', 'utf-8'),
+        	)
+        );
+
 		if (preg_match('/<span style=\"color:#000000;\" title=\"Пользователь\">.*<\/span>/', $result))
 			return TRUE;
 		else
-			return FALSE;		  
+			return FALSE;
 	}
-	
 	
 	//функция проверки введёного URL`а
 	public static function checkRule($data)
@@ -110,21 +50,7 @@ class anidub
 	{
         $pieces = explode(' ', $data);
         $dates = explode('-', $pieces[0]);
-        switch ($dates[1])
-        {
-            case '01': $m="янв"; break;
-            case '02': $m="фев"; break;
-            case '03': $m="мар"; break;
-            case '04': $m="апр"; break;
-            case '05': $m="мая"; break;
-            case '06': $m="июн"; break;
-            case '07': $m="июл"; break;
-            case '08': $m="авг"; break;
-            case '09': $m="сен"; break;
-            case '10': $m="окт"; break;
-            case '11': $m="ноя"; break;
-            case '12': $m="дек"; break;
-        }    
+        $m = Sys::dateNumToString($dates[1]);
         $date = $dates[2].' '.$m.' '.$dates[0];
         $time = substr($pieces[1], 0, -3);
         $dateTime = $date.' '.$time;
@@ -142,7 +68,17 @@ class anidub
 			$login = iconv("utf-8", "windows-1251", $credentials['login']);
 			$password = $credentials['password'];
 			
-			$page = anidub::login($login, $password);
+			//авторизовываемся на трекере
+			$page = Sys::getUrlContent(
+            	array(
+            		'type'           => 'POST',
+            		'header'         => 1,
+            		'returntransfer' => 1,
+            		'url'            => 'http://tr.anidub.com/takelogin.php',
+            		'postfields'     => "username={$login}&password={$password}",
+            		'convert'        => array('windows-1251', 'utf-8'),
+            	)
+            );			
 			
 			if ( ! empty($page))
 			{
@@ -216,7 +152,17 @@ class anidub
 		if (anidub::$exucution)
 		{
 			//получаем страницу для парсинга
-			$page = anidub::getContent($torrent_id, anidub::$sess_cookie);
+            $page = Sys::getUrlContent(
+            	array(
+            		'type'           => 'POST',
+            		'header'         => 0,
+            		'returntransfer' => 1,
+            		'url'            => 'http://tr.anidub.com/details.php?id='.$torrent_id,
+            		'cookie'         => anidub::$sess_cookie,
+            		'sendHeader'     => array('Host' => 'tr.anidub.com', 'Content-length' => strlen(anidub::$sess_cookie)),
+            		'convert'        => array('windows-1251', 'utf-8'),
+            	)
+            );
 
 			if ( ! empty($page))
 			{
@@ -241,7 +187,16 @@ class anidub
                                 $torrent_id = $array[1];
                                 $torrent_id_name = $array[2];
 								//сохраняем торрент в файл
-								$torrent = anidub::getTorrent($torrent_id, $torrent_id_name, anidub::$sess_cookie);
+                                $torrent = Sys::getUrlContent(
+                                	array(
+                                		'type'           => 'POST',
+                                		'returntransfer' => 1,
+                                		'url'            => 'http://tr.anidub.com/download.php?id='.$torrent_id.'&name='.$torrent_id_name,
+                                		'cookie'         => anidub::$sess_cookie,
+                                		'sendHeader'     => array('Host' => 'tr.anidub.com', 'Content-length' => strlen(anidub::$sess_cookie)),
+                                		'referer'        => 'http://tr.anidub.com/details.php?id='.$torrent_id,
+                                	)
+                                );
 								$client = ClientAdapterFactory::getStorage('file');
 								$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
 								//обновляем время регистрации торрента в базе

@@ -15,86 +15,27 @@ class rutracker
         }
         return self::$instance;
     }
-    
-	//получаем куки для доступа к сайту
-	protected static function login($login, $password)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
-		curl_setopt($ch, CURLOPT_HEADER, 1);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, "http://login.rutracker.org/forum/login.php");
-		curl_setopt($ch, CURLOPT_POSTFIELDS, "login_username={$login}&login_password={$password}&login=%C2%F5%EE%E4");
-		$result = curl_exec($ch);
-		curl_close($ch);
-		
-		$result = iconv("windows-1251", "utf-8", $result);
-		return $result;
-	}
-	
-	//получаем страницу для парсинга
-	private static function getContent($threme, $sess_cookie)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, "http://rutracker.org/forum/viewtopic.php?t={$threme}");
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HEADER, 1);
-		$header[] = "Host: rutracker.org\r\n";
-		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
-		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-		$result = curl_exec($ch);
-		curl_close($ch);
-		
-		$result = iconv("windows-1251", "utf-8", $result);
-		return $result;
-	}
-	
-	//получаем содержимое torrent файла
-	public static function getTorrent($threme, $sess_cookie)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, "http://dl.rutracker.org/forum/dl.php?t={$threme}");
-		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie."; bb_dl={$threme}");
-		curl_setopt($ch, CURLOPT_REFERER, "http://dl.rutracker.org/forum/dl.php?t={$threme}");
-		curl_setopt($ch, CURLOPT_POSTFIELDS, "t={$threme}");
-		$result = curl_exec($ch);
-		curl_close($ch);
-		
-		return $result;
-	}
-	
+
 	//проверяем cookie
 	public static function checkCookie($sess_cookie)
 	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, "http://rutracker.org/forum/index.php");
-		$header[] = "Host: rutracker.org\r\n";
-		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
-		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-		$result = curl_exec($ch);
-		curl_close($ch);
-		
-		$result = iconv("windows-1251", "utf-8", $result);
+        $result = Sys::getUrlContent(
+        	array(
+        		'type'           => 'POST',
+        		'returntransfer' => 1,
+        		'url'            => 'http://rutracker.org/forum/index.php',
+        		'cookie'         => $sess_cookie,
+        		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen($sess_cookie)),
+        		'convert'        => array('windows-1251', 'utf-8'),
+        	)
+        );
+
 		if (preg_match('/Вы зашли как: &nbsp;/', $result))
 			return TRUE;
 		else
-			return FALSE;		  
+			return FALSE;
 	}
-	
-	
+
 	//функция проверки введёного URL`а
 	public static function checkRule($data)
 	{
@@ -103,7 +44,7 @@ class rutracker
 		else
 			return TRUE;
 	}
-	
+
 	//функция преобразования даты
 	private static function dateStringToNum($data)
 	{
@@ -111,20 +52,20 @@ class rutracker
 		$month = substr($data, 3, 6);
 		$date = preg_replace("/(\d\d)-(\d\d)-(\d\d)/", "$3-$2-$1", str_replace($month, str_pad(array_search($month, $monthes)+1, 2, 0, STR_PAD_LEFT), $data));
 		$date = date("Y-m-d H:i:s", strtotime($date));
-		
+
 		return $date;
 	}
-	
+
 	//функция преобразования даты
 	private static function dateNumToString($data)
 	{
 		$data = str_replace('-', ' ', $data);
 		$arr = preg_split("/\s/", $data);
 		$date = $arr[0].' '.$arr[1].' 20'.$arr[2].' '.$arr[3];
-		
-		return $date;		
+
+		return $date;
 	}
-	
+
 	//функция получения кук
 	protected static function getCookie($tracker)
 	{
@@ -135,9 +76,19 @@ class rutracker
 			$credentials = Database::getCredentials($tracker);
 			$login = iconv("utf-8", "windows-1251", $credentials['login']);
 			$password = $credentials['password'];
-			
-			$page = rutracker::login($login, $password);
-			
+
+			//авторизовываемся на трекере
+			$page = Sys::getUrlContent(
+            	array(
+            		'type'           => 'POST',
+            		'header'         => 1,
+            		'returntransfer' => 1,
+            		'url'            => 'http://login.rutracker.org/forum/login.php',
+            		'postfields'     => "login_username={$login}&login_password={$password}&login=%C2%F5%EE%E4",
+            		'convert'        => array('windows-1251', 'utf-8'),
+            	)
+            );
+
 			if ( ! empty($page))
 			{
 				//проверяем подходят ли учётные данные
@@ -193,7 +144,7 @@ class rutracker
 			rutracker::$exucution = FALSE;
 		}
 	}
-	
+
 	//основная функция
 	public static function main($id, $tracker, $name, $torrent_id, $timestamp)
 	{
@@ -203,15 +154,25 @@ class rutracker
 			rutracker::$sess_cookie = $cookie;
 			//запускам процесс выполнения
 			rutracker::$exucution = TRUE;
-		}			
+		}
 		else
     		rutracker::getCookie($tracker);
 
 		if (rutracker::$exucution)
 		{
 			//получаем страницу для парсинга
-			$page = rutracker::getContent($torrent_id, rutracker::$sess_cookie);
-			
+            $page = Sys::getUrlContent(
+            	array(
+            		'type'           => 'POST',
+            		'header'         => 0,
+            		'returntransfer' => 1,
+            		'url'            => 'http://rutracker.org/forum/viewtopic.php?t='.$torrent_id,
+            		'cookie'         => rutracker::$sess_cookie,
+            		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen(rutracker::$sess_cookie)),
+            		'convert'        => array('windows-1251', 'utf-8'),
+            	)
+            );
+
 			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
@@ -232,7 +193,16 @@ class rutracker
 							if ($date != $timestamp)
 							{
 								//сохраняем торрент в файл
-								$torrent = rutracker::getTorrent($torrent_id, rutracker::$sess_cookie);
+                                $torrent = Sys::getUrlContent(
+                                	array(
+                                		'type'           => 'POST',
+                                		'returntransfer' => 1,
+                                		'url'            => 'http://dl.rutracker.org/forum/dl.php?t='.$torrent_id,
+                                		'cookie'         => rutracker::$sess_cookie.'; bb_dl='.$torrent_id,
+                                		'sendHeader'     => array('Host' => 'dl.rutracker.org', 'Content-length' => strlen(rutracker::$sess_cookie.'; bb_dl='.$torrent_id)),
+                                		'referer'        => 'http://rutracker.org/forum/viewtopic.php?t='.$torrent_id,
+                                	)
+                                );
 								$client = ClientAdapterFactory::getStorage('file');
 								$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
 								//обновляем время регистрации торрента в базе
@@ -277,7 +247,7 @@ class rutracker
 					//останавливаем процесс выполнения, т.к. не может работать без кук
 					rutracker::$exucution = FALSE;
 				}
-			}			
+			}
 			else
 			{
 				//устанавливаем варнинг

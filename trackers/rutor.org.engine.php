@@ -1,7 +1,6 @@
 <?php
 class rutor
 {
-	protected static $sess_cookie;
 	protected static $exucution;
 	protected static $warning;
 
@@ -15,37 +14,6 @@ class rutor
         }
         return self::$instance;
     }
-
-	//получаем страницу для парсинга
-	private static function getContent($threme, $sess_cookie)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, "http://www.rutor.org/torrent/{$threme}");
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HEADER, 1);
-		$header[] = "Host: rutor.org\r\n";
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-		$result = curl_exec($ch);
-		curl_close($ch);
-
-		return $result;
-	}
-
-	//получаем содержимое torrent файла
-	public static function getTorrent($threme, $sess_cookie)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, "http://d.rutor.org/download/{$threme}");
-		curl_setopt($ch, CURLOPT_REFERER, "http://www.rutor.org/torrent/{$threme}");
-		$result = curl_exec($ch);
-		curl_close($ch);
-
-		return $result;
-	}
 
 	//функция проверки введёного URL`а
 	public static function checkRule($data)
@@ -83,8 +51,15 @@ class rutor
 		if (rutor::$exucution)
 		{
 			//получаем страницу для парсинга
-			$page = rutor::getContent($torrent_id, rutor::$sess_cookie);
-			
+			$page = Sys::getUrlContent(
+            	array(
+            		'type'           => 'GET',
+            		'header'         => 0,
+            		'returntransfer' => 1,
+            		'url'            => 'http://www.rutor.org/torrent/'.$torrent_id
+            	)
+            );
+
 			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
@@ -105,7 +80,15 @@ class rutor
 							if ($date != $timestamp)
 							{
 								//сохраняем торрент в файл
-								$torrent = rutor::getTorrent($torrent_id, rutor::$sess_cookie);
+								$torrent = Sys::getUrlContent(
+                                	array(
+                                		'type'           => 'GET',
+                                		'returntransfer' => 1,
+                                		'url'            => 'http://d.rutor.org/download/'.$torrent_id,
+                                		'sendHeader'     => array('Host' => 'rutor.org'),
+                                		'referer'        => 'http://www.rutor.org/torrent/'.$torrent_id,
+                                	)
+                                );
 								$client = ClientAdapterFactory::getStorage('file');
 								$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
 								//обновляем время регистрации торрента в базе

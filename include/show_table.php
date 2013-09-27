@@ -42,7 +42,7 @@ if ( ! empty($torrents_list))
 			$class = "#ffffff";
 	?>
         <tr>
-            <td class="text-align-left"><span class="icon-torrent" style="background-image: url(img/<?php echo $tracker ?>.ico);"></span><?php echo $tracker ?></td>
+            <td class="text-align-left" nowrap><span class="icon-torrent" style="background-image: url(img/<?php echo $tracker ?>.ico);"></span><?php echo $tracker ?></td>
             <td class="text-align-left">
     	  	<?php 
     		if ($tracker == "rutracker.org" || $tracker == "nnm-club.me" || $tracker == "tfile.me")
@@ -84,7 +84,7 @@ if ( ! empty($torrents_list))
     			echo '&nbsp;(MP4)';
     		?>
     		</td>
-            <td>
+            <td nowrap>
             <?php
             if ($timestamp == "0000-00-00 00:00:00" || $timestamp == NULL) {}
             else

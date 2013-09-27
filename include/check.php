@@ -17,7 +17,7 @@ if (Sys::checkInternet())
 			<td>Подключение к интернету установлено.</td>
 		</tr>
 	<?php
-	if (Sys::checkConfig())
+	if (Sys::checkConfigExist())
 	{
 	?>
 		<tr>

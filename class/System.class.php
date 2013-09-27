@@ -1,13 +1,7 @@
 <?php
 class Sys
 {
-	public static function configPath()
-	{
-		$dir = dirname(__FILE__);
-		$dir = str_replace('class', '', $dir);
-		return $dir.'/config.php';
-	}
-
+	//проверяем есть ли интернет
 	public static function checkInternet()
 	{
 		$page = file_get_contents('http://ya.ru');
@@ -17,17 +11,23 @@ class Sys
 			return FALSE;
 	}
 	
+	//проверяем есть ли конфигурационный файл
 	public static function checkConfigExist()
 	{
-		if (file_exists(Sys::configPath()))
+		$dir = dirname(__FILE__);
+		$dir = str_replace('class', '', $dir);
+		if (file_exists($dir.'/config.php'))
 			return TRUE;
 		else
 			return FALSE;
 	}
 
+	//проверяем правильно ли заполнен конфигурационный файл
 	public static function checkConfig()
 	{
-		include_once(Sys::configPath());
+		$dir = dirname(__FILE__)."/../";
+		include_once $dir."config.php";
+		
 		$confArray = Config::$confArray;
 		foreach ($confArray as $key => $val)
 		{
@@ -37,6 +37,7 @@ class Sys
 		return TRUE;
 	}
 
+	//проверяем установлено ли расширение CURL
 	public static function checkCurl()
 	{
 		if (in_array("curl", get_loaded_extensions()))
@@ -44,7 +45,8 @@ class Sys
 		else
 			return FALSE;
 	}
-	
+
+	//проверяем есть ли на конце пути /
 	public static function checkPath($path)
 	{
 		if (substr($path, -1) == '/')
@@ -54,16 +56,19 @@ class Sys
 		return $path;
 	}
 	
+	//проверка на возхможность записи в директорию
 	public static function checkWriteToPath($path)
 	{
 		return is_writable($path);
 	}
-	
+
+	//версия системы
 	public static function version()
 	{
-		return '0.7.7';
+		return '0.8.1';
 	}
 
+	//проверка обновлений системы
 	public static function checkUpdate()
 	{
 		$xml = @simplexml_load_file('http://korphome.ru/torrent_monitor/version.xml');
@@ -78,6 +83,7 @@ class Sys
 			Errors::setWarnings($tracker, 'update');
 	}
 	
+	//обёртка для CURL, для более удобного использования
 	public static function getUrlContent($param = null)
     {
     	if (is_array($param))
@@ -171,26 +177,26 @@ class Sys
 	}
 	
 	//преобразуем месяц из числового в текстовый
-	public static function dateNumToString($data)
+	public static function dateNumToString($date)
 	{
-		switch ($data)
-		{
-			case 1: $m="Янв"; break;
-			case 2: $m="Фев"; break;
-			case 3: $m="Мар"; break;
-			case 4: $m="Апр"; break;
-			case 5: $m="Мая"; break;
-			case 6: $m="Июн"; break;
-			case 7: $m="Июл"; break;
-			case 8: $m="Авг"; break;
-			case 9: $m="Сен"; break;
-			case 10: $m="Окт"; break;
-			case 11: $m="Ноя"; break;
-			case 12: $m="Дек"; break;
-		}
-		return $m;
+	    $monthes_num = array("/10/", "/11/", "/12/", "/0?1/", "/0?2/", "/0?3/", "/0?4/", "/0?5/", "/0?6/", "/0?7/", "/0?8/", "/0?9/");
+	    $monthes_ru = array("Окт", "Ноя", "Дек", "Янв", "Фев", "Мар", "Апр", "Мая", "Июн", "Июл", "Авг", "Сен");
+	    $month = preg_replace($monthes_num, $monthes_ru, $date);
+	    
+	    return $month;
 	}
 	
+	//преобразуем месяц из текстового в числовый
+	public static function dateStringToNum($date)
+	{
+	    $monthes = array("/янв|Янв|Jan/i", "/фев|Фев|Feb/i", "/мар|Мар|Mar/i", "/апр|Апр|Apr/i", "/мая|май|Мая|мая|May/i", "/июн|Июн|Jun/i", "/июл|Июл|Jul/i", "/авг|Авг|Aug/i", "/сен|Сен|Sep/i", "/окт|Окт|Oct/i", "/ноя|Ноя|Nov/i", "/дек|Дек|Dec/i");
+	    $monthes_num = array("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12");
+	    $month = preg_replace($monthes, $monthes_num, $date);
+	    
+	    return $month;
+	}
+	
+	//записываем время последнего запуска системы
 	public static function lastStart()
 	{
         $dir = dirname(__FILE__);

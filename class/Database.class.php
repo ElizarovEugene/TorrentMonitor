@@ -1,4 +1,7 @@
 <?php
+$dir = dirname(__FILE__)."/../";
+include_once $dir."config.php";
+
 class Database
 {
     public $dbh;
@@ -11,7 +14,7 @@ class Database
         switch ($this->dbType)
         {
             case 'mysql':
-                $dsn = "mysql:host=".Config::read('db.host').";port=".Config::read('db.port').";dbname=".Config::read('db.basename');
+                $dsn = "mysql:host=".Config::read('db.host').";dbname=".Config::read('db.basename');
                 $username = Config::read('db.user');
                 $password = Config::read('db.password');
                 $options = array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES ".Config::read('db.charset'));
@@ -70,10 +73,8 @@ class Database
             {
                 return $row['val'];
             }
-            return $resultArray;
         }
         $stmt = NULL;
-        $resultArray = NULL;
     }
     
     public static function getAllSetting()
@@ -859,8 +860,5 @@ class Database
             return FALSE;
         $stmt = NULL;
     }
-    
-    
-    
 }
 ?>

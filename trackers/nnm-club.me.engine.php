@@ -5,8 +5,6 @@ class nnmclub
 	protected static $exucution;
 	protected static $warning;
 	
-	protected static $page;	
-	
 	//инициализируем класс
 	public static function getInstance()
     {
@@ -18,81 +16,20 @@ class nnmclub
         return self::$instance;
     }
 
-	//получаем куки для доступа к сайту
-	protected static function login($login, $password)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
-		curl_setopt($ch, CURLOPT_HEADER, 1); 
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_URL, "http://nnm-club.me/forum/login.php");
-		curl_setopt($ch, CURLOPT_POSTFIELDS, "username={$login}&password={$password}&login=%C2%F5%EE%E4");
-		$result = curl_exec($ch);
-		curl_close($ch);
-		
-		$result = iconv("windows-1251", "utf-8", $result);
-		return $result;
-	}
-	
-	//получаем страницу для парсинга
-	public static function getContent($threme, $sess_cookie)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, "http://nnm-club.me/forum/viewtopic.php?t={$threme}");
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HEADER, 1);
-		$header[] = "Host: nnm-club.me\r\n";
-		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
-		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-		$result = curl_exec($ch);
-		curl_close($ch);
-		
-		$result = iconv("windows-1251", "utf-8", $result);
-		return $result;
-	}
-	
-	//получаем содержимое torrent файла
-	public static function getTorrent($threme, $sess_cookie)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, "http://nnm-club.me/forum/download.php?id={$threme}");
-		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
-		curl_setopt($ch, CURLOPT_REFERER, "http://nnm-club.me/forum/viewtopic.php?t={$threme}");
-		$header[] = "Host: nnm-club.me\r\n";
-		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-		$result = curl_exec($ch);
-		curl_close($ch);
-		
-		return $result;
-	}
-	
 	//проверяем cookie
 	public static function checkCookie($sess_cookie)
 	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, "http://nnm-club.me/forum/index.php");
-		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
-		$header[] = "Host: nnm-club.me\r\n";
-		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-		$result = curl_exec($ch);
-		curl_close($ch);
-		
-		$result = iconv("windows-1251", "utf-8", $result);
+        $result = Sys::getUrlContent(
+        	array(
+        		'type'           => 'POST',
+        		'returntransfer' => 1,
+        		'url'            => 'http://nnm-club.me/forum/index.php',
+        		'cookie'         => $sess_cookie,
+        		'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-length' => strlen($sess_cookie)),
+        		'convert'        => array('windows-1251', 'utf-8'),
+        	)
+        );
+
 		if (preg_match('/class=\"mainmenu\">Выход [ .* ]<\/a>/U', $result))
 			return TRUE;
 		else
@@ -136,12 +73,22 @@ class nnmclub
 			$login = iconv("utf-8", "windows-1251", $credentials['login']);
 			$password = $credentials['password'];
 			
-			nnmclub::$page = nnmclub::login($login, $password);
+			//авторизовываемся на трекере
+			$page = Sys::getUrlContent(
+            	array(
+            		'type'           => 'POST',
+            		'header'         => 1,
+            		'returntransfer' => 1,
+            		'url'            => 'http://nnm-club.me/forum/login.php',
+            		'postfields'     => "username={$login}&password={$password}&login=%C2%F5%EE%E4",
+            		'convert'        => array('windows-1251', 'utf-8'),
+            	)
+            );
 			
-			if ( ! empty(nnmclub::$page))
+			if ( ! empty($page))
 			{
 				//проверяем подходят ли учётные данные
-				if (preg_match("/login\.php\?redirect=/", nnmclub::$page, $array))
+				if (preg_match("/login\.php\?redirect=/", $page, $array))
 				{
 					//устанавливаем варнинг
 					if (nnmclub::$warning == NULL)
@@ -155,7 +102,7 @@ class nnmclub
 				else
 				{
 					//если подходят - получаем куки
-					if (preg_match_all("/Set-Cookie: (.*);/iU", nnmclub::$page, $array))
+					if (preg_match_all("/Set-Cookie: (.*);/iU", $page, $array))
 					{
 						nnmclub::$sess_cookie = implode("; ", $array[1]);
 						Database::setCookie($tracker, nnmclub::$sess_cookie);
@@ -172,6 +119,7 @@ class nnmclub
 				{
 					nnmclub::$warning = TRUE;
 					Errors::setWarnings($tracker, 'not_available');
+					echo '1';
 				}
 				//останавливаем процесс выполнения, т.к. не может работать без кук
 				nnmclub::$exucution = FALSE;
@@ -204,12 +152,23 @@ class nnmclub
 		
 		if (nnmclub::$exucution)
 		{
-			nnmclub::$page = nnmclub::getContent($torrent_id, nnmclub::$sess_cookie);
-			
-			if ( ! empty(nnmclub::$page))
+			//получаем страницу для парсинга
+            $page = Sys::getUrlContent(
+            	array(
+            		'type'           => 'POST',
+            		'header'         => 0,
+            		'returntransfer' => 1,
+            		'url'            => 'http://nnm-club.me/forum/viewtopic.php?t='.$torrent_id,
+            		'cookie'         => nnmclub::$sess_cookie,
+            		'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-length' => strlen(nnmclub::$sess_cookie)),
+            		'convert'        => array('windows-1251', 'utf-8'),
+            	)
+            );
+
+			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
-				if (preg_match("/<td class=\"genmed\">&nbsp;(\d{2}\s\D{6}\s\d{4}\s\d{2}:\d{2}:\d{2})<\/td>/", nnmclub::$page, $array))
+				if (preg_match("/<td class=\"genmed\">&nbsp;(\d{2}\s\D{6}\s\d{4}\s\d{2}:\d{2}:\d{2})<\/td>/", $page, $array))
 				{
 					//проверяем удалось ли получить дату со страницы
 					if (isset($array[1]))
@@ -218,7 +177,7 @@ class nnmclub
 						if ( ! empty($array[1]))
 						{
 							//находим имя торрента для скачивания		
-							if (preg_match("/download\.php\?id=(\d{6,8})/", nnmclub::$page, $link))
+							if (preg_match("/download\.php\?id=(\d{6,8})/", $page, $link))
 							{
 								//сбрасываем варнинг
 								Database::clearWarnings($tracker);
@@ -230,7 +189,16 @@ class nnmclub
 								{
 									//сохраняем торрент в файл
 									$torrent_id = $link[1];
-									$torrent = nnmclub::getTorrent($torrent_id, nnmclub::$sess_cookie);
+									$torrent = Sys::getUrlContent(
+	                                	array(
+	                                		'type'           => 'POST',
+	                                		'returntransfer' => 1,
+	                                		'url'            => 'http://nnm-club.me/forum/download.php?id='.$torrent_id,
+	                                		'cookie'         => nnmclub::$sess_cookie,
+	                                		'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-length' => strlen(nnmclub::$sess_cookie)),
+	                                		'referer'        => 'http://nnm-club.me/forum/viewtopic.php?t='.$torrent_id,
+	                                	)
+	                                );
 									$client = ClientAdapterFactory::getStorage('file');
 									$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
 									//обновляем время регистрации торрента в базе
@@ -247,6 +215,7 @@ class nnmclub
                     			{
                     				nnmclub::$warning = TRUE;
                     				Errors::setWarnings($tracker, 'not_available');
+                    				echo '2';
                     			}
                     			//останавливаем процесс выполнения, т.к. не может работать без кук
 								nnmclub::$exucution = FALSE;
@@ -259,6 +228,7 @@ class nnmclub
                 			{
                 				nnmclub::$warning = TRUE;
                 				Errors::setWarnings($tracker, 'not_available');
+                				echo '3';
                 			}
                 			//останавливаем процесс выполнения, т.к. не может работать без кук
 							nnmclub::$exucution = FALSE;
@@ -271,6 +241,7 @@ class nnmclub
             			{
             				nnmclub::$warning = TRUE;
             				Errors::setWarnings($tracker, 'not_available');
+            				echo '4';
             			}
             			//останавливаем процесс выполнения, т.к. не может работать без кук
 						nnmclub::$exucution = FALSE;
@@ -283,6 +254,7 @@ class nnmclub
         			{
         				nnmclub::$warning = TRUE;
         				Errors::setWarnings($tracker, 'not_available');
+        				echo '5';
         			}
         			//останавливаем процесс выполнения, т.к. не может работать без кук
 					nnmclub::$exucution = FALSE;
@@ -295,6 +267,7 @@ class nnmclub
     			{
     				nnmclub::$warning = TRUE;
     				Errors::setWarnings($tracker, 'not_available');
+    				echo '6';
     			}
     			//останавливаем процесс выполнения, т.к. не может работать без кук
 				nnmclub::$exucution = FALSE;

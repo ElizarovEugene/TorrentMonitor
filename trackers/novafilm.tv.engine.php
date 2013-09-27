@@ -20,96 +20,19 @@ class novafilm
         return self::$instance;
     }
     
-	//получаем куки для доступа к сайту
-	private static function login($login, $password)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
-		curl_setopt($ch, CURLOPT_HEADER, 1); 
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, 'http://novafilm.tv/auth/login');
-		$boundary = "----WebKitFormBoundaryRQ3KHJbpfmPf11v6";
-		$data = "--{$boundary}
-Content-Disposition: form-data; name=\"return\"
-
-/auth
---{$boundary}
-Content-Disposition: form-data; name=\"username\"
-
-{$login}
---{$boundary}
-Content-Disposition: form-data; name=\"password\"
-
-{$password}
---{$boundary}
-Content-Disposition: form-data; name=\"login\"
-
-Хочу войти!
---{$boundary}--";
-
-		$header[] = "Content-Type: multipart/form-data; boundary=".$boundary;
-		$header[] = "Content-Length: ".strlen($data);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);	
-		$result = curl_exec($ch);
-		curl_close($ch);
-		
-		return $result;
-	}
-	
-	//получаем страницу для парсинга
-	private static function getContent()
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		//временное решение, пока новавцы не поднимут свою жопу, что бы починить собственную rss
-		curl_setopt($ch, CURLOPT_URL, "http://www.ulitka.tv/novafilm.xml");
-		#http://novafilm.tv/rss/rssd.xml
-		$result = curl_exec($ch);
-		curl_close($ch);
-		
-		return $result;
-	}
-	
-	//получаем содержимое torrent файла
-	private static function getTorrent($link, $sess_cookie)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, "{$link}");
-		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
-		$header[] = "Host: novafilm.tv\r\n";
-		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-		$result = curl_exec($ch);
-		curl_close($ch);
-		
-		return $result;
-	}
-	
 	//проверяем cookie
 	public static function checkCookie($sess_cookie)
 	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ru; rv:1.9.2.4) Gecko/20100611 Firefox/3.6.4");
-		curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, "http://novafilm.tv");
-		curl_setopt($ch, CURLOPT_COOKIE, $sess_cookie);
-		$header[] = "Host: novafilm.tv\r\n";
-		$header[] = "Content-length: ".strlen($sess_cookie)."\r\n\r\n";
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-		$result = curl_exec($ch);
-		curl_close($ch);
-		
+		$result = Sys::getUrlContent(
+			array(
+				'type'           => 'POST',
+				'returntransfer' => 1,
+				'url'            => 'http://novafilm.tv',
+				'cookie'         => novafilm::$sess_cookie,
+				'sendHeader'     => array('Host' => 'novafilm.tv', 'Content-length' => strlen(novafilm::$sess_cookie)),
+			)
+		);
+
 		if (preg_match('/<p>Здравствуйте, <a href=\"\/user\/.*">.*<\/a>/U', $result))
 			return TRUE;
 		else
@@ -199,12 +122,20 @@ Content-Disposition: form-data; name=\"login\"
 			$login = iconv("utf-8", "windows-1251", $credentials['login']);
 			$password = $credentials['password'];
 			
-			novafilm::$page = novafilm::login($login, $password);
-		
-			if ( ! empty(novafilm::$page))
+			$page = Sys::getUrlContent(
+            	array(
+            		'type'           => 'POST',
+            		'header'         => 1,
+            		'returntransfer' => 1,
+            		'url'            => 'http://novafilm.tv/auth/login',
+            		'postfields'     => "returnto=/&username={$login}&password={$password}&login=Хочу войти!",
+            	)
+            );
+            
+			if ( ! empty($page))
 			{
 				//проверяем подходят ли учётные данные
-				if (preg_match_all("/Set-Cookie: (\w*)=(\S*)/", novafilm::$page, $array))
+				if (preg_match_all("/Set-Cookie: (\w*)=(\S*)/", $page, $array))
 				{
 					novafilm::$sess_cookie = $array[1][2]."=".$array[2][2];
 					Database::setCookie($tracker, novafilm::$sess_cookie);
@@ -212,7 +143,7 @@ Content-Disposition: form-data; name=\"login\"
 					novafilm::$exucution = TRUE;
 				}
 				//проверяем нет ли сообщения о неправильном логине/пароле
-				elseif (preg_match("/\/do\/recover/", novafilm::$page, $out))
+				elseif (preg_match("/\/do\/recover/", $page, $out))
 				{
 					//устанавливаем варнинг
 					if (novafilm::$warning == NULL)
@@ -287,7 +218,14 @@ Content-Disposition: form-data; name=\"login\"
 				if (novafilm::$exucution)
 				{
 					//получаем страницу
-					novafilm::$page = novafilm::getContent();
+			        novafilm::$page = Sys::getUrlContent(
+			        	array(
+			        		'type'           => 'GET',
+			        		'returntransfer' => 1,
+			        		'url'            => 'http://www.ulitka.tv/novafilm.xml',
+			        	)
+			        );
+			        
 					if ( ! empty(novafilm::$page))
 					{
 						//читаем xml
@@ -359,10 +297,18 @@ Content-Disposition: form-data; name=\"login\"
 
 						if ($download)
 						{
-							$torrent = novafilm::getTorrent($serial['link'], novafilm::$sess_cookie);
 							$amp = ($hd) ? 'HD' : NULL;
 							$file = '[novafilm.tv]_'.$name.'_'.$serial['episode'].'_'.$amp.'.torrent';
 							//сохраняем торрент в файл
+							$torrent = Sys::getUrlContent(
+								array(
+									'type'           => 'POST',
+									'returntransfer' => 1,
+									'url'            => $serial['link'],
+									'cookie'         => novafilm::$sess_cookie,
+									'sendHeader'     => array('Host' => 'novafilm.tv', 'Content-length' => strlen(novafilm::$sess_cookie)),
+								)
+							);							
 							$client = ClientAdapterFactory::getStorage('file');
 							$client->store($torrent, $id, $tracker, $name, $id, $timestamp, array('filename' => $file));							
 							//обновляем время регистрации торрента в базе
