@@ -418,19 +418,17 @@ function del(id)
 //Выводим логин/пароль в зависимости от выбранного в списке
 function changefunc()
 {
-        var select = document.getElementById("selectfunc");
-        var selectedText = select.options[select.selectedIndex].text;
-        var a = ['kinozal.tv', 'lostfilm.tv', 'nnm-club.me', 'novafilm.tv', 'rutracker.org'];
-        for (var i = 0; i < a.length; i++)
-        {
-                var e = a[i];
-                var d;
-                if (selectedText == e)
-                        d = "block";
-                else
-                        d = "none";
-                document.getElementById(e + "_label").style.display = d;
-        }
+	var d, select, selectedText, tracker, _i, _len, _ref, _results;
+	select = document.getElementById("selectfunc");
+	selectedText = select.options[select.selectedIndex].text;
+	_ref = ['kinozal.tv', 'lostfilm.tv', 'nnm-club.me', 'novafilm.tv', 'rutracker.org'];
+	_results = [];
+	for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+		tracker = _ref[_i];
+		d = selectedText === tracker ? "block" : "none";
+		_results.push(document.getElementById("" + tracker + "_label").style.display = d);
+	}
+	return _results;  
 }
 
 //Меняем checkbox на radiobutton
