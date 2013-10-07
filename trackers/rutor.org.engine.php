@@ -56,7 +56,7 @@ class rutor
             		'type'           => 'GET',
             		'header'         => 0,
             		'returntransfer' => 1,
-            		'url'            => 'http://www.rutor.org/torrent/'.$torrent_id
+            		'url'            => 'http://rutor.org/torrent/'.$torrent_id
             	)
             );
 
@@ -83,12 +83,11 @@ class rutor
 								$torrent = Sys::getUrlContent(
                                 	array(
                                 		'type'           => 'GET',
-                                		'returntransfer' => 1,
+                                		'returntransfer' => 0,
                                 		'url'            => 'http://d.rutor.org/download/'.$torrent_id,
-                                		'sendHeader'     => array('Host' => 'rutor.org'),
-                                		'referer'        => 'http://www.rutor.org/torrent/'.$torrent_id,
                                 	)
                                 );
+
 								$client = ClientAdapterFactory::getStorage('file');
 								$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
 								//обновляем время регистрации торрента в базе
