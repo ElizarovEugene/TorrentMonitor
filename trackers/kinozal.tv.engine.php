@@ -63,12 +63,13 @@ class kinozal
 	    elseif (preg_match('/\d{2} \D* \d{4} в \d{2}:\d{2}/', $data))
 	    {
 			$pieces = explode(' ', $data);
-			$month = Sys::dateStringToNum(substr('$pieces[1]', 0, 3));
-			$date = $pieces[2].'-'.$m.'-'.$pieces[0];
+			$month = Sys::dateStringToNum(substr($pieces[1], 0, 6));
+			$date = $pieces[2].'-'.$month.'-'.$pieces[0];
 			$time = $pieces[4].':00';
 			$dateTime = $date.' '.$time;
 			return $dateTime;
 	    }
+	    
 	}
 	
 	//функция получения кук
