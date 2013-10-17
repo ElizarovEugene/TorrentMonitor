@@ -32,7 +32,7 @@
     </p>
     <p>
         <label class="label-name"></label>
-        <label id="changedField"></label>
+        <span id="changedField"></span>
     </p>
     <button class="form-button">Добавить</button>
 </form>

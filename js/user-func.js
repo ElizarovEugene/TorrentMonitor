@@ -438,7 +438,7 @@ function changeField()
 {
 	var tracker = document.getElementById("tracker").value;
 	if (tracker == 'lostfilm.tv')
-		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD качество<br/><input type="radio" name="hd" value="1"> HD качество<br/><input type="radio" name="hd" value="2"> HD MP4</span>');
+		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD качество<br /><input type="radio" name="hd" value="1"> HD качество<br /><input type="radio" name="hd" value="2"> HD MP4</span>');
 	if (tracker == 'novafilm.tv')
 		$('#changedField').empty().append('<input type="checkbox" name="hd"> HD качество</label>');
 }
