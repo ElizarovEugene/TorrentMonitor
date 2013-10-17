@@ -41,7 +41,7 @@ LOCK TABLES `credentials` WRITE;
 INSERT INTO `credentials` (`id`, `tracker`, `log`, `pass`, `cookie`)
 VALUES
 	(1,'rutracker.org','','',''),
-	(2,'nnm-club.ru','','',''),
+	(2,'nnm-club.me','','',''),
 	(3,'lostfilm.tv','','',''),
 	(4,'novafilm.tv','','',''),
 	(5,'rutor.org', ' ', ' ',''),
