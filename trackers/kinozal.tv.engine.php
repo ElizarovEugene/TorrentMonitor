@@ -60,7 +60,7 @@ class kinozal
 	        $dateTime = $date.' '.$time;
 	        return $dateTime;
 	    }
-	    elseif (preg_match('/\d{2} \D* \d{4} в \d{2}:\d{2}/', $data))
+	    elseif (preg_match('/\d{1,2} \D* \d{4} в \d{2}:\d{2}/', $data))
 	    {
 			$pieces = explode(' ', $data);
 			$month = Sys::dateStringToNum(substr($pieces[1], 0, 6));
