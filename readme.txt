@@ -15,16 +15,6 @@
 * Поиск новых серий на lostfilm.tv (SD/HD/MP4 версии на выбор)
 * Поиск новых серий на novafilm.tv (SD/HD версии на выбор)
 
-###Скриншоты:
-![Screenshot0](http://blog.korphome.ru/wp-content/uploads/2011/02/IMG_0003.png "Screenshot0")
-![Screenshot1](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый11.png "Screenshot1")
-![Screenshot2](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый.png "Screenshot2")
-![Screenshot3](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый21.png "Screenshot3")
-![Screenshot4](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый3.png "Screenshot4")
-![Screenshot5](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый4.png "Screenshot5")
-![Screenshot6](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый5.png "Screenshot6")
-![Screenshot7](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый6.png "Screenshot7")
-
 ###Требования для установки:
 
 * Веб-сервер (Apache, nginx, lighttpd)
@@ -100,4 +90,4 @@ open_basedir = /tmp/:/path/to/folder/torrent_monitor/:/path/to/folder/torrent_cl
 
 ###Страница проекта:
 
-[blog.korphome.ru](http://blog.korphome.ru/torrentmonitor/)
+http://blog.korphome.ru/torrentmonitor/
