@@ -80,7 +80,7 @@ class novafilm
 	//функция анализа xml ленты
 	private static function analysis($name, $hd, $item)
 	{
-		if (preg_match('/\('.$name.'\)/i', $item->category))
+		if (preg_match('/'.$name.'/i', $item->category))
 		{
 			if ($hd)
 			{

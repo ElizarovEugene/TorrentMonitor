@@ -65,13 +65,21 @@ class Sys
 	//версия системы
 	public static function version()
 	{
-		return '0.8.1';
+		return '0.8.2';
 	}
 
 	//проверка обновлений системы
 	public static function checkUpdate()
 	{
-		$xml = @simplexml_load_file('http://korphome.ru/torrent_monitor/version.xml');
+	    $opts = stream_context_create(array(
+    		'http' => array(
+    			'timeout' => 1
+    			)
+    		));
+
+        $xmlstr = @file_get_contents('http://korphome.ru/torrent_monitor/version.xml', false, $opts);
+        $xml = @simplexml_load_string($xmlstr);
+	    
 		if (false !== $xml)
 		{
 			if (Sys::version() < $xml->current_version)
@@ -79,8 +87,6 @@ class Sys
 			else
 				return FALSE;
 		}
-		else
-			Errors::setWarnings($tracker, 'update');
 	}
 	
 	//обёртка для CURL, для более удобного использования
@@ -124,6 +130,14 @@ class Sys
 
     		if (isset($param['referer']))
     			curl_setopt($ch, CURLOPT_REFERER, $param['referer']);
+    			
+            $settingProxy = Database::getSetting('proxy');
+            if ($settingProxy)
+            {
+                $settingProxyAddress = Database::getSetting('proxyAddress');
+                curl_setopt($ch, CURLOPT_PROXY, $settingProxyAddress); 
+                curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5); 
+            }
 
     		$result = curl_exec($ch);
     		curl_close($ch);
@@ -133,6 +147,24 @@ class Sys
 
     		return $result;
     	}
+    }
+    
+    //Проверяем доступность трекера
+    public static function checkavAilability($tracker)
+    {
+		$page = Sys::getUrlContent(
+            array(
+                'type'           => 'GET',
+                'header'         => 1,
+                'returntransfer' => 1,
+                'url'            => $tracker,
+            )
+		);
+		
+		if (preg_match('/HTTP\/1\.1 200 OK/', $page))
+			return true;
+		else
+			return false;
     }
 	
 	//Получаем заголовок страницы

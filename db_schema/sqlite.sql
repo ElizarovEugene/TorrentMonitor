@@ -39,6 +39,8 @@ INSERT INTO "settings" VALUES (3, 'send', '1');
 INSERT INTO "settings" VALUES (4, 'send_warning', '0');
 INSERT INTO "settings" VALUES (5, 'password', '1f10c9fd49952a7055531975c06c5bd8');
 INSERT INTO "settings" VALUES (6, 'auth', '1');
+INSERT INTO "settings" VALUES (7, 'proxy', '0');
+INSERT INTO "settings" VALUES (8, 'proxyAddress', '127.0.0.1:9050');
 
 CREATE TABLE `torrent` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,

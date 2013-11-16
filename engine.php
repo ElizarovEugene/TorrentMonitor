@@ -70,11 +70,9 @@ if (Sys::checkConfig())
 					$class = $class[0];
 					$class = str_replace('-', '', $class);
 					$functionClass = $class.'Search';
-					
-					echo $tracker.' - '.$usersList[$i]['name'].'<br>'."\r\n";
 
 					call_user_func($functionClass .'::mainSearch', $usersList[$i]['id'], $tracker, $usersList[$i]['name']);
-					
+
 					$functionClass = NULL;
 					$functionEngine = NULL;
 				}

@@ -73,9 +73,11 @@ VALUES
 	(1,'email',''),
 	(2,'path',''),
 	(3,'send','1'),
+	(4,'send_warning','0'),
 	(5,'password','1f10c9fd49952a7055531975c06c5bd8'),
 	(6,'auth','1'),
-	(4,'send_warning','0');
+	(7,'proxy','0'),
+	(8,'proxyAddress','127.0.0.1:9050');
 
 /*!40000 ALTER TABLE `settings` ENABLE KEYS */;
 UNLOCK TABLES;

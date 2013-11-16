@@ -64,6 +64,8 @@ class kinozal
 	    {
 			$pieces = explode(' ', $data);
 			$month = Sys::dateStringToNum(substr($pieces[1], 0, 6));
+			if (strlen($pieces[0]) == 1)
+			    $pieces[0] = '0'.$pieces[0];
 			$date = $pieces[2].'-'.$month.'-'.$pieces[0];
 			$time = $pieces[4].':00';
 			$dateTime = $date.' '.$time;

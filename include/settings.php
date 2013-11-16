@@ -34,6 +34,15 @@ foreach ($settings as $row)
         <label class="label-name"></label>
         <label><input type="checkbox" name="auth" <?php if ($auth) echo "checked" ?>> Включить авторизацию</label>
     </p>
+    <p>
+        <label class="label-name"></label>
+        <label><input type="checkbox" name="proxy" <?php if ($proxy) echo "checked" ?>> Использовать прокси</label>
+    </p>    
+    <p>
+        <label class="label-name">IP, порт proxy</label>
+        <input type="text" name="proxyAddress" value="<?php echo $proxyAddress ?>"><br>
+        <span class="subinput-text">Например: 127.0.0.1:9050</span>
+    </p>    
     <button class="form-button">Сохранить</button>
 </form>
 <br/>

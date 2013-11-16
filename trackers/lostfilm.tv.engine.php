@@ -159,7 +159,7 @@ class lostfilm
 	//функция анализа xml ленты
 	private static function analysis($name, $hd, $item)
 	{
-		if (preg_match('/\('.$name.'\)/i', $item->title))
+		if (preg_match('/'.$name.'/i', $item->title))
 		{
 			if ($hd == 1)
 			{

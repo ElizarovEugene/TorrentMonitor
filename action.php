@@ -284,6 +284,7 @@ if (isset($_POST["action"]))
 		$path = Sys::checkPath($_POST["path"]);   
 		Database::updateSettings('path', $path    );
 		Database::updateSettings('email', $_POST["email"]);
+		Database::updateSettings('proxyAddress', $_POST["proxyAddress"]);
 		
 		if ( ! empty($_POST["send"]))
 			$send = 1;
@@ -302,6 +303,12 @@ if (isset($_POST["action"]))
 		else 
 			$auth = 0;
 		Database::updateSettings('auth', $auth);
+		
+		if ( ! empty($_POST["proxy"]))
+			$proxy = 1;
+		else 
+			$proxy = 0;
+		Database::updateSettings('proxy', $proxy);		
 		?>
 		Настройки монитора обновлены.
 		<?php

@@ -123,13 +123,13 @@ if (Sys::checkInternet())
 		<tr>
 				<?php	
 				}
-				ini_set('default_socket_timeout', 10);
 				if ($tracker == 'lostfilm.tv')
 					$pre = 'www.';
 				else
 					$pre = '';
-				$headers = @get_headers('http://'.$pre.$tracker);
-				if (@preg_match('/200/', $headers[0]) || @preg_match('/200/', $headers[7]))
+				$page = 'http://'.$pre.$tracker;
+
+				if (Sys::checkavAilability($page))
 				{
 				?>
 		<tr>

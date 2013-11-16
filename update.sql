@@ -1,2 +1,4 @@
-UPDATE `credentials` SET `tracker` = 'nnm-club.me' WHERE `id` = '2'
-UPDATE `torrent` SET `tracker` = 'nnm-club.me' WHERE `tracker` = 'nnm-club.ru'
+INSERT INTO `settings` (`id`, `key`, `val`)
+VALUES
+	(7,'proxy','0'),
+	(8,'proxyAddress','127.0.0.1:9050');
