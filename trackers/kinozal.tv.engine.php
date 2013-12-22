@@ -5,17 +5,6 @@ class kinozal
 	protected static $exucution;
 	protected static $warning;
 
-	//инициализируем класс
-	public static function getInstance()
-    {
-        if ( ! isset(self::$instance))
-        {
-            $object = __CLASS__;
-            self::$instance = new $object;
-        }
-        return self::$instance;
-    }
-
 	//проверяем cookie
 	public static function checkCookie($sess_cookie)
 	{
@@ -82,7 +71,7 @@ class kinozal
 		{
 			//получаем учётные данные
 			$credentials = Database::getCredentials($tracker);
-			$login = iconv("utf-8", "windows-1251", $credentials['login']);
+			$login = iconv('utf-8', 'windows-1251', $credentials['login']);
 			$password = $credentials['password'];
 			
 			//авторизовываемся на трекере
@@ -92,7 +81,7 @@ class kinozal
             		'header'         => 1,
             		'returntransfer' => 1,
             		'url'            => 'http://kinozal.tv/takelogin.php',
-            		'postfields'     => "username={$login}&password={$password}&returnto=",
+            		'postfields'     => 'username='.$login.'&password='.$password.'&returnto=',
             		'convert'        => array('windows-1251', 'utf-8'),
             	)
             );			
@@ -100,7 +89,7 @@ class kinozal
 			if ( ! empty($page))
 			{
 				//проверяем подходят ли учётные данные
-				if (preg_match("/Не верно указан пароль/", $page, $array))
+				if (preg_match('/Не верно указан пароль/', $page, $array))
 				{
 					//устанавливаем варнинг
 					Errors::setWarnings($tracker, 'credential_wrong');
@@ -108,7 +97,7 @@ class kinozal
 					kinozal::$exucution = FALSE;
 				}
 				//если подходят - получаем куки
-				elseif (preg_match_all("/Set-Cookie: (.+);/iU", $page, $array))
+				elseif (preg_match_all('/Set-Cookie: (.+);/iU', $page, $array))
 				{
 					kinozal::$sess_cookie = $array[1][0].'; '.$array[1][1].';';
 					Database::setCookie($tracker, kinozal::$sess_cookie);
@@ -153,7 +142,7 @@ class kinozal
 		}
 	}
 	
-    public static function work($array, $id, $tracker, $name, $torrent_id, $timestamp)
+    public static function work($array, $id, $tracker, $name, $torrent_id, $timestamp, $hash)
     {
 		//проверяем удалось ли получить дату со страницы
 		if (isset($array[1]))
@@ -174,7 +163,7 @@ class kinozal
                     	array(
                     		'type'           => 'POST',
                     		'returntransfer' => 1,
-                    		'url'            => "http://kinozal.tv/download.php/{$torrent_id}/%5Bkinozal.tv%5Did{$torrent_id}.torrent",
+                    		'url'            => 'http://kinozal.tv/download.php/'.$torrent_id.'/%5Bkinozal.tv%5Did'.$torrent_id.'.torrent',
                     		'cookie'         => kinozal::$sess_cookie,
                     		'sendHeader'     => array('Host' => 'kinozal.tv', 'Content-length' => strlen(kinozal::$sess_cookie)),
                     		'referer'        => 'http://kinozal.tv/details.php?id='.$torrent_id,
@@ -193,8 +182,7 @@ class kinozal
 					}
 					else
 					{
-    					$client = ClientAdapterFactory::getStorage('file');
-    					$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
+    					Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash);
     					//обновляем время регистрации торрента в базе
     					Database::setNewDate($id, $date);
     					//отправляем уведомлении о новом торренте
@@ -229,7 +217,7 @@ class kinozal
     }
 	
 	//основная функция
-	public static function main($id, $tracker, $name, $torrent_id, $timestamp)
+	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash)
 	{
 		$cookie = Database::getCookie($tracker);
 		if (kinozal::checkCookie($cookie))
@@ -259,10 +247,10 @@ class kinozal
 			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
-				if (preg_match("/<li>Обновлен<span class=\"floatright green n\">(.*)<\/span><\/li>/", $page, $array))
-    				kinozal::work($array, $id, $tracker, $name, $torrent_id, $timestamp);
-				elseif (preg_match("/<li>Залит<span class=\"floatright green n\">(.*)<\/span><\/li>/", $page, $array))
-				    kinozal::work($array, $id, $tracker, $name, $torrent_id, $timestamp);
+				if (preg_match('/<li>Обновлен<span class=\"floatright green n\">(.*)<\/span><\/li>/', $page, $array))
+    				kinozal::work($array, $id, $tracker, $name, $torrent_id, $timestamp, $hash);
+				elseif (preg_match('/<li>Залит<span class=\"floatright green n\">(.*)<\/span><\/li>/', $page, $array))
+				    kinozal::work($array, $id, $tracker, $name, $torrent_id, $timestamp, $hash);
 				else
 				{
 					//устанавливаем варнинг

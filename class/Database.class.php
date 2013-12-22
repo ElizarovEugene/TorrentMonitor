@@ -267,7 +267,8 @@ class Database
                             to_char(timestamp, 'dd') AS day,
                             to_char(timestamp, 'mm') AS month,
                             to_char(timestamp, 'YYYY') AS year,
-                            to_char(timestamp, 'HH24:MI:SS') AS time
+                            to_char(timestamp, 'HH24:MI:SS') AS time,
+                            hash
                             FROM torrent 
                             ORDER BY {$order}");
         }
@@ -277,7 +278,8 @@ class Database
                             DATE_FORMAT(`timestamp`, '%d') AS `day`, 
                             DATE_FORMAT(`timestamp`, '%m') AS `month`, 
                             DATE_FORMAT(`timestamp`, '%Y') AS `year`, 
-                            DATE_FORMAT(`timestamp`, '%T') AS `time` 
+                            DATE_FORMAT(`timestamp`, '%T') AS `time`,
+                            `hash`
                             FROM `torrent` 
                             ORDER BY {$order}");
         }
@@ -287,7 +289,8 @@ class Database
                             strftime('%d', `timestamp`) AS `day`, 
                             strftime('%m', `timestamp`) AS `month`, 
                             strftime('%Y', `timestamp`) AS `year`, 
-                            strftime('%H:%M', `timestamp`) AS `time` 
+                            strftime('%H:%M', `timestamp`) AS `time`,
+                            `hash`
                             FROM `torrent` 
                             ORDER BY {$order}");    		
         }
@@ -307,6 +310,7 @@ class Database
                 $resultArray[$i]['month'] = $row['month'];
                 $resultArray[$i]['year'] = $row['year'];
                 $resultArray[$i]['time'] = $row['time'];
+                $resultArray[$i]['hash'] = $row['hash'];
                 $i++;
             }
             if ( ! empty($resultArray))
@@ -703,6 +707,21 @@ class Database
             return FALSE;
         $stmt = NULL;
     }
+    
+    public static function updateHash($id, $hash)
+    {
+        if (Database::getDbType() == 'pgsql')
+            $stmt = Database::getInstance()->dbh->prepare("UPDATE torrent SET hash = :hash WHERE id = :id");
+        else
+            $stmt = Database::getInstance()->dbh->prepare("UPDATE `torrent` SET `hash` = :hash WHERE `id` = :id");        
+        $stmt->bindParam(':hash', $hash);
+        $stmt->bindParam(':id', $id);
+        if ($stmt->execute())
+            return TRUE;
+        else
+            return FALSE;
+        $stmt = NULL;
+    }   
     
     public static function deletItem($id)
     {

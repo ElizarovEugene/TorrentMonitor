@@ -25,8 +25,8 @@ class Sys
 	//проверяем правильно ли заполнен конфигурационный файл
 	public static function checkConfig()
 	{
-		$dir = dirname(__FILE__)."/../";
-		include_once $dir."config.php";
+		$dir = dirname(__FILE__).'/../';
+		include_once $dir.'config.php';
 		
 		$confArray = Config::$confArray;
 		foreach ($confArray as $key => $val)
@@ -40,7 +40,7 @@ class Sys
 	//проверяем установлено ли расширение CURL
 	public static function checkCurl()
 	{
-		if (in_array("curl", get_loaded_extensions()))
+		if (in_array('curl', get_loaded_extensions()))
 			return TRUE;
 		else
 			return FALSE;
@@ -65,7 +65,7 @@ class Sys
 	//версия системы
 	public static function version()
 	{
-		return '0.8.2';
+		return '0.9';
 	}
 
 	//проверка обновлений системы
@@ -101,7 +101,7 @@ class Sys
     		if ($param['type'] == 'GET')
     			curl_setopt($ch, CURLOPT_HTTPGET, 1);
 
-    		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:16.0) Gecko/20100101 Firefox/16.0");
+    		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:16.0) Gecko/20100101 Firefox/16.0');
 
     		if (isset($param['header']))
     			curl_setopt($ch, CURLOPT_HEADER, 1);
@@ -171,7 +171,7 @@ class Sys
 	public static function getHeader($url)
 	{
 		$Purl = parse_url($url);
-		$tracker = $Purl["host"];
+		$tracker = $Purl['host'];
 		$tracker = preg_replace('/www\./', '', $tracker);
 	
 		$forumPage = Sys::getUrlContent(
@@ -183,12 +183,12 @@ class Sys
 		);
 
 		if ($tracker != 'rutor.org')
-			$forumPage = iconv("windows-1251", "utf-8//IGNORE", $forumPage);
+			$forumPage = iconv('windows-1251', 'utf-8//IGNORE', $forumPage);
 
 		if ($tracker == 'tr.anidub.com')
 			$tracker = 'anidub.com';
 		
-		preg_match("/<title>(.*)<\/title>/is", $forumPage, $array);
+		preg_match('/<title>(.*)<\/title>/is', $forumPage, $array);
 		if ( ! empty($array[1]))
 		{
 			$name = $array[1];
@@ -204,15 +204,33 @@ class Sys
 				$name = substr($name, 13);
 		}
 		else
-			$name = "Неизвестный";
+			$name = 'Неизвестный';
 		return $name;
+	}
+	
+	//созраняем torrent файл
+	public static function saveTorrent($tracker, $name, $torrent, $id, $hash)
+	{
+    	$file = '['.$tracker.']_'.$name.'.torrent';
+        $path = Database::getSetting('path').$file;
+        file_put_contents($path, $torrent);
+
+        $torrentClient = Database::getSetting('torrentClient');
+        
+        $dir = dirname(__FILE__).'/';
+        include_once $dir.$torrentClient.'.class.php';
+        call_user_func($torrentClient.'::addNew', $id, $path, $hash, $tracker);
+        
+        $deleteTorrent = Database::getSetting('deleteTorrent');
+        if ($deleteTorrent)
+            unlink($path);
 	}
 	
 	//преобразуем месяц из числового в текстовый
 	public static function dateNumToString($date)
 	{
-	    $monthes_num = array("/10/", "/11/", "/12/", "/0?1/", "/0?2/", "/0?3/", "/0?4/", "/0?5/", "/0?6/", "/0?7/", "/0?8/", "/0?9/");
-	    $monthes_ru = array("Окт", "Ноя", "Дек", "Янв", "Фев", "Мар", "Апр", "Мая", "Июн", "Июл", "Авг", "Сен");
+	    $monthes_num = array('/10/', '/11/', '/12/', '/0?1/', '/0?2/', '/0?3/', '/0?4/', '/0?5/', '/0?6/', '/0?7/', '/0?8/', '/0?9/');
+	    $monthes_ru = array('Окт', 'Ноя', 'Дек', 'Янв', 'Фев', 'Мар', 'Апр', 'Мая', 'Июн', 'Июл', 'Авг', 'Сен');
 	    $month = preg_replace($monthes_num, $monthes_ru, $date);
 	    
 	    return $month;
@@ -221,8 +239,8 @@ class Sys
 	//преобразуем месяц из текстового в числовый
 	public static function dateStringToNum($date)
 	{
-	    $monthes = array("/янв|Янв|Jan/i", "/фев|Фев|Feb/i", "/мар|Мар|Mar/i", "/апр|Апр|Apr/i", "/мая|май|Мая|мая|May/i", "/июн|Июн|Jun/i", "/июл|Июл|Jul/i", "/авг|Авг|Aug/i", "/сен|Сен|Sep/i", "/окт|Окт|Oct/i", "/ноя|Ноя|Nov/i", "/дек|Дек|Dec/i");
-	    $monthes_num = array("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12");
+	    $monthes = array('/янв|Янв|Jan/i', '/фев|Фев|Feb/i', '/мар|Мар|Mar/i', '/апр|Апр|Apr/i', '/мая|май|Мая|мая|May/i', '/июн|Июн|Jun/i', '/июл|Июл|Jul/i', '/авг|Авг|Aug/i', '/сен|Сен|Sep/i', '/окт|Окт|Oct/i', '/ноя|Ноя|Nov/i', '/дек|Дек|Dec/i');
+	    $monthes_num = array('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12');
 	    $month = preg_replace($monthes, $monthes_num, $date);
 	    
 	    return $month;
@@ -233,7 +251,7 @@ class Sys
 	{
         $dir = dirname(__FILE__);
 		$dir = str_replace('class', '', $dir);	   
-		$date = date("d-m-Y H:i:s");
+		$date = date('d-m-Y H:i:s');
 		file_put_contents($dir.'/laststart.txt', $date);
 	}
 }

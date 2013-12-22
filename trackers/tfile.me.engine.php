@@ -4,17 +4,6 @@ class tfile
 	protected static $exucution;
 	protected static $warning;
 
-	//инициализируем класс
-	public static function getInstance()
-    {
-        if ( ! isset(self::$instance))
-        {
-            $object = __CLASS__;
-            self::$instance = new $object;
-        }
-        return self::$instance;
-    }
-
 	//функция проверки введёного URL`а
 	public static function checkRule($data)
 	{
@@ -44,7 +33,7 @@ class tfile
 	}
 	
 	//основная функция
-	public static function main($id, $tracker, $name, $torrent_id, $timestamp)
+	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash)
 	{
 		tfile::$exucution = TRUE;
 
@@ -63,7 +52,7 @@ class tfile
 			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
-				if (preg_match("/class=\"regDate\">(.+)<\/span>/", $page, $array))
+				if (preg_match('/class=\"regDate\">(.+)<\/span>/', $page, $array))
 				{
 					//проверяем удалось ли получить дату со страницы
 					if (isset($array[1]))
@@ -72,7 +61,7 @@ class tfile
 						if ( ! empty($array[1]))
 						{
 							//находим имя торрента для скачивания		
-							if (preg_match("/download\.php\?id=(\d+)&uk=1111111111/", $page, $link))
+							if (preg_match('/download\.php\?id=(\d+)&uk=1111111111/', $page, $link))
 							{
 								//сбрасываем варнинг
 								Database::clearWarnings($tracker);
@@ -91,13 +80,12 @@ class tfile
 		                                	array(
 		                                		'type'           => 'GET',
 		                                		'returntransfer' => 1,
-		                                		'url'            => "http://tfile.me/forum/download.php?id={$torrent_id}&uk=1111111111",
+		                                		'url'            => 'http://tfile.me/forum/download.php?id='.$torrent_id.'&uk=1111111111',
 		                                		'sendHeader'     => array('Host' => 'tfile.me'),
 		                                		'referer'        => 'http://tfile.me/forum/viewtopic.php?t='.$torrent_id,
 		                                	)
 		                                );
-										$client = ClientAdapterFactory::getStorage('file');
-										$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
+										Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash);
 										//обновляем время регистрации торрента в базе
 										Database::setNewDate($id, $date);
 										//отправляем уведомлении о новом торренте

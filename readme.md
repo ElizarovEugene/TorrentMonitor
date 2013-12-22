@@ -15,6 +15,10 @@
 * Поиск новых серий на lostfilm.tv (SD/HD/MP4 версии на выбор)
 * Поиск новых серий на novafilm.tv (SD/HD версии на выбор)
 
+* Работа через proxy (к примеру Tor)
+
+* Управление торрент-клиентами (добавление/удаление раздач и файлов): Transmission, Deluge (на данные момент только под linux платформу, ибо работает через консольную часть этих клиентов).
+
 ###Скриншоты:
  ![Screenshot0](http://blog.korphome.ru/wp-content/uploads/2011/02/IMG_0003.png "Screenshot0")
  ![Screenshot1](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый11.png "Screenshot1")

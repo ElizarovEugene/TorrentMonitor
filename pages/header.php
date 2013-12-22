@@ -7,7 +7,7 @@
     <meta name="keywords" content="">
     <meta name="viewport" content="width=1000">
     <link rel="stylesheet" href="pages/styles.css">
-    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="icon" type="image/png" href="img/favicon.png" />
     <!--[if lt IE 9]><script src="js/html5shiv-3.5.min.js"></script><![endif]-->
     <script type="text/javascript">
         function FocusOnInput() { document.getElementById("password").focus(); }

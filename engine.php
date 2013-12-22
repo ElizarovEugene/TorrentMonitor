@@ -8,7 +8,7 @@ include_once $dir.'class/System.class.php';
 include_once $dir.'class/Database.class.php';
 include_once $dir.'class/Errors.class.php';
 include_once $dir.'class/Notification.class.php';
-include_once $dir.'adapters/ClientAdapterFactory.class.php';
+
 header('Content-Type: text/html; charset=utf-8');
 
 if (Sys::checkConfig())
@@ -17,7 +17,7 @@ if (Sys::checkConfig())
 	{
 		$torrentsList = Database::getTorrentsList('name');
 		$count = count($torrentsList);
-		
+
 		for ($i=0; $i<$count; $i++)
 		{
 			$tracker = $torrentsList[$i]['tracker'];
@@ -32,14 +32,14 @@ if (Sys::checkConfig())
 					$class = explode('.', $tracker);
 					$class = $class[0];
 					$functionClass = str_replace('-', '', $class);
-					
+					echo $torrentsList[$i]['name']."\r\n";
 					if ($tracker == 'lostfilm.tv' || $tracker == 'novafilm.tv')
 					{
-    				    call_user_func($functionClass .'::main', $torrentsList[$i]['id'], $tracker, $torrentsList[$i]['name'], $torrentsList[$i]['hd'], $torrentsList[$i]['ep'], $torrentsList[$i]['timestamp']);
+    				    call_user_func($functionClass.'::main', $torrentsList[$i]['id'], $tracker, $torrentsList[$i]['name'], $torrentsList[$i]['hd'], $torrentsList[$i]['ep'], $torrentsList[$i]['timestamp'], $torrentsList[$i]['hash']);
 					}
 					if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.me' || $tracker == 'rutor.org' || $tracker == 'tfile.me' || $tracker == 'kinozal.tv' || $tracker == 'anidub.com')
 					{
-    					call_user_func($functionClass .'::main', $torrentsList[$i]['id'], $tracker, $torrentsList[$i]['name'], $torrentsList[$i]['torrent_id'], $torrentsList[$i]['timestamp']);
+    					call_user_func($functionClass.'::main', $torrentsList[$i]['id'], $tracker, $torrentsList[$i]['name'], $torrentsList[$i]['torrent_id'], $torrentsList[$i]['timestamp'], $torrentsList[$i]['hash']);
 					}
 
 					$functionClass = NULL;

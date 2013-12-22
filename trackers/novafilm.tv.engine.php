@@ -9,17 +9,6 @@ class novafilm
 	protected static $log_page;
 	protected static $xml_page;
 
-	//инициализируем класс
-	public static function getInstance()
-    {
-        if (!isset(self::$instance))
-        {
-            $object = __CLASS__;
-            self::$instance = new $object;
-        }
-        return self::$instance;
-    }
-    
 	//проверяем cookie
 	public static function checkCookie($sess_cookie)
 	{
@@ -41,7 +30,7 @@ class novafilm
 
 	public static function checkRule($data)
 	{
-		if (preg_match("/^[\.\+\s\'\`\:\;\-a-zA-Z0-9]+$/", $data))
+		if (preg_match('/^[\.\+\s\'\`\:\;\-a-zA-Z0-9]+$/', $data))
 			return TRUE;
 		else
 			return FALSE;
@@ -53,11 +42,11 @@ class novafilm
 		$data = substr($data, 5);
 		$data = substr($data, 0, -6);
 		
-		$monthes = array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+		$monthes = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 		$month = substr($data, 3, 3);
-		$data = preg_replace("/(\d\d)-(\d\d)-(\d\d)/", "$3-$2-$1", str_replace($month, str_pad(array_search($month, $monthes)+1, 2, 0, STR_PAD_LEFT), $data));
+		$data = preg_replace('/(\d\d)-(\d\d)-(\d\d)/', '$3-$2-$1', str_replace($month, str_pad(array_search($month, $monthes)+1, 2, 0, STR_PAD_LEFT), $data));
 		
-		$data = preg_split("/\s/", $data);		
+		$data = preg_split('/\s/', $data);		
 		$date = $data[2].'-'.$data[1].'-'.$data[0].' '.$data[3];
 		return $date;
 	}
@@ -67,12 +56,14 @@ class novafilm
 	{
 		$data = substr($data, 0, -3);
 		$data = str_replace('-', ' ', $data);
-		$arr = preg_split("/\s/", $data);
+		$arr = preg_split('/\s/', $data);
 		
-		$monthes_en = array("/01/", "/02/", "/03/", "/04/", "/05/", "/06/", "/07/", "/08/", "/09/", "/10/", "/11/", "/12/");
-		$monthes_ru = array("Янв", "Фев", "Мар", "Апр", "Мая", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек");
+		#$monthes_en = array("/01/", "/02/", "/03/", "/04/", "/05/", "/06/", "/07/", "/08/", "/09/", "/10/", "/11/", "/12/");
+		#$monthes_ru = array("Янв", "Фев", "Мар", "Апр", "Мая", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек");
 		
-		$month = preg_replace($monthes_en, $monthes_ru, $arr[1]);
+		#$month = preg_replace($monthes_en, $monthes_ru, $arr[1]);
+		
+		$month = Sys::dateNumToString($arr[1]);
 		$date = $arr[2].' '.$month.' '.$arr[0].' '.$arr[3];
 		return $date;
 	}
@@ -119,7 +110,7 @@ class novafilm
 		{
 			//получаем учётные данные
 			$credentials = Database::getCredentials($tracker);
-			$login = iconv("utf-8", "windows-1251", $credentials['login']);
+			$login = iconv('utf-8', 'windows-1251', $credentials['login']);
 			$password = $credentials['password'];
 			
 			$page = Sys::getUrlContent(
@@ -128,22 +119,22 @@ class novafilm
             		'header'         => 1,
             		'returntransfer' => 1,
             		'url'            => 'http://novafilm.tv/auth/login',
-            		'postfields'     => "returnto=/&username={$login}&password={$password}&login=Хочу войти!",
+            		'postfields'     => 'returnto=/&username='.$login.'&password='.$password.'&login=Хочу войти!',
             	)
             );
             
 			if ( ! empty($page))
 			{
 				//проверяем подходят ли учётные данные
-				if (preg_match_all("/Set-Cookie: (\w*)=(\S*)/", $page, $array))
+				if (preg_match_all('/Set-Cookie: (\w*)=(\S*)/', $page, $array))
 				{
-					novafilm::$sess_cookie = $array[1][2]."=".$array[2][2];
+					novafilm::$sess_cookie = $array[1][2].'='.$array[2][2];
 					Database::setCookie($tracker, novafilm::$sess_cookie);
 					//запускам процесс выполнения, т.к. не может работать без кук
 					novafilm::$exucution = TRUE;
 				}
 				//проверяем нет ли сообщения о неправильном логине/пароле
-				elseif (preg_match("/\/do\/recover/", $page, $out))
+				elseif (preg_match('/\/do\/recover/', $page, $out))
 				{
 					//устанавливаем варнинг
 					if (novafilm::$warning == NULL)
@@ -193,7 +184,7 @@ class novafilm
 	}
 	
 	//основная функция
-	public static function main($id, $tracker, $name, $hd, $ep, $timestamp)
+	public static function main($id, $tracker, $name, $hd, $ep, $timestamp, $hash)
 	{
 		//проверяем небыло ли до этого уже ошибок
 		if (empty(novafilm::$exucution) || (novafilm::$exucution))
@@ -298,7 +289,6 @@ class novafilm
 						if ($download)
 						{
 							$amp = ($hd) ? 'HD' : NULL;
-							$file = '[novafilm.tv]_'.$name.'_'.$serial['episode'].'_'.$amp.'.torrent';
 							//сохраняем торрент в файл
 							$torrent = Sys::getUrlContent(
 								array(
@@ -309,8 +299,8 @@ class novafilm
 									'sendHeader'     => array('Host' => 'novafilm.tv', 'Content-length' => strlen(novafilm::$sess_cookie)),
 								)
 							);							
-							$client = ClientAdapterFactory::getStorage('file');
-							$client->store($torrent, $id, $tracker, $name, $id, $timestamp, array('filename' => $file));							
+							$file = str_replace(' ', '.', $name).'.S'.$season.'E'.$episode.'.'.$amp;
+							Sys::saveTorrent($tracker, $file, $torrent, $id, $hash);							
 							//обновляем время регистрации торрента в базе
 							Database::setNewDate($id, $serial['date']);
 							//обновляем сведения о последнем эпизоде

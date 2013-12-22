@@ -89,7 +89,7 @@ if ( ! empty($torrents_list))
             if ($timestamp == "0000-00-00 00:00:00" || $timestamp == NULL) {}
             else
             {
-            	if ($tracker != "rutracker.org" && $tracker != "nnm-club.me" && $tracker != "rutor.org")
+            	if ($tracker != "rutracker.org" && $tracker != "nnm-club.me" && $tracker != "rutor.org" && $tracker != "kinozal.tv")
             	{
             	?>
             	<div onclick="expand('div<?php echo $id ?>')" class="cut" style="cursor: pointer;">
@@ -115,7 +115,7 @@ if ( ! empty($torrents_list))
             		$season = substr($ep, 1, 2);
             		$episode = substr($ep, -2);
 
-                	if ($tracker != "rutracker.org" && $tracker != "nnm-club.me")
+                	if ($tracker != "rutracker.org" && $tracker != "nnm-club.me" && $tracker != "rutor.org" && $tracker != "kinozal.tv")
                 	{
                 	?>
             		<div id="div<?php echo $id ?>" class="result">

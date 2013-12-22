@@ -5,17 +5,6 @@ class nnmclub
 	protected static $exucution;
 	protected static $warning;
 	
-	//инициализируем класс
-	public static function getInstance()
-    {
-        if ( ! isset(self::$instance))
-        {
-            $object = __CLASS__;
-            self::$instance = new $object;
-        }
-        return self::$instance;
-    }
-
 	//проверяем cookie
 	public static function checkCookie($sess_cookie)
 	{
@@ -47,10 +36,10 @@ class nnmclub
 	
 	private static function dateStringToNum($data)
 	{
-		$monthes = array("Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек");
+		$monthes = array('Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек');
 		$month = mb_substr($data, 3, 6);
-		$date = preg_replace("/(\d\d)\s(\d\d)\s(\d\d\d\d)/", "$3-$2-$1",str_replace($month, str_pad(array_search($month, $monthes)+1, 2, 0, STR_PAD_LEFT), $data));
-		$date = date("Y-m-d H:i:s", strtotime($date));
+		$date = preg_replace('/(\d\d)\s(\d\d)\s(\d\d\d\d)/', '$3-$2-$1',str_replace($month, str_pad(array_search($month, $monthes)+1, 2, 0, STR_PAD_LEFT), $data));
+		$date = date('Y-m-d H:i:s', strtotime($date));
 	
 		return $date;
 	}
@@ -70,7 +59,7 @@ class nnmclub
 		{
 			//получаем учётные данные
 			$credentials = Database::getCredentials($tracker);
-			$login = iconv("utf-8", "windows-1251", $credentials['login']);
+			$login = iconv('utf-8', 'windows-1251', $credentials['login']);
 			$password = $credentials['password'];
 			
 			//авторизовываемся на трекере
@@ -80,7 +69,7 @@ class nnmclub
             		'header'         => 1,
             		'returntransfer' => 1,
             		'url'            => 'http://nnm-club.me/forum/login.php',
-            		'postfields'     => "username={$login}&password={$password}&login=%C2%F5%EE%E4",
+            		'postfields'     => 'username='.$login.'&password='.$password.'&login=%C2%F5%EE%E4',
             		'convert'        => array('windows-1251', 'utf-8'),
             	)
             );
@@ -88,7 +77,7 @@ class nnmclub
 			if ( ! empty($page))
 			{
 				//проверяем подходят ли учётные данные
-				if (preg_match("/login\.php\?redirect=/", $page, $array))
+				if (preg_match('/login\.php\?redirect=/', $page, $array))
 				{
 					//устанавливаем варнинг
 					if (nnmclub::$warning == NULL)
@@ -102,9 +91,9 @@ class nnmclub
 				else
 				{
 					//если подходят - получаем куки
-					if (preg_match_all("/Set-Cookie: (.*);/iU", $page, $array))
+					if (preg_match_all('/Set-Cookie: (.*);/iU', $page, $array))
 					{
-						nnmclub::$sess_cookie = implode("; ", $array[1]);
+						nnmclub::$sess_cookie = implode('; ', $array[1]);
 						Database::setCookie($tracker, nnmclub::$sess_cookie);
 						//запускам процесс выполнения, т.к. не может работать без кук
 						nnmclub::$exucution = TRUE;
@@ -119,7 +108,6 @@ class nnmclub
 				{
 					nnmclub::$warning = TRUE;
 					Errors::setWarnings($tracker, 'not_available');
-					echo '1';
 				}
 				//останавливаем процесс выполнения, т.к. не может работать без кук
 				nnmclub::$exucution = FALSE;
@@ -138,7 +126,7 @@ class nnmclub
 		}
 	}
 	
-	public static function main($id, $tracker, $name, $torrent_id, $timestamp)
+	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash)
 	{
 		$cookie = Database::getCookie($tracker);
 		if (nnmclub::checkCookie($cookie))
@@ -168,7 +156,7 @@ class nnmclub
 			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
-				if (preg_match("/<td class=\"genmed\">&nbsp;(\d{2}\s\D{6}\s\d{4}\s\d{2}:\d{2}:\d{2})<\/td>/", $page, $array))
+				if (preg_match('/<td class=\"genmed\">&nbsp;(\d{2}\s\D{6}\s\d{4}\s\d{2}:\d{2}:\d{2})<\/td>/', $page, $array))
 				{
 					//проверяем удалось ли получить дату со страницы
 					if (isset($array[1]))
@@ -177,7 +165,7 @@ class nnmclub
 						if ( ! empty($array[1]))
 						{
 							//находим имя торрента для скачивания		
-							if (preg_match("/download\.php\?id=(\d{6,8})/", $page, $link))
+							if (preg_match('/download\.php\?id=(\d{6,8})/', $page, $link))
 							{
 								//сбрасываем варнинг
 								Database::clearWarnings($tracker);
@@ -199,8 +187,7 @@ class nnmclub
 	                                		'referer'        => 'http://nnm-club.me/forum/viewtopic.php?t='.$torrent_id,
 	                                	)
 	                                );
-									$client = ClientAdapterFactory::getStorage('file');
-									$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
+									Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash);
 									//обновляем время регистрации торрента в базе
 									Database::setNewDate($id, $date);
 									//отправляем уведомлении о новом торренте
@@ -215,7 +202,6 @@ class nnmclub
                     			{
                     				nnmclub::$warning = TRUE;
                     				Errors::setWarnings($tracker, 'not_available');
-                    				echo '2';
                     			}
                     			//останавливаем процесс выполнения, т.к. не может работать без кук
 								nnmclub::$exucution = FALSE;
@@ -228,7 +214,6 @@ class nnmclub
                 			{
                 				nnmclub::$warning = TRUE;
                 				Errors::setWarnings($tracker, 'not_available');
-                				echo '3';
                 			}
                 			//останавливаем процесс выполнения, т.к. не может работать без кук
 							nnmclub::$exucution = FALSE;
@@ -241,7 +226,6 @@ class nnmclub
             			{
             				nnmclub::$warning = TRUE;
             				Errors::setWarnings($tracker, 'not_available');
-            				echo '4';
             			}
             			//останавливаем процесс выполнения, т.к. не может работать без кук
 						nnmclub::$exucution = FALSE;
@@ -254,7 +238,6 @@ class nnmclub
         			{
         				nnmclub::$warning = TRUE;
         				Errors::setWarnings($tracker, 'not_available');
-        				echo '5';
         			}
         			//останавливаем процесс выполнения, т.к. не может работать без кук
 					nnmclub::$exucution = FALSE;
@@ -267,7 +250,6 @@ class nnmclub
     			{
     				nnmclub::$warning = TRUE;
     				Errors::setWarnings($tracker, 'not_available');
-    				echo '6';
     			}
     			//останавливаем процесс выполнения, т.к. не может работать без кук
 				nnmclub::$exucution = FALSE;

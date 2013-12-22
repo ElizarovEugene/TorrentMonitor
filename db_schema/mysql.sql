@@ -77,7 +77,15 @@ VALUES
 	(5,'password','1f10c9fd49952a7055531975c06c5bd8'),
 	(6,'auth','1'),
 	(7,'proxy','0'),
-	(8,'proxyAddress','127.0.0.1:9050');
+	(8,'proxyAddress','127.0.0.1:9050'),
+	(9,'useTorrent','0'),
+	(10,'torrentClient',''),
+	(11,'torrentAddress',''),
+	(12,'torrentLogin',''),
+	(13,'torrentPassword',''),
+	(14,'pathToDownload',''),
+	(15,'deleteTorrent','0'),
+	(16,'deleteOldFiles','0');
 
 /*!40000 ALTER TABLE `settings` ENABLE KEYS */;
 UNLOCK TABLES;

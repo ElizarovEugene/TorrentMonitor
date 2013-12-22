@@ -9,29 +9,18 @@ class lostfilm
 	protected static $log_page;
 	protected static $xml_page;
 	
-	//инициализируем класс
-	public static function getInstance()
-    {
-        if ( ! isset(self::$instance))
-        {
-            $object = __CLASS__;
-            self::$instance = new $object;
-        }
-        return self::$instance;
-    }
-    
 	//получаем куки для доступа к сайту
 	private static function login($type, $login, $password)
 	{
 		if ($type == 'simple')
 		{
 			$url = 'http://lostfilm.tv/useri.php';
-			$postfields = "FormLogin={$login}&FormPassword={$password}&module=1&repage=user&act=login";
+			$postfields = 'FormLogin='.$login.'&FormPassword='.$password.'&module=1&repage=user&act=login';
 		}
 		if ($type == 'hard')
 		{
 			$url = 'http://login.bogi.ru/login.php?referer=http%3A%2F%2Fwww.lostfilm.tv%2F';
-			$postfields = "login={$login}&password={$password}&module=1&target=http%3A%2F%2Flostfilm.tv%2F&repage=user&act=login";
+			$postfields = 'login='.$login.'&password='.$password.'&module=1&target=http%3A%2F%2Flostfilm.tv%2F&repage=user&act=login';
 		}
 
         $result = Sys::getUrlContent(
@@ -65,8 +54,8 @@ class lostfilm
 	        		'convert'        => array('windows-1251', 'utf-8'),
 	        	)
 	        );
-			preg_match("/<td align=\"left\">(.*)<br >/", $page, $out);
-			lostfilm::$sess_cookie .= " usess=".$out[1];
+			preg_match('/<td align=\"left\">(.*)<br >/', $page, $out);
+			lostfilm::$sess_cookie .= ' usess='.$out[1];
 			Database::setCookie($tracker, lostfilm::$sess_cookie);
 			Database::clearWarnings('lostfilm.tv');
 		}
@@ -107,7 +96,7 @@ class lostfilm
 	//функция проверки введёного названия
 	public static function checkRule($data)
 	{
-		if (preg_match("/^[\.\+\s\'\`\:\;\-a-zA-Z0-9]+$/", $data))
+		if (preg_match('/^[\.\+\s\'\`\:\;\-a-zA-Z0-9]+$/', $data))
 			return TRUE;
 		else
 			return FALSE;
@@ -119,11 +108,11 @@ class lostfilm
 		$data = substr($data, 5);
 		$data = substr($data, 0, -6);
 		
-		$monthes = array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+		$monthes = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 		$month = substr($data, 3, 3);
-		$data = preg_replace("/(\d\d)-(\d\d)-(\d\d)/", "$3-$2-$1", str_replace($month, str_pad(array_search($month, $monthes)+1, 2, 0, STR_PAD_LEFT), $data));
+		$data = preg_replace('/(\d\d)-(\d\d)-(\d\d)/', '$3-$2-$1', str_replace($month, str_pad(array_search($month, $monthes)+1, 2, 0, STR_PAD_LEFT), $data));
 		
-		$data = preg_split("/\s/", $data);
+		$data = preg_split('/\s/', $data);
 		$date = $data[2].'-'.$data[1].'-'.$data[0].' '.$data[3];
 		return $date;
 	}
@@ -132,14 +121,12 @@ class lostfilm
 	private static function dateNumToString($data)
 	{
 		$data = substr($data, 0, -3);
-		$data = preg_split("/\s/", $data);
+		$data = preg_split('/\s/', $data);
 		$time = $data[1];
 		$data = $data[0];
-		$data = preg_split("/\-/", $data);
+		$data = preg_split('/\-/', $data);
 
-		$monthes_num = array("/01/", "/02/", "/03/", "/04/", "/05/", "/06/", "/07/", "/08/", "/09/", "/10/", "/11/", "/12/");
-		$monthes_ru = array("Янв", "Фев", "Мар", "Апр", "Мая", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек");
-		$month = preg_replace($monthes_num, $monthes_ru, $data[1]);
+		$month = Sys::dateNumToString($data[1]);
 		$date = $data[2].' '.$month.' '.$data[0].' '.$time;
 		return $date;
 	}
@@ -219,7 +206,7 @@ class lostfilm
 		        	)
 		        );
 				
-				if (preg_match_all("/Set-Cookie: (\w*)=(\S*)/", $page, $array))
+				if (preg_match_all('/Set-Cookie: (\w*)=(\S*)/', $page, $array))
 				{
 					lostfilm::getCookies($tracker, $array);
 					lostfilm::$exucution = TRUE;
@@ -240,7 +227,7 @@ class lostfilm
 	}
 	
 	//основная функция
-	public static function main($id, $tracker, $name, $hd, $ep, $timestamp)
+	public static function main($id, $tracker, $name, $hd, $ep, $timestamp, $hash)
 	{
 		//проверяем небыло ли до этого уже ошибок
 		if (empty(lostfilm::$exucution) || (lostfilm::$exucution))
@@ -351,7 +338,6 @@ class lostfilm
 									$amp = 'MP4';
 								else
 									$amp = NULL;
-								$file = '[lostfilm.tv]_'.$name.'_'.$serial['episode'].'_'.$amp.'.torrent';
 								//сохраняем торрент в файл
                                 $torrent = Sys::getUrlContent(
 						        	array(
@@ -362,8 +348,8 @@ class lostfilm
 						        		'sendHeader'     => array('Host' => 'lostfilm.tv', 'Content-length' => strlen(lostfilm::$sess_cookie)),
 						        	)
                                 );								
-								$client = ClientAdapterFactory::getStorage('file');
-								$client->store($torrent, $id, $tracker, $name, $id, $timestamp, array('filename' => $file));
+								$file = str_replace(' ', '.', $name).'.S'.$season.'E'.$episode.'.'.$amp;
+								Sys::saveTorrent($tracker, $file, $torrent, $id, $hash);
 								//обновляем время регистрации торрента в базе
 								Database::setNewDate($id, $serial['date']);
 								//обновляем сведения о последнем эпизоде

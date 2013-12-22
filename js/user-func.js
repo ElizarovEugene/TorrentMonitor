@@ -331,6 +331,14 @@ $("#setting").submit(function()
 		a = $form.find('input[name="auth"]').attr('checked');
 		pr = $form.find('input[name="proxy"]').attr('checked');
 		pa = $form.find('input[name="proxyAddress"]').val();
+		t = $form.find('input[name="torrent"]').attr('checked');
+		tc = $form.find('select[name="torrentClient"]').val();
+		ta = $form.find('input[name="torrentAddress"]').val();
+		tl = $form.find('input[name="torrentLogin"]').val();
+		tp = $form.find('input[name="torrentPassword"]').val();
+		ptd = $form.find('input[name="pathToDownload"]').val();
+		dt = $form.find('input[name="deleteTorrent"]').attr('checked');
+		dof = $form.find('input[name="deleteOldFiles"]').attr('checked');
 	
 	if (p == '')
 	{
@@ -350,8 +358,14 @@ $("#setting").submit(function()
 		return false;
 	}
 	
+	if (t == 'checked' && tc == ''  && ta == '' && ptd == '')
+	{
+    	alert('Вы не указали настройки торрент-клиента.');
+		return false;
+	}
+	
 	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-	$.post("action.php",{action: 'update_settings', path: p, email: e, send: s, send_warning: s_w, auth: a, proxy: pr, proxyAddress: pa},
+	$.post("action.php",{action: 'update_settings', path: p, email: e, send: s, send_warning: s_w, auth: a, proxy: pr, proxyAddress: pa, torrent: t, torrentClient: tc, torrentAddress: ta, torrentLogin: tl, torrentPassword: tp, pathToDownload: ptd, deleteTorrent: dt, deleteOldFiles: dof},
 		function(data) {
 			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
 			$(s).removeAttr('disabled');
@@ -435,4 +449,24 @@ function changeField()
 		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD качество<br /><input type="radio" name="hd" value="1"> HD качество<br /><input type="radio" name="hd" value="2"> HD MP4</span>');
 	if (tracker == 'novafilm.tv')
 		$('#changedField').empty().append('<input type="checkbox" name="hd"> HD качество</label>');
+}
+
+//Показать/скрыть настройки proxy
+function showProxy()
+{
+    var proxy = document.getElementById("proxy").checked;
+	if (proxy)
+	    document.getElementById("proxySettings").style.display = "block";
+    else
+        document.getElementById("proxySettings").style.display = "none";
+}
+
+//Показать/скрыть настройки торрент-клиента
+function showTorrent()
+{
+    var torrent = document.getElementById("torrent").checked;
+	if (torrent)
+	    document.getElementById("torrentSettings").style.display = "block";
+    else
+        document.getElementById("torrentSettings").style.display = "none";
 }

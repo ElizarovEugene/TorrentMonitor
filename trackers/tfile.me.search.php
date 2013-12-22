@@ -6,14 +6,14 @@ class tfileSearch extends tfile
 	//ищем темы пользователя	
 	public static function mainSearch($user_id, $tracker, $user)
 	{
-		$user = str_replace(' ', '+', iconv("utf-8", "windows-1251", $user));
+		$user = str_replace(' ', '+', iconv('utf-8', 'windows-1251', $user));
         //получаем страницу для парсинга
     	$page = Sys::getUrlContent(
         	array(
         		'type'           => 'GET',
         		'header'         => 0,
         		'returntransfer' => 1,
-        		'url'            => "http://tfile.me/forum/ssearch.php?a={$user}&to=1&io=1",
+        		'url'            => 'http://tfile.me/forum/ssearch.php?a='.$user.'&to=1&io=1',
         		'convert'        => array('windows-1251', 'utf-8')
         	)
         );
@@ -61,7 +61,7 @@ class tfileSearch extends tfile
 	            );
                 
 				//находим имя торрента для скачивания		
-				if (preg_match("/download\.php\?id=(\d+)&uk=1111111111/", $page, $link))
+				if (preg_match('/download\.php\?id=(\d+)&uk=1111111111/', $page, $link))
 				{
 					//сбрасываем варнинг
 					Database::clearWarnings($tracker);
@@ -72,13 +72,12 @@ class tfileSearch extends tfile
                     	array(
                     		'type'           => 'GET',
                     		'returntransfer' => 1,
-                    		'url'            => "http://tfile.me/forum/download.php?id={$torrent_id}&uk=1111111111",
+                    		'url'            => 'http://tfile.me/forum/download.php?id='.$torrent_id.'&uk=1111111111',
                     		'sendHeader'     => array('Host' => 'tfile.me'),
                     		'referer'        => 'http://tfile.me/forum/viewtopic.php?t='.$torrent_id,
                     	)
                     );
-					$client = ClientAdapterFactory::getStorage('file');
-					$client->store($torrent, $toDownload[$i]['id'], $tracker, $toDownload[$i]['threme'], $toDownload[$i]['threme_id'], time());
+					Sys::saveTorrent($tracker, $torrent_id, $torrent);
 					//обновляем время регистрации торрента в базе
 					Database::setDownloaded($toDownload[$i]['id']);
 					//отправляем уведомлении о новом торренте

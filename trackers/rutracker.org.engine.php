@@ -5,17 +5,6 @@ class rutracker
 	protected static $exucution;
 	protected static $warning;
 
-	//инициализируем класс
-	public static function getInstance()
-    {
-        if ( ! isset(self::$instance))
-        {
-            $object = __CLASS__;
-            self::$instance = new $object;
-        }
-        return self::$instance;
-    }
-
 	//проверяем cookie
 	public static function checkCookie($sess_cookie)
 	{
@@ -48,10 +37,10 @@ class rutracker
 	//функция преобразования даты
 	private static function dateStringToNum($data)
 	{
-		$monthes = array("Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек");
+		$monthes = array('Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек');
 		$month = substr($data, 3, 6);
-		$date = preg_replace("/(\d\d)-(\d\d)-(\d\d)/", "$3-$2-$1", str_replace($month, str_pad(array_search($month, $monthes)+1, 2, 0, STR_PAD_LEFT), $data));
-		$date = date("Y-m-d H:i:s", strtotime($date));
+		$date = preg_replace('/(\d\d)-(\d\d)-(\d\d)/', '$3-$2-$1', str_replace($month, str_pad(array_search($month, $monthes)+1, 2, 0, STR_PAD_LEFT), $data));
+		$date = date('Y-m-d H:i:s', strtotime($date));
 
 		return $date;
 	}
@@ -60,7 +49,7 @@ class rutracker
 	private static function dateNumToString($data)
 	{
 		$data = str_replace('-', ' ', $data);
-		$arr = preg_split("/\s/", $data);
+		$arr = preg_split('/\s/', $data);
 		$date = $arr[0].' '.$arr[1].' 20'.$arr[2].' '.$arr[3];
 
 		return $date;
@@ -74,7 +63,7 @@ class rutracker
 		{
 			//получаем учётные данные
 			$credentials = Database::getCredentials($tracker);
-			$login = iconv("utf-8", "windows-1251", $credentials['login']);
+			$login = iconv('utf-8', 'windows-1251', $credentials['login']);
 			$password = $credentials['password'];
 
 			//авторизовываемся на трекере
@@ -84,7 +73,7 @@ class rutracker
             		'header'         => 1,
             		'returntransfer' => 1,
             		'url'            => 'http://login.rutracker.org/forum/login.php',
-            		'postfields'     => "login_username={$login}&login_password={$password}&login=%C2%F5%EE%E4",
+            		'postfields'     => 'login_username='.$login.'&login_password='.$password.'&login=%C2%F5%EE%E4',
             		'convert'        => array('windows-1251', 'utf-8'),
             	)
             );
@@ -92,7 +81,7 @@ class rutracker
 			if ( ! empty($page))
 			{
 				//проверяем подходят ли учётные данные
-				if (preg_match("/profile\.php\?mode=register/", $page, $array))
+				if (preg_match('/profile\.php\?mode=register/', $page, $array))
 				{
 					//устанавливаем варнинг
 					Errors::setWarnings($tracker, 'credential_wrong');
@@ -100,7 +89,7 @@ class rutracker
 					rutracker::$exucution = FALSE;
 				}
 				//если подходят - получаем куки
-				elseif (preg_match("/bb_data=(.+);/iU", $page, $array))
+				elseif (preg_match('/bb_data=(.+);/iU', $page, $array))
 				{
 					rutracker::$sess_cookie = 'bb_data='.$array[1].';';
 					Database::setCookie($tracker, rutracker::$sess_cookie);
@@ -146,7 +135,7 @@ class rutracker
 	}
 
 	//основная функция
-	public static function main($id, $tracker, $name, $torrent_id, $timestamp)
+	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash)
 	{
 		$cookie = Database::getCookie($tracker);
 		if (rutracker::checkCookie($cookie))
@@ -176,7 +165,7 @@ class rutracker
 			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
-				if (preg_match("/<span title=\"Когда зарегистрирован\">\[ (.+) \]<\/span>/", $page, $array))
+				if (preg_match('/<span title=\"Когда зарегистрирован\">\[ (.+) \]<\/span>/', $page, $array))
 				{
 					//проверяем удалось ли получить дату со страницы
 					if (isset($array[1]))
@@ -203,8 +192,7 @@ class rutracker
                                 		'referer'        => 'http://rutracker.org/forum/viewtopic.php?t='.$torrent_id,
                                 	)
                                 );
-								$client = ClientAdapterFactory::getStorage('file');
-								$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
+								Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash);
 								//обновляем время регистрации торрента в базе
 								Database::setNewDate($id, $date);
 								//отправляем уведомлении о новом торренте

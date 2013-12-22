@@ -1,57 +1,57 @@
 <?php
-$dir = dirname(__FILE__)."/";
-include_once $dir."config.php";
-include_once $dir."class/System.class.php";
-include_once $dir."class/Database.class.php";
-include_once $dir."class/Errors.class.php";
-include_once $dir."class/Notification.class.php";
+$dir = dirname(__FILE__).'/';
+include_once $dir.'config.php';
+include_once $dir.'class/System.class.php';
+include_once $dir.'class/Database.class.php';
+include_once $dir.'class/Errors.class.php';
+include_once $dir.'class/Notification.class.php';
 
-if (isset($_POST["action"]))
+if (isset($_POST['action']))
 {
 	//Проверяем пароль
-	if ($_POST["action"] == "enter")
+	if ($_POST['action'] == 'enter')
 	{
-		$password = md5($_POST["password"]);
+		$password = md5($_POST['password']);
 		$count = Database::countCredentials($password);
 		
 		if ($count == 1)
 		{
 			session_start();
-			$_SESSION["TM"] = $password;
-			$return["error"] = FALSE;
+			$_SESSION['TM'] = $password;
+			$return['error'] = FALSE;
 		}
 		else
 		{
-			$return["error"] = TRUE;
-			$return["msg"] = 'Неверный пароль!';
+			$return['error'] = TRUE;
+			$return['msg'] = 'Неверный пароль!';
 		}
 		echo json_encode($return);
 	}
 
 	//Добавляем тему для мониторинга
-	if ($_POST["action"] == "torrent_add")
+	if ($_POST['action'] == 'torrent_add')
 	{
-		if ($url = parse_url($_POST["url"]))
+		if ($url = parse_url($_POST['url']))
 		{
-			$tracker = $url["host"];
+			$tracker = $url['host'];
 			$tracker = preg_replace('/www\./', '', $tracker);
 			if ($tracker == 'tr.anidub.com')
 				$tracker = 'anidub.com';
 			
 			if ($tracker != 'rutor.org')
 			{
-				$query = explode("=", $url["query"]);
+				$query = explode('=', $url['query']);
 				$threme = $query[1];
 			}
 			else
 			{
-				preg_match('/\d{4,8}/', $url["path"], $array);
+				preg_match('/\d{4,8}/', $url['path'], $array);
 				$threme = $array[0];
 			}
 			
 			if (is_array(Database::getCredentials($tracker)))
 			{
-				$engineFile = $dir."/trackers/{$tracker}.engine.php";
+				$engineFile = $dir.'/trackers/'.$tracker.'.engine.php';
 				if (file_exists($engineFile))
 				{	
 					$functionEngine = include_once $engineFile;
@@ -63,10 +63,10 @@ if (isset($_POST["action"]))
 					{
 						if (Database::checkThremExist($tracker, $threme))
 						{
-							if ( ! empty($_POST["name"]))
-								$name = $_POST["name"];
+							if ( ! empty($_POST['name']))
+								$name = $_POST['name'];
 							else
-								$name = Sys::getHeader($_POST["url"]);
+								$name = Sys::getHeader($_POST['url']);
 
 							Database::setThreme($tracker, $name, $threme);
 							?>
@@ -111,23 +111,23 @@ if (isset($_POST["action"]))
 	}
 		
 	//Добавляем сериал для мониторинга
-	if ($_POST["action"] == "serial_add")
+	if ($_POST['action'] == 'serial_add')
 	{
-		$tracker = $_POST["tracker"];
+		$tracker = $_POST['tracker'];
 		if (is_array(Database::getCredentials($tracker)))
 		{
-			$engineFile = $dir."/trackers/{$tracker}.engine.php";
+			$engineFile = $dir.'/trackers/'.$tracker.'.engine.php';
 			if (file_exists($engineFile))
 			{
 				$functionEngine = include_once $engineFile;
 				$class = explode('.', $tracker);
 				$class = $class[0];
 				$class = str_replace('-', '', $class);
-				if (call_user_func(array($class, 'checkRule'), $_POST["name"]))
+				if (call_user_func(array($class, 'checkRule'), $_POST['name']))
 				{
-					if (Database::checkSerialExist($tracker, $_POST["name"], $_POST["hd"]))	
+					if (Database::checkSerialExist($tracker, $_POST['name'], $_POST['hd']))	
 					{
-						Database::setSerial($tracker, $_POST["name"], $_POST["hd"]);
+						Database::setSerial($tracker, $_POST['name'], $_POST['hd']);
 						?>
 						Сериал добавлен для мониторинга.
 						<?php
@@ -163,17 +163,17 @@ if (isset($_POST["action"]))
 	}
 	
 	//Добавляем пользователя для мониторинга
-	if ($_POST["action"] == "user_add")
+	if ($_POST['action'] == 'user_add')
 	{
-		$tracker = $_POST["tracker"];
+		$tracker = $_POST['tracker'];
 		if (is_array(Database::getCredentials($tracker)))
 		{
-			$engineFile = $dir."/trackers/{$tracker}.search.php";
+			$engineFile = $dir.'/trackers/'.$tracker.'.search.php';
 			if (file_exists($engineFile))
 			{
-				if (Database::checkUserExist($tracker, $_POST["name"]))	
+				if (Database::checkUserExist($tracker, $_POST['name']))	
 				{
-					Database::setUser($tracker, $_POST["name"]);
+					Database::setUser($tracker, $_POST['name']);
 					?>
 					Пользователь добавлен для мониторинга.
 					<?php
@@ -248,20 +248,20 @@ if (isset($_POST["action"]))
 		$update = Database::updateThremesToDownload($_POST['id']);
 		if ($update)
 		{
-			$return["error"] = FALSE;
+			$return['error'] = FALSE;
 		}
 		else
 		{		
-			$return["error"] = TRUE;
-			$return["msg"] = 'Пометить тему для закачки.';
+			$return['error'] = TRUE;
+			$return['msg'] = 'Пометить тему для закачки.';
 		}
 		echo json_encode($return);
 	}
 	
 	//Удаляем мониторинг
-	if ($_POST["action"] == "del")
+	if ($_POST['action'] == 'del')
 	{
-		Database::deletItem($_POST["id"]);
+		Database::deletItem($_POST['id']);
 		?>
 		Удаляю...
 		<?php
@@ -269,9 +269,9 @@ if (isset($_POST["action"]))
 	}
 	
 	//Обновляем личные данные
-	if ($_POST["action"] == "update_credentials")
+	if ($_POST['action'] == 'update_credentials')
 	{
-		Database::setCredentials($_POST["id"], $_POST["log"], $_POST["pass"]);
+		Database::setCredentials($_POST['id'], $_POST['log'], $_POST['pass']);
 		?>
 		Данные для трекера обновлены!
 		<?php
@@ -279,36 +279,60 @@ if (isset($_POST["action"]))
 	}
 	
 	//Обновляем настройки
-	if ($_POST["action"] == "update_settings")
+	if ($_POST['action'] == 'update_settings')
 	{
-		$path = Sys::checkPath($_POST["path"]);   
-		Database::updateSettings('path', $path    );
-		Database::updateSettings('email', $_POST["email"]);
-		Database::updateSettings('proxyAddress', $_POST["proxyAddress"]);
+		$path = Sys::checkPath($_POST['path']);
+		Database::updateSettings('path', $path);
+		Database::updateSettings('email', $_POST['email']);
 		
-		if ( ! empty($_POST["send"]))
+		if ( ! empty($_POST['send']))
 			$send = 1;
 		else 
 			$send = 0;
 		Database::updateSettings('send', $send);
 		
-		if ( ! empty($_POST["send_warning"]))
+		if ( ! empty($_POST['send_warning']))
 			$send_warning = 1;
 		else 
 			$send_warning = 0;
 		Database::updateSettings('send_warning', $send_warning);
 		
-		if ( ! empty($_POST["auth"]))
+		if ( ! empty($_POST['auth']))
 			$auth = 1;
 		else 
 			$auth = 0;
 		Database::updateSettings('auth', $auth);
 		
-		if ( ! empty($_POST["proxy"]))
+		if ( ! empty($_POST['proxy']))
 			$proxy = 1;
 		else 
 			$proxy = 0;
-		Database::updateSettings('proxy', $proxy);		
+		Database::updateSettings('proxy', $proxy);
+		Database::updateSettings('proxyAddress', $_POST['proxyAddress']);
+
+        if ( ! empty($_POST['torrent']))
+			$torrent = 1;
+		else 
+			$torrent = 0;
+        Database::updateSettings('torrent', $torrent);
+        Database::updateSettings('torrentClient', $_POST['torrentClient']);
+        Database::updateSettings('torrentAddress', $_POST['torrentAddress']);
+        Database::updateSettings('torrentLogin', $_POST['torrentLogin']);
+        Database::updateSettings('torrentPassword', $_POST['torrentPassword']);
+        $pathToDownload = Sys::checkPath($_POST['pathToDownload']);
+        Database::updateSettings('pathToDownload', $pathToDownload);
+        
+        if ( ! empty($_POST['deleteTorrent']))
+			$deleteTorrent = 1;
+		else 
+			$deleteTorrent = 0;
+        Database::updateSettings('deleteTorrent', $deleteTorrent);
+        
+        if ( ! empty($_POST['deleteOldFiles']))
+			$deleteOldFiles = 1;
+		else 
+			$deleteOldFiles = 0;
+        Database::updateSettings('deleteOldFiles', $deleteOldFiles);
 		?>
 		Настройки монитора обновлены.
 		<?php
@@ -316,24 +340,24 @@ if (isset($_POST["action"]))
 	}
 	
 	//Меняем пароль
-	if ($_POST["action"] == "change_pass")
+	if ($_POST['action'] == 'change_pass')
 	{
-		$pass = md5($_POST["pass"]);
+		$pass = md5($_POST['pass']);
 		$q = Database::updateCredentials($pass);
 		if ($q)
 		{
-			$return["error"] = FALSE;
+			$return['error'] = FALSE;
 		}
 		else
 		{
-			$return["error"] = TRUE;
-			$return["msg"] = 'Не удалось сменить пароль!';
+			$return['error'] = TRUE;
+			$return['msg'] = 'Не удалось сменить пароль!';
 		}
 		echo json_encode($return);
 	}
 	
 	//Добавляем тему на закачку
-	if ($_POST["action"] == "download_thremes")
+	if ($_POST['action'] == 'download_thremes')
 	{
 		if ( ! empty($_POST['checkbox']))
 		{
@@ -342,26 +366,26 @@ if (isset($_POST["action"]))
 			{
 				Database::updateDownloadThreme($id);
 			}
-			echo count($arr)." тем помечено для закачки.";
+			echo count($arr).' тем помечено для закачки.';
 			return TRUE;
 		}
 		Database::updateDownloadThremeNew();
 	}	
 }
 
-if (isset($_GET["action"]))
+if (isset($_GET['action']))
 {
 	//Сортировка вывода торрентов
-	if ($_GET["action"] == "order")
+	if ($_GET['action'] == 'order')
 	{
 		session_start();
-		if ($_GET["order"] == "date")
-			$_SESSION["order"] = "date";
-		elseif ($_GET["order"] == "dateDesc")
-			$_SESSION["order"] = "dateDesc";			
-		elseif ($_GET["order"] == "name")
-			unset($_SESSION["order"]);
-		header("Location: index.php");
+		if ($_GET['order'] == 'date')
+			$_SESSION['order'] = 'date';
+		elseif ($_GET['order'] == 'dateDesc')
+			$_SESSION['order'] = 'dateDesc';			
+		elseif ($_GET['order'] == 'name')
+			unset($_SESSION['order']);
+		header('Location: index.php');
 	}	
 }
 ?>

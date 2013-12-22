@@ -18,7 +18,7 @@ class rutrackerSearch extends rutracker
 
 		if (rutracker::$exucution)
 		{
-    		$user = iconv("utf-8", "windows-1251", $user);
+    		$user = iconv('utf-8', 'windows-1251', $user);
     		$page = Sys::getUrlContent(
             	array(
             		'type'           => 'POST',
@@ -26,7 +26,7 @@ class rutrackerSearch extends rutracker
             		'returntransfer' => 1,
             		'url'            => 'http://rutracker.org/forum/tracker.php',
             		'cookie'         => rutracker::$sess_cookie,
-            		'postfields'     => "prev_my=0&prev_new=0&prev_oop=0&f%5B%5D=-1&o=1&s=2&tm=-1&pn={$user}&nm=",
+            		'postfields'     => 'prev_my=0&prev_new=0&prev_oop=0&f%5B%5D=-1&o=1&s=2&tm=-1&pn='.$user.'&nm=',
             		'convert'        => array('windows-1251', 'utf-8'),
             	)
 	        );
@@ -64,8 +64,7 @@ class rutrackerSearch extends rutracker
                     		'referer'        => 'http://dl.rutracker.org/forum/dl.php?t='.$torrent_id,
                     	)
                     );
-    				$client = ClientAdapterFactory::getStorage('file');
-    				$client->store($torrent, $id, $tracker, $name, $id, time());
+    				Sys::saveTorrent($tracker, $torrent_id, $torrent);
     				//обновляем время регистрации торрента в базе
     				Database::setDownloaded($toDownload[$i]['id']);
     				//отправляем уведомлении о новом торренте

@@ -4,17 +4,6 @@ class rutor
 	protected static $exucution;
 	protected static $warning;
 
-	//инициализируем класс
-	public static function getInstance()
-    {
-        if ( ! isset(self::$instance))
-        {
-            $object = __CLASS__;
-            self::$instance = new $object;
-        }
-        return self::$instance;
-    }
-
 	//функция проверки введёного URL`а
 	public static function checkRule($data)
 	{
@@ -28,7 +17,7 @@ class rutor
 	private static function dateStringToNum($data)
 	{
 		$date = $data;
-		$date = date("Y-m-d H:i:s", strtotime($date));
+		$date = date('Y-m-d H:i:s', strtotime($date));
 
 		return $date;
 	}
@@ -44,7 +33,7 @@ class rutor
 	}
 
 	//основная функция
-	public static function main($id, $tracker, $name, $torrent_id, $timestamp)
+	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash)
 	{
 		rutor::$exucution = TRUE;
 
@@ -63,7 +52,7 @@ class rutor
 			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
-				if (preg_match("/<tr><td class=\"header\">Добавлен<\/td><td>(.+)  \((.+) назад\)<\/td><\/tr>/", $page, $array))
+				if (preg_match('/<tr><td class=\"header\">Добавлен<\/td><td>(.+)  \((.+) назад\)<\/td><\/tr>/', $page, $array))
 				{
 					//проверяем удалось ли получить дату со страницы
 					if (isset($array[1]))
@@ -87,9 +76,7 @@ class rutor
                                 		'url'            => 'http://d.rutor.org/download/'.$torrent_id,
                                 	)
                                 );
-
-								$client = ClientAdapterFactory::getStorage('file');
-								$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
+								Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash);
 								//обновляем время регистрации торрента в базе
 								Database::setNewDate($id, $date);
 								//отправляем уведомлении о новом торренте

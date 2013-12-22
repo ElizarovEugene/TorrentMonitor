@@ -18,14 +18,14 @@ class nnmclubSearch extends nnmclub
 
 		if (nnmclub::$exucution)
 		{
-    		$user = iconv("utf-8", "windows-1251", $user);
+    		$user = iconv('utf-8', 'windows-1251', $user);
     		$page = Sys::getUrlContent(
             	array(
             		'type'           => 'POST',
             		'header'         => 1,
             		'returntransfer' => 1,
             		'url'            => 'http://nnm-club.me/forum/tracker.php',
-            		'postfields'     => "prev_sd=0&prev_a=0&prev_my=0&prev_n=0&prev_shc=0&prev_shf=1&prev_sha=1&prev_shs=0&prev_shr=0&prev_sht=0&f%5B%5D=-1&o=1&s=2&tm=-1&shf=1&sha=1&ta=-1&sns=-1&sds=-1&nm=&pn={$user}&submit=%CF%EE%E8%F1%EA",
+            		'postfields'     => 'prev_sd=0&prev_a=0&prev_my=0&prev_n=0&prev_shc=0&prev_shf=1&prev_sha=1&prev_shs=0&prev_shr=0&prev_sht=0&f%5B%5D=-1&o=1&s=2&tm=-1&shf=1&sha=1&ta=-1&sns=-1&sds=-1&nm=&pn='.$user.'&submit=%CF%EE%E8%F1%EA',
             		'convert'        => array('windows-1251', 'utf-8'),
             	)
 	        );
@@ -63,7 +63,7 @@ class nnmclubSearch extends nnmclub
         			if ( ! empty($page))
         			{
                         //находим имя торрента для скачивания
-                        if (preg_match("/download\.php\?id=(\d{2,8})/", $page, $link))
+                        if (preg_match('/download\.php\?id=(\d{2,8})/', $page, $link))
                         {
                         	//сбрасываем варнинг
 							Database::clearWarnings($tracker);
@@ -79,8 +79,7 @@ class nnmclubSearch extends nnmclub
                             		'referer'        => 'http://nnm-club.me/forum/viewtopic.php?t='.$torrent_id,
                             	)
                             );
-            				$client = ClientAdapterFactory::getStorage('file');
-            				$client->store($torrent, $toDownload[$i]['threme_id'], $tracker, $toDownload[$i]['threme'], $torrent_id, time());
+                            Sys::saveTorrent($tracker, $torrent_id, $torrent);
             				//обновляем время регистрации торрента в базе
             				Database::setDownloaded($toDownload[$i]['id']);
             				//отправляем уведомлении о новом торренте

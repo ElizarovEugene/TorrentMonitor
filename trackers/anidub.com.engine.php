@@ -5,17 +5,6 @@ class anidub
 	protected static $exucution;
 	protected static $warning;
 
-	//инициализируем класс
-	public static function getInstance()
-    {
-        if ( ! isset(self::$instance))
-        {
-            $object = __CLASS__;
-            self::$instance = new $object;
-        }
-        return self::$instance;
-    }
-
 	//проверяем cookie
 	public static function checkCookie($sess_cookie)
 	{
@@ -75,7 +64,7 @@ class anidub
             		'header'         => 1,
             		'returntransfer' => 1,
             		'url'            => 'http://tr.anidub.com/takelogin.php',
-            		'postfields'     => "username={$login}&password={$password}",
+            		'postfields'     => 'username='.$login.'&password='.$password,
             		'convert'        => array('windows-1251', 'utf-8'),
             	)
             );			
@@ -83,7 +72,7 @@ class anidub
 			if ( ! empty($page))
 			{
 				//проверяем подходят ли учётные данные
-				if (preg_match("/<td class=\"embedded\">Вы не зарегистрированы в системе\.<\/td>/", $page, $array))
+				if (preg_match('/<td class=\"embedded\">Вы не зарегистрированы в системе\.<\/td>/', $page, $array))
 				{
 					//устанавливаем варнинг
 					Errors::setWarnings($tracker, 'credential_wrong');
@@ -91,7 +80,7 @@ class anidub
 					anidub::$exucution = FALSE;
 				}
 				//если подходят - получаем куки
-				elseif (preg_match_all("/Set-Cookie: (.*);/U", $page, $array))
+				elseif (preg_match_all('/Set-Cookie: (.*);/U', $page, $array))
 				{
 					anidub::$sess_cookie = $array[1][1].'; '.$array[1][2];
 					Database::setCookie($tracker, anidub::$sess_cookie);
@@ -137,7 +126,7 @@ class anidub
 	}
 	
 	//основная функция
-	public static function main($id, $tracker, $name, $torrent_id, $timestamp)
+	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash)
 	{
 		$cookie = Database::getCookie($tracker);
 		if (anidub::checkCookie($cookie))
@@ -167,7 +156,7 @@ class anidub
 			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
-				if (preg_match("/<td width=\"\" class=\"heading\" valign=\"top\" align=\"right\">Добавлен<\/td><td valign=\"top\" align=\"left\">(.*)<\/td>/", $page, $array))
+				if (preg_match('/<td width=\"\" class=\"heading\" valign=\"top\" align=\"right\">Добавлен<\/td><td valign=\"top\" align=\"left\">(.*)<\/td>/', $page, $array))
 				{
 					//проверяем удалось ли получить дату со страницы
 					if (isset($array[1]))
@@ -197,8 +186,7 @@ class anidub
                                 		'referer'        => 'http://tr.anidub.com/details.php?id='.$torrent_id,
                                 	)
                                 );
-								$client = ClientAdapterFactory::getStorage('file');
-								$client->store($torrent, $id, $tracker, $name, $torrent_id, $timestamp);
+								Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash);
 								//обновляем время регистрации торрента в базе
 								Database::setNewDate($id, $date);
 								//отправляем уведомлении о новом торренте

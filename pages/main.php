@@ -16,6 +16,7 @@ window.onload = function(){
             echo Sys::version();
         ?>
         </h1>
+        
         <menu class="h-menu">
             <li id="show_table" class="active"><a href="#" onclick="show('show_table')" class="h-menu-item1">Торренты</a></li>
             <li id="show_watching"><a href="#" onclick="show('show_watching')" class="h-menu-item2">Пользователи</a></li>
@@ -37,7 +38,7 @@ window.onload = function(){
             }
             ?>
             </a></li>
-            <li><a href="#" onclick="show('check')" class="h-menu-item7">Тест</a></li>
+            <li id="check"><a href="#" onclick="show('check')" class="h-menu-item7">Тест</a></li>
         </menu>
     </header>
     <div id="content">
