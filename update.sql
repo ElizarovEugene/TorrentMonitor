@@ -11,4 +11,4 @@ VALUES
 	(15,'deleteTorrent','0'),
 	(16,'deleteOldFiles','0');
 	
-ALTER TABLE `torrent` ADD `hash2` VARCHAR(40) NOT NULL;
+ALTER TABLE `torrent` ADD `hash` VARCHAR(40) NOT NULL;
