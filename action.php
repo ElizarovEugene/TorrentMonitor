@@ -314,7 +314,7 @@ if (isset($_POST['action']))
 			$torrent = 1;
 		else 
 			$torrent = 0;
-        Database::updateSettings('torrent', $torrent);
+        Database::updateSettings('useTorrent', $torrent);
         Database::updateSettings('torrentClient', $_POST['torrentClient']);
         Database::updateSettings('torrentAddress', $_POST['torrentAddress']);
         Database::updateSettings('torrentLogin', $_POST['torrentLogin']);
