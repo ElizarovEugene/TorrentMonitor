@@ -760,6 +760,7 @@ class Database
             {
                 return $row['cookie'];
             }
+            return NULL;
         }
         $stmt = NULL;
     }
