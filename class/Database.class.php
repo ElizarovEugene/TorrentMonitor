@@ -60,12 +60,15 @@ class Database
         return Database::getInstance()->dbType;
     }
     
+    public static function newStatement($request) {
+        if (self::getDbType() == 'pgsql')
+            $request = str_replace('`','"',$request);
+	    return self::getInstance()->dbh->prepare($request);
+    }
+	
     public static function getSetting($param)
     {
-        if (Database::getDbType() == 'pgsql')
-           $stmt = Database::getInstance()->dbh->prepare("SELECT val FROM settings WHERE key = :param");
-        else
-           $stmt = Database::getInstance()->dbh->prepare("SELECT `val` FROM `settings` WHERE `key` = :param");
+        $stmt = self::newStatement("SELECT `val` FROM `settings` WHERE `key` = :param");
         $stmt->bindParam(':param', $param);
         if ($stmt->execute())
         {
@@ -79,10 +82,7 @@ class Database
     
     public static function getAllSetting()
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("SELECT * FROM settings");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("SELECT * FROM `settings`");
+        $stmt = self::newStatement("SELECT * FROM `settings`");
         if ($stmt->execute())
         {
             foreach ($stmt as $row)
@@ -98,10 +98,7 @@ class Database
     
     public static function updateSettings($setting, $val)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE settings SET val = :val WHERE key = :setting");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE `settings` SET `val` = :val WHERE `key` = :setting");
+        $stmt = self::newStatement("UPDATE `settings` SET `val` = :val WHERE `key` = :setting");
         $stmt->bindParam(':setting', $setting);
         $stmt->bindParam(':val', $val);
         if ($stmt->execute())
@@ -113,10 +110,7 @@ class Database
     
     public static function getCredentials($tracker)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("SELECT log, pass FROM credentials WHERE tracker = :tracker");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("SELECT `log`, `pass` FROM `credentials` WHERE `tracker` = :tracker");        
+        $stmt = self::newStatement("SELECT `log`, `pass` FROM `credentials` WHERE `tracker` = :tracker");        
         $stmt->bindParam(':tracker', $tracker);
         if ($stmt->execute())
         {
@@ -139,10 +133,7 @@ class Database
     
     public static function getAllCredentials()
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("SELECT id, tracker, log, pass FROM credentials");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `tracker`, `log`, `pass` FROM `credentials`");        
+        $stmt = self::newStatement("SELECT `id`, `tracker`, `log`, `pass` FROM `credentials`");        
         if ($stmt->execute())
         {
             $i = 0;
@@ -163,10 +154,7 @@ class Database
     
     public static function countCredentials($password)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("SELECT COUNT(*) AS count FROM settings WHERE key = 'password' AND val = :password");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("SELECT COUNT(*) AS count FROM settings WHERE `key` = 'password' AND `val` = :password");
+        $stmt = self::newStatement("SELECT COUNT(*) AS count FROM settings WHERE `key` = 'password' AND `val` = :password");
         $stmt->bindParam(':password', $password);
         if ($stmt->execute())
         {
@@ -183,10 +171,7 @@ class Database
     
     public static function updateCredentials($password)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE settings SET val = :password WHERE key = 'password'");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE `settings` SET `val` = :password WHERE `key` = 'password'");        
+        $stmt = self::newStatement("UPDATE `settings` SET `val` = :password WHERE `key` = 'password'");        
         $stmt->bindParam(':password', $password);
         if ($stmt->execute())
             return TRUE;
@@ -197,10 +182,7 @@ class Database
     
     public static function setCredentials($id, $login, $password)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE credentials SET log = :login, pass = :password WHERE id = :id");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE `credentials` SET `log` = :login, `pass` = :password WHERE `id` = :id");        
+        $stmt = self::newStatement("UPDATE `credentials` SET `log` = :login, `pass` = :password WHERE `id` = :id");        
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':login', $login);
         $stmt->bindParam(':password', $password);
@@ -213,10 +195,7 @@ class Database
     
     public static function checkTrackersCredentialsExist($tracker)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("SELECT log, pass FROM credentials WHERE tracker = :tracker");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("SELECT `log`, `pass` FROM `credentials` WHERE `tracker` = :tracker");        
+        $stmt = self::newStatement("SELECT `log`, `pass` FROM `credentials` WHERE `tracker` = :tracker");        
         $stmt->bindParam(':tracker', $tracker);
         if ($stmt->execute())
         {
@@ -233,10 +212,7 @@ class Database
     
     public static function getTrackersList()
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("SELECT id, tracker FROM credentials ORDER BY tracker");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `tracker` FROM `credentials` ORDER BY `tracker`");        
+        $stmt = self::newStatement("SELECT `id`, `tracker` FROM `credentials` ORDER BY `tracker`");        
         if ($stmt->execute())
         {
             $i = 0;
@@ -327,7 +303,7 @@ class Database
         if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.ru' || $tracker == 'rutor.org')
             $fields = 'torrent_id';
             
-        $stmt = Database::getInstance()->dbh->prepare("SELECT name, timestamp, ".$fields." FROM torrent WHERE tracker = :tracker ORDER BY id");
+        $stmt = self::newStatement("SELECT name, timestamp, ".$fields." FROM torrent WHERE tracker = :tracker ORDER BY id");
         $stmt->bindParam(':tracker', $tracker);
         if ($stmt->execute())
         {
@@ -354,10 +330,7 @@ class Database
     
     public static function getUserToWatch()
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("SELECT id, tracker, name FROM watch ORDER BY tracker");	
-        else
-            $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `tracker`, `name` FROM `watch` ORDER BY `tracker`");	        
+        $stmt = self::newStatement("SELECT `id`, `tracker`, `name` FROM `watch` ORDER BY `tracker`");	        
         if ($stmt->execute())
         {
             $i = 0;
@@ -377,10 +350,7 @@ class Database
     
     public static function checkUserExist($tracker, $name)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("SELECT COUNT(*) AS count FROM watch WHERE tracker = :tracker AND name = :name");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("SELECT COUNT(*) AS count FROM `watch` WHERE `tracker` = :tracker AND `name` = :name");        
+        $stmt = self::newStatement("SELECT COUNT(*) AS count FROM `watch` WHERE `tracker` = :tracker AND `name` = :name");        
         $stmt->bindParam(':tracker', $tracker);
         $stmt->bindParam(':name', $name);
         if ($stmt->execute())
@@ -398,10 +368,7 @@ class Database
     
     public static function setUser($tracker, $name)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("INSERT INTO watch (tracker, name) VALUES (:tracker, :name)");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("INSERT INTO `watch` (`tracker`, `name`) VALUES (:tracker, :name)");        
+        $stmt = self::newStatement("INSERT INTO `watch` (`tracker`, `name`) VALUES (:tracker, :name)");        
         $stmt->bindParam(':tracker', $tracker);
         $stmt->bindParam(':name', $name);
         if ($stmt->execute())
@@ -413,17 +380,11 @@ class Database
     
     public static function deletUser($id)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("DELETE FROM watch WHERE id = :id");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("DELETE FROM `watch` WHERE `id` = :id");        
+        $stmt = self::newStatement("DELETE FROM `watch` WHERE `id` = :id");        
         $stmt->bindParam(':id', $id);
         if ($stmt->execute())
         {
-            if (Database::getDbType() == 'pgsql')
-                $stmt = Database::getInstance()->dbh->prepare("DELETE FROM buffer WHERE user_id = :id");
-            else
-                $stmt = Database::getInstance()->dbh->prepare("DELETE FROM `buffer` WHERE `user_id` = :id");
+            $stmt = self::newStatement("DELETE FROM `buffer` WHERE `user_id` = :id");
             $stmt->bindParam(':id', $id);		
             if ($stmt->execute())
                 return TRUE;
@@ -439,10 +400,7 @@ class Database
      
     public static function addThremeToBuffer($user_id, $section, $threme_id, $threme, $tracker)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("SELECT COUNT(*) AS count FROM buffer WHERE user_id = :user_id AND threme_id = :threme_id");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("SELECT COUNT(*) AS count FROM `buffer` WHERE `user_id` = :user_id AND `threme_id` = :threme_id");        
+        $stmt = self::newStatement("SELECT COUNT(*) AS count FROM `buffer` WHERE `user_id` = :user_id AND `threme_id` = :threme_id");        
         $stmt->bindParam(':user_id', $user_id);
         $stmt->bindParam(':threme_id', $threme_id);
         if ($stmt->execute())
@@ -451,7 +409,7 @@ class Database
             {
                 if ($row['count'] == 0)
                 {
-                    $stmt = Database::getInstance()->dbh->prepare("INSERT INTO buffer (user_id, section, threme_id, threme, tracker) VALUES (:user_id, :section, :threme_id, :threme, :tracker)");
+                    $stmt = self::newStatement("INSERT INTO buffer (user_id, section, threme_id, threme, tracker) VALUES (:user_id, :section, :threme_id, :threme, :tracker)");
                     $stmt->bindParam(':user_id', $user_id);
                     $stmt->bindParam(':section', $section);
                     $stmt->bindParam(':threme_id', $threme_id);
@@ -473,10 +431,7 @@ class Database
     
     public static function getThremesFromBuffer($user_id)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("SELECT id, section, threme_id, threme FROM buffer WHERE user_id = :user_id AND new = '1' ORDER BY threme_id DESC");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `section`, `threme_id`, `threme` FROM `buffer` WHERE `user_id` = :user_id AND `new` = '1' ORDER BY `threme_id` DESC");        
+        $stmt = self::newStatement("SELECT `id`, `section`, `threme_id`, `threme` FROM `buffer` WHERE `user_id` = :user_id AND `new` = '1' ORDER BY `threme_id` DESC");        
         $stmt->bindParam(':user_id', $user_id);
         if ($stmt->execute())
         {
@@ -498,10 +453,7 @@ class Database
     
     public static function transferFromBuffer($id)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("SELECT buffer.threme_id, buffer.threme, watch.tracker FROM buffer LEFT JOIN watch ON buffer.user_id = watch.id WHERE buffer.id = :id");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("SELECT `buffer`.`threme_id`, `buffer`.`threme`, `watch`.`tracker` FROM `buffer` LEFT JOIN `watch` ON `buffer`.`user_id` = `watch`.`id` WHERE `buffer`.`id` = :id");        
+        $stmt = self::newStatement("SELECT `buffer`.`threme_id`, `buffer`.`threme`, `watch`.`tracker` FROM `buffer` LEFT JOIN `watch` ON `buffer`.`user_id` = `watch`.`id` WHERE `buffer`.`id` = :id");        
         $stmt->bindParam(':id', $id);
         if ($stmt->execute())
         {
@@ -518,10 +470,7 @@ class Database
     
     public static function deleteFromBuffer($id)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE buffer SET new = '0' WHERE id = :id");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE `buffer` SET `new` = '0' WHERE `id` = :id");        
+        $stmt = self::newStatement("UPDATE `buffer` SET `new` = '0' WHERE `id` = :id");        
         $stmt->bindParam(':id', $id);
         if ($stmt->execute())
             return TRUE;
@@ -532,10 +481,7 @@ class Database
     
     public static function selectAllFromBuffer()
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("SELECT id FROM buffer WHERE accept = '0' AND new = '1'");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("SELECT `id` FROM `buffer` WHERE `accept` = '0' AND `new` = '1'");        
+        $stmt = self::newStatement("SELECT `id` FROM `buffer` WHERE `accept` = '0' AND `new` = '1'");        
         if ($stmt->execute())
         {
             $i=0;
@@ -553,10 +499,7 @@ class Database
     
     public static function updateThremesToDownload($id)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE buffer SET accept = '1', new = '0' WHERE id = :id");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE `buffer` SET `accept` = '1', `new` = '0' WHERE `id` = :id");        
+        $stmt = self::newStatement("UPDATE `buffer` SET `accept` = '1', `new` = '0' WHERE `id` = :id");        
         $stmt->bindParam(':id', $id);
         if ($stmt->execute())
             return TRUE;
@@ -567,10 +510,7 @@ class Database
 
     public static function takeToDownload($tracker)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("SELECT id, threme_id, threme FROM buffer WHERE accept = '1' AND downloaded = '0' AND tracker = :tracker");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `threme_id`, `threme` FROM `buffer` WHERE `accept` = '1' AND `downloaded` = '0' AND `tracker` = :tracker");        
+        $stmt = self::newStatement("SELECT `id`, `threme_id`, `threme` FROM `buffer` WHERE `accept` = '1' AND `downloaded` = '0' AND `tracker` = :tracker");        
         $stmt->bindParam(':tracker', $tracker);
         if ($stmt->execute())
         {
@@ -591,10 +531,7 @@ class Database
     
     public static function setDownloaded($id)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE buffer SET downloaded = '1' WHERE id = :id");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE `buffer` SET `downloaded` = '1' WHERE `id` = :id");        
+        $stmt = self::newStatement("UPDATE `buffer` SET `downloaded` = '1' WHERE `id` = :id");        
         $stmt->bindParam(':id', $id);
         if ($stmt->execute())
             return TRUE;
@@ -605,10 +542,7 @@ class Database
     
     public static function checkSerialExist($tracker, $name, $hd)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("SELECT COUNT(*) AS count FROM torrent WHERE tracker = :tracker AND name = :name AND hd = :hd");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("SELECT COUNT(*) AS `count` FROM `torrent` WHERE `tracker` = :tracker AND `name` = :name AND `hd` = :hd");        
+        $stmt = self::newStatement("SELECT COUNT(*) AS `count` FROM `torrent` WHERE `tracker` = :tracker AND `name` = :name AND `hd` = :hd");        
         $stmt->bindParam(':tracker', $tracker);
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':hd', $hd);
@@ -627,10 +561,7 @@ class Database
     
     public static function checkThremExist($tracker, $id)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("SELECT COUNT(*) AS count FROM torrent WHERE tracker = :tracker AND torrent_id = :id");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("SELECT COUNT(*) AS `count` FROM `torrent` WHERE `tracker` = :tracker AND `torrent_id` = :id");        
+        $stmt = self::newStatement("SELECT COUNT(*) AS `count` FROM `torrent` WHERE `tracker` = :tracker AND `torrent_id` = :id");        
         $stmt->bindParam(':tracker', $tracker);
         $stmt->bindParam(':id', $id);
         if ($stmt->execute())
@@ -648,10 +579,7 @@ class Database
     
     public static function setSerial($tracker, $name, $hd=FALSE)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("INSERT INTO torrent (tracker, name, hd) VALUES (:tracker, :name, :hd)");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("INSERT INTO `torrent` (`tracker`, `name`, `hd`) VALUES (:tracker, :name, :hd)");        
+        $stmt = self::newStatement("INSERT INTO `torrent` (`tracker`, `name`, `hd`) VALUES (:tracker, :name, :hd)");        
         $stmt->bindParam(':tracker', $tracker);
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':hd', $hd);
@@ -664,10 +592,7 @@ class Database
     
     public static function setThreme($tracker, $name, $threme)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("INSERT INTO torrent (tracker, name, torrent_id) VALUES (:tracker, :name, :threme)");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("INSERT INTO `torrent` (`tracker`, `name`, `torrent_id`) VALUES (:tracker, :name, :threme)");        
+        $stmt = self::newStatement("INSERT INTO `torrent` (`tracker`, `name`, `torrent_id`) VALUES (:tracker, :name, :threme)");        
         $stmt->bindParam(':tracker', $tracker);
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':threme', $threme);
@@ -680,10 +605,7 @@ class Database
     
     public static function setNewDate($id, $date)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE torrent SET timestamp = :date WHERE id = :id");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE `torrent` SET `timestamp` = :date WHERE `id` = :id");        
+        $stmt = self::newStatement("UPDATE `torrent` SET `timestamp` = :date WHERE `id` = :id");        
         $stmt->bindParam(':date', $date);
         $stmt->bindParam(':id', $id);
         if ($stmt->execute())
@@ -695,10 +617,7 @@ class Database
     
     public static function setNewEpisode($id, $ep)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE torrent SET ep = :ep WHERE id = :id");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE `torrent` SET `ep` = :ep WHERE `id` = :id");        
+        $stmt = self::newStatement("UPDATE `torrent` SET `ep` = :ep WHERE `id` = :id");        
         $stmt->bindParam(':ep', $ep);
         $stmt->bindParam(':id', $id);
         if ($stmt->execute())
@@ -710,10 +629,7 @@ class Database
     
     public static function updateHash($id, $hash)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE torrent SET hash = :hash WHERE id = :id");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE `torrent` SET `hash` = :hash WHERE `id` = :id");        
+        $stmt = self::newStatement("UPDATE `torrent` SET `hash` = :hash WHERE `id` = :id");        
         $stmt->bindParam(':hash', $hash);
         $stmt->bindParam(':id', $id);
         if ($stmt->execute())
@@ -725,10 +641,7 @@ class Database
     
     public static function deletItem($id)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("DELETE FROM torrent WHERE id = :id");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("DELETE FROM `torrent` WHERE `id` = :id");        
+        $stmt = self::newStatement("DELETE FROM `torrent` WHERE `id` = :id");        
         $stmt->bindParam(':id', $id);
         if ($stmt->execute())
             return TRUE;
@@ -739,10 +652,7 @@ class Database
     
     public static function getWarningsCount()
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("SELECT \"where\", COUNT(*) AS count FROM warning GROUP BY \"where\"");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("SELECT `where`, COUNT(*) AS `count` FROM `warning` GROUP BY `where`");        
+        $stmt = self::newStatement("SELECT `where`, COUNT(*) AS `count` FROM `warning` GROUP BY `where`");        
         if ($stmt->execute())
         {
             $i=0;
@@ -818,10 +728,7 @@ class Database
     
     public static function setWarnings($date, $tracker, $message)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("INSERT INTO warning (time, \"where\", reason) VALUES (:date, :tracker, :message)");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("INSERT INTO `warning` (`time`, `where`, `reason`) VALUES (:date, :tracker, :message)");        
+        $stmt = self::newStatement("INSERT INTO `warning` (`time`, `where`, `reason`) VALUES (:date, :tracker, :message)");        
         $stmt->bindParam(':date', $date);
         $stmt->bindParam(':tracker', $tracker);
         $stmt->bindParam(':message', $message);
@@ -834,10 +741,7 @@ class Database
     
     public static function clearWarnings($tracker)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("DELETE FROM warning WHERE \"where\" = :tracker");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("DELETE FROM `warning` WHERE `where` = :tracker");        
+        $stmt = self::newStatement("DELETE FROM `warning` WHERE `where` = :tracker");        
         $stmt->bindParam(':tracker', $tracker);
         if ($stmt->execute())
             return TRUE;
@@ -848,10 +752,7 @@ class Database
     
     public static function getCookie($tracker)
     {
-        if (Database::getDbType() == 'pgsql')
-           $stmt = Database::getInstance()->dbh->prepare("SELECT cookie FROM credentials WHERE tracker = :tracker");
-        else
-           $stmt = Database::getInstance()->dbh->prepare("SELECT `cookie` FROM `credentials` WHERE `tracker` = :tracker");
+        $stmt = self::newStatement("SELECT `cookie` FROM `credentials` WHERE `tracker` = :tracker");
         $stmt->bindParam(':tracker', $tracker);
         if ($stmt->execute())
         {
@@ -859,18 +760,14 @@ class Database
             {
                 return $row['cookie'];
             }
-            return $resultArray;
+            return NULL;
         }
         $stmt = NULL;
-        $resultArray = NULL;
     }
     
     public static function setCookie($tracker, $cookie)
     {
-        if (Database::getDbType() == 'pgsql')
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE credentials SET cookie = :cookie WHERE tracker = :tracker");
-        else
-            $stmt = Database::getInstance()->dbh->prepare("UPDATE `credentials` SET `cookie` = :cookie WHERE `tracker` = :tracker");
+        $stmt = self::newStatement("UPDATE `credentials` SET `cookie` = :cookie WHERE `tracker` = :tracker");
         $stmt->bindParam(':cookie', $cookie);
         $stmt->bindParam(':tracker', $tracker);
         if ($stmt->execute())
