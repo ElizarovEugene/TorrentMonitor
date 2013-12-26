@@ -70,7 +70,7 @@ if (Sys::checkInternet())
 			
             $neededver = Database::$currentversion;
             $actualver = Database::getSetting("dbversion");
-			checkSetting($neededver == $actualver,
+			if($neededver == $actualver)
 			{
 			?>
 		<tr>
