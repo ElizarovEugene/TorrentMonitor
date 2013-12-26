@@ -5,6 +5,7 @@ include_once $dir.'class/System.class.php';
 include_once $dir.'class/Database.class.php';
 include_once $dir.'class/Errors.class.php';
 include_once $dir.'class/Notification.class.php';
+include_once $dir.'class/DBUpgrade.class.php';
 
 if (isset($_POST['action']))
 {
@@ -370,6 +371,19 @@ if (isset($_POST['action']))
 			return TRUE;
 		}
 		Database::updateDownloadThremeNew();
+	}	
+    
+	//Апгрейдим базу
+	if ($_POST['action'] == 'upgrade_db')
+	{
+    	?>
+		Апгрейдим...
+		<?php
+        if (DBUpgrade::upgrade())
+            echo "удачно!";
+        else
+            echo "неудачно...!";
+		return TRUE;
 	}	
 }
 
