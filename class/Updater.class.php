@@ -17,7 +17,7 @@ define("uip", detectPackageRoot()."/".uipfile);
 define("newVersionUrl",updatefolder."/".oldVersionUrl);
 define("redirectQuery","?autostart");
 
-$donotdelete = array(updatefolder, uipfile, configfile);
+$donotdelete = array(updatefolder, uipfile, configfile, 'laststart.txt', '.*'/*For developers*/);
 
 function detectPackageRoot(){
     $dir = dirname(__FILE__);
@@ -30,10 +30,12 @@ function detectPackageRoot(){
 }
 
 function delTree($dir) {
+    global $donotdelete;
     if (is_dir($dir)) {
         $objects = scandir($dir);
         foreach ($objects as $object) {
-            if ($object != "." && $object != "..") {
+            if (!in_array($object, $donotdelete) and 
+               !preg_match('/^\./', $object)) /* . .. .git etc */{
                 if (is_dir("$dir/$object")) 
                     delTree("$dir/$object"); 
                 else 
