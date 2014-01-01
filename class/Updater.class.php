@@ -1,5 +1,21 @@
 <?php
 
+function delTree($dir) {
+    if (is_dir($dir)) {
+        $objects = scandir($dir);
+        foreach ($objects as $object) {
+            if ($object != "." && $object != "..") {
+                if (is_dir("$dir/$object")) 
+                    delTree("$dir/$object"); 
+                else 
+                    unlink("$dir/$object");
+            }
+        }
+        reset($objects);
+        return rmdir($dir);
+    }
+}
+
 class Updater {
     private $steps;
     private $lastError;
@@ -7,8 +23,8 @@ class Updater {
     public function __construct()
     {
         $this->steps =  array();
-        array_push($this->steps, new Step("1a"));
-        array_push($this->steps, new Step("1b"));
+        array_push($this->steps, new Step1("1a"));
+        array_push($this->steps, new Step2("1b"));
         array_push($this->steps, new Step("1c"));
         array_push($this->steps, new Step("1d"));
         array_push($this->steps, new Step("1e"));
@@ -16,7 +32,7 @@ class Updater {
     }
     
     private static function uip() {
-        return dirname(__FILE__)."/updateinprogress.txt";
+        return dirname(dirname(__FILE__))."/updateinprogress.txt";
     }
     
     function updateInProgress(){
@@ -167,7 +183,39 @@ class Step {
 
 class Step1 extends Step {
     public function makeStep() {
-    	return true;
+        $dir = dirname(dirname(__FILE__))."/update";
+    	$this->message = "Создание папки update";
+    	$result = !is_dir($dir) or delTree($dir); 
+        $reslut = $result and mkdir($dir);
+        return $result;
+    }
+}
+
+define("zipfile", dirname(dirname(__FILE__))."/update/NewVersion.zip");
+        
+class Step2 extends Step {
+    private static $url = "http://dev.local/NewVersion.zip";
+    public function makeStep() {
+    	$this->message = "Загрузка новой версии";
+        $file = fopen(zipfile, 'wb');
+        if(!$file){
+            $this->message = "Не могу создать zip файл";
+            return false;
+        }
+        $ch = curl_init(self::$url);
+        $result  = curl_setopt($ch, CURLOPT_FILE , $file) and
+        curl_setopt($ch, CURLOPT_TIMEOUT, 50) and
+        curl_setopt($ch,CURLOPT_FAILONERROR,true) and
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true) and
+        curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if(!$result or $httpCode < 200 or $httpCode >= 400){
+            $this->message  = "Ошибка при загрузке ".self::$url.": ".curl_error($ch);
+            return false;
+        }        
+        curl_close($ch);
+        fclose($file);
+        return $result;
     }
 }
 
@@ -179,18 +227,18 @@ if(array_key_exists("action",$_REQUEST)){
 <html>
 <head>
 <meta charset="utf-8">
-<script type="text/javascript" src="../js/jquery.js"></script>
+<script type="text/javascript" src="../js/jquery-1.8.2.min.js"></script>
 </head>
 <script type="text/javascript">
 
 function NextStep(aStep){
-	$.post("index.php",{action: "nextstep", step: aStep},
+	$.post("#",{action: "nextstep", step: aStep},
 		function(data) {
 			if (data.success){
 				$('#message').html(data.message);
 				$('#progress').html(data.progress);
-				if(data.nextstep)
-				    setTimeout('NextStep('+data.nextstep+')', 100);
+				//if(data.nextstep)
+				    //setTimeout('NextStep('+data.nextstep+')', 100);
             } 
 			else {
 				$('#error').html(data.message);
