@@ -52,14 +52,15 @@ class Updater {
     public function __construct()
     {
         $this->steps =  array();
-        array_push($this->steps, new MsgStep("1a","Начинаю обновление"));
-        array_push($this->steps, new MakeDirStep("1b"));
-        array_push($this->steps, new MsgStep("1c","Начинаю скачивание"));
-        array_push($this->steps, new DownloadStep("1d"));
-        array_push($this->steps, new MsgStep("1e","Начинаю распаковку"));
-        array_push($this->steps, new UnzipStep("1f"));
-        array_push($this->steps, new MsgStep("1g","Переход к новой версии"));
-        array_push($this->steps, new RedirectStep("1h",newVersionUrl.redirectQuery));
+        array_push($this->steps, new RedirectStep("1a",oldVersionUrl.redirectQuery));
+        array_push($this->steps, new MsgStep("1b","Начинаю обновление"));
+        array_push($this->steps, new MakeDirStep("1c"));
+        array_push($this->steps, new MsgStep("1d","Начинаю скачивание"));
+        array_push($this->steps, new DownloadStep("1e"));
+        array_push($this->steps, new MsgStep("1f","Начинаю распаковку"));
+        array_push($this->steps, new UnzipStep("1g"));
+        array_push($this->steps, new MsgStep("1h","Переход к новой версии"));
+        array_push($this->steps, new RedirectStep("1i",newVersionUrl.redirectQuery));
         array_push($this->steps, new MsgStep("2a","Переход осуществлен"));
         array_push($this->steps, new DeleteOldVersionStep("2b"));
         $this->lastError = '';
@@ -234,8 +235,9 @@ class Step {
         $result["message"] = "перенаправление...";
         $result["progress"] = "";
         $result["nextstep"] = false; 
-        $myurl = filter_input(INPUT_SERVER, 'PHP_SELF', FILTER_SANITIZE_SPECIAL_CHARS);
-        $result["redirect"] = dirname(dirname($myurl))."/".$url; //class/../url 
+        //$myurl = filter_input(INPUT_SERVER, 'PHP_SELF', FILTER_SANITIZE_SPECIAL_CHARS);
+        $packagerooturl = str_replace($_SERVER['DOCUMENT_ROOT'], '', detectPackageRoot());
+        $result["redirect"] = $packagerooturl."/".$url;  
         return json_encode($result);
     }
     
