@@ -1,50 +1,34 @@
 <?php
 
-require_once(dirname(dirname(__FILE__)).'/pclzip/pclzip.lib.php');
+require_once(dirname(dirname(__FILE__))."/"."pclzip"."/"."pclzip.lib.php");
+//require_once(dirname(__FILE__)."/"."DBUpgrade.class.php");
 
 
+define("updateUrl", "http://dev.local/NewVersion.zip");
 
 define("updatefolder", "update");
 define("uipfile", "updateinprogress.txt");
 define("configfile","config.php");
 
-define("oldVersionUrl","class/Updater.class.php");
+define("oldVersionUrl","class"."/"."Updater.class.php");
 
 define("updatedir", detectPackageRoot()."/".updatefolder);
-define("zipfile", detectPackageRoot()."/NewVersion.zip");
+define("zipfile", detectPackageRoot()."/"."NewVersion.zip");
 define("uip", detectPackageRoot()."/".uipfile);
 
 define("newVersionUrl",updatefolder."/".oldVersionUrl);
 define("redirectQuery","?autostart");
 
-$donotdelete = array(updatefolder, uipfile, configfile, 'laststart.txt', '.*'/*For developers*/);
+$donotdelete = array(updatefolder, uipfile, configfile, 'laststart.txt');
 
 function detectPackageRoot(){
     $dir = dirname(__FILE__);
-    while(!file_exists($dir."/".configfile) and $dir != '/')
+    while(!file_exists($dir."/".configfile) and $dir != "/")
         $dir = dirname($dir);
     if(file_exists($dir."/".configfile))
         return $dir;
     else 
-        return false;        
-}
-
-function delTree($dir) {
-    global $donotdelete;
-    if (is_dir($dir)) {
-        $objects = scandir($dir);
-        foreach ($objects as $object) {
-            if (!in_array($object, $donotdelete) and 
-               !preg_match('/^\./', $object)) /* . .. .git etc */{
-                if (is_dir("$dir/$object")) 
-                    delTree("$dir/$object"); 
-                else 
-                    unlink("$dir/$object");
-            }
-        }
-        reset($objects);
-        return rmdir($dir);
-    }
+        return false;         
 }
 
 class Updater {
@@ -65,6 +49,15 @@ class Updater {
         array_push($this->steps, new RedirectStep("1i",newVersionUrl.redirectQuery));
         array_push($this->steps, new MsgStep("2a","Переход осуществлен"));
         array_push($this->steps, new DeleteOldVersionStep("2b"));
+        array_push($this->steps, new MsgStep("2с","Перемещаем новую версию"));
+        array_push($this->steps, new MoveNewVersionStep("2d"));
+        array_push($this->steps, new MsgStep("2e","Переходим к обновленной версии"));
+        array_push($this->steps, new RedirectStep("2f",oldVersionUrl.redirectQuery));
+        array_push($this->steps, new MsgStep("3a","Чистим за собой"));
+        array_push($this->steps, new DelUpdateDirStep("3b"));
+        array_push($this->steps, new MsgStep("3c","Обновляем БД"));
+        array_push($this->steps, new UpgradeDBStep("3d"));
+        array_push($this->steps, new MsgStep("3e","Версия обновлена!"));
         $this->lastError = '';
     }
     
@@ -141,6 +134,9 @@ class Updater {
     function makeTheStep(Step $step){
         if(!$this->setAsCurrentStep($step->stepid))
             return $this->makeError();
+        
+        $step->progress = intval(array_search($step, $this->steps) / count($this->steps) * 100);
+        
         if(!$step->CheckConditions() or !$step->makeStep()){
             $this->Error($step->message);
             return $this->makeError();
@@ -164,6 +160,7 @@ class Updater {
     function makeCurrentStep(){
         if(!($step = $this->getCurrentStep()))
             return $this->makeError();
+        
         return $this->makeTheStep($step);
     }
 
@@ -195,6 +192,7 @@ class Updater {
 class Step {
     public $stepid;
     public $message;
+    public $progress = 0;
     public function __construct($id) {
         $this->stepid = $id;
         $this->message = "";
@@ -208,42 +206,98 @@ class Step {
         return true;
     }
     
-    public function CheckPhase($phase) {
+    protected function CheckPhase($phase) {
         return intval(substr($this->stepid,0,1)) == $phase;
     }
     
-    function makeFinished(){
+    protected function xCopy($dir, $dest) {
+        if (is_dir($dir)) {
+            if(!is_dir($dest) and !mkdir($dest,0777,true)){
+                $this->message = "Не могу создать $dest";
+                return false;
+            }
+            $objects = scandir($dir);
+            foreach ($objects as $object) {
+                if (!preg_match('/^\./', $object)) /* . .. .git etc */{
+                    $obj = $dir."/".$object;
+                    if (is_dir($obj)){
+                        if(!$this->xCopy($obj, $dest."/".$object))
+                            return false;
+                    } else {
+                        if(!rename($obj, $dest."/".$object) or //to keep original time and permissions 
+                           !copy($dest."/".$object, $obj)){
+                            $this->message = "Не могу скопировать $obj в $dest";
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        } 
+        $this->message = "$dir - не директория!";
+        return false;
+    }
+    
+    
+    protected function delTree($dir, $onlysubdirs = false) {
+        global $donotdelete;
+        if (is_dir($dir)) {
+            $objects = scandir($dir);
+            foreach ($objects as $object) {
+                if (!in_array($object, $donotdelete) and 
+                   !preg_match('/^\./', $object)) /* . .. .git etc */{
+                    $obj = $dir."/".$object;
+                    if (is_dir($obj)) {
+                        if(!$this->delTree($obj))
+                            return false; 
+                    } else {
+                        if(!unlink($obj)){
+                            $this->message = "Не могу удалить $obj";
+                            return false;
+                        }
+                    }
+                }
+            }
+            reset($objects);
+            if (!$onlysubdirs and !rmdir($dir)){
+                $this->message = "Не могу удалить $dir";
+                return false;
+            }
+            return true;
+        }
+    }
+    
+    public function makeFinished(){
         $result = array();
         $result["success"] = true;
         $result["message"] = "Успех!";
-        $result["progress"] = "Конец.";
+        $result["progress"] = 100;
         $result["nextstep"] = false; 
         return json_encode($result);
     }
     
-    public function makeResult(){
+    protected function makeResult(){
         $result = array();
         $result["success"] = true;
         $result["message"] = $this->message;
-        $result["progress"] = "Шаг ".$this->stepid." завершен."; 
+        $result["progress"] = $this->progress; 
         $result["nextstep"] = true; 
         return json_encode($result);
     }
     
     
-    function makeRedirect($url){
+    protected function makeRedirect($url){
         $result = array();
         $result["success"] = true;
         $result["message"] = "перенаправление...";
-        $result["progress"] = "";
+        $result["progress"] = $this->progress;
         $result["nextstep"] = false; 
-        //$myurl = filter_input(INPUT_SERVER, 'PHP_SELF', FILTER_SANITIZE_SPECIAL_CHARS);
         $packagerooturl = str_replace($_SERVER['DOCUMENT_ROOT'], '', detectPackageRoot());
         $result["redirect"] = $packagerooturl."/".$url;  
         return json_encode($result);
     }
     
-    function result(){
+    public function result(){
         return $this->makeResult();
     }
     
@@ -273,7 +327,6 @@ class RedirectStep extends Step {
 
 class Phase1Step extends Step {
     protected function isOldVersion() {
-        $this->message = "Проверка, что мы в старой версии";
         if(__FILE__ != detectPackageRoot()."/".oldVersionUrl){
             $this->message = "Необходимо перейти в старую версию!:".__FILE__."!=".detectPackageRoot()."/".oldVersionUrl;
             return false;
@@ -286,19 +339,38 @@ class Phase1Step extends Step {
     }
 }
 
+class Phase2Step extends Step {
+    protected function isNewVersion() {
+        if(__FILE__ != detectPackageRoot()."/".newVersionUrl){
+            $this->message = "Данный шаг должен выполняться в новой версии: ".__FILE__."!=".detectPackageRoot()."/".newVersionUrl;
+            return false;
+        } 
+        return true;
+    }
+    
+    function CheckConditions() {
+        return $this->CheckPhase(2) and $this->isNewVersion();
+    }
+}
+
+class Phase3Step extends Phase1Step {
+    public function CheckConditions() {
+        return $this->CheckPhase(3) and $this->isOldVersion();
+    }
+}
+
 class MakeDirStep extends Phase1Step {
     public function makeStep() {
     	$this->message = "Создание папки update";
     	$result = !is_dir(updatedir);
     	if(!$result) 
-    	  $result = delTree(updatedir); 
+    	  $result = $this->delTree(updatedir); 
         $result = $result and mkdir(updatedir);
         return $result;
     }
 }
 
 class DownloadStep extends Phase1Step {
-    private static $url = "http://dev.local/NewVersion.zip";
     public function makeStep() {
     	$this->message = "Загрузка новой версии";
         $file = fopen(zipfile, 'wb');
@@ -306,7 +378,7 @@ class DownloadStep extends Phase1Step {
             $this->message = "Не могу создать zip файл";
             return false;
         }
-        $ch = curl_init(self::$url);
+        $ch = curl_init(updateUrl);
         $result  = curl_setopt($ch, CURLOPT_FILE , $file) and
         curl_setopt($ch, CURLOPT_TIMEOUT, 50) and
         curl_setopt($ch, CURLOPT_FAILONERROR, true) and
@@ -314,7 +386,7 @@ class DownloadStep extends Phase1Step {
         curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         if(!$result or $httpCode != 200){
-            $this->message  = "Ошибка при загрузке ".self::$url.": ".curl_error($ch);
+            $this->message  = "Ошибка при загрузке ".updateUrl.": ".curl_error($ch);
             return false;
         }        
         curl_close($ch);
@@ -337,27 +409,48 @@ class UnzipStep extends Phase1Step {
     }
 }
 
-class Phase2Step extends Step {
-    protected function isNewVersion() {
-        $this->message = "Проверка, что мы в новой версии";
-        if(__FILE__ != detectPackageRoot()."/".newVersionUrl){
-            $this->message = "Старая версия не найдена: ".__FILE__."!=".detectPackageRoot()."/".newVersionUrl;
-            return false;
-        } 
-        return true;
-    }
-    
-    function CheckConditions() {
-        return $this->CheckPhase(2) and $this->isNewVersion();
-    }
-}
-
 class DeleteOldVersionStep extends Phase2Step {
     public function makeStep() {
         $this->message = "Удаление старой версии";
+        if (!$this->delTree(detectPackageRoot(), true)){
+            $this->message = "При удалении старой версии:\n".$this->message."\n".
+            "Измените права доступа или обновляйтесь вручную.";
+            return false;
+        }
         return true;
     }
 } 
+
+class MoveNewVersionStep extends Phase2Step {
+    public function makeStep() {
+        $this->message = "Заменяем на новую версию";
+        if (!$this->xCopy(updatedir, detectPackageRoot())){
+            $this->message = "При копировании новой версии:\n".$this->message."\n".
+            "Измените права доступа или обновляйтесь вручную.";
+            return false;
+        }
+        return true;
+    }
+} 
+
+class UpgradeDBStep extends Phase3Step {
+    public function makeStep() {
+        $this->message = "Апгрейдим БД";
+        //if (!xCopy(updatedir, detectPackageRoot())){
+        //    $this->message = "Ошибка при удалении старой версии! Обновляйтесь вручную.";
+        //}
+        return true;
+    }
+}
+
+class DelUpdateDirStep extends Phase3Step {
+    public function makeStep() {
+    	$result = !is_dir(updatedir);
+    	if(!$result) 
+    	  $result = $this->delTree(updatedir); 
+        return $result;
+    }
+}
 
 if(array_key_exists("action",$_REQUEST)){
     $U = new Updater();
@@ -382,13 +475,13 @@ function TakeAction(action){
 				$('#message').html(data.message);
 				$('#progress').html(data.progress);
 				if(data.nextstep)
-				    ;//MakeNextStep();
+				    MakeNextStep();
 				else if(data.redirect)
 					window.location = data.redirect; 
             } 
 			else {
-				$('#error').html(data.message);
-                if (confirm("Что-то не получилось. Попробуем еще раз?"))
+				//$('#error').html(data.message);
+                if (confirm("Ошибка:"+data.message+".\nПопробуем еще раз?"))
                 	MakeNextStep();
                 else 
                     $('#message').html("Автоматическое обновление прервано. Попробуйте еще раз. если не получится - придется обновляться вручную.");
