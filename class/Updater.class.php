@@ -1,29 +1,27 @@
 <?php
 
-require_once(dirname(dirname(__FILE__))."/"."pclzip"."/"."pclzip.lib.php");
-//require_once(dirname(__FILE__)."/"."DBUpgrade.class.php");
+require_once(dirname(__DIR__)."/"."pclzip"."/"."pclzip.lib.php");
+//require_once(__DIR__."/"."DBUpgrade.class.php");
 
 
 define("updateUrl", "http://dev.local/NewVersion.zip");
 
-define("updatefolder", "update");
+define("newVerSubfolder", "update");
 define("uipfile", "updateinprogress.txt");
 define("configfile","config.php");
 
-define("oldVersionUrl","class"."/"."Updater.class.php");
+define("oldVersionUrl","index.php?view=update");
 
-define("updatedir", detectPackageRoot()."/".updatefolder);
+define("updatedir", detectPackageRoot()."/".newVerSubfolder);
 define("zipfile", detectPackageRoot()."/"."NewVersion.zip");
 define("uip", detectPackageRoot()."/".uipfile);
 
-define("newVersionUrl",updatefolder."/".oldVersionUrl);
-define("redirectQuery","?autostart");
-
-$donotdelete = array(updatefolder, uipfile, configfile, 'laststart.txt');
+define("newVersionUrl",newVerSubfolder."/".oldVersionUrl);
+define("redirectQuery","&autostart");
 
 function detectPackageRoot(){
-    $dir = dirname(__FILE__);
-    while(!file_exists($dir."/".configfile) and $dir != "/")
+    $dir = __DIR__;
+    while(!(file_exists($dir."/".configfile) and basename($dir) != newVerSubfolder) and $dir != "/")
         $dir = dirname($dir);
     if(file_exists($dir."/".configfile))
         return $dir;
@@ -32,51 +30,57 @@ function detectPackageRoot(){
 }
 
 class Updater {
-    private $steps;
-    private $lastError;
-    
-    public function __construct()
+    private static $steps = NULL;
+    private static $lastError;
+
+    private static function Initialize()
     {
-        $this->steps =  array();
-        array_push($this->steps, new RedirectStep("1a",oldVersionUrl.redirectQuery));
-        array_push($this->steps, new MsgStep("1b","Начинаю обновление"));
-        array_push($this->steps, new MakeDirStep("1c"));
-        array_push($this->steps, new MsgStep("1d","Начинаю скачивание"));
-        array_push($this->steps, new DownloadStep("1e"));
-        array_push($this->steps, new MsgStep("1f","Начинаю распаковку"));
-        array_push($this->steps, new UnzipStep("1g"));
-        array_push($this->steps, new MsgStep("1h","Переход к новой версии"));
-        array_push($this->steps, new RedirectStep("1i",newVersionUrl.redirectQuery));
-        array_push($this->steps, new MsgStep("2a","Переход осуществлен"));
-        array_push($this->steps, new DeleteOldVersionStep("2b"));
-        array_push($this->steps, new MsgStep("2с","Перемещаем новую версию"));
-        array_push($this->steps, new MoveNewVersionStep("2d"));
-        array_push($this->steps, new MsgStep("2e","Переходим к обновленной версии"));
-        array_push($this->steps, new RedirectStep("2f",oldVersionUrl.redirectQuery));
-        array_push($this->steps, new MsgStep("3a","Чистим за собой"));
-        array_push($this->steps, new DelUpdateDirStep("3b"));
-        array_push($this->steps, new MsgStep("3c","Обновляем БД"));
-        array_push($this->steps, new UpgradeDBStep("3d"));
-        array_push($this->steps, new MsgStep("3e","Версия обновлена!"));
-        $this->lastError = '';
+        if(!self::$steps) 
+        {
+            self::$steps =  array();
+            array_push(self::$steps, new RedirectStep("1a",oldVersionUrl.redirectQuery));
+            array_push(self::$steps, new MsgStep("1b","Начинаю обновление"));
+            array_push(self::$steps, new MakeDirStep("1c"));
+            array_push(self::$steps, new MsgStep("1d","Начинаю скачивание"));
+            array_push(self::$steps, new DownloadStep("1e"));
+            array_push(self::$steps, new MsgStep("1f","Начинаю распаковку"));
+            array_push(self::$steps, new UnzipStep("1g"));
+            array_push(self::$steps, new MsgStep("1h","Копирую файл конфигурации"));
+            array_push(self::$steps, new CopyConfigStep("1h2"));
+            array_push(self::$steps, new MsgStep("1h3","Переход к новой версии"));
+            array_push(self::$steps, new RedirectStep("1i",newVersionUrl.redirectQuery));
+            array_push(self::$steps, new MsgStep("2a","Переход осуществлен"));
+            array_push(self::$steps, new DeleteOldVersionStep("2b"));
+            array_push(self::$steps, new MsgStep("2с","Перемещаем новую версию"));
+            array_push(self::$steps, new MoveNewVersionStep("2d"));
+            array_push(self::$steps, new MsgStep("2e","Переходим к обновленной версии"));
+            array_push(self::$steps, new RedirectStep("2f",oldVersionUrl.redirectQuery));
+            array_push(self::$steps, new MsgStep("3a","Чистим за собой"));
+            array_push(self::$steps, new DelUpdateDirStep("3b"));
+            array_push(self::$steps, new MsgStep("3c","Обновляем БД"));
+            array_push(self::$steps, new UpgradeDBStep("3d"));
+            array_push(self::$steps, new MsgStep("3e","Проверка установки!"));
+            array_push(self::$steps, new RedirectStep("3f",'index.php?view=check'));
+            self::$lastError = '';
+        }
     }
     
-    function makeError(){
+    private static function makeError(){
         $error = array();
         $error["success"] = false;
-        $error["message"] = $this->lastError;
+        $error["message"] = self::$lastError;
         return json_encode($error);
     }
     
-    function updateInProgress(){
+    private static function updateInProgress(){
         return file_exists(uip) and strlen(file_get_contents(uip)) > 0;
     }
     
-    private function readStepID(){ 
+    private static function readStepID(){ 
         return file_get_contents(uip);
     }
     
-    private function writeStepID($stepid){
+    private static function writeStepID($stepid){
         $file = @fopen(uip, 'wb');
         if(!$file)
             return false;
@@ -89,113 +93,118 @@ class Updater {
     }
     
 
-    function seekToStep($stepid){
-        reset($this->steps);
-        while(key($this->steps) !== null && current($this->steps)->stepid !== $stepid)
-            next($this->steps);
-        if(!current($this->steps)){
-            $this->Error("Не найден шаг ".$stepid);
+    private static function seekToStep($stepid){
+        reset(self::$steps);
+        while(key(self::$steps) !== null && current(self::$steps)->stepid !== $stepid)
+            next(self::$steps);
+        if(!current(self::$steps)){
+            self::Error("Не найден шаг ".$stepid);
             return false;
         }
         return true;
     }
     
-    function getCurrentStep(){
-        $stepid = $this->readStepID();
+    private static function getCurrentStep(){
+        $stepid = self::readStepID();
         if(!$stepid) {
-            $this->Error("файл ".uip." не найден.");
+            self::Error("файл ".uip." не найден.");
             return false;
         }
-        if($this->seekToStep($stepid))
-            $step = current($this->steps);
+        if(self::seekToStep($stepid))
+            $step = current(self::$steps);
         else
             $step = null;
         return $step;
     }
 
-    function setAsCurrentStep($stepid){
-        $result = $this->writeStepID($stepid);
+    private static function setAsCurrentStep($stepid){
+        $result = self::writeStepID($stepid);
         if(!$result)
-            $this->Error("файл ".uip." недоступен для записи.");
+            self::Error("файл ".uip." недоступен для записи.");
         return $result;
     }
         
-    function Error($msg){
-        $this->lastError = $msg;        
+    private static function Error($msg){
+        self::$lastError = $msg;        
     }
     
-    function getNextStep($stepid){
-        if($this->seekToStep($stepid))
-            return next($this->steps);
+    private static function getNextStep($stepid){
+        if(self::seekToStep($stepid))
+            return next(self::$steps);
         else
             return false;
     }
     
-    function makeTheStep(Step $step){
-        if(!$this->setAsCurrentStep($step->stepid))
-            return $this->makeError();
+    private static function makeTheStep(Step $step){
+        if(!self::setAsCurrentStep($step->stepid))
+            return self::makeError();
         
-        $step->progress = intval(array_search($step, $this->steps) / count($this->steps) * 100);
+        $step->progress = intval(array_search($step, self::$steps) / count(self::$steps) * 100);
         
         if(!$step->CheckConditions() or !$step->makeStep()){
-            $this->Error($step->message);
-            return $this->makeError();
+            self::Error($step->message);
+            return self::makeError();
         }
-        $nextstep = $this->getNextStep($step->stepid);
+        $nextstep = self::getNextStep($step->stepid);
         if($nextstep === false){
-            $this->finish();
-            return $step->makeFinished();
+            self::finish();
+            return $step->result(false);
         }
-        if (!$this->setAsCurrentStep($nextstep->stepid))
-            return $this->makeError();
-        return $step->result();
+        if (!self::setAsCurrentStep($nextstep->stepid))
+            return self::makeError();
+        return $step->result(true);
     }
     
-    function makeFirstStep(){
-        reset($this->steps);
-        $step = current($this->steps);
-        return $this->makeTheStep($step);
+    private static function makeFirstStep(){
+        reset(self::$steps);
+        $step = current(self::$steps);
+        return self::makeTheStep($step);
     }
 
-    function makeCurrentStep(){
-        if(!($step = $this->getCurrentStep()))
-            return $this->makeError();
+    private static function makeCurrentStep(){
+        if(!($step = self::getCurrentStep()))
+            return self::makeError();
         
-        return $this->makeTheStep($step);
+        return self::makeTheStep($step);
     }
 
-    function reset(){
-       unlink(uip);    
+    private static function reset(){
+        if(file_exists(uip))
+            unlink(uip);    
     }
     
-    function finish(){
-        $this->reset();
+    private static function finish(){
+        self::reset();
     }
     
-    function action(){
-            header("Content-type","text/json");
-            if($_REQUEST['action'] == "reset") {
-                $this->reset();
-                $result = $this->makeFirstStep();
+    public static function action($action){
+        self::Initialize();
+        header("Content-type","text/json");
+        switch($action) {
+        	case "update_reset":
+        	    self::reset();
+                $result = self::makeFirstStep();
                 echo $result;
-            }
-            if($_REQUEST['action'] == "nextstep") {
-                if($this->updateInProgress())
-                    $result = $this->makeCurrentStep();            
+                break;
+            case "update_nextstep":
+                if(self::updateInProgress())
+                    $result = self::makeCurrentStep();            
                 else
-                    $result = $this->makeFirstStep();
+                    $result = self::makeFirstStep();
                 echo $result;
-            }
+                break;
+        }
     }
 }
 
 class Step {
+    private static $donotdelete = array(newVerSubfolder, uipfile, configfile, 'laststart.txt');
     public $stepid;
     public $message;
     public $progress = 0;
     public function __construct($id) {
         $this->stepid = $id;
-        $this->message = "";
+        $this->message = "&nbsp;";
     }
     public function makeStep(){
         $this->message = "Завершен шаг ".$this->stepid;
@@ -218,7 +227,8 @@ class Step {
             }
             $objects = scandir($dir);
             foreach ($objects as $object) {
-                if (!preg_match('/^\./', $object)) /* . .. .git etc */{
+                if (!in_array($object, self::$donotdelete) and
+                    !preg_match('/^\./', $object)) /* . .. .git etc */{
                     $obj = $dir."/".$object;
                     if (is_dir($obj)){
                         if(!$this->xCopy($obj, $dest."/".$object))
@@ -239,16 +249,15 @@ class Step {
     }
     
     
-    protected function delTree($dir, $onlysubdirs = false) {
-        global $donotdelete;
+    protected function delTree($dir, $onlyContents = false) {
         if (is_dir($dir)) {
             $objects = scandir($dir);
             foreach ($objects as $object) {
-                if (!in_array($object, $donotdelete) and 
+                if ((!$onlyContents or !in_array($object, self::$donotdelete)) and 
                    !preg_match('/^\./', $object)) /* . .. .git etc */{
                     $obj = $dir."/".$object;
                     if (is_dir($obj)) {
-                        if(!$this->delTree($obj))
+                        if(!$this->delTree($obj, false))
                             return false; 
                     } else {
                         if(!unlink($obj)){
@@ -259,7 +268,7 @@ class Step {
                 }
             }
             reset($objects);
-            if (!$onlysubdirs and !rmdir($dir)){
+            if (!$onlyContents and !rmdir($dir)){
                 $this->message = "Не могу удалить $dir";
                 return false;
             }
@@ -276,12 +285,12 @@ class Step {
         return json_encode($result);
     }
     
-    protected function makeResult(){
+    protected function makeResult($nextstep){
         $result = array();
         $result["success"] = true;
         $result["message"] = $this->message;
         $result["progress"] = $this->progress; 
-        $result["nextstep"] = true; 
+        $result["nextstep"] = $nextstep; 
         return json_encode($result);
     }
     
@@ -297,8 +306,8 @@ class Step {
         return json_encode($result);
     }
     
-    public function result(){
-        return $this->makeResult();
+    public function result($nextstep){
+        return $this->makeResult($nextstep);
     }
     
 }
@@ -321,14 +330,15 @@ class RedirectStep extends Step {
     }
     
     public function result(){
-    	return $this->makeRedirect($this->url);
+        $this->message = 'Перенаправление...';
+        return $this->makeRedirect($this->url);
     }
 }
 
 class Phase1Step extends Step {
     protected function isOldVersion() {
-        if(__FILE__ != detectPackageRoot()."/".oldVersionUrl){
-            $this->message = "Необходимо перейти в старую версию!:".__FILE__."!=".detectPackageRoot()."/".oldVersionUrl;
+        if(dirname(__DIR__) != detectPackageRoot()){
+            $this->message = "Необходимо перейти в старую версию! Сейчас:".dirname(__DIR__).", нужно ".detectPackageRoot();
             return false;
         } 
         return true;
@@ -341,8 +351,8 @@ class Phase1Step extends Step {
 
 class Phase2Step extends Step {
     protected function isNewVersion() {
-        if(__FILE__ != detectPackageRoot()."/".newVersionUrl){
-            $this->message = "Данный шаг должен выполняться в новой версии: ".__FILE__."!=".detectPackageRoot()."/".newVersionUrl;
+        if(dirname(__DIR__) != detectPackageRoot()."/".newVerSubfolder){
+            $this->message = "Данный шаг должен выполняться в новой версии! Сейчас:".dirname(__DIR__).", нужно ".detectPackageRoot()."/".newVerSubfolder;
             return false;
         } 
         return true;
@@ -361,18 +371,17 @@ class Phase3Step extends Phase1Step {
 
 class MakeDirStep extends Phase1Step {
     public function makeStep() {
-    	$this->message = "Создание папки update";
     	$result = !is_dir(updatedir);
     	if(!$result) 
     	  $result = $this->delTree(updatedir); 
         $result = $result and mkdir(updatedir);
+    	$this->message = "Папка update создана";
         return $result;
     }
 }
 
 class DownloadStep extends Phase1Step {
     public function makeStep() {
-    	$this->message = "Загрузка новой версии";
         $file = fopen(zipfile, 'wb');
         if(!$file){
             $this->message = "Не могу создать zip файл";
@@ -391,13 +400,13 @@ class DownloadStep extends Phase1Step {
         }        
         curl_close($ch);
         fclose($file);
-        return $result;
+    	$this->message = "Загрузка новой версии завершена";
+        return true;
     }
 }
 
 class UnzipStep extends Phase1Step {
     public function makeStep() {
-        $this->message = "Распаковка новой версии";
         $archive = new PclZip(zipfile);
         $list  =  $archive->extract(PCLZIP_OPT_PATH, updatedir."/",
                                     PCLZIP_OPT_STOP_ON_ERROR);
@@ -405,108 +414,66 @@ class UnzipStep extends Phase1Step {
             $this->message = "Ошибка при распаковке: '".$archive->errorInfo()."'";
             return false; 
         }
+        $this->message = "Распаковка новой версии завершена";
+        return true;
+    }
+}
+
+class CopyConfigStep extends Phase1Step {
+    public function makeStep() {
+        if (!copy(detectPackageRoot()."/".configfile, detectPackageRoot()."/".newVerSubfolder."/".configfile)){
+            $this->message = "При копировании конфигурации.\n".
+            "Измените права доступа или обновляйтесь вручную.";
+            return false;
+        }
+        $this->message = "Копирование конфигурации завершено";
         return true;
     }
 }
 
 class DeleteOldVersionStep extends Phase2Step {
     public function makeStep() {
-        $this->message = "Удаление старой версии";
         if (!$this->delTree(detectPackageRoot(), true)){
             $this->message = "При удалении старой версии:\n".$this->message."\n".
             "Измените права доступа или обновляйтесь вручную.";
             return false;
         }
+        $this->message = "Удаление старой версии завершено";
         return true;
     }
 } 
 
 class MoveNewVersionStep extends Phase2Step {
     public function makeStep() {
-        $this->message = "Заменяем на новую версию";
         if (!$this->xCopy(updatedir, detectPackageRoot())){
             $this->message = "При копировании новой версии:\n".$this->message."\n".
             "Измените права доступа или обновляйтесь вручную.";
             return false;
         }
+        $this->message = "Замещение новой версией завершено";
         return true;
     }
 } 
 
 class UpgradeDBStep extends Phase3Step {
     public function makeStep() {
-        $this->message = "Апгрейдим БД";
-        //if (!xCopy(updatedir, detectPackageRoot())){
-        //    $this->message = "Ошибка при удалении старой версии! Обновляйтесь вручную.";
+        //if (!DBUpgrade::Upgrade()){
+        //    $this->message = "Ошибка при апгрейде! Обновляйтесь вручную.";
         //}
+        $this->message = "Апгрейд завершен";
         return true;
     }
 }
 
 class DelUpdateDirStep extends Phase3Step {
     public function makeStep() {
-    	$result = !is_dir(updatedir);
-    	if(!$result) 
-    	  $result = $this->delTree(updatedir); 
-        return $result;
+    	if(is_dir(updatedir) and !$this->delTree(updatedir)) {
+            $this->message = "Ошибка при удалении копии.";
+            return false;
+    	} 
+        $this->message = "Чистка завершена";
+    	return true;
     }
 }
 
-if(array_key_exists("action",$_REQUEST)){
-    $U = new Updater();
-    $U->action();
-} else {
-?><!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<script type="text/javascript" src="../js/jquery-1.8.2.min.js"></script>
-</head>
-<script type="text/javascript">
-
-function MakeNextStep(){
-	setTimeout('TakeAction("nextstep")', 100);
-}
-
-function TakeAction(action){
-	$.post("#",{"action": action},
-		function(data) {
-			if (data.success){
-				$('#message').html(data.message);
-				$('#progress').html(data.progress);
-				if(data.nextstep)
-				    MakeNextStep();
-				else if(data.redirect)
-					window.location = data.redirect; 
-            } 
-			else {
-				//$('#error').html(data.message);
-                if (confirm("Ошибка:"+data.message+".\nПопробуем еще раз?"))
-                	MakeNextStep();
-                else 
-                    $('#message').html("Автоматическое обновление прервано. Попробуйте еще раз. если не получится - придется обновляться вручную.");
-                    
-            }
-		}, "json"
-	);
-}
-
-$(document).ready(function() {
-
-	if(window.location.search.substr(1) == 'autostart')
-		MakeNextStep();
-});
-	
-
-</script>
-<body>
-<div id="message"></div>
-<div id="progress"></div>
-<div id="error"></div>
-</body>
-<button onclick="TakeAction('nextstep');">next</button>
-<button onclick="TakeAction('reset');">Начать!</button>
-</html>
-<?php
-} 
 ?>

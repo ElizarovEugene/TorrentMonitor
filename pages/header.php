@@ -12,19 +12,23 @@
     <script type="text/javascript">
         function FocusOnInput() { document.getElementById("password").focus(); }
     </script>
+    <script src="js/jquery-1.8.2.min.js"></script>
+    <script src="js/jquery.query.js"></script>
+    <script src="js/user-func.js"></script>
 </head>
 <body onload="FocusOnInput()">
 <?php
 //Проверка обновления
 $dir = __DIR__.'/';
 include_once $dir.'../class/System.class.php';
-$update = Sys::checkUpdate();
+$update = true;//Sys::checkUpdate();
 if ($update)
 {
 ?>
 <div class="update">
 	Доступна новая версия TorrentMonitor<br>
-	Пожалуйста <a href="http://blog.korphome.ru/torrentmonitor/">обновитесь</a>!
+	Пожалуйста, обновитесь <a href="#" onclick="show('update');">автоматически</a><br>
+	либо <a href="http://blog.korphome.ru/torrentmonitor/">вручную</a>!
 </div>
 <?php
 }

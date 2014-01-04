@@ -447,3 +447,24 @@ div.result {
 span.quality {
 	display: inline-block;
 }
+
+#updater #progress_border {
+	position: relative;
+	border: 1px black solid;
+	width: 100%;
+}
+
+#updater #progress_bar {
+	background-color: green;
+	width: 0%;
+	background: #89b1b9 url(../img/bg.png) 0 0 repeat;
+}
+#updater #progress {
+	text-align: center;
+	position: absolute;
+	z-index: 50;
+	width: 100%;
+}
+#updater .secondhalf{
+	color: white;
+}

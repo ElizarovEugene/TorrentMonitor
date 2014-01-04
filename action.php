@@ -5,372 +5,279 @@ include_once $dir.'class/System.class.php';
 include_once $dir.'class/Database.class.php';
 include_once $dir.'class/Errors.class.php';
 include_once $dir.'class/Notification.class.php';
+include_once $dir.'class/Updater.class.php';
 
-if (isset($_POST['action']))
-{
-	//Проверяем пароль
-	if ($_POST['action'] == 'enter')
+//Проверяем пароль
+function OnAction_enter(){
+	$password = md5($_POST['password']);
+	$count = Database::countCredentials($password);
+	
+	if ($count == 1)
 	{
-		$password = md5($_POST['password']);
-		$count = Database::countCredentials($password);
+		session_start();
+		$_SESSION['TM'] = $password;
+		$return['error'] = FALSE;
+	}
+	else
+	{
+		$return['error'] = TRUE;
+		$return['msg'] = 'Неверный пароль!';
+	}
+	echo json_encode($return);
+}
+    
+
+//Добавляем тему для мониторинга
+function OnAction_torrent_add(){
+	if ($url = parse_url($_POST['url']))
+	{
+		$tracker = $url['host'];
+		$tracker = preg_replace('/www\./', '', $tracker);
+		if ($tracker == 'tr.anidub.com')
+			$tracker = 'anidub.com';
 		
-		if ($count == 1)
+		if ($tracker != 'rutor.org')
 		{
-			session_start();
-			$_SESSION['TM'] = $password;
-			$return['error'] = FALSE;
+			$query = explode('=', $url['query']);
+			$threme = $query[1];
 		}
 		else
 		{
-			$return['error'] = TRUE;
-			$return['msg'] = 'Неверный пароль!';
+			preg_match('/\d{4,8}/', $url['path'], $array);
+			$threme = $array[0];
 		}
-		echo json_encode($return);
-	}
-
-	//Добавляем тему для мониторинга
-	if ($_POST['action'] == 'torrent_add')
-	{
-		if ($url = parse_url($_POST['url']))
-		{
-			$tracker = $url['host'];
-			$tracker = preg_replace('/www\./', '', $tracker);
-			if ($tracker == 'tr.anidub.com')
-				$tracker = 'anidub.com';
-			
-			if ($tracker != 'rutor.org')
-			{
-				$query = explode('=', $url['query']);
-				$threme = $query[1];
-			}
-			else
-			{
-				preg_match('/\d{4,8}/', $url['path'], $array);
-				$threme = $array[0];
-			}
-			
-			if (is_array(Database::getCredentials($tracker)))
-			{
-				$engineFile = $dir.'/trackers/'.$tracker.'.engine.php';
-				if (file_exists($engineFile))
-				{	
-					$functionEngine = include_once $engineFile;
-					$class = explode('.', $tracker);
-					$class = $class[0];
-					$class = str_replace('-', '', $class);
-
-					if (call_user_func(array($class, 'checkRule'), $threme))
-					{
-						if (Database::checkThremExist($tracker, $threme))
-						{
-							if ( ! empty($_POST['name']))
-								$name = $_POST['name'];
-							else
-								$name = Sys::getHeader($_POST['url']);
-
-							Database::setThreme($tracker, $name, $threme);
-							?>
-							Тема добавлена для мониторинга.
-							<?php
-						}
-						else
-						{
-						?>
-							Вы уже следите за данной темой на трекере <b><?php echo $tracker?></b>.
-						<?php
-						}
-					}
-					else
-					{
-					?>
-						Не верная ссылка.
-					<?php
-					}
-				}
-				else
-				{
-				?>
-					Отсутствует модуль для трекера - <b><?php echo $tracker?></b>.
-				<?php
-				}
-			}
-			else
-			{
-			?>
-				Вы не можете следить за этим сериалом на трекере - <b><?php echo $tracker?></b>, пока не введёте свои учётные данные!
-			<?php
-			}
-		}
-		else
-		{
-		?>
-			Не верная ссылка.
-		<?php
-		}
-		return TRUE;
-	}
 		
-	//Добавляем сериал для мониторинга
-	if ($_POST['action'] == 'serial_add')
-	{
-		$tracker = $_POST['tracker'];
 		if (is_array(Database::getCredentials($tracker)))
 		{
 			$engineFile = $dir.'/trackers/'.$tracker.'.engine.php';
 			if (file_exists($engineFile))
-			{
+			{	
 				$functionEngine = include_once $engineFile;
 				$class = explode('.', $tracker);
 				$class = $class[0];
 				$class = str_replace('-', '', $class);
-				if (call_user_func(array($class, 'checkRule'), $_POST['name']))
+
+				if (call_user_func(array($class, 'checkRule'), $threme))
 				{
-					if (Database::checkSerialExist($tracker, $_POST['name'], $_POST['hd']))	
+					if (Database::checkThremExist($tracker, $threme))
 					{
-						Database::setSerial($tracker, $_POST['name'], $_POST['hd']);
-						?>
-						Сериал добавлен для мониторинга.
-						<?php
+						if ( ! empty($_POST['name']))
+							$name = $_POST['name'];
+						else
+							$name = Sys::getHeader($_POST['url']);
+
+						Database::setThreme($tracker, $name, $threme);
+						echo "Тема добавлена для мониторинга.";
 					}
 					else
-					{
-					?>
-						Вы уже следите за данным сериалом на этом трекере - <b><?php echo $tracker?></b>.
-					<?php
-					}
+					    echo "Вы уже следите за данной темой на трекере <b>$tracker?></b>.";
 				}
 				else
-				{
-				?>
-					Название содержит недопустимые символы.
-				<?php
-				}
+				    echo "Неверная ссылка.";
 			}
 			else
-			{
-			?>
-				Отсутствует модуль для трекера - <b><?php echo $tracker?></b>.
-			<?php
-			}
+			    echo "Отсутствует модуль для трекера - <b>$tracker</b>.";
 		}
 		else
-		{
-		?>
-			Вы не можете следить за этим сериалом на трекере - <b><?php echo $tracker?></b>, пока не введёте свои учётные данные!
-		<?php
-		}
-		return TRUE;
+		    echo "Вы не можете следить за этим сериалом на трекере - <b>$tracker</b>, пока не введёте свои учётные данные!";
 	}
+	else
+	    echo "Неверная ссылка.";
+	return TRUE;
+}
+		
+	//Добавляем сериал для мониторинга
+function OnAction_serial_add(){
+	$tracker = $_POST['tracker'];
+	if (is_array(Database::getCredentials($tracker)))
+	{
+		$engineFile = $dir.'/trackers/'.$tracker.'.engine.php';
+		if (file_exists($engineFile))
+		{
+			$functionEngine = include_once $engineFile;
+			$class = explode('.', $tracker);
+			$class = $class[0];
+			$class = str_replace('-', '', $class);
+			if (call_user_func(array($class, 'checkRule'), $_POST['name']))
+			{
+				if (Database::checkSerialExist($tracker, $_POST['name'], $_POST['hd']))	
+				{
+					Database::setSerial($tracker, $_POST['name'], $_POST['hd']);
+					echo "Сериал добавлен для мониторинга.";
+				}
+				else
+				    echo "Вы уже следите за данным сериалом на этом трекере - <b>$tracker</b>.";
+			}
+			else
+                echo "Название содержит недопустимые символы.";
+		}
+		else 
+		    echo "Отсутствует модуль для трекера - <b>$tracker</b>.";
+	}
+	else
+	    echo "Вы не можете следить за этим сериалом на трекере - <b>$tracker</b>, пока не введёте свои учётные данные!";
+	return TRUE;
+}
 	
 	//Добавляем пользователя для мониторинга
-	if ($_POST['action'] == 'user_add')
+function OnAction_user_add(){
+	$tracker = $_POST['tracker'];
+	if (is_array(Database::getCredentials($tracker)))
 	{
-		$tracker = $_POST['tracker'];
-		if (is_array(Database::getCredentials($tracker)))
+		$engineFile = $dir.'/trackers/'.$tracker.'.search.php';
+		if (file_exists($engineFile))
 		{
-			$engineFile = $dir.'/trackers/'.$tracker.'.search.php';
-			if (file_exists($engineFile))
+			if (Database::checkUserExist($tracker, $_POST['name']))	
 			{
-				if (Database::checkUserExist($tracker, $_POST['name']))	
-				{
-					Database::setUser($tracker, $_POST['name']);
-					?>
-					Пользователь добавлен для мониторинга.
-					<?php
-				}
-				else
-				{
-				?>
-					Вы уже следите за данным пользователем на этом трекере - <b><?php echo $tracker?></b>.
-				<?php
-				}
+				Database::setUser($tracker, $_POST['name']);
+				echo "Пользователь добавлен для мониторинга.";
 			}
 			else
-			{
-			?>
-				Отсутствует модуль для трекера - <b><?php echo $tracker?></b>.
-			<?php
-			}
+			    echo "Вы уже следите за данным пользователем на этом трекере - <b>$tracker</b>.";
 		}
 		else
-		{
-		?>
-			Вы не можете следить за этим пользователем на трекере - <b><?php echo $tracker?></b>, пока не введёте свои учётные данные!
-		<?php
-		}
-		return TRUE;
+		    echo "Отсутствует модуль для трекера - <b>$tracker</b>.";
 	}
-	
-	//Удаляем пользователя из мониторинга и все его темы
-	if ($_POST['action'] == 'delete_user')
-	{
-    	Database::deletUser($_POST['user_id']);
-    	?>
-		Удаляю...
-		<?php
-		return TRUE;
-	}
-	
-	//Удаляем тему из буфера
-	if ($_POST['action'] == 'delete_from_buffer')
-	{
-    	Database::deleteFromBuffer($_POST['id']);
-    	?>
-		Удаляю...
-		<?php
-		return TRUE;
-	}
-	
-	//Очищаем весь список тем
-	if ($_POST['action'] == 'threme_clear')
-	{
-    	$array = Database::selectAllFromBuffer();
-    	for($i=0; $i<count($array); $i++)
-    	{
-        	Database::deleteFromBuffer($array[$i]['id']);
-    	}
+	else
+	    echo "Вы не можете следить за этим пользователем на трекере - <b>$tracker</b>, пока не введёте свои учётные данные!";
+	return TRUE;
+}
 
-	}	
+//Удаляем пользователя из мониторинга и все его темы
+function OnAction_delete_user(){
+	Database::deletUser($_POST['user_id']);
+	echo "Удаляю...";
+	return TRUE;
+}
 	
-	//Перемещаем тему из буфера в мониторинг постоянный
-	if ($_POST['action'] == 'transfer_from_buffer')
-	{
-    	Database::transferFromBuffer($_POST['id']);
-    	?>
-		Переношу...
-		<?php
-		return TRUE;
-	}
-	
-	//Помечаем тему для скачивания
-	if ($_POST['action'] == 'threme_add')
-	{
-		$update = Database::updateThremesToDownload($_POST['id']);
-		if ($update)
-		{
-			$return['error'] = FALSE;
-		}
-		else
-		{		
-			$return['error'] = TRUE;
-			$return['msg'] = 'Пометить тему для закачки.';
-		}
-		echo json_encode($return);
-	}
-	
-	//Удаляем мониторинг
-	if ($_POST['action'] == 'del')
-	{
-		Database::deletItem($_POST['id']);
-		?>
-		Удаляю...
-		<?php
-		return TRUE;
-	}
-	
-	//Обновляем личные данные
-	if ($_POST['action'] == 'update_credentials')
-	{
-		Database::setCredentials($_POST['id'], $_POST['log'], $_POST['pass']);
-		?>
-		Данные для трекера обновлены!
-		<?php
-		return TRUE;
-	}
-	
-	//Обновляем настройки
-	if ($_POST['action'] == 'update_settings')
-	{
-		$path = Sys::checkPath($_POST['path']);
-		Database::updateSettings('path', $path);
-		Database::updateSettings('email', $_POST['email']);
-		
-		if ( ! empty($_POST['send']))
-			$send = 1;
-		else 
-			$send = 0;
-		Database::updateSettings('send', $send);
-		
-		if ( ! empty($_POST['send_warning']))
-			$send_warning = 1;
-		else 
-			$send_warning = 0;
-		Database::updateSettings('send_warning', $send_warning);
-		
-		if ( ! empty($_POST['auth']))
-			$auth = 1;
-		else 
-			$auth = 0;
-		Database::updateSettings('auth', $auth);
-		
-		if ( ! empty($_POST['proxy']))
-			$proxy = 1;
-		else 
-			$proxy = 0;
-		Database::updateSettings('proxy', $proxy);
-		Database::updateSettings('proxyAddress', $_POST['proxyAddress']);
+//Удаляем тему из буфера
+function OnAction_delete_from_buffer(){
+	Database::deleteFromBuffer($_POST['id']);
+	echo "Удаляю...";
+	return TRUE;
+}	
 
-        if ( ! empty($_POST['torrent']))
-			$torrent = 1;
-		else 
-			$torrent = 0;
-        Database::updateSettings('useTorrent', $torrent);
-        Database::updateSettings('torrentClient', $_POST['torrentClient']);
-        Database::updateSettings('torrentAddress', $_POST['torrentAddress']);
-        Database::updateSettings('torrentLogin', $_POST['torrentLogin']);
-        Database::updateSettings('torrentPassword', $_POST['torrentPassword']);
-        $pathToDownload = Sys::checkPath($_POST['pathToDownload']);
-        Database::updateSettings('pathToDownload', $pathToDownload);
-        
-        if ( ! empty($_POST['deleteTorrent']))
-			$deleteTorrent = 1;
-		else 
-			$deleteTorrent = 0;
-        Database::updateSettings('deleteTorrent', $deleteTorrent);
-        
-        if ( ! empty($_POST['deleteOldFiles']))
-			$deleteOldFiles = 1;
-		else 
-			$deleteOldFiles = 0;
-        Database::updateSettings('deleteOldFiles', $deleteOldFiles);
-		?>
-		Настройки монитора обновлены.
-		<?php
+//Очищаем весь список тем
+function OnAction_threme_clear(){
+	$array = Database::selectAllFromBuffer();
+	for($i=0; $i<count($array); $i++)
+	{
+    	Database::deleteFromBuffer($array[$i]['id']);
+	}
+}
+	
+//Перемещаем тему из буфера в мониторинг постоянный
+function OnAction_transfer_from_buffer(){
+	Database::transferFromBuffer($_POST['id']);
+	echo "Переношу...";
+	return TRUE;
+}
+
+//Помечаем тему для скачивания
+function OnAction_threme_add(){
+	$update = Database::updateThremesToDownload($_POST['id']);
+	if ($update)
+	{
+		$return['error'] = FALSE;
+	}
+	else
+	{		
+		$return['error'] = TRUE;
+		$return['msg'] = 'Пометить тему для закачки.';
+	}
+	echo json_encode($return);
+}	
+
+//Удаляем мониторинг
+function OnAction_del(){
+	Database::deletItem($_POST['id']);
+	echo "Удаляю...";
+	return TRUE;
+}
+
+//Обновляем личные данные
+function OnAction_update_credentials(){
+	Database::setCredentials($_POST['id'], $_POST['log'], $_POST['pass']);
+	echo "Данные для трекера обновлены!";
+	return TRUE;
+}
+
+function notEmptyPost($key){
+    if(!empty($_POST[$key]))
+        return 1;
+    else 
+        return 0;
+}
+
+//Обновляем настройки
+function OnAction_update_settings(){
+	$path = Sys::checkPath($_POST['path']);
+	Database::updateSettings('path', $path);
+	Database::updateSettings('email', $_POST['email']);
+	
+	Database::updateSettings('send', notEmptyPost('send'));
+	Database::updateSettings('send_warning', notEmptyPost('send_warning'));
+	Database::updateSettings('auth', notEmptyPost('auth'));
+	
+	Database::updateSettings('proxy', notEmptyPost('proxy'));
+
+	Database::updateSettings('proxyAddress', $_POST['proxyAddress']);
+
+    Database::updateSettings('useTorrent', notEmptyPost('torrent'));
+    Database::updateSettings('torrentClient', $_POST['torrentClient']);
+    Database::updateSettings('torrentAddress', $_POST['torrentAddress']);
+    Database::updateSettings('torrentLogin', $_POST['torrentLogin']);
+    Database::updateSettings('torrentPassword', $_POST['torrentPassword']);
+    $pathToDownload = Sys::checkPath($_POST['pathToDownload']);
+    Database::updateSettings('pathToDownload', $pathToDownload);
+    Database::updateSettings('deleteOldFiles', notEmptyPost('deleteOldFiles'));
+	echo "Настройки монитора обновлены.";
+	return TRUE;
+}
+
+//Меняем пароль
+function OnAction_change_pass(){
+	$pass = md5($_POST['pass']);
+	$q = Database::updateCredentials($pass);
+	if ($q)
+	{
+		$return['error'] = FALSE;
+	}
+	else
+	{
+		$return['error'] = TRUE;
+		$return['msg'] = 'Не удалось сменить пароль!';
+	}
+	echo json_encode($return);
+}
+
+//Добавляем тему на закачку
+function OnAction_download_thremes(){
+	if ( ! empty($_POST['checkbox']))
+	{
+		$arr = $_POST['checkbox'];
+		foreach ($arr as $id => $val)
+		{
+			Database::updateDownloadThreme($id);
+		}
+		echo count($arr).' тем помечено для закачки.';
 		return TRUE;
 	}
+	Database::updateDownloadThremeNew();
+}
 	
-	//Меняем пароль
-	if ($_POST['action'] == 'change_pass')
-	{
-		$pass = md5($_POST['pass']);
-		$q = Database::updateCredentials($pass);
-		if ($q)
-		{
-			$return['error'] = FALSE;
-		}
-		else
-		{
-			$return['error'] = TRUE;
-			$return['msg'] = 'Не удалось сменить пароль!';
-		}
-		echo json_encode($return);
-	}
 	
-	//Добавляем тему на закачку
-	if ($_POST['action'] == 'download_thremes')
-	{
-		if ( ! empty($_POST['checkbox']))
-		{
-			$arr = $_POST['checkbox'];
-			foreach ($arr as $id => $val)
-			{
-				Database::updateDownloadThreme($id);
-			}
-			echo count($arr).' тем помечено для закачки.';
-			return TRUE;
-		}
-		Database::updateDownloadThremeNew();
-	}	
+function OnAction_update_reset(){
+    Updater::action('update_reset');
+}
+
+function OnAction_update_nextstep(){
+    Updater::action('update_nextstep');
+}
+
+if (isset($_POST['action']))
+{
+    return call_user_func("OnAction_".preg_replace("/[^0-9a-zA-Z_]+/", "", $_POST['action']));
 }
 
 if (isset($_GET['action']))
