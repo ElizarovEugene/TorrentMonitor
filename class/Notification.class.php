@@ -1,12 +1,13 @@
 <?php
 class Notification
 {
+    private static $instance;
 	private static $headers;
 	private static $errors;
 
     private function __construct()
     {
-    	$this->headers = "From: TorrentMonitor 0.6\r\n";
+    	$this->headers = "From: TorrentMonitor\r\n";
 		$this->headers .= "MIME-Version: 1.0\r\n";
 		$this->headers .= "Content-type: text/html; charset=utf-8\r\n";
     }
@@ -38,7 +39,7 @@ class Notification
 	public static function send($settingEmail, $date, $tracker, $message, $header_message)
 	{
 		$msg = "Дата: {$date}\nТрекер: {$tracker}\nСообщение: {$message}";
-		mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor 2: ".$header_message).'?=', $msg, self::$headers);		
+		mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor 2: ".$header_message).'?=', $msg, Notification::getInstance()->headers);		
 	}
 	
 	public static function sendNotification($type, $date, $tracker, $message)
