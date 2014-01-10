@@ -215,15 +215,19 @@ class Sys
         $path = Database::getSetting('path').$file;
         file_put_contents($path, $torrent);
 
-        $torrentClient = Database::getSetting('torrentClient');
-        
-        $dir = dirname(__FILE__).'/';
-        include_once $dir.$torrentClient.'.class.php';
-        call_user_func($torrentClient.'::addNew', $id, $path, $hash, $tracker);
-        
-        $deleteTorrent = Database::getSetting('deleteTorrent');
-        if ($deleteTorrent)
-            unlink($path);
+        $useTorrent = Database::getSetting('useTorrent');
+        if ($useTorrent)
+        {
+            $torrentClient = Database::getSetting('torrentClient');
+            
+            $dir = dirname(__FILE__).'/';
+            include_once $dir.$torrentClient.'.class.php';
+            call_user_func($torrentClient.'::addNew', $id, $path, $hash, $tracker);
+            
+            $deleteTorrent = Database::getSetting('deleteTorrent');
+            if ($deleteTorrent)
+                unlink($path);
+        }
 	}
 	
 	//преобразуем месяц из числового в текстовый
