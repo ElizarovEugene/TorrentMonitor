@@ -30,7 +30,6 @@ class lostfilm
         		'returntransfer' => 1,
         		'url'            => $url,
         		'postfields'     => $postfields,
-        		'convert'        => array('windows-1251', 'utf-8'),
         	)
         );
 
@@ -187,7 +186,7 @@ class lostfilm
 				$page = lostfilm::login('hard', $login, $password);
 				preg_match_all('/name=\"(.*)\"/iU', $page, $array_names);
 				preg_match_all('/value=\"(.*)\"/iU', $page, $array_values);
-				
+
 				if ( ! empty($array_names) &&  ! empty($array_values))
 				{
 					$post = '';
@@ -195,6 +194,7 @@ class lostfilm
 						$post .= $array_names[1][$i+1].'='.$array_values[1][$i].'&';
 				}
 				$post = substr($post, 0, -1);
+
 				$page = Sys::getUrlContent(
 		        	array(
 		        		'type'           => 'POST',
@@ -205,7 +205,7 @@ class lostfilm
 		        		'convert'        => array('windows-1251', 'utf-8'),
 		        	)
 		        );
-				
+
 				if (preg_match_all('/Set-Cookie: (\w*)=(\S*)/', $page, $array))
 				{
 					lostfilm::getCookies($tracker, $array);
