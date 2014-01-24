@@ -28,6 +28,7 @@ INSERT INTO credentials VALUES (5, 'rutor.org', ' ', ' ', '');
 INSERT INTO credentials VALUES (6, 'tfile.me', ' ', ' ', '');
 INSERT INTO credentials VALUES (7, 'kinozal.tv', '', '', '');
 INSERT INTO credentials VALUES (8, 'anidub.com', '', '', '');
+INSERT INTO credentials VALUES (9, 'baibako.tv', '', '', '');
 
 CREATE TABLE "settings" (
   "id" INTEGER  PRIMARY KEY NOT NULL,

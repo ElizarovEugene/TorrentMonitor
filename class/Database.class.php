@@ -235,7 +235,7 @@ class Database
     	elseif ($order == 'dateDesc')
     		$order = 'timestamp DESC';
     	else
-    		$order = 'tracker, name';
+    		$order = 'tracker, name, hd';
     		
         if (Database::getDbType() == 'pgsql')
         {

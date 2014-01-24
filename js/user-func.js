@@ -122,25 +122,14 @@ $("#serial_add").submit(function()
 		n = $(n_f).val(),
 		h_f = $form.find('input[name="hd"]');
 		
-		if (t == 'novafilm.tv')
+	h = $(h_f).val();
+	for (var i = 0; i < h_f.length; i++)
+	{
+		if (h_f[i].checked)
 		{
-			h = $(h_f).attr('checked');
-			if (h == 'checked')
-				var $form = $(this), h = 1;
-			else
-				var $form = $(this), h = 0;
+			var $form = $(this), h = h_f[i].value
 		}
-		if (t == 'lostfilm.tv')
-		{
-			h = $(h_f).val();
-			for (var i = 0; i < h_f.length; i++)
-			{
-				if (h_f[i].checked)
-				{
-					var $form = $(this), h = h_f[i].value
-				}
-			}
-		}
+	}
 
     if (t == '')
     {
@@ -428,7 +417,7 @@ function changefunc()
 {
     var select = document.getElementById("selectfunc");
     var selectedText = select.options[select.selectedIndex].text;
-    var a = ['anidub.com', 'kinozal.tv', 'lostfilm.tv', 'nnm-club.me', 'novafilm.tv', 'rutracker.org'];
+    var a = ['anidub.com', 'baibako.tv', 'kinozal.tv', 'lostfilm.tv', 'nnm-club.me', 'novafilm.tv', 'rutracker.org'];
     for (var i = 0; i < a.length; i++)
     {
         var e = a[i];
@@ -441,14 +430,16 @@ function changefunc()
     }
 }
 
-//Меняем checkbox на radiobutton
+//Меняем radiobutton
 function changeField()
 {
 	var tracker = document.getElementById("tracker").value;
+    if (tracker == 'baibako.tv')
+        $('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> HD 720<br /><input type="radio" name="hd" value="2"> HD 1080</span>');
 	if (tracker == 'lostfilm.tv')
-		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD качество<br /><input type="radio" name="hd" value="1"> HD качество<br /><input type="radio" name="hd" value="2"> HD MP4</span>');
+		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> HD 720<br /><input type="radio" name="hd" value="2"> HD 720 MP4</span>');
 	if (tracker == 'novafilm.tv')
-		$('#changedField').empty().append('<input type="checkbox" name="hd"> HD качество</label>');
+		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> HD 720</span>');
 }
 
 //Показать/скрыть настройки proxy

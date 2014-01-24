@@ -47,7 +47,8 @@ VALUES
 	(5,'rutor.org', ' ', ' ',''),
 	(6,'tfile.me', ' ', ' ',''),
 	(7,'kinozal.tv', '', '',''),
-	(8,'anidub.com', '', '','');
+	(8,'anidub.com', '', '',''),
+	(9,'baibako.tv', '', '','');
 
 /*!40000 ALTER TABLE `credentials` ENABLE KEYS */;
 UNLOCK TABLES;
