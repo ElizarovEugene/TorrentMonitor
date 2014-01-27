@@ -23,6 +23,7 @@
             <option></option>
             <option value="baibako.tv">baibako.tv</option>
             <option value="lostfilm.tv">lostfilm.tv</option>
+            <option value="newstudio.tv">newstudio.tv</option>
             <option value="novafilm.tv">novafilm.tv</option>
         </select>
     </p>

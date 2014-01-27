@@ -1,3 +1,4 @@
 INSERT INTO `credentials` (`id`, `tracker`, `log`, `pass`, `cookie`)
 VALUES
-	(9,'baibako.tv', '', '','');
+	(10,'casstudio.tv', '', '',''),
+	(11,'newstudio.tv', '', '','');

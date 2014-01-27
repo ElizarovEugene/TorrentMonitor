@@ -1,5 +1,5 @@
 <?php
-class anidub
+class casstudio
 {
 	protected static $sess_cookie;
 	protected static $exucution;
@@ -12,19 +12,18 @@ class anidub
         	array(
         		'type'           => 'POST',
         		'returntransfer' => 1,
-        		'url'            => 'http://tr.anidub.com',
+        		'url'            => 'http://casstudio.tv/',
         		'cookie'         => $sess_cookie,
-        		'sendHeader'     => array('Host' => 'tr.anidub.com', 'Content-length' => strlen($sess_cookie)),
-        		'convert'        => array('windows-1251', 'utf-8'),
+        		'sendHeader'     => array('Host' => 'casstudio.tv', 'Content-length' => strlen($sess_cookie)),
         	)
         );
 
-		if (preg_match('/<span style=\"color:#000000;\" title=\"Пользователь\">.*<\/span>/', $result))
+		if (preg_match('/<a href=\"logout\.php\">Выход [ (.*) ]<\/a>/', $result))
 			return TRUE;
 		else
 			return FALSE;
 	}
-	
+
 	//функция проверки введёного URL`а
 	public static function checkRule($data)
 	{
@@ -33,19 +32,20 @@ class anidub
 		else
 			return TRUE;
 	}
-	
+
 	//функция преобразования даты
 	private static function dateNumToString($data)
-	{
-        $pieces = explode(' ', $data);
-        $dates = explode('-', $pieces[0]);
-        $m = Sys::dateNumToString($dates[1]);
-        $date = $dates[2].' '.$m.' '.$dates[0];
-        $time = substr($pieces[1], 0, -3);
-        $dateTime = $date.' '.$time;
-        return $dateTime;
-	}
-	
+    {
+    	$arr = preg_split('/\s/', $data);
+    	
+    	$dates = preg_split('/-/', $arr[0]);
+    	$date = $dates[2].' '.Sys::dateNumToString($dates[1]).' '.$dates[0];
+    	
+    	$time = substr($arr[1], 0, -3);
+    	
+    	return $date.' в '.$time;
+    }
+
 	//функция получения кук
 	protected static function getCookie($tracker)
 	{
@@ -54,17 +54,17 @@ class anidub
 		{
 			//получаем учётные данные
 			$credentials = Database::getCredentials($tracker);
-			$login = iconv("utf-8", "windows-1251", $credentials['login']);
+			$login = iconv('utf-8', 'windows-1251', $credentials['login']);
 			$password = $credentials['password'];
-			
+
 			//авторизовываемся на трекере
 			$page = Sys::getUrlContent(
             	array(
             		'type'           => 'POST',
             		'header'         => 1,
             		'returntransfer' => 1,
-            		'url'            => 'http://tr.anidub.com/takelogin.php',
-            		'postfields'     => 'username='.$login.'&password='.$password,
+            		'url'            => 'http://casstudio.tv/takelogin.php',
+            		'postfields'     => 'login=submit&username='.$login.'&password='.$password.'&x=0&y=0',
             		'convert'        => array('windows-1251', 'utf-8'),
             	)
             );
@@ -72,81 +72,73 @@ class anidub
 			if ( ! empty($page))
 			{
 				//проверяем подходят ли учётные данные
-				if (preg_match('/<td class=\"embedded\">Вы не зарегистрированы в системе\.<\/td>/', $page, $array))
+				if (preg_match('/<b>Ошибка входа<\/b><br \/>Имя пользователя или пароль неверны/', $page, $array))
 				{
 					//устанавливаем варнинг
 					Errors::setWarnings($tracker, 'credential_wrong');
 					//останавливаем процесс выполнения, т.к. не может работать без кук
-					anidub::$exucution = FALSE;
+					casstudio::$exucution = FALSE;
 				}
-                //проверяем подходят ли учётные данные
-				elseif (preg_match_all('/<td class=\"embedded\">Имя пользователя или пароль неверны<\/td>/', $page, $array))
-				{
-					//устанавливаем варнинг
-					Errors::setWarnings($tracker, 'credential_wrong');
-					//останавливаем процесс выполнения, т.к. не может работать без кук
-					anidub::$exucution = FALSE;
-				}				
 				//если подходят - получаем куки
-				elseif (preg_match_all('/Set-Cookie: (.*);/U', $page, $array))
+				elseif (preg_match_all('/Set-Cookie: (.*);/iU', $page, $array))
 				{
-					anidub::$sess_cookie = $array[1][1].'; '.$array[1][2].';';
-					Database::setCookie($tracker, anidub::$sess_cookie);
+					casstudio::$sess_cookie = implode('; ', $array[1]);
+					Database::setCookie($tracker, casstudio::$sess_cookie);
 					//запускам процесс выполнения, т.к. не может работать без кук
-					anidub::$exucution = TRUE;
+					casstudio::$exucution = TRUE;
 				}
 				else
 				{
 					//устанавливаем варнинг
-					if (anidub::$warning == NULL)
+					if (casstudio::$warning == NULL)
 					{
-						anidub::$warning = TRUE;
+						casstudio::$warning = TRUE;
 						Errors::setWarnings($tracker, 'not_available');
 					}
 					//останавливаем процесс выполнения, т.к. не может работать без кук
-					anidub::$exucution = FALSE;
+					casstudio::$exucution = FALSE;
 				}
 			}
 			//если вообще ничего не найдено
 			else
 			{
 				//устанавливаем варнинг
-				if (anidub::$warning == NULL)
+				if (casstudio::$warning == NULL)
 				{
-					anidub::$warning = TRUE;
+					casstudio::$warning = TRUE;
 					Errors::setWarnings($tracker, 'not_available');
 				}
 				//останавливаем процесс выполнения, т.к. не может работать без кук
-				anidub::$exucution = FALSE;
+				casstudio::$exucution = FALSE;
 			}
 		}
 		else
 		{
 			//устанавливаем варнинг
-			if (anidub::$warning == NULL)
+			if (casstudio::$warning == NULL)
 			{
-				anidub::$warning = TRUE;
+				casstudio::$warning = TRUE;
 				Errors::setWarnings($tracker, 'credential_miss');
 			}
 			//останавливаем процесс выполнения, т.к. не может работать без кук
-			anidub::$exucution = FALSE;
+			casstudio::$exucution = FALSE;
 		}
 	}
-	
+
 	//основная функция
 	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash)
 	{
 		$cookie = Database::getCookie($tracker);
-		if (anidub::checkCookie($cookie))
+		if (casstudio::checkCookie($cookie))
 		{
-			anidub::$sess_cookie = $cookie;
+			casstudio::$sess_cookie = $cookie;
 			//запускам процесс выполнения
-			anidub::$exucution = TRUE;
-		}			
+			casstudio::$exucution = TRUE;
+		}
 		else
-    		anidub::getCookie($tracker);
-    		
-		if (anidub::$exucution)
+    		casstudio::getCookie($tracker);
+
+		if (casstudio::$exucution)
 		{
 			//получаем страницу для парсинга
             $page = Sys::getUrlContent(
@@ -154,17 +146,16 @@ class anidub
             		'type'           => 'POST',
             		'header'         => 0,
             		'returntransfer' => 1,
-            		'url'            => 'http://tr.anidub.com/details.php?id='.$torrent_id,
-            		'cookie'         => anidub::$sess_cookie,
-            		'sendHeader'     => array('Host' => 'tr.anidub.com', 'Content-length' => strlen(anidub::$sess_cookie)),
-            		'convert'        => array('windows-1251', 'utf-8'),
+            		'url'            => 'http://casstudio.tv/details.php?id='.$torrent_id,
+            		'cookie'         => casstudio::$sess_cookie,
+            		'sendHeader'     => array('Host' => 'casstudio.tv', 'Content-length' => strlen(casstudio::$sess_cookie)),
             	)
             );
-//print_r($page);
+
 			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
-				if (preg_match('/<td width=\"\" class=\"heading\" valign=\"top\" align=\"right\">Добавлен<\/td><td valign=\"top\" align=\"left\">(.*)<\/td>/', $page, $array))
+				if (preg_match('/<li><strong>Дата:<\/strong> (.*)<\/li>/', $page, $array))
 				{
 					//проверяем удалось ли получить дату со страницы
 					if (isset($array[1]))
@@ -176,78 +167,89 @@ class anidub
 							Database::clearWarnings($tracker);
 							//приводим дату к общему виду
 							$date = $array[1];
-							$date_str = anidub::dateNumToString($array[1]);
+							$date_str = casstudio::dateNumToString($array[1]);
 							//если даты не совпадают, перекачиваем торрент
 							if ($date != $timestamp)
 							{
-                                preg_match('/<a href=\"download\.php\?id=(\d{2,6})&amp;name=(.*)\">/U', $page, $array);
-                                $torrent_id = $array[1];
-                                $torrent_id_name = $array[2];
-								//сохраняем торрент в файл
-                                $torrent = Sys::getUrlContent(
+							    if (preg_match('/download\.php\?id='.$torrent_id.'&amp;name=(.*)\.torrent/', $page, $link))
+							    {
+    								//сохраняем торрент в файл
+                                    $torrent = Sys::getUrlContent(
                                 	array(
                                 		'type'           => 'POST',
                                 		'returntransfer' => 1,
-                                		'url'            => 'http://tr.anidub.com/download.php?id='.$torrent_id.'&name='.$torrent_id_name,
-                                		'cookie'         => anidub::$sess_cookie,
-                                		'sendHeader'     => array('Host' => 'tr.anidub.com', 'Content-length' => strlen(anidub::$sess_cookie)),
-                                		'referer'        => 'http://tr.anidub.com/details.php?id='.$torrent_id,
-                                	)
-                                );
-								Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash);
-								//обновляем время регистрации торрента в базе
-								Database::setNewDate($id, $date);
-								//отправляем уведомлении о новом торренте
-								$message = $name.' обновлён.';
-								Notification::sendNotification('notification', $date_str, $tracker, $message);
+                                		'url'            => 'http://casstudio.tv/download.php?id='.$torrent_id.'&name='.$link[1].'.torrent',
+                                		'cookie'         => casstudio::$sess_cookie.'; bb_dl='.$torrent_id,
+                                		'sendHeader'     => array('Host' => 'casstudio.tv', 'Content-length' => strlen(casstudio::$sess_cookie.'; bb_dl='.$torrent_id)),
+                                		'referer'        => 'http://casstudio.tv/details.php?id='.$torrent_id,
+                                    	)
+                                    );
+    								Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash);
+    								//обновляем время регистрации торрента в базе
+    								Database::setNewDate($id, $date);
+    								//отправляем уведомлении о новом торренте
+    								$message = $name.' обновлён.';
+    								Notification::sendNotification('notification', $date_str, $tracker, $message);
+                                }
+                                else
+                                {
+                                    //устанавливаем варнинг
+        							if (casstudio::$warning == NULL)
+        							{
+        								casstudio::$warning = TRUE;
+        								Errors::setWarnings($tracker, 'not_available');
+        							}
+        							//останавливаем процесс выполнения, т.к. не может работать без кук
+        							casstudio::$exucution = FALSE;
+                                }
 							}
 						}
 						else
 						{
 							//устанавливаем варнинг
-							if (anidub::$warning == NULL)
+							if (casstudio::$warning == NULL)
 							{
-								anidub::$warning = TRUE;
+								casstudio::$warning = TRUE;
 								Errors::setWarnings($tracker, 'not_available');
 							}
 							//останавливаем процесс выполнения, т.к. не может работать без кук
-							anidub::$exucution = FALSE;
+							casstudio::$exucution = FALSE;
 						}
 					}
 					else
 					{
 						//устанавливаем варнинг
-						if (anidub::$warning == NULL)
+						if (casstudio::$warning == NULL)
 						{
-							anidub::$warning = TRUE;
+							casstudio::$warning = TRUE;
 							Errors::setWarnings($tracker, 'not_available');
 						}
 						//останавливаем процесс выполнения, т.к. не может работать без кук
-						anidub::$exucution = FALSE;
+						casstudio::$exucution = FALSE;
 					}
 				}
 				else
 				{
 					//устанавливаем варнинг
-					if (anidub::$warning == NULL)
+					if (casstudio::$warning == NULL)
 					{
-						anidub::$warning = TRUE;
+						casstudio::$warning = TRUE;
 						Errors::setWarnings($tracker, 'not_available');
 					}
 					//останавливаем процесс выполнения, т.к. не может работать без кук
-					anidub::$exucution = FALSE;
+					casstudio::$exucution = FALSE;
 				}
-			}			
+			}
 			else
 			{
 				//устанавливаем варнинг
-				if (anidub::$warning == NULL)
+				if (casstudio::$warning == NULL)
 				{
-					anidub::$warning = TRUE;
+					casstudio::$warning = TRUE;
 					Errors::setWarnings($tracker, 'not_available');
 				}
 				//останавливаем процесс выполнения, т.к. не может работать без кук
-				anidub::$exucution = FALSE;
+				casstudio::$exucution = FALSE;
 			}
 		}
 	}
