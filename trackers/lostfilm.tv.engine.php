@@ -19,7 +19,7 @@ class lostfilm
 		}
 		if ($type == 'hard')
 		{
-			$url = 'http://login.bogi.ru/login.php?referer=http%3A%2F%2Fwww.lostfilm.tv%2F';
+			$url = 'http://login1.bogi.ru/login.php?referer=http%3A%2F%2Fwww.lostfilm.tv%2F';
 			$postfields = 'login='.$login.'&password='.$password.'&module=1&target=http%3A%2F%2Flostfilm.tv%2F&repage=user&act=login';
 		}
 
@@ -172,11 +172,11 @@ class lostfilm
 		{
 			//получаем учётные данные
 			$credentials = Database::getCredentials($tracker);
-			$login = iconv("utf-8", "windows-1251", $credentials['login']);
+			$login = iconv('utf-8', 'windows-1251', $credentials['login']);
 			$password = $credentials['password'];
 			
 			$page = lostfilm::login('simple', $login, $password);
-			if (preg_match_all("/Set-Cookie: (\w*)=(\S*)/", $page, $array))
+			if (preg_match_all('/Set-Cookie: (\w*)=(\S*)/', $page, $array))
 			{
 				lostfilm::getCookies($tracker, $array);
 				lostfilm::$exucution = TRUE;
@@ -186,7 +186,7 @@ class lostfilm
 				$page = lostfilm::login('hard', $login, $password);
 				preg_match_all('/name=\"(.*)\"/iU', $page, $array_names);
 				preg_match_all('/value=\"(.*)\"/iU', $page, $array_values);
-
+print_r($page);
 				if ( ! empty($array_names) &&  ! empty($array_values))
 				{
 					$post = '';
@@ -212,6 +212,7 @@ class lostfilm
 					lostfilm::$exucution = TRUE;
 				}	
 			}
+			
 		}
 		else
 		{
