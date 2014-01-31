@@ -197,16 +197,18 @@ class baibako
 				if (baibako::$exucution)
 				{
 					//получаем страницу
-			        baibako::$page = Sys::getUrlContent(
+			        $page = Sys::getUrlContent(
 			        	array(
 			        		'type'           => 'GET',
 			        		'returntransfer' => 1,
 			        		'url'            => 'http://baibako.tv/rss2.php?feed=dl',
 			        		'cookie'         => baibako::$sess_cookie,
                             'sendHeader'     => array('Host' => 'baibako.tv', 'Content-length' => strlen(baibako::$sess_cookie)),
+                            'convert'        => array('windows-1251', 'utf-8'),
 			        	)
 			        );
 
+                    baibako::$page = str_replace('<?xml version="1.0" encoding="windows-1251" ?>','<?xml version="1.0" encoding="utf-8"?>', $page);
 					if ( ! empty(baibako::$page))
 					{
 						//читаем xml

@@ -186,7 +186,7 @@ class lostfilm
 				$page = lostfilm::login('hard', $login, $password);
 				preg_match_all('/name=\"(.*)\"/iU', $page, $array_names);
 				preg_match_all('/value=\"(.*)\"/iU', $page, $array_values);
-print_r($page);
+
 				if ( ! empty($array_names) &&  ! empty($array_values))
 				{
 					$post = '';
