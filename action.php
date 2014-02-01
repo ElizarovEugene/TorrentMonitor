@@ -29,6 +29,7 @@ function OnAction_enter(){
 
 //Добавляем тему для мониторинга
 function OnAction_torrent_add(){
+    global $dir;
 	if ($url = parse_url($_POST['url']))
 	{
 		$tracker = $url['host'];
@@ -88,6 +89,7 @@ function OnAction_torrent_add(){
 		
 	//Добавляем сериал для мониторинга
 function OnAction_serial_add(){
+    global $dir;
 	$tracker = $_POST['tracker'];
 	if (is_array(Database::getCredentials($tracker)))
 	{
@@ -112,7 +114,7 @@ function OnAction_serial_add(){
                 echo "Название содержит недопустимые символы.";
 		}
 		else 
-		    echo "Отсутствует модуль для трекера - <b>$tracker</b>.";
+		    echo "Отсутствует модуль ''$engineFile'' для трекера - <b>$tracker</b>.";
 	}
 	else
 	    echo "Вы не можете следить за этим сериалом на трекере - <b>$tracker</b>, пока не введёте свои учётные данные!";
@@ -121,6 +123,7 @@ function OnAction_serial_add(){
 	
 	//Добавляем пользователя для мониторинга
 function OnAction_user_add(){
+    global $dir;
 	$tracker = $_POST['tracker'];
 	if (is_array(Database::getCredentials($tracker)))
 	{

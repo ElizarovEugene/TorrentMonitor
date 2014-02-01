@@ -396,6 +396,7 @@ class DownloadStep extends Phase1Step {
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         if(!$result or $httpCode != 200){
             $this->message  = "Ошибка при загрузке ".updateUrl.": ".curl_error($ch);
+            curl_close($ch);
             return false;
         }        
         curl_close($ch);
