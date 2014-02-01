@@ -1,4 +1,4 @@
-/*
+﻿/*
  *
  * @author Maxim Sofronov
  * @link maxsof.ru
@@ -448,6 +448,9 @@ span.quality {
 	display: inline-block;
 }
 
+/* ==========================================================================
+   Прогресс обновления
+   ========================================================================== */
 #updater #progress_border {
 	position: relative;
 	border: 1px black solid;
@@ -462,7 +465,7 @@ span.quality {
 #updater #progress {
 	text-align: center;
 	position: absolute;
-	z-index: 50;
+/*	z-index: 50; */
 	width: 100%;
 }
 #updater .invert_percents{

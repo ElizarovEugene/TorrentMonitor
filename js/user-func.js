@@ -28,132 +28,121 @@ $(document).ready(function()
 	});
 	
 	//Передаём пароль
-	$("#enter").submit(function() {
-		var $form = $(this),p = $form.find('input[name="password"]').val();
-		$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-		$.post("action.php",{action: 'enter', password: p},
-			function(data) {
-				if (data.error)
-					$('#notice').empty().attr('background', '#FF6633').append(data.msg).delay(3000).fadeOut(400);
-				else
-	          		document.location.reload();
-	          	console.log(data.error)
-			}, "json"
-		);
-		
-		return false;
-	});
+    $("#enter").submit(function() {
+        var $form = $(this),p = $form.find('input[name="password"]').val();
+        $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+        $.post("action.php",{action: 'enter', password: p},
+            function(data) {
+                if (data.error)
+                    $('#notice').empty().attr('background', '#FF6633').append(data.msg).delay(3000).fadeOut(400);
+                else
+                    document.location.reload();
+                console.log(data.error)
+            }, "json"
+        );
+        
+        return false;
+    });
 
-	//Передаём тему для мониторинга
-	$("#torrent_add").submit(function()
-	{
-		var $form = $(this),
-			s = $form.find('input[type=submit]'),
-			n_f = $form.find('input[name="name"]'),
-			n = $(n_f).val(),
-			u_f = $form.find('input[name="url"]');
-			u = $(u_f).val();
-		
-	    if (u == '')
-	    {
-	    	alert("Вы не указали ссылку на тему!");
-	    	return false;
-	    }
-									
-		$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-		$.post("action.php",{action: 'torrent_add', name: n, url: u},
-			function(data) {
-				$('#notice').empty().append(data).delay(3000).fadeOut(400);
-				$(n_f).val('');
-				$(u_f).val('');
-			}
-		);
-		return false;
-	});
+    //Передаём тему для мониторинга
+    $("#torrent_add").submit(function()
+    {
+        var $form = $(this),
+            s = $form.find('input[type=submit]'),
+            n_f = $form.find('input[name="name"]'),
+            n = $(n_f).val(),
+            u_f = $form.find('input[name="url"]');
+            u = $(u_f).val();
+        
+        if (u == '')
+        {
+            alert("Вы не указали ссылку на тему!");
+            return false;
+        }
+                                    
+        $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+        $.post("action.php",{action: 'torrent_add', name: n, url: u},
+            function(data) {
+                $('#notice').empty().append(data).delay(3000).fadeOut(400);
+                $(n_f).val('');
+                $(u_f).val('');
+            }
+        );
+        return false;
+    });
 
-	//Передаём сериал для мониторинга
-	$("#serial_add").submit(function()
-	{
-		var $form = $(this),
-			s = $form.find('input[type=submit]'),
-			t = $form.find('select[name="tracker"]').val(),
-			n_f = $form.find('input[name="name"]'),
-			n = $(n_f).val(),
-			h_f = $form.find('input[name="hd"]');
-			
-			if (t == 'novafilm.tv')
-			{
-				h = $(h_f).attr('checked');
-				if (h == 'checked')
-					var $form = $(this), h = 1;
-				else
-					var $form = $(this), h = 0;
-			}
-			if (t == 'lostfilm.tv')
-			{
-				h = $(h_f).val();
-				for (var i = 0; i < h_f.length; i++)
-				{
-					if (h_f[i].checked)
-					{
-						var $form = $(this), h = h_f[i].value
-					}
-				}
-			}
+    //Передаём сериал для мониторинга
+    $("#serial_add").submit(function()
+    {
+        var $form = $(this),
+            s = $form.find('input[type=submit]'),
+            t = $form.find('select[name="tracker"]').val(),
+            n_f = $form.find('input[name="name"]'),
+            n = $(n_f).val(),
+            h_f = $form.find('input[name="hd"]');
+            
+        h = $(h_f).val();
+        for (var i = 0; i < h_f.length; i++)
+        {
+            if (h_f[i].checked)
+            {
+                var $form = $(this), h = h_f[i].value
+            }
+        }
 
-	    if (t == '')
-	    {
-	    	alert("Вы не выбрали трекер!");
-	    	return false;
-	    }
-	    
-	    if (n == '')
-	    {
-	    	alert("Вы не указали название сериала!");
-	    	return false;
-	    }     
+        if (t == '')
+        {
+            alert("Вы не выбрали трекер!");
+            return false;
+        }
+        
+        if (n == '')
+        {
+            alert("Вы не указали название сериала!");
+            return false;
+        }     
 
-		$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-		$.post("action.php",{action: 'serial_add', tracker: t, name: n, hd: h},
-			function(data) {
-				$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
-				$(n_f).val('');
-				$(h_f).removeAttr('checked');
-			}
-		);
-		return false;
-	});
+        $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+        $.post("action.php",{action: 'serial_add', tracker: t, name: n, hd: h},
+            function(data) {
+                $('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+                $(n_f).val('');
+                $(h_f).removeAttr('checked');
+            }
+        );
+        return false;
+    });
 
-	//Передаём пользователя для мониторинга
-	$("#user_add").submit(function()
-	{
-		var $form = $(this),
-			s = $form.find('input[type=submit]'),
-			t = $form.find('select[name="tracker"]').val(),
-			n_f = $form.find('input[name="name"]'),
-			n = $(n_f).val();
+    //Передаём пользователя для мониторинга
+    $("#user_add").submit(function()
+    {
+        var $form = $(this),
+            s = $form.find('input[type=submit]'),
+            t = $form.find('select[name="tracker"]').val(),
+            n_f = $form.find('input[name="name"]'),
+            n = $(n_f).val();
 
-	    if (t == '')
-	    {
-	    	alert("Вы не выбрали трекер!");
-	    	return false;
-	    }
-	    
-	    if (n == '')
-	    {
-	    	alert("Вы не указали имя пользователя!");
-	    	return false;
-	    }    
-		
-		$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-		$.post("action.php",{action: 'user_add', tracker: t, name: n},
-			function(data) {
-				$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
-				$(n_f).val('');
-			}
-		);
-		return false;
-	});
+        if (t == '')
+        {
+            alert("Вы не выбрали трекер!");
+            return false;
+        }
+        
+        if (n == '')
+        {
+            alert("Вы не указали имя пользователя!");
+            return false;
+        }    
+        
+        $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+        $.post("action.php",{action: 'user_add', tracker: t, name: n},
+            function(data) {
+                $('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+                $(n_f).val('');
+            }
+        );
+        return false;
+    });
 
 	//Удаляем темы 
 	$("#threme_clear").submit(function()
@@ -428,7 +417,7 @@ function changefunc()
 {
     var select = document.getElementById("selectfunc");
     var selectedText = select.options[select.selectedIndex].text;
-    var a = ['anidub.com', 'kinozal.tv', 'lostfilm.tv', 'nnm-club.me', 'novafilm.tv', 'rutracker.org'];
+    var a = ['anidub.com', 'baibako.tv', 'casstudio.tv', 'kinozal.tv', 'lostfilm.tv', 'newstudio.tv', 'nnm-club.me', 'novafilm.tv', 'rutracker.org'];
     for (var i = 0; i < a.length; i++)
     {
         var e = a[i];
@@ -441,14 +430,16 @@ function changefunc()
     }
 }
 
-//Меняем checkbox на radiobutton
+//Меняем radiobutton
 function changeField()
 {
 	var tracker = document.getElementById("tracker").value;
+    if (tracker == 'baibako.tv' || tracker == 'newstudio.tv')
+        $('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> HD 720<br /><input type="radio" name="hd" value="2"> HD 1080</span>');
 	if (tracker == 'lostfilm.tv')
-		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD качество<br /><input type="radio" name="hd" value="1"> HD качество<br /><input type="radio" name="hd" value="2"> HD MP4</span>');
+		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> HD 720<br /><input type="radio" name="hd" value="2"> HD 720 MP4</span>');
 	if (tracker == 'novafilm.tv')
-		$('#changedField').empty().append('<input type="checkbox" name="hd"> HD качество</label>');
+		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> HD 720</span>');
 }
 
 //Показать/скрыть настройки proxy

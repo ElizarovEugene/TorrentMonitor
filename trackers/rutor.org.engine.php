@@ -27,7 +27,7 @@ class rutor
 	{
 		$data = str_replace('-', ' ', $data);
 		$arr = preg_split("/\s/", $data);
-		$date = $arr[0].' '.$arr[1].' '.$arr[2].' '.$arr[3];
+		$date = $arr[0].' '.Sys::dateNumToString($arr[1]).' '.$arr[2].' '.$arr[3];
 
 		return $date;
 	}
@@ -64,7 +64,7 @@ class rutor
 							Database::clearWarnings($tracker);
 							//приводим дату к общему виду
 							$date = rutor::dateStringToNum($array[1]);
-							$date_str = $array[1];
+							$date_str = rutor::dateNumToString($array[1]);
 							//если даты не совпадают, перекачиваем торрент
 							if ($date != $timestamp)
 							{
@@ -81,7 +81,7 @@ class rutor
 								Database::setNewDate($id, $date);
 								//отправляем уведомлении о новом торренте
 								$message = $name.' обновлён.';
-								Notification::sendNotification('notification', rutor::dateNumToString($date_str), $tracker, $message);
+								Notification::sendNotification('notification', $date_str, $tracker, $message);
 							}
 						}
 						else

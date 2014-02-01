@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
     <meta charset="utf-8">
@@ -21,7 +21,7 @@
 //Проверка обновления
 $dir = __DIR__.'/';
 include_once $dir.'../class/System.class.php';
-$update = true;//Sys::checkUpdate();
+$update = Sys::checkUpdate();
 if ($update)
 {
 ?>
