@@ -482,7 +482,7 @@ function TakeAction(action){
 				$('#message').html(data.message);
 				$('#progress_bar').css("width",data.progress+"%");
 				$('#progress').html(data.progress+"%");
-     			$('#progress').toggleClass("secondhalf", data.progress > 50);
+     			$('#progress').toggleClass("invert_percents", data.progress > 50);
 				if(data.nextstep)
 				    MakeNextStep();
 				else if(data.redirect)
