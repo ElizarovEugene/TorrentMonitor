@@ -453,7 +453,7 @@ span.quality {
    ========================================================================== */
 #updater #progress_border {
 	position: relative;
-	border: 1px black solid;
+    border: 1px #E2E6EF solid;
 	width: 100%;
 }
 
@@ -465,7 +465,6 @@ span.quality {
 #updater #progress {
 	text-align: center;
 	position: absolute;
-/*	z-index: 50; */
 	width: 100%;
 }
 #updater .invert_percents{
