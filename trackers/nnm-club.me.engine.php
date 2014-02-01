@@ -15,7 +15,7 @@ class nnmclub
         		'url'            => 'http://nnm-club.me/forum/index.php',
         		'cookie'         => $sess_cookie,
         		'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-length' => strlen($sess_cookie)),
-        		'convert'        => array('windows-1251', 'utf-8'),
+        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
         	)
         );
 
@@ -70,7 +70,7 @@ class nnmclub
             		'returntransfer' => 1,
             		'url'            => 'http://nnm-club.me/forum/login.php',
             		'postfields'     => 'username='.$login.'&password='.$password.'&login=%C2%F5%EE%E4',
-            		'convert'        => array('windows-1251', 'utf-8'),
+            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
 			
@@ -149,7 +149,7 @@ class nnmclub
             		'url'            => 'http://nnm-club.me/forum/viewtopic.php?t='.$torrent_id,
             		'cookie'         => nnmclub::$sess_cookie,
             		'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-length' => strlen(nnmclub::$sess_cookie)),
-            		'convert'        => array('windows-1251', 'utf-8'),
+            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
 

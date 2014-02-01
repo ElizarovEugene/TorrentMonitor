@@ -50,7 +50,7 @@ class lostfilm
 	        		'url'            => 'http://lostfilm.tv/my.php',
 	        		'cookie'         => lostfilm::$sess_cookie,
 	        		'sendHeader'     => array('Host' => 'lostfilm.tv', 'Content-length' => strlen(lostfilm::$sess_cookie)),
-	        		'convert'        => array('windows-1251', 'utf-8'),
+	        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
 	        	)
 	        );
 			preg_match('/<td align=\"left\">(.*)<br >/', $page, $out);
@@ -82,7 +82,7 @@ class lostfilm
         		'url'            => 'http://www.lostfilm.tv/',
         		'cookie'         => $sess_cookie,
         		'sendHeader'     => array('Host' => 'lostfilm.tv', 'Content-length' => strlen($sess_cookie)),
-        		'convert'        => array('windows-1251', 'utf-8'),
+        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
         	)
         );
 
@@ -202,7 +202,7 @@ class lostfilm
 		        		'returntransfer' => 1,
 		        		'url'            => 'http://www.lostfilm.tv/blg.php?ref=aHR0cDovL3d3dy5sb3N0ZmlsbS50di8=',
 		        		'postfields'     => $post,
-		        		'convert'        => array('windows-1251', 'utf-8'),
+		        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
 		        	)
 		        );
 
@@ -258,7 +258,7 @@ class lostfilm
 			        		'type'           => 'GET',
 			        		'returntransfer' => 1,
 			        		'url'            => 'http://www.lostfilm.tv/rssdd.xml',
-			        		'convert'        => array('windows-1251', 'utf-8'),
+			        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
 			        	)
 			        );
 			        

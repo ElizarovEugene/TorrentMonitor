@@ -26,7 +26,7 @@ class nnmclubSearch extends nnmclub
             		'returntransfer' => 1,
             		'url'            => 'http://nnm-club.me/forum/tracker.php',
             		'postfields'     => 'prev_sd=0&prev_a=0&prev_my=0&prev_n=0&prev_shc=0&prev_shf=1&prev_sha=1&prev_shs=0&prev_shr=0&prev_sht=0&f%5B%5D=-1&o=1&s=2&tm=-1&shf=1&sha=1&ta=-1&sns=-1&sds=-1&nm=&pn='.$user.'&submit=%CF%EE%E8%F1%EA',
-            		'convert'        => array('windows-1251', 'utf-8'),
+            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
 	        );
 	        
@@ -56,7 +56,7 @@ class nnmclubSearch extends nnmclub
 		            		'url'            => 'http://nnm-club.me/forum/viewtopic.php?t='.$toDownload[$i]['threme_id'],
 		            		'cookie'         => nnmclub::$sess_cookie,
 		            		'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-length' => strlen(nnmclub::$sess_cookie)),
-		            		'convert'        => array('windows-1251', 'utf-8'),
+		            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
 		            	)
 		            );
 

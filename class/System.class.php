@@ -183,7 +183,7 @@ class Sys
 		);
 
 		if ($tracker != 'rutor.org' && $tracker != 'casstudio.tv')
-			$forumPage = iconv('windows-1251', 'utf-8', $forumPage);
+			$forumPage = iconv('windows-1251', 'utf-8//IGNORE', $forumPage);
 
 		if ($tracker == 'tr.anidub.com')
 			$tracker = 'anidub.com';

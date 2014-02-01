@@ -15,7 +15,7 @@ class rutracker
         		'url'            => 'http://rutracker.org/forum/index.php',
         		'cookie'         => $sess_cookie,
         		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen($sess_cookie)),
-        		'convert'        => array('windows-1251', 'utf-8'),
+        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
         	)
         );
 
@@ -74,7 +74,7 @@ class rutracker
             		'returntransfer' => 1,
             		'url'            => 'http://login.rutracker.org/forum/login.php',
             		'postfields'     => 'login_username='.$login.'&login_password='.$password.'&login=%C2%F5%EE%E4',
-            		'convert'        => array('windows-1251', 'utf-8'),
+            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
 
@@ -158,7 +158,7 @@ class rutracker
             		'url'            => 'http://rutracker.org/forum/viewtopic.php?t='.$torrent_id,
             		'cookie'         => rutracker::$sess_cookie,
             		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen(rutracker::$sess_cookie)),
-            		'convert'        => array('windows-1251', 'utf-8'),
+            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
 

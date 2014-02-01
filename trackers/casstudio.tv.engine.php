@@ -65,7 +65,7 @@ class casstudio
             		'returntransfer' => 1,
             		'url'            => 'http://casstudio.tv/takelogin.php',
             		'postfields'     => 'login=submit&username='.$login.'&password='.$password.'&x=0&y=0',
-            		'convert'        => array('windows-1251', 'utf-8'),
+            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
 

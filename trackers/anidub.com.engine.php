@@ -15,7 +15,7 @@ class anidub
         		'url'            => 'http://tr.anidub.com',
         		'cookie'         => $sess_cookie,
         		'sendHeader'     => array('Host' => 'tr.anidub.com', 'Content-length' => strlen($sess_cookie)),
-        		'convert'        => array('windows-1251', 'utf-8'),
+        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
         	)
         );
 
@@ -65,7 +65,7 @@ class anidub
             		'returntransfer' => 1,
             		'url'            => 'http://tr.anidub.com/takelogin.php',
             		'postfields'     => 'username='.$login.'&password='.$password,
-            		'convert'        => array('windows-1251', 'utf-8'),
+            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
 
@@ -157,7 +157,7 @@ class anidub
             		'url'            => 'http://tr.anidub.com/details.php?id='.$torrent_id,
             		'cookie'         => anidub::$sess_cookie,
             		'sendHeader'     => array('Host' => 'tr.anidub.com', 'Content-length' => strlen(anidub::$sess_cookie)),
-            		'convert'        => array('windows-1251', 'utf-8'),
+            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
 //print_r($page);
