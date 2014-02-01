@@ -4,6 +4,7 @@
 ###Список возможностей приложения:
 
 * Слежение за темами на anidub.com
+* Слежение за темами на casstudio.tv
 * Слежение за темами на kinozal.tv
 * Слежение за темами на nnm-club.ru
 * Слежение за темами на rutracker.org
@@ -12,22 +13,23 @@
 * Слежение за релизерами на nnm-club.ru
 * Слежение за релизерами на rutracker.org
 * Слежение за релизерами на tfile.me
-* Поиск новых серий на lostfilm.tv (SD/HD/MP4 версии на выбор)
-* Поиск новых серий на novafilm.tv (SD/HD версии на выбор)
+* Поиск новых серий на baibako.tv (SD/HD 720/HD 1080 версии на выбор)
+* Поиск новых серий на lostfilm.tv (SD/HD 720/HD 720 MP4 версии на выбор)
+* Поиск новых серий на newstudio.tv (SD/HD 720/HD 1080 версии на выбор)
+* Поиск новых серий на novafilm.tv (SD/HD 720 версии на выбор)
 
 * Работа через proxy (к примеру Tor)
 
 * Управление торрент-клиентами (добавление/удаление раздач и файлов): Transmission, Deluge (на данные момент только под linux платформу, ибо работает через консольную часть этих клиентов).
 
 ###Скриншоты:
- ![Screenshot0](http://blog.korphome.ru/wp-content/uploads/2011/02/IMG_0003.png "Screenshot0")
- ![Screenshot1](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый11.png "Screenshot1")
- ![Screenshot2](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый.png "Screenshot2")
- ![Screenshot3](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый21.png "Screenshot3")
- ![Screenshot4](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый3.png "Screenshot4")
- ![Screenshot5](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый4.png "Screenshot5")
- ![Screenshot6](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый5.png "Screenshot6")
- ![Screenshot7](http://blog.korphome.ru/wp-content/uploads/2011/02/Новый6.png "Screenshot7")
+ ![Screenshot0](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-53-42.jpg "Screenshot0")
+ ![Screenshot1](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-54-16.jpg "Screenshot1")
+ ![Screenshot2](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-54-38.jpg "Screenshot2")
+ ![Screenshot3](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-54-52.jpg "Screenshot3")
+ ![Screenshot4](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-55-28.jpg "Screenshot4")
+ ![Screenshot5](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-55-41.jpg "Screenshot5")
+ ![Screenshot6](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-56-36.jpg "Screenshot6")
 
 ###Требования для установки:
 

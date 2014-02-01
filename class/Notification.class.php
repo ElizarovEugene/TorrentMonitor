@@ -1,25 +1,7 @@
 <?php
 class Notification
 {
-	private static $headers;
 	private static $errors;
-
-    private function __construct()
-    {
-    	$this->headers = "From: TorrentMonitor 0.6\r\n";
-		$this->headers .= "MIME-Version: 1.0\r\n";
-		$this->headers .= "Content-type: text/html; charset=utf-8\r\n";
-    }
-    
-    public static function getInstance()
-    {
-        if ( ! isset(self::$instance))
-        {
-            $object = __CLASS__;
-            self::$instance = new $object;
-        }
-        return self::$instance;
-    }
 
 	public static function findWarning()
     {
@@ -37,8 +19,12 @@ class Notification
 	
 	public static function send($settingEmail, $date, $tracker, $message, $header_message)
 	{
-		$msg = "Дата: {$date}\nТрекер: {$tracker}\nСообщение: {$message}";
-		mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor 2: ".$header_message).'?=', $msg, self::$headers);		
+        $headers = 'From: TorrentMonitor'."\r\n";
+		$headers .= 'MIME-Version: 1.0'."\r\n";
+		$headers .= 'Content-type: text/html; charset=utf-8'."\r\n";	
+		$msg = 'Дата: '.$date.'<br>Трекер: '.$tracker.'<br>Сообщение: '.$message;
+		
+		mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor: ".$header_message).'?=', $msg, $headers);		
 	}
 	
 	public static function sendNotification($type, $date, $tracker, $message)

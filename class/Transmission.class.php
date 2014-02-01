@@ -6,7 +6,6 @@ class Transmission
     {
         #получаем настройки из базы
         $settings = Database::getAllSetting();
-        print_r($settings);
         foreach ($settings as $row)
         {
         	extract($row);
