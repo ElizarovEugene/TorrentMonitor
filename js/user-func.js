@@ -120,6 +120,7 @@ $("#serial_add").submit(function()
 		t = $form.find('select[name="tracker"]').val(),
 		n_f = $form.find('input[name="name"]'),
 		n = $(n_f).val(),
+		n_p = $form.find('input[name="download_path"]').val(),
 		h_f = $form.find('input[name="hd"]');
 		
 	h = $(h_f).val();
@@ -141,10 +142,10 @@ $("#serial_add").submit(function()
     {
     	alert("Вы не указали название сериала!");
     	return false;
-    }     
+    } 
 
 	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-	$.post("action.php",{action: 'serial_add', tracker: t, name: n, hd: h},
+	$.post("action.php",{action: 'serial_add', tracker: t, name: n, path: n_p, hd: h},
 		function(data) {
 			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
 			$(n_f).val('');

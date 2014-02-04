@@ -2,13 +2,16 @@
 class Deluge
 {
     #добавляем новую закачку в torrent-клиент, обновляем hash в базе
-    public static function addNew($id, $file, $hash, $tracker)
+    public static function addNew($id, $file, $hash, $tracker, $download_path='')
     {
         #получаем настройки из базы
         $settings = Database::getAllSetting();
         foreach ($settings as $row)
         {
         	extract($row);
+        }
+        if( $download_path){
+            $pathToDownload = $download_path;
         }
 
         if ( ! empty($hash))

@@ -295,6 +295,18 @@ class Database
         $stmt = NULL;
         $resultArray = NULL;
     }
+
+    public static function getTorrentDownloadPath($id)
+    {
+        $stmt = self::newStatement("SELECT `path` FROM `torrent` WHERE `id` = :id");
+        $stmt->bindParam(':id', $id);
+        if ($stmt->execute()) 
+        {
+            return $stmt->fetchColumn();
+        }
+        $stmt = NULL; 
+
+    }
     
     public static function getTorrentsListByTracker($tracker)
     {
@@ -577,11 +589,12 @@ class Database
         $stmt = NULL;
     }
     
-    public static function setSerial($tracker, $name, $hd=FALSE)
+    public static function setSerial($tracker, $name, $path='', $hd=FALSE)
     {
-        $stmt = self::newStatement("INSERT INTO `torrent` (`tracker`, `name`, `hd`) VALUES (:tracker, :name, :hd)");        
+        $stmt = self::newStatement("INSERT INTO `torrent` (`tracker`, `name`, `path`, `hd`) VALUES (:tracker, :name, :d_path,  :hd)");        
         $stmt->bindParam(':tracker', $tracker);
         $stmt->bindParam(':name', $name);
+        $stmt->bindParam(':d_path', $path);
         $stmt->bindParam(':hd', $hd);
         if ($stmt->execute())
             return TRUE;

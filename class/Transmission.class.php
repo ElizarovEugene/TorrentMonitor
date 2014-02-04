@@ -2,7 +2,7 @@
 class Transmission
 {
     #добавляем новую закачку в torrent-клиент, обновляем hash в базе
-    public static function addNew($id, $file, $hash, $tracker)
+    public static function addNew($id, $file, $hash, $tracker, $download_path='')
     {
         #получаем настройки из базы
         $settings = Database::getAllSetting();
@@ -10,6 +10,10 @@ class Transmission
         {
         	extract($row);
         }
+        if( $download_path){
+            $pathToDownload = $download_path;
+        }
+
         $opt = '';
         if ( ! empty($torrentLogin) && ! empty($torrentPassword))
             $opt = '-n '.$torrentLogin.':'.$torrentPassword;
@@ -29,6 +33,7 @@ class Transmission
 
         #добавляем торрент в torrent-клиента
         $command = `transmission-remote $torrentAddress $opt -a '$file' -w $pathToDownload`;
+        echo $command, "\n";
         if ( ! preg_match('/responded: \"success\"/', $command))
         {
             Errors::setWarnings('Transmission', 'add_fail');

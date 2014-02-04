@@ -113,6 +113,8 @@ if (isset($_POST['action']))
 	//Добавляем сериал для мониторинга
 	if ($_POST['action'] == 'serial_add')
 	{
+
+		//avar_dump($_POST); exit;
 		$tracker = $_POST['tracker'];
 		if (is_array(Database::getCredentials($tracker)))
 		{
@@ -127,7 +129,7 @@ if (isset($_POST['action']))
 				{
 					if (Database::checkSerialExist($tracker, $_POST['name'], $_POST['hd']))	
 					{
-						Database::setSerial($tracker, $_POST['name'], $_POST['hd']);
+						Database::setSerial($tracker, $_POST['name'], $_POST['path'], $_POST['hd']);
 						?>
 						Сериал добавлен для мониторинга.
 						<?php

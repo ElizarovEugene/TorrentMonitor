@@ -217,6 +217,9 @@ class Sys
         $path = Database::getSetting('path').$file;
         file_put_contents($path, $torrent);
 
+        // get torrent save path
+        $download_path = Database::getTorrentDownloadPath($id);
+
         $useTorrent = Database::getSetting('useTorrent');
         if ($useTorrent)
         {
@@ -224,7 +227,7 @@ class Sys
             
             $dir = dirname(__FILE__).'/';
             include_once $dir.$torrentClient.'.class.php';
-            call_user_func($torrentClient.'::addNew', $id, $path, $hash, $tracker);
+            call_user_func($torrentClient.'::addNew', $id, $path, $hash, $tracker, $download_path);
             
             $deleteTorrent = Database::getSetting('deleteTorrent');
             if ($deleteTorrent)
