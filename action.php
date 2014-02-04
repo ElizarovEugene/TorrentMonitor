@@ -114,7 +114,6 @@ if (isset($_POST['action']))
 	if ($_POST['action'] == 'serial_add')
 	{
 
-		//avar_dump($_POST); exit;
 		$tracker = $_POST['tracker'];
 		if (is_array(Database::getCredentials($tracker)))
 		{
