@@ -154,7 +154,7 @@ class lostfilm
 			}
 			elseif ($hd == 2)
 			{
-				if (preg_match_all('/720|MP4/', $item->title, $matches))
+				if (preg_match_all('/MP4/', $item->title, $matches))
 					return lostfilm::analysisEpisode($item);
 			}
 			elseif ($hd == 3)
