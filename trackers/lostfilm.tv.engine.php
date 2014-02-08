@@ -154,10 +154,14 @@ class lostfilm
 			}
 			elseif ($hd == 2)
 			{
-				if (preg_match_all('/MP4/', $item->title, $matches))
+				if (preg_match_all('/720|MP4/', $item->title, $matches))
 					return lostfilm::analysisEpisode($item);
 			}
-			else
+			elseif ($hd == 3)
+			{
+				if (preg_match_all('/1080/', $item->title, $matches))
+					return lostfilm::analysisEpisode($item);
+			}			else
 			{
 				if (preg_match_all('/^(?!(.*720|.*HD))/', $item->link, $matches))
 					return lostfilm::analysisEpisode($item);
@@ -337,6 +341,8 @@ class lostfilm
 									$amp = 'HD';
 								elseif ($hd == 2)
 									$amp = 'MP4';
+								elseif ($hd == 3)
+									$amp = 'FullHD';
 								else
 									$amp = NULL;
 								//сохраняем торрент в файл

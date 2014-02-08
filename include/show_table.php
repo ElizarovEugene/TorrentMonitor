@@ -75,7 +75,7 @@ if ( ! empty($torrents_list))
                     echo '<img src="img/720.png">';
         		elseif ($hd == 2 && $tracker == 'lostfilm.tv')
         			echo '<img src="img/720mp4.png">';
-                elseif ($hd == 2 && $tracker == 'baibako.tv' || $hd == 2 && $tracker == 'newstudio.tv')
+                elseif ($hd == 2 && $tracker == 'baibako.tv' || $hd == 2 && $tracker == 'newstudio.tv' || $hd == 3 && $tracker == 'lostfilm.tv')
                     echo '<img src="img/1080.png">';
                 else
                     echo '<img src="img/sd.png">';
