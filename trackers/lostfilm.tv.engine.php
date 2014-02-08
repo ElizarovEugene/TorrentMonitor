@@ -337,12 +337,10 @@ class lostfilm
 							
 							if ($download)
 							{
-								if ($hd == 1)
+								if ($hd == 1 || $hd == 3)
 									$amp = 'HD';
 								elseif ($hd == 2)
 									$amp = 'MP4';
-								elseif ($hd == 3)
-									$amp = 'FullHD';
 								else
 									$amp = NULL;
 								//сохраняем торрент в файл
