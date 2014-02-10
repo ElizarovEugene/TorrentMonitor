@@ -103,6 +103,7 @@ CREATE TABLE `torrent` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tracker` varchar(30) NOT NULL,
   `name` varchar(250) NOT NULL DEFAULT '',
+  `path` varchar(250) NOT NULL DEFAULT '',
   `hd` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `torrent_id` int(9) unsigned NOT NULL DEFAULT '0',
   `ep` varchar(10) DEFAULT '',

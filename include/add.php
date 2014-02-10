@@ -33,6 +33,11 @@
         <span class="subinput-text">На английском языке<br/>Пример: House, Lie to me</span>
     </p>
     <p>
+        <label class="label-name">Директория для скачивания</label>
+        <input type="text" name="download_path"><br/>
+        <span class="subinput-text">Например:  /home/transmission/downloads/series</span>
+    </p>
+    <p>
         <label class="label-name"></label>
         <span id="changedField"></span>
     </p>
