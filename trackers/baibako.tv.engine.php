@@ -19,7 +19,7 @@ class baibako
 				'url'            => 'http://baibako.tv/',
 				'cookie'         => baibako::$sess_cookie,
 				'sendHeader'     => array('Host' => 'baibako.tv', 'Content-length' => strlen(baibako::$sess_cookie)),
-				'convert'        => array('windows-1251', 'utf-8'),
+				'convert'        => array('windows-1251', 'utf-8//IGNORE'),
 			)
 		);
 
@@ -103,7 +103,7 @@ class baibako
             		'returntransfer' => 1,
             		'url'            => 'http://baibako.tv/takelogin.php',
             		'postfields'     => 'username='.$login.'&password='.$password.'&commit=%CF%F3%F1%F2%E8%F2%E5+%EC%E5%ED%FF',
-            		'convert'        => array('windows-1251', 'utf-8'),
+            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
 
@@ -204,15 +204,16 @@ class baibako
 			        		'url'            => 'http://baibako.tv/rss2.php?feed=dl',
 			        		'cookie'         => baibako::$sess_cookie,
                             'sendHeader'     => array('Host' => 'baibako.tv', 'Content-length' => strlen(baibako::$sess_cookie)),
-                            'convert'        => array('windows-1251', 'utf-8'),
+                            'convert'        => array('windows-1251', 'utf-8//IGNORE'),
 			        	)
 			        );
 
-                    baibako::$page = str_replace('<?xml version="1.0" encoding="windows-1251" ?>','<?xml version="1.0" encoding="utf-8"?>', $page);
-					if ( ! empty(baibako::$page))
+                    $page = str_replace('<?xml version="1.0" encoding="windows-1251" ?>','<?xml version="1.0" encoding="utf-8"?>', $page);
+					if ( ! empty($page))
 					{
+					    $xml_page = str_replace(array("&amp;", "&"), array("&", "&amp;"), $page);
 						//читаем xml
-						baibako::$xml_page = @simplexml_load_string(baibako::$page);
+						baibako::$xml_page = @simplexml_load_string($xml_page);
 						//если XML пришёл с ошибками - останавливаем выполнение, иначе - ставим флажок, что получаем страницу
 						if ( ! baibako::$xml_page)
 						{

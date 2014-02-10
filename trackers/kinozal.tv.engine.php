@@ -15,7 +15,7 @@ class kinozal
         		'url'            => 'http://kinozal.tv',
         		'cookie'         => $sess_cookie,
         		'sendHeader'     => array('Host' => 'kinozal.tv', 'Content-length' => strlen($sess_cookie)),
-        		'convert'        => array('windows-1251', 'utf-8'),
+        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
         	)
         );
 
@@ -82,7 +82,7 @@ class kinozal
             		'returntransfer' => 1,
             		'url'            => 'http://kinozal.tv/takelogin.php',
             		'postfields'     => 'username='.$login.'&password='.$password.'&returnto=',
-            		'convert'        => array('windows-1251', 'utf-8'),
+            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );			
 			
@@ -240,7 +240,7 @@ class kinozal
             		'url'            => 'http://kinozal.tv/details.php?id='.$torrent_id,
             		'cookie'         => kinozal::$sess_cookie,
             		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen(kinozal::$sess_cookie)),
-            		'convert'        => array('windows-1251', 'utf-8'),
+            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );			
 

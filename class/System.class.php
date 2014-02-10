@@ -65,7 +65,7 @@ class Sys
 	//версия системы
 	public static function version()
 	{
-		return '0.9.2';
+		return '0.9.3';
 	}
 
 	//проверка обновлений системы
@@ -183,7 +183,7 @@ class Sys
 		);
 
 		if ($tracker != 'rutor.org' && $tracker != 'casstudio.tv')
-			$forumPage = iconv('windows-1251', 'utf-8', $forumPage);
+			$forumPage = iconv('windows-1251', 'utf-8//IGNORE', $forumPage);
 
 		if ($tracker == 'tr.anidub.com')
 			$tracker = 'anidub.com';

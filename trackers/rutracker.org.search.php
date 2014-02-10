@@ -27,7 +27,7 @@ class rutrackerSearch extends rutracker
             		'url'            => 'http://rutracker.org/forum/tracker.php',
             		'cookie'         => rutracker::$sess_cookie,
             		'postfields'     => 'prev_my=0&prev_new=0&prev_oop=0&f%5B%5D=-1&o=1&s=2&tm=-1&pn='.$user.'&nm=',
-            		'convert'        => array('windows-1251', 'utf-8'),
+            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
 	        );
 
