@@ -163,7 +163,7 @@ class lostfilm
 					return lostfilm::analysisEpisode($item);
 			}			else
 			{
-				if (preg_match_all('/^(?!(.*720|.*HD))/', $item->link, $matches))
+				if (preg_match_all('/^(?!(.*720|.*HD|.*1080))/', $item->link, $matches))
 					return lostfilm::analysisEpisode($item);
 			}
 		}
