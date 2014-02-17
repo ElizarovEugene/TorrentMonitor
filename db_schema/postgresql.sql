@@ -31,6 +31,7 @@ INSERT INTO credentials VALUES (8, 'anidub.com', '', '', '');
 INSERT INTO credentials VALUES (9, 'baibako.tv', '', '', '');
 INSERT INTO credentials VALUES (10,'casstudio.tv', '', '','');
 INSERT INTO credentials VALUES (11,'newstudio.tv', '', '','');
+INSERT INTO credentials VALUES (12,'animelayer.ru', '', '','');
 
 CREATE TABLE "settings" (
   "id" INTEGER  PRIMARY KEY NOT NULL,
