@@ -92,8 +92,10 @@ $("#torrent_add").submit(function()
 		s = $form.find('input[type=submit]'),
 		n_f = $form.find('input[name="name"]'),
 		n = $(n_f).val(),
-		u_f = $form.find('input[name="url"]');
-		u = $(u_f).val();
+		u_f = $form.find('input[name="url"]'),
+		u = $(u_f).val(),
+		p_f = $form.find('input[name="path"]'),
+		p = $(p_f).val(); 
 	
     if (u == '')
     {
@@ -102,7 +104,7 @@ $("#torrent_add").submit(function()
     }
 								
 	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-	$.post("action.php",{action: 'torrent_add', name: n, url: u},
+	$.post("action.php",{action: 'torrent_add', name: n, url: u, path: p},
 		function(data) {
 			$('#notice').empty().append(data).delay(3000).fadeOut(400);
 			$(n_f).val('');
@@ -120,8 +122,10 @@ $("#serial_add").submit(function()
 		t = $form.find('select[name="tracker"]').val(),
 		n_f = $form.find('input[name="name"]'),
 		n = $(n_f).val(),
-		h_f = $form.find('input[name="hd"]');
-		
+		h_f = $form.find('input[name="hd"]'),
+		p_f = $form.find('input[name="path"]'),
+		p = $(p_f).val();
+
 	h = $(h_f).val();
 	for (var i = 0; i < h_f.length; i++)
 	{
@@ -144,7 +148,7 @@ $("#serial_add").submit(function()
     }     
 
 	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-	$.post("action.php",{action: 'serial_add', tracker: t, name: n, hd: h},
+	$.post("action.php",{action: 'serial_add', tracker: t, name: n, hd: h, path: p},
 		function(data) {
 			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
 			$(n_f).val('');
@@ -417,7 +421,7 @@ function changefunc()
 {
     var select = document.getElementById("selectfunc");
     var selectedText = select.options[select.selectedIndex].text;
-    var a = ['anidub.com', 'baibako.tv', 'casstudio.tv', 'kinozal.tv', 'lostfilm.tv', 'newstudio.tv', 'nnm-club.me', 'novafilm.tv', 'rutracker.org'];
+    var a = ['anidub.com', 'animelayer.ru', 'baibako.tv', 'casstudio.tv', 'kinozal.tv', 'lostfilm.tv', 'newstudio.tv', 'nnm-club.me', 'novafilm.tv', 'rutracker.org'];
     for (var i = 0; i < a.length; i++)
     {
         var e = a[i];

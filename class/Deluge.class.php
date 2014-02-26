@@ -10,13 +10,15 @@ class Deluge
         {
         	extract($row);
         }
+        $individualPath = Database::getTorrentDownloadPath($id);
+        if ( ! empty($individualPath))
+            $pathToDownload = $individualPath;
 
         if ( ! empty($hash))
         {
             $delOpt = '';
             if ($tracker == 'lostfilm.tv' || $tracker == 'novafilm.tv')
             {
-                echo $deleteOldFiles;
                 if ($deleteOldFiles)
                     $delOpt = '--remove_data';
             }
@@ -26,7 +28,7 @@ class Deluge
         }
 
         #добавляем торрент в torrent-клиента
-        $command = `deluge-console 'connect $torrentAddress $torrentLogin $torrentPassword; add -p $pathToDownload $file'`;
+        $command = `deluge-console 'connect $torrentAddress $torrentLogin $torrentPassword; add -p '$pathToDownload' $file'`;
         if ( ! preg_match('/Torrent added!/', $command))
         {
             Errors::setWarnings('Deluge', 'add_fail');

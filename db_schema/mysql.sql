@@ -50,7 +50,8 @@ VALUES
 	(8,'anidub.com', '', '',''),
 	(9,'baibako.tv', '', '',''),
 	(10,'casstudio.tv', '', '',''),
-	(11,'newstudio.tv', '', '','');
+	(11,'newstudio.tv', '', '',''),
+	(12,'animelayer.ru', '', '','');
 
 /*!40000 ALTER TABLE `credentials` ENABLE KEYS */;
 UNLOCK TABLES;

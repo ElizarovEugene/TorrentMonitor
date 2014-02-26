@@ -10,6 +10,14 @@
         <input type="text" name="url">
         <span class="subinput-text">Пример: http://rutracker.org/forum/viewtopic.php?t=4201572</span>
     </p>
+    <div onclick='expand("divDop")' class='cutLink' style='cursor: pointer;'>Дополнительные параметры</div>
+    <div id='divDop' class='result'>
+    <p>
+        <label class="label-name">Директория для скачивания</label>
+        <input type="text" name="path"><br>
+        <span class="subinput-text">Например: /var/lib/transmission/downloads</span>
+    </p>
+	</div>
     <button class="form-button">Добавить</button>
 </form>
 <br/>
@@ -36,6 +44,14 @@
         <label class="label-name"></label>
         <span id="changedField"></span>
     </p>
+    <div onclick='expand("divDop2")' class='cutLink' style='cursor: pointer;'>Дополнительные параметры</div>
+    <div id='divDop2' class='result'>
+    <p>
+        <label class="label-name">Директория для скачивания</label>
+        <input type="text" name="path"><br>
+        <span class="subinput-text">Например: /var/lib/transmission/downloads</span>
+    </p>
+	</div>    
     <button class="form-button">Добавить</button>
 </form>
 <br/>

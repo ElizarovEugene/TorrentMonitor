@@ -95,7 +95,21 @@ class Database
         $stmt = NULL;
         $resultArray = NULL;
     }
-    
+
+    public static function getTorrentDownloadPath($id)
+    {
+        $stmt = self::newStatement("SELECT `path` FROM `torrent` WHERE `id` = :id");
+        $stmt->bindParam(':id', $id);
+        if ($stmt->execute())
+        {
+            foreach ($stmt as $row)
+            {
+                return $row['path'];
+            }
+        }
+        $stmt = NULL; 
+    }
+
     public static function updateSettings($setting, $val)
     {
         $stmt = self::newStatement("UPDATE `settings` SET `val` = :val WHERE `key` = :setting");
@@ -577,11 +591,12 @@ class Database
         $stmt = NULL;
     }
     
-    public static function setSerial($tracker, $name, $hd=FALSE)
+    public static function setSerial($tracker, $name, $path, $hd=FALSE)
     {
-        $stmt = self::newStatement("INSERT INTO `torrent` (`tracker`, `name`, `hd`) VALUES (:tracker, :name, :hd)");        
+        $stmt = self::newStatement("INSERT INTO `torrent` (`tracker`, `name`, `path`, `hd`) VALUES (:tracker, :name, :path, :hd)");        
         $stmt->bindParam(':tracker', $tracker);
         $stmt->bindParam(':name', $name);
+        $stmt->bindParam(':path', $path);
         $stmt->bindParam(':hd', $hd);
         if ($stmt->execute())
             return TRUE;

@@ -127,7 +127,7 @@ if (isset($_POST['action']))
 				{
 					if (Database::checkSerialExist($tracker, $_POST['name'], $_POST['hd']))	
 					{
-						Database::setSerial($tracker, $_POST['name'], $_POST['hd']);
+						Database::setSerial($tracker, $_POST['name'], $_POST['path'], $_POST['hd']);
 						?>
 						Сериал добавлен для мониторинга.
 						<?php
