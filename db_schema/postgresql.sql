@@ -63,6 +63,7 @@ CREATE TABLE "torrent" (
   "tracker" varchar(30) NOT NULL,
   "name" varchar(250) NOT NULL DEFAULT '',
   "hd" INTEGER NOT NULL DEFAULT '0',
+  "path" varchar(100) NOT NULL,
   "torrent_id" INTEGER NOT NULL DEFAULT '0',
   "ep" varchar(10) DEFAULT '',
   "timestamp" timestamp,
