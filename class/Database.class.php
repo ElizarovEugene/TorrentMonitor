@@ -605,11 +605,12 @@ class Database
         $stmt = NULL;
     }
     
-    public static function setThreme($tracker, $name, $threme)
+    public static function setThreme($tracker, $name, $path, $threme)
     {
-        $stmt = self::newStatement("INSERT INTO `torrent` (`tracker`, `name`, `torrent_id`) VALUES (:tracker, :name, :threme)");        
+        $stmt = self::newStatement("INSERT INTO `torrent` (`tracker`, `name`, `path`, `torrent_id`) VALUES (:tracker, :name, :path, :threme)");        
         $stmt->bindParam(':tracker', $tracker);
         $stmt->bindParam(':name', $name);
+        $stmt->bindParam(':path', $path);
         $stmt->bindParam(':threme', $threme);
         if ($stmt->execute())
             return TRUE;
