@@ -210,7 +210,7 @@ class Sys
 		return $name;
 	}
 	
-	//созраняем torrent файл
+	//сохраняем torrent файл
 	public static function saveTorrent($tracker, $name, $torrent, $id, $hash)
 	{
     	$file = '['.$tracker.']_'.$name.'.torrent';
