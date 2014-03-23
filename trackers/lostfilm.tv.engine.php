@@ -149,19 +149,20 @@ class lostfilm
 		{
 			if ($hd == 1)
 			{
-				if (preg_match_all('/720|HD/', $item->title, $matches))
+			    if (preg_match_all('/1080/', $item->title, $matches))
 					return lostfilm::analysisEpisode($item);
+				else
+				{
+    				if (preg_match_all('/720|HD/', $item->title, $matches))
+    					return lostfilm::analysisEpisode($item);
+                }
 			}
 			elseif ($hd == 2)
 			{
 				if (preg_match_all('/MP4/', $item->title, $matches))
 					return lostfilm::analysisEpisode($item);
 			}
-			elseif ($hd == 3)
-			{
-				if (preg_match_all('/1080/', $item->title, $matches))
-					return lostfilm::analysisEpisode($item);
-			}			else
+			else
 			{
 				if (preg_match_all('/^(?!(.*720|.*HD|.*1080))/', $item->link, $matches))
 					return lostfilm::analysisEpisode($item);
