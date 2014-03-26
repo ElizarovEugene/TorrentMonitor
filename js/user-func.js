@@ -28,16 +28,15 @@ $(".h-menu li").click(function() {
     $(this).addClass("active");
 });
 
-
 //Подгрузка страниц
 function show(name)
 {
-	$.get("include/"+name+".php",
-		function(data) {
-			$('#content').empty().append(data);
-		}
-	);
-	
+    $('#content').empty().append('<img src="img/ajax-loader.gif" class="loader">');
+    $.get("include/"+name+".php",
+        function(data) {
+            $('#content').empty().append(data);
+    });
+
 	if (name == 'show_table')
 	{
 		window.clearTimeout(this.timeoutID);
@@ -53,7 +52,7 @@ function show(name)
 		window.clearTimeout(this.timeoutID);
 		delete this.timeoutID;
 	}
-		
+	
 	return false;
 }
 

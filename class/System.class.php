@@ -213,6 +213,7 @@ class Sys
 	//созраняем torrent файл
 	public static function saveTorrent($tracker, $name, $torrent, $id, $hash)
 	{
+	    $name = str_replace("'", '', $name);
     	$file = '['.$tracker.']_'.$name.'.torrent';
         $path = Database::getSetting('path').$file;
         file_put_contents($path, $torrent);

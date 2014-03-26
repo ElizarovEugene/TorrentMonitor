@@ -452,3 +452,7 @@ div.result {
 span.quality {
 	display: inline-block;
 }
+
+img.loader {
+    padding: 0 40% 0px;
+}
