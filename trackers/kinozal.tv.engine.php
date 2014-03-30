@@ -239,7 +239,7 @@ class kinozal
             		'returntransfer' => 1,
             		'url'            => 'http://kinozal.tv/details.php?id='.$torrent_id,
             		'cookie'         => kinozal::$sess_cookie,
-            		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen(kinozal::$sess_cookie)),
+            		'sendHeader'     => array('Host' => 'kinozal.tv', 'Content-length' => strlen(kinozal::$sess_cookie)),
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );			
