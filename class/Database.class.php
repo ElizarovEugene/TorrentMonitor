@@ -96,6 +96,26 @@ class Database
         $resultArray = NULL;
     }
 
+    public static function getPaths()
+    {
+        $stmt = self::newStatement("SELECT DISTINCT(`path`) AS `path` FROM `torrent`");
+        if ($stmt->execute())
+        {
+            $i = 0;
+            foreach ($stmt as $row)
+            {
+                if ( ! empty($row['path']))
+                {
+                    $resultArray[$i]['path'] = $row['path'];
+                    $i++;
+                }
+            }
+            if ( ! empty($resultArray))
+                return $resultArray;
+        }
+        $stmt = NULL; 
+    }    
+
     public static function getTorrentDownloadPath($id)
     {
         $stmt = self::newStatement("SELECT `path` FROM `torrent` WHERE `id` = :id");

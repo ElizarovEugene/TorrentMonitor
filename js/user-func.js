@@ -17,7 +17,6 @@ $(function()
         $(this).toggleClass("active");
         $(this).next().toggle();
     });
-
 });
 
 // Меню
@@ -31,7 +30,9 @@ $(".h-menu li").click(function() {
 //Подгрузка страниц
 function show(name)
 {
-    $('#content').empty().append('<img src="img/ajax-loader.gif" class="loader">');
+    if (name == 'check')
+        $('#content').empty().append('<img src="img/ajax-loader.gif" class="loader">');
+
     $.get("include/"+name+".php",
         function(data) {
             $('#content').empty().append(data);
