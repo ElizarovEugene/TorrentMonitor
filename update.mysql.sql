@@ -1,4 +1,4 @@
 INSERT INTO `credentials` (`id`, `tracker`, `log`, `pass`, `cookie`)
 VALUES
-	(10,'casstudio.tv', '', '',''),
-	(11,'newstudio.tv', '', '','');
+	(12,'animelayer.ru', '', '','');
+ALTER TABLE `torrent` ADD `path` VARCHAR(100) AFTER `HD`

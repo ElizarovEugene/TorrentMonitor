@@ -14,6 +14,10 @@ class Transmission
         if ( ! empty($torrentLogin) && ! empty($torrentPassword))
             $opt = '-n '.$torrentLogin.':'.$torrentPassword;
 
+        $individualPath = Database::getTorrentDownloadPath($id);
+        if ( ! empty($individualPath))
+            $pathToDownload = $individualPath;
+
         if ( ! empty($hash))
         {
             $delOpt = '-r';
@@ -28,7 +32,7 @@ class Transmission
         }
 
         #добавляем торрент в torrent-клиента
-        $command = `transmission-remote $torrentAddress $opt -a '$file' -w $pathToDownload`;
+        $command = `transmission-remote $torrentAddress $opt -a '$file' -w '$pathToDownload'`;
         if ( ! preg_match('/responded: \"success\"/', $command))
         {
             Errors::setWarnings('Transmission', 'add_fail');

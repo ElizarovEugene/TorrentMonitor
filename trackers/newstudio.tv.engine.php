@@ -106,12 +106,12 @@ class newstudio
 		{
 			if ($hd == 1)
 			{
-				if (preg_match_all('/WEBDL 720p/', $item->title, $matches))
+				if (preg_match_all('/720p/', $item->title, $matches))
 					return newstudio::analysisEpisode($item);
 			}
 			elseif ($hd == 2)
 			{
-				if (preg_match_all('/WEBDL 1080p/', $item->title, $matches))
+				if (preg_match_all('/1080p/', $item->title, $matches))
 					return newstudio::analysisEpisode($item);
 			}
 			else

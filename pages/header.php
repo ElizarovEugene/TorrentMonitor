@@ -7,12 +7,14 @@
     <meta name="keywords" content="">
     <meta name="viewport" content="width=1000">
     <link rel="stylesheet" href="pages/styles.css">
+    <link rel="stylesheet" href="pages/jquery-ui.css">
     <link rel="icon" type="image/png" href="img/favicon.png" />
-    <!--[if lt IE 9]><script src="js/html5shiv-3.5.min.js"></script><![endif]-->
+    <!--[if lt IE 9]><script src="js/html5shiv.min.js"></script><![endif]-->
     <script type="text/javascript">
         function FocusOnInput() { document.getElementById("password").focus(); }
     </script>
-    <script src="js/jquery-1.8.2.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
     <script src="js/jquery.query.js"></script>
     <script src="js/user-func.js"></script>
 </head>

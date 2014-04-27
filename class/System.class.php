@@ -65,7 +65,7 @@ class Sys
 	//версия системы
 	public static function version()
 	{
-		return '0.9.3';
+		return '0.9.5';
 	}
 
 	//проверка обновлений системы
@@ -213,6 +213,7 @@ class Sys
 	//созраняем torrent файл
 	public static function saveTorrent($tracker, $name, $torrent, $id, $hash)
 	{
+	    $name = str_replace("'", '', $name);
     	$file = '['.$tracker.']_'.$name.'.torrent';
         $path = Database::getSetting('path').$file;
         file_put_contents($path, $torrent);

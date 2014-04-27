@@ -95,7 +95,41 @@ class Database
         $stmt = NULL;
         $resultArray = NULL;
     }
-    
+
+    public static function getPaths()
+    {
+        $stmt = self::newStatement("SELECT DISTINCT(`path`) AS `path` FROM `torrent`");
+        if ($stmt->execute())
+        {
+            $i = 0;
+            foreach ($stmt as $row)
+            {
+                if ( ! empty($row['path']))
+                {
+                    $resultArray[$i]['path'] = $row['path'];
+                    $i++;
+                }
+            }
+            if ( ! empty($resultArray))
+                return $resultArray;
+        }
+        $stmt = NULL; 
+    }    
+
+    public static function getTorrentDownloadPath($id)
+    {
+        $stmt = self::newStatement("SELECT `path` FROM `torrent` WHERE `id` = :id");
+        $stmt->bindParam(':id', $id);
+        if ($stmt->execute())
+        {
+            foreach ($stmt as $row)
+            {
+                return $row['path'];
+            }
+        }
+        $stmt = NULL; 
+    }
+
     public static function updateSettings($setting, $val)
     {
         $stmt = self::newStatement("UPDATE `settings` SET `val` = :val WHERE `key` = :setting");
@@ -577,11 +611,12 @@ class Database
         $stmt = NULL;
     }
     
-    public static function setSerial($tracker, $name, $hd=FALSE)
+    public static function setSerial($tracker, $name, $path, $hd=FALSE)
     {
-        $stmt = self::newStatement("INSERT INTO `torrent` (`tracker`, `name`, `hd`) VALUES (:tracker, :name, :hd)");        
+        $stmt = self::newStatement("INSERT INTO `torrent` (`tracker`, `name`, `path`, `hd`) VALUES (:tracker, :name, :path, :hd)");        
         $stmt->bindParam(':tracker', $tracker);
         $stmt->bindParam(':name', $name);
+        $stmt->bindParam(':path', $path);
         $stmt->bindParam(':hd', $hd);
         if ($stmt->execute())
             return TRUE;
@@ -590,11 +625,12 @@ class Database
         $stmt = NULL;
     }
     
-    public static function setThreme($tracker, $name, $threme)
+    public static function setThreme($tracker, $name, $path, $threme)
     {
-        $stmt = self::newStatement("INSERT INTO `torrent` (`tracker`, `name`, `torrent_id`) VALUES (:tracker, :name, :threme)");        
+        $stmt = self::newStatement("INSERT INTO `torrent` (`tracker`, `name`, `path`, `torrent_id`) VALUES (:tracker, :name, :path, :threme)");        
         $stmt->bindParam(':tracker', $tracker);
         $stmt->bindParam(':name', $name);
+        $stmt->bindParam(':path', $path);
         $stmt->bindParam(':threme', $threme);
         if ($stmt->execute())
             return TRUE;

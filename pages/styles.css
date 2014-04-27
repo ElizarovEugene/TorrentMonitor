@@ -434,6 +434,11 @@ div.cut {
 	font-weight: bold;
 }
 
+div.cutLink {
+    color: #5493ff;
+    text-decoration: underline;
+}
+
 div.cut_box {
 	font: 12px "Lucida Grande",Verdana,Arial,"Bitstream Vera Sans",sans-serif;
 	font-weight: bold;
@@ -446,6 +451,11 @@ div.result {
 
 span.quality {
 	display: inline-block;
+}
+
+
+img.loader {
+    padding: 0 40% 0px;
 }
 
 /* ==========================================================================

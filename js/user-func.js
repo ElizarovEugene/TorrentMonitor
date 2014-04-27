@@ -51,8 +51,10 @@ $(document).ready(function()
             s = $form.find('input[type=submit]'),
             n_f = $form.find('input[name="name"]'),
             n = $(n_f).val(),
-            u_f = $form.find('input[name="url"]');
-            u = $(u_f).val();
+		u_f = $form.find('input[name="url"]'),
+		u = $(u_f).val(),
+		p_f = $form.find('input[name="path"]'),
+		p = $(p_f).val(); 
         
         if (u == '')
         {
@@ -61,7 +63,7 @@ $(document).ready(function()
         }
                                     
         $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-        $.post("action.php",{action: 'torrent_add', name: n, url: u},
+	$.post("action.php",{action: 'torrent_add', name: n, url: u, path: p},
             function(data) {
                 $('#notice').empty().append(data).delay(3000).fadeOut(400);
                 $(n_f).val('');
@@ -79,7 +81,9 @@ $(document).ready(function()
             t = $form.find('select[name="tracker"]').val(),
             n_f = $form.find('input[name="name"]'),
             n = $(n_f).val(),
-            h_f = $form.find('input[name="hd"]');
+		h_f = $form.find('input[name="hd"]'),
+		p_f = $form.find('input[name="path"]'),
+		p = $(p_f).val();
             
         h = $(h_f).val();
         for (var i = 0; i < h_f.length; i++)
@@ -103,7 +107,7 @@ $(document).ready(function()
         }     
 
         $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-        $.post("action.php",{action: 'serial_add', tracker: t, name: n, hd: h},
+	$.post("action.php",{action: 'serial_add', tracker: t, name: n, hd: h, path: p},
             function(data) {
                 $('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
                 $(n_f).val('');
@@ -219,12 +223,6 @@ $(document).ready(function()
 			return false;
 		}
 		
-		if (e == '')
-		{
-			alert('Вы не указали e-mail для отправки уведомлений.');
-			return false;
-		}	
-		
 		if (pr == 'checked' && pa == '')
 		{
 			alert('Вы не указали адрес proxy-сервера.');
@@ -284,6 +282,9 @@ $(document).ready(function()
 //Подгрузка страниц
 function show(name)
 {
+    if (name == 'check')
+        $('#content').empty().append('<img src="img/ajax-loader.gif" class="loader">');
+
 	$.get("include/"+name+".php",
 		function(data) {
 			$('#content').empty().append(data);
@@ -417,7 +418,7 @@ function changefunc()
 {
     var select = document.getElementById("selectfunc");
     var selectedText = select.options[select.selectedIndex].text;
-    var a = ['anidub.com', 'baibako.tv', 'casstudio.tv', 'kinozal.tv', 'lostfilm.tv', 'newstudio.tv', 'nnm-club.me', 'novafilm.tv', 'rutracker.org'];
+    var a = ['anidub.com', 'animelayer.ru', 'baibako.tv', 'casstudio.tv', 'kinozal.tv', 'lostfilm.tv', 'newstudio.tv', 'nnm-club.me', 'novafilm.tv', 'rutracker.org'];
     for (var i = 0; i < a.length; i++)
     {
         var e = a[i];
@@ -437,7 +438,7 @@ function changeField()
     if (tracker == 'baibako.tv' || tracker == 'newstudio.tv')
         $('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> HD 720<br /><input type="radio" name="hd" value="2"> HD 1080</span>');
 	if (tracker == 'lostfilm.tv')
-		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> HD 720<br /><input type="radio" name="hd" value="2"> HD 720 MP4<br /><input type="radio" name="hd" value="3"> HD 1080</span>');
+		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> Автовыбор HD 720/1080<br /><input type="radio" name="hd" value="2"> HD 720 MP4');
 	if (tracker == 'novafilm.tv')
 		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> HD 720</span>');
 }

@@ -31,6 +31,7 @@ INSERT INTO credentials VALUES (8, 'anidub.com', '', '', '');
 INSERT INTO credentials VALUES (9, 'baibako.tv', '', '', '');
 INSERT INTO credentials VALUES (10,'casstudio.tv', '', '','');
 INSERT INTO credentials VALUES (11,'newstudio.tv', '', '','');
+INSERT INTO credentials VALUES (12,'animelayer.ru', '', '','');
 
 CREATE TABLE "settings" (
   "id" INTEGER  PRIMARY KEY NOT NULL,
@@ -62,6 +63,7 @@ CREATE TABLE "torrent" (
   "tracker" varchar(30) NOT NULL,
   "name" varchar(250) NOT NULL DEFAULT '',
   "hd" INTEGER NOT NULL DEFAULT '0',
+  "path" varchar(100) NOT NULL,
   "torrent_id" INTEGER NOT NULL DEFAULT '0',
   "ep" varchar(10) DEFAULT '',
   "timestamp" timestamp,

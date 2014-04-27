@@ -67,7 +67,7 @@ function OnAction_torrent_add(){
 						else
 							$name = Sys::getHeader($_POST['url']);
 
-						Database::setThreme($tracker, $name, $threme);
+						Database::setThreme($tracker, $name, $_POST['path'], $threme);
 						echo "Тема добавлена для мониторинга.";
 					}
 					else
@@ -104,7 +104,7 @@ function OnAction_serial_add(){
 			{
 				if (Database::checkSerialExist($tracker, $_POST['name'], $_POST['hd']))	
 				{
-					Database::setSerial($tracker, $_POST['name'], $_POST['hd']);
+					Database::setSerial($tracker, $_POST['name'], $_POST['path'], $_POST['hd']);
 					echo "Сериал добавлен для мониторинга.";
 				}
 				else
@@ -233,6 +233,7 @@ function OnAction_update_settings(){
     Database::updateSettings('torrentPassword', $_POST['torrentPassword']);
     $pathToDownload = Sys::checkPath($_POST['pathToDownload']);
     Database::updateSettings('pathToDownload', $pathToDownload);
+    Database::updateSettings('deleteTorrent', notEmptyPost('deleteTorrent'));
     Database::updateSettings('deleteOldFiles', notEmptyPost('deleteOldFiles'));
 	echo "Настройки монитора обновлены.";
 	return TRUE;
