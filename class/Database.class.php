@@ -6,6 +6,7 @@ class Database
 {
     public $dbh;
     private static $instance;
+    public static $currentversion = 2;
 
     private function __construct()
     {
@@ -811,6 +812,36 @@ class Database
         else
             return FALSE;
         $stmt = NULL;
+    }
+    
+    public static function addNewColumn($table, $column, $column_definition){
+        $stmt = self::newStatement("ALTER TABLE `$table` ADD COLUMN `$column` $column_definition");
+        return $stmt->execute();
+    }
+    
+    public static function columnExists($table, $column){
+        switch(self::getdbType())
+        {
+            case 'mysql':
+                $stmt = self::newStatement("SHOW COLUMNS FROM `$table`");
+                $key = "Field";
+                break;
+            case 'pgsql':
+                $stmt = self::newStatement("SELECT * FROM information_schema.columns WHERE table_name='$table'");
+                $key = "column_name";
+                break;
+            case 'sqlite':
+                $stmt = self::newStatement("PRAGMA table_info($table)");
+                $key = "name";
+                break;
+  
+        }
+        if($stmt->execute()){
+            while ($row = $stmt->fetch())
+                if($row[$key] == $column)
+                    return TRUE;
+            return FALSE;
+        }
     }
 }
 ?>

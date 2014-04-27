@@ -463,6 +463,16 @@ function showTorrent()
         document.getElementById("torrentSettings").style.display = "none";
 }
 
+function UpgradeDB(){
+	$.post("action.php",{action: 'upgrade_db'},
+		function(data) {
+			$('#notice').empty().append(data).fadeIn(400).delay(3000).fadeOut(400);
+            show("check");
+		}
+	);
+	return false;
+}
+
 function MakeNextStep(){
 	setTimeout('TakeAction("nextstep")', 1000);
 }

@@ -1,7 +1,7 @@
 <?php
 
 require_once(dirname(__DIR__)."/"."pclzip"."/"."pclzip.lib.php");
-//require_once(__DIR__."/"."DBUpgrade.class.php");
+require_once(__DIR__."/"."DBUpgrade.class.php");
 
 
 define("updateUrl", "http://dev.local/NewVersion.zip");
@@ -458,9 +458,10 @@ class MoveNewVersionStep extends Phase2Step {
 
 class UpgradeDBStep extends Phase3Step {
     public function makeStep() {
-        //if (!DBUpgrade::Upgrade()){
-        //    $this->message = "Ошибка при апгрейде! Обновляйтесь вручную.";
-        //}
+        if (!DBUpgrade::Upgrade()){
+            $this->message = "Ошибка при апгрейде:\n".DBUpgrade::$lasterror;
+            return false;
+        }
         $this->message = "Апгрейд завершен";
         return true;
     }

@@ -6,6 +6,7 @@ include_once $dir.'class/Database.class.php';
 include_once $dir.'class/Errors.class.php';
 include_once $dir.'class/Notification.class.php';
 include_once $dir.'class/Updater.class.php';
+include_once $dir.'class/DBUpgrade.class.php';
 
 //Проверяем пароль
 function OnAction_enter(){
@@ -277,6 +278,10 @@ function OnAction_update_reset(){
 
 function OnAction_update_nextstep(){
     Updater::action('update_nextstep');
+}
+
+function OnAction_upgrade_db(){
+    DBUpgrade::Upgrade();
 }
 
 if (isset($_POST['action']))
