@@ -53,13 +53,19 @@ if (isset($_POST['action']))
 			{
 				$engineFile = $dir.'/trackers/'.$tracker.'.engine.php';
 				if (file_exists($engineFile))
-				{	
+				{    
 					$functionEngine = include_once $engineFile;
 					$class = explode('.', $tracker);
 					$class = $class[0];
-					$class = str_replace('-', '', $class);
+					$functionClass = str_replace('-', '', $class);
+					
+					if ($tracker == 'tracker.0day.kiev.ua')
+					    $functionClass = 'kiev';
+					    
+                    if ($tracker == 'torrents.net.ua')
+					    $functionClass = 'torrentsnet';
 
-					if (call_user_func(array($class, 'checkRule'), $threme))
+					if (call_user_func(array($functionClass, 'checkRule'), $threme))
 					{
 						if (Database::checkThremExist($tracker, $threme))
 						{
@@ -229,7 +235,7 @@ if (isset($_POST['action']))
     	{
         	Database::deleteFromBuffer($array[$i]['id']);
     	}
-
+        return TRUE;
 	}	
 	
 	//Перемещаем тему из буфера в мониторинг постоянный
@@ -284,33 +290,33 @@ if (isset($_POST['action']))
 		$path = Sys::checkPath($_POST['path']);
 		Database::updateSettings('path', $path);
 		Database::updateSettings('email', $_POST['email']);
-		
-		if ( ! empty($_POST['send']))
+
+		if ($_POST['send'] == 'true')
 			$send = 1;
 		else 
 			$send = 0;
 		Database::updateSettings('send', $send);
 		
-		if ( ! empty($_POST['send_warning']))
+		if ($_POST['send_warning'] == 'true')
 			$send_warning = 1;
 		else 
 			$send_warning = 0;
 		Database::updateSettings('send_warning', $send_warning);
 		
-		if ( ! empty($_POST['auth']))
+		if ($_POST['auth'] == 'true')
 			$auth = 1;
 		else 
 			$auth = 0;
 		Database::updateSettings('auth', $auth);
 		
-		if ( ! empty($_POST['proxy']))
+		if ($_POST['proxy'] == 'true')
 			$proxy = 1;
 		else 
 			$proxy = 0;
 		Database::updateSettings('proxy', $proxy);
 		Database::updateSettings('proxyAddress', $_POST['proxyAddress']);
 
-        if ( ! empty($_POST['torrent']))
+        if ($_POST['torrent'] == 'true')
 			$torrent = 1;
 		else 
 			$torrent = 0;
@@ -322,13 +328,13 @@ if (isset($_POST['action']))
         $pathToDownload = Sys::checkPath($_POST['pathToDownload']);
         Database::updateSettings('pathToDownload', $pathToDownload);
         
-        if ( ! empty($_POST['deleteTorrent']))
+        if ($_POST['deleteTorrent'] == 'true')
 			$deleteTorrent = 1;
 		else 
 			$deleteTorrent = 0;
         Database::updateSettings('deleteTorrent', $deleteTorrent);
         
-        if ( ! empty($_POST['deleteOldFiles']))
+        if ($_POST['deleteOldFiles'] == 'true')
 			$deleteOldFiles = 1;
 		else 
 			$deleteOldFiles = 0;

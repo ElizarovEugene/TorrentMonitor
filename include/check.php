@@ -50,7 +50,7 @@ if (Sys::checkInternet())
 		<tr>			
 			<?php	
 			}
-			$dir = str_replace('include', '', __DIR__);
+			$dir = str_replace('include', '', dirname(__FILE__));
 			if (Sys::checkWriteToPath($dir))
 			{
 			?>

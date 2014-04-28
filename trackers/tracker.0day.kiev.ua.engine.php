@@ -1,5 +1,5 @@
 <?php
-class rutracker
+class kiev
 {
 	protected static $sess_cookie;
 	protected static $exucution;
@@ -12,14 +12,14 @@ class rutracker
         	array(
         		'type'           => 'POST',
         		'returntransfer' => 1,
-        		'url'            => 'http://rutracker.org/forum/index.php',
+        		'url'            => 'http://tracker.0day.kiev.ua/',
         		'cookie'         => $sess_cookie,
-        		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen($sess_cookie)),
+        		'sendHeader'     => array('Host' => 'tracker.0day.kiev.ua', 'Content-length' => strlen($sess_cookie)),
         		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
         	)
         );
 
-		if (preg_match('/Вы зашли как: &nbsp;/', $result))
+		if (preg_match('/<a href=\"userdetails\.php\?id=\d+\">/U', $result))
 			return TRUE;
 		else
 			return FALSE;
@@ -35,24 +35,16 @@ class rutracker
 	}
 
 	//функция преобразования даты
-	private static function dateStringToNum($data)
-	{
-		$monthes = array('Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек');
-		$month = substr($data, 3, 6);
-		$date = preg_replace('/(\d\d)-(\d\d)-(\d\d)/', '$3-$2-$1', str_replace($month, str_pad(array_search($month, $monthes)+1, 2, 0, STR_PAD_LEFT), $data));
-		$date = date('Y-m-d H:i:s', strtotime($date));
-
-		return $date;
-	}
-
-	//функция преобразования даты
 	private static function dateNumToString($data)
 	{
-		$data = str_replace('-', ' ', $data);
-		$arr = preg_split('/\s/', $data);
-		$date = $arr[0].' '.$arr[1].' 20'.$arr[2].' '.$arr[3];
-
-		return $date;
+		$pieces = explode(' ', $data);
+        $dates = explode('-', $pieces[0]);
+        $m = Sys::dateNumToString($dates[1]);
+        $date = $dates[2].' '.$m.' '.$dates[0];
+        $time = substr($pieces[1], 0, -3);
+        $dateTime = $date.' '.$time;
+        
+        return $dateTime;
 	}
 
 	//функция получения кук
@@ -72,8 +64,8 @@ class rutracker
             		'type'           => 'POST',
             		'header'         => 1,
             		'returntransfer' => 1,
-            		'url'            => 'http://login.rutracker.org/forum/login.php',
-            		'postfields'     => 'login_username='.$login.'&login_password='.$password.'&login=%C2%F5%EE%E4',
+            		'url'            => 'http://tracker.0day.kiev.ua/takelogin.php',
+            		'postfields'     => 'username='.$login.'&password='.$password,
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
@@ -81,56 +73,56 @@ class rutracker
 			if ( ! empty($page))
 			{
 				//проверяем подходят ли учётные данные
-				if (preg_match('/profile\.php\?mode=register/', $page, $array))
+				if (preg_match('/Имя пользователя или пароль неверны/', $page, $array))
 				{
 					//устанавливаем варнинг
 					Errors::setWarnings($tracker, 'credential_wrong');
 					//останавливаем процесс выполнения, т.к. не может работать без кук
-					rutracker::$exucution = FALSE;
+					kiev::$exucution = FALSE;
 				}
 				//если подходят - получаем куки
-				elseif (preg_match('/bb_data=.+;/U', $page, $array))
+				elseif (preg_match_all('/Set-Cookie: (.*);/U', $page, $array))
 				{
-					rutracker::$sess_cookie = $array[0];
-					Database::setCookie($tracker, rutracker::$sess_cookie);
+					kiev::$sess_cookie = $array[1][1].'; '.$array[1][2].';';
+					Database::setCookie($tracker, kiev::$sess_cookie);
 					//запускам процесс выполнения, т.к. не может работать без кук
-					rutracker::$exucution = TRUE;
+					kiev::$exucution = TRUE;
 				}
 				else
 				{
 					//устанавливаем варнинг
-					if (rutracker::$warning == NULL)
+					if (kiev::$warning == NULL)
 					{
-						rutracker::$warning = TRUE;
+						kiev::$warning = TRUE;
 						Errors::setWarnings($tracker, 'not_available');
 					}
 					//останавливаем процесс выполнения, т.к. не может работать без кук
-					rutracker::$exucution = FALSE;
+					kiev::$exucution = FALSE;
 				}
 			}
 			//если вообще ничего не найдено
 			else
 			{
 				//устанавливаем варнинг
-				if (rutracker::$warning == NULL)
+				if (kiev::$warning == NULL)
 				{
-					rutracker::$warning = TRUE;
+					kiev::$warning = TRUE;
 					Errors::setWarnings($tracker, 'not_available');
 				}
 				//останавливаем процесс выполнения, т.к. не может работать без кук
-				rutracker::$exucution = FALSE;
+				kiev::$exucution = FALSE;
 			}
 		}
 		else
 		{
 			//устанавливаем варнинг
-			if (rutracker::$warning == NULL)
+			if (kiev::$warning == NULL)
 			{
-				rutracker::$warning = TRUE;
+				kiev::$warning = TRUE;
 				Errors::setWarnings($tracker, 'credential_miss');
 			}
 			//останавливаем процесс выполнения, т.к. не может работать без кук
-			rutracker::$exucution = FALSE;
+			kiev::$exucution = FALSE;
 		}
 	}
 
@@ -138,16 +130,16 @@ class rutracker
 	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash)
 	{
 		$cookie = Database::getCookie($tracker);
-		if (rutracker::checkCookie($cookie))
+		if (kiev::checkCookie($cookie))
 		{
-			rutracker::$sess_cookie = $cookie;
+			kiev::$sess_cookie = $cookie;
 			//запускам процесс выполнения
-			rutracker::$exucution = TRUE;
+			kiev::$exucution = TRUE;
 		}
 		else
-    		rutracker::getCookie($tracker);
+    		kiev::getCookie($tracker);
 
-		if (rutracker::$exucution)
+		if (kiev::$exucution)
 		{
 			//получаем страницу для парсинга
             $page = Sys::getUrlContent(
@@ -155,9 +147,9 @@ class rutracker
             		'type'           => 'POST',
             		'header'         => 0,
             		'returntransfer' => 1,
-            		'url'            => 'http://rutracker.org/forum/viewtopic.php?t='.$torrent_id,
-            		'cookie'         => rutracker::$sess_cookie,
-            		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen(rutracker::$sess_cookie)),
+            		'url'            => 'http://tracker.0day.kiev.ua/details.php?id='.$torrent_id,
+            		'cookie'         => kiev::$sess_cookie,
+            		'sendHeader'     => array('Host' => 'tracker.0day.kiev.ua', 'Content-length' => strlen(kiev::$sess_cookie)),
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
@@ -165,7 +157,7 @@ class rutracker
 			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
-				if (preg_match('/<span title=\"Когда зарегистрирован\">\[ (.+) \]<\/span>/', $page, $array))
+				if (preg_match('/Добавлен<\/td><td class=\'row2\' valign=\"top\" align=\"left\">(.*)<\/td>/', $page, $array))
 				{
 					//проверяем удалось ли получить дату со страницы
 					if (isset($array[1]))
@@ -176,81 +168,85 @@ class rutracker
 							//сбрасываем варнинг
 							Database::clearWarnings($tracker);
 							//приводим дату к общему виду
-							$date = rutracker::dateStringToNum($array[1]);
-							$date_str = rutracker::dateNumToString($array[1]);
+							$date = $array[1];
+							$date_str = kiev::dateNumToString($array[1]);
 							//если даты не совпадают, перекачиваем торрент
 							if ($date != $timestamp)
 							{
-								//сохраняем торрент в файл
-                                $torrent = Sys::getUrlContent(
-                                	array(
-                                		'type'           => 'POST',
-                                		'returntransfer' => 1,
-                                		'url'            => 'http://dl.rutracker.org/forum/dl.php?t='.$torrent_id,
-                                		'cookie'         => rutracker::$sess_cookie.'; bb_dl='.$torrent_id,
-                                		'sendHeader'     => array('Host' => 'dl.rutracker.org', 'Content-length' => strlen(rutracker::$sess_cookie.'; bb_dl='.$torrent_id)),
-                                		'referer'        => 'http://rutracker.org/forum/viewtopic.php?t='.$torrent_id,
-                                	)
-                                );
-								$message = $name.' обновлён.';
-								$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str);
+							    //ищем ссылку на скачивание torrent-файла
+                                if (preg_match('/download\.php\?id='.$torrent_id.'\&amp\;name=.*\.torrent/', $page, $array))
+                                {
+                                    $link = str_replace('&amp;', '&', 'http://tracker.0day.kiev.ua/'.$array[0]);
+    								//сохраняем торрент в файл
+                                    $torrent = Sys::getUrlContent(
+                                    	array(
+                                    		'type'           => 'GET',
+                                    		'returntransfer' => 1,
+                                    		'url'            => $link,
+                                    		'cookie'         => kiev::$sess_cookie,
+                                    		'sendHeader'     => array('Host' => 'tracker.0day.kiev.ua', 'Content-length' => strlen(kiev::$sess_cookie)),
+                                    	)
+                                    );
+    								$message = $name.' обновлён.';
+    								$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str);
 								
-								if ($status == 'add_fail' || $status == 'connect_fail' || $status == 'credential_wrong')
-								{
-								    $torrentClient = Database::getSetting('torrentClient');
-								    Errors::setWarnings($torrentClient, $status);
-								}
-								
-								//обновляем время регистрации торрента в базе
-								Database::setNewDate($id, $date);
+    								if ($status == 'add_fail' || $status == 'connect_fail' || $status == 'credential_wrong')
+    								{
+    								    $torrentClient = Database::getSetting('torrentClient');
+    								    Errors::setWarnings($torrentClient, $status);
+    								}
+    								
+    								//обновляем время регистрации торрента в базе
+    								Database::setNewDate($id, $date);
+                                }
 							}
 						}
 						else
 						{
 							//устанавливаем варнинг
-							if (rutracker::$warning == NULL)
+							if (kiev::$warning == NULL)
 							{
-								rutracker::$warning = TRUE;
+								kiev::$warning = TRUE;
 								Errors::setWarnings($tracker, 'not_available');
 							}
 							//останавливаем процесс выполнения, т.к. не может работать без кук
-							rutracker::$exucution = FALSE;
+							kiev::$exucution = FALSE;
 						}
 					}
 					else
 					{
 						//устанавливаем варнинг
-						if (rutracker::$warning == NULL)
+						if (kiev::$warning == NULL)
 						{
-							rutracker::$warning = TRUE;
+							kiev::$warning = TRUE;
 							Errors::setWarnings($tracker, 'not_available');
 						}
 						//останавливаем процесс выполнения, т.к. не может работать без кук
-						rutracker::$exucution = FALSE;
+						kiev::$exucution = FALSE;
 					}
 				}
 				else
 				{
 					//устанавливаем варнинг
-					if (rutracker::$warning == NULL)
+					if (kiev::$warning == NULL)
 					{
-						rutracker::$warning = TRUE;
+						kiev::$warning = TRUE;
 						Errors::setWarnings($tracker, 'not_available');
 					}
 					//останавливаем процесс выполнения, т.к. не может работать без кук
-					rutracker::$exucution = FALSE;
+					kiev::$exucution = FALSE;
 				}
 			}
 			else
 			{
 				//устанавливаем варнинг
-				if (rutracker::$warning == NULL)
+				if (kiev::$warning == NULL)
 				{
-					rutracker::$warning = TRUE;
+					kiev::$warning = TRUE;
 					Errors::setWarnings($tracker, 'not_available');
 				}
 				//останавливаем процесс выполнения, т.к. не может работать без кук
-				rutracker::$exucution = FALSE;
+				kiev::$exucution = FALSE;
 			}
 		}
 	}

@@ -496,7 +496,7 @@ class Database
                 $threme = $row['threme_id'];
                 $name = $row['threme'];
                 $tracker = $row['tracker'];
-                Database::setThreme($tracker, $name, $threme);
+                Database::setThreme($tracker, $name, '', $threme);
                 Database::deleteFromBuffer($id);
             }
         }
@@ -811,6 +811,55 @@ class Database
         else
             return FALSE;
         $stmt = NULL;
+    }
+    
+    public static function saveToTemp($id, $path, $hash, $tracker, $message, $date)
+    {
+        $stmt = self::newStatement("INSERT INTO `temp` (`id`, `path`, `hash`, `tracker`, `message`, `date`) VALUES (:id, :path, :hash, :tracker, :message, :date)");        
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':path', $path);
+        $stmt->bindParam(':hash', $hash);
+        $stmt->bindParam(':tracker', $tracker);
+        $stmt->bindParam(':message', $message);
+        $stmt->bindParam(':date', $date);
+        if ($stmt->execute())
+            return TRUE;
+        else
+            return FALSE;
+        $stmt = NULL;        
+    }
+    
+    public static function getAllFromTemp()
+    {
+        $stmt = self::newStatement("SELECT `id`, `path`, `hash`, `tracker`, `message`, `date` FROM `temp`");
+        if ($stmt->execute())
+        {
+            $i=0;
+            foreach ($stmt as $row)
+            {
+                $resultArray[$i]['id'] = $row['id'];
+                $resultArray[$i]['path'] = $row['path'];
+                $resultArray[$i]['hash'] = $row['hash'];
+                $resultArray[$i]['tracker'] = $row['tracker'];
+                $resultArray[$i]['message'] = $row['message'];
+                $resultArray[$i]['date_str'] = $row['date'];
+                $i++;
+            }
+            if ( ! empty($resultArray))
+                return $resultArray;
+        }
+        $stmt = NULL;
+    }
+    
+    public static function deleteFromTemp($id)
+    {
+        $stmt = self::newStatement("DELETE FROM `temp` WHERE `id` = :id");        
+        $stmt->bindParam(':id', $id);
+        if ($stmt->execute())
+            return TRUE;
+        else
+            return FALSE;
+        $stmt = NULL;        
     }
 }
 ?>

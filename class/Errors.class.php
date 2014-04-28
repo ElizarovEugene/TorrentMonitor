@@ -13,9 +13,9 @@ class Errors
     	Errors::write('credential_wrong', 'Неправильные учётные данные.');
     	Errors::write('rss_parse_false', 'Ошибка при чтении XML файла RSS ленты.');
     	Errors::write('max_torrent', 'Вы использовали доступное Вам количество торрент-файлов в сутки.');
-    	Errors::write('captcha', 'При логине запрашивается капча, следует отключить мониторинг на некоторое время.');
     	Errors::write('update', 'Невозможно проверить обновление системы.');
     	Errors::write('add_fail', 'Не удалось добавить torrent-файл в torrent-клиент.');
+    	Errors::write('connect_fail', 'Не удалось подключиться к torrent-клиенту.');
 	}
 	
 	public static function getInstance()
