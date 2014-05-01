@@ -44,6 +44,7 @@ class Deluge
         
             //сбрасываем варнинг
             Database::clearWarnings('Deluge');
+            return TRUE;
         }
     }
 }

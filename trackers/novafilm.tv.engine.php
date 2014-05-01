@@ -68,7 +68,7 @@ class novafilm
 	{
 		if (preg_match('/'.$name.'/i', $item->category))
 		{
-			if ($hd)
+			if ($hd == 1)
 			{
 				if (preg_match_all('/720/', $item->link, $matches))
 				{
@@ -81,9 +81,22 @@ class novafilm
 					}
 				}
 			}
+			elseif ($hd == 2)
+			{
+				if (preg_match_all('/1080/', $item->link, $matches))
+				{
+					preg_match('/s\d{2}\.?e\d{2}/i', $item->link, $matches);
+					if (isset($matches[0]))
+					{
+						$episode = $matches[0];
+						$date = novafilm::dateStringToNum($item->pubDate);
+						return array('episode'=>$episode, 'date'=>$date, 'link'=>(string)$item->link);
+					}
+				}
+			}
 			else
 			{
-				if (preg_match_all('/^(?!(.*720))/', $item->link, $matches))
+				if (preg_match_all('/^(?!(.*720|.*1080))/', $item->link, $matches))
 				{
 					preg_match('/s\d{2}\.?e\d{2}/i', $item->link, $matches);
 					if (isset($matches[0]))
@@ -266,6 +279,7 @@ class novafilm
 					{
 						$episode = substr($serial['episode'], 4, 2);
 						$season = substr($serial['episode'], 1, 2);
+						$date_str = novafilm::dateNumToString($serial['date']);
 						
 						if ( ! empty($ep))
 						{
