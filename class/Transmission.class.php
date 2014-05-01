@@ -26,14 +26,14 @@ class Transmission
                 if ($deleteOldFiles)
                     $delOpt = '--remove-and-delete';
             }
-            
+
             #удяляем существующую закачку из torrent-клиента
             $command = `transmission-remote $torrentAddress $opt -t $hash $delOpt`;
         }
 
         #добавляем торрент в torrent-клиента
         $command = `transmission-remote $torrentAddress $opt -a '$file' -w '$pathToDownload'`;
-        if ( ! preg_match('/responded: \"success\"/', $command))
+        if ( ! preg_match('/responded\:\s\"success\"/', $command))
             return 'add_fail';
         elseif (preg_match('/Couldn\'t connect to server/', $command))
             return 'connect_fail';
@@ -43,9 +43,10 @@ class Transmission
             $hashNew = `transmission-show '$file' | grep Hash | awk '{print $2}'`;
             #обновляем hash в базе
             Database::updateHash($id, $hashNew);
-        
+
             //сбрасываем варнинг
             Database::clearWarnings('Transmission');
+            return TRUE;
         }
     }
 }

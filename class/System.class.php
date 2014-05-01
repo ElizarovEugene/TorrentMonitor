@@ -10,7 +10,7 @@ class Sys
 		else
 			return FALSE;
 	}
-	
+
 	//проверяем есть ли конфигурационный файл
 	public static function checkConfigExist()
 	{
@@ -27,7 +27,7 @@ class Sys
 	{
 		$dir = dirname(__FILE__).'/../';
 		include_once $dir.'config.php';
-		
+
 		$confArray = Config::$confArray;
 		foreach ($confArray as $key => $val)
 		{
@@ -55,7 +55,7 @@ class Sys
 			$path = $path.'/';
 		return $path;
 	}
-	
+
 	//проверка на возхможность записи в директорию
 	public static function checkWriteToPath($path)
 	{
@@ -65,7 +65,7 @@ class Sys
 	//версия системы
 	public static function version()
 	{
-		return '0.9.6';
+		return '0.9.7';
 	}
 
 	//проверка обновлений системы
@@ -79,7 +79,7 @@ class Sys
 
         $xmlstr = @file_get_contents('http://korphome.ru/torrent_monitor/version.xml', false, $opts);
         $xml = @simplexml_load_string($xmlstr);
-	    
+
 		if (false !== $xml)
 		{
 			if (Sys::version() < $xml->current_version)
@@ -88,7 +88,7 @@ class Sys
 				return FALSE;
 		}
 	}
-	
+
 	//обёртка для CURL, для более удобного использования
 	public static function getUrlContent($param = null)
     {
@@ -126,17 +126,17 @@ class Sys
     				$header[] = $k.': '.$v."\r\n";
     			}
     			curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-    		}		
+    		}
 
     		if (isset($param['referer']))
     			curl_setopt($ch, CURLOPT_REFERER, $param['referer']);
-    			
+
             $settingProxy = Database::getSetting('proxy');
             if ($settingProxy)
             {
                 $settingProxyAddress = Database::getSetting('proxyAddress');
-                curl_setopt($ch, CURLOPT_PROXY, $settingProxyAddress); 
-                curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5); 
+                curl_setopt($ch, CURLOPT_PROXY, $settingProxyAddress);
+                curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
             }
 
     		$result = curl_exec($ch);
@@ -148,7 +148,7 @@ class Sys
     		return $result;
     	}
     }
-    
+
     //Проверяем доступность трекера
     public static function checkavAilability($tracker)
     {
@@ -160,20 +160,20 @@ class Sys
                 'url'            => $tracker,
             )
 		);
-		
+
 		if (preg_match('/HTTP\/1\.1 200 OK/', $page))
 			return true;
 		else
 			return false;
     }
-	
+
 	//Получаем заголовок страницы
 	public static function getHeader($url)
 	{
 		$Purl = parse_url($url);
 		$tracker = $Purl['host'];
 		$tracker = preg_replace('/www\./', '', $tracker);
-	
+
 		$forumPage = Sys::getUrlContent(
             array(
                 'type'           => 'GET',
@@ -181,7 +181,7 @@ class Sys
                 'url'            => $url,
             )
 		);
-		
+
 		if ($tracker == 'rustorka.com')
 		{
 		    $dir = str_replace('class', '', dirname(__FILE__));
@@ -189,7 +189,7 @@ class Sys
 			if (file_exists($engineFile))
 			{
 				Database::clearWarnings('system');
-					
+
 				$functionEngine = include_once $engineFile;
 				$class = explode('.', $tracker);
 				$class = $class[0];
@@ -209,7 +209,7 @@ class Sys
         		$sess_cookie = call_user_func($functionClass.'::getCookie', $tracker);
         		//запускам процесс выполнения
     			$exucution = TRUE;
-            } 
+            }
 
     		if ($exucution)
     		{
@@ -262,12 +262,12 @@ class Sys
 			$name = 'Неизвестный';
 		return $name;
 	}
-	
+
 	//добавляем в torrent-клиент
 	public static function addToClient($id, $path, $hash, $tracker, $message, $date_str)
 	{
         $torrentClient = Database::getSetting('torrentClient');
-        
+
         $dir = dirname(__FILE__).'/';
         include_once $dir.$torrentClient.'.class.php';
         if (call_user_func($torrentClient.'::addNew', $id, $path, $hash, $tracker))
@@ -275,7 +275,7 @@ class Sys
             $deleteTorrent = Database::getSetting('deleteTorrent');
             if ($deleteTorrent)
                 unlink($path);
-            
+
             Database::deleteFromTemp($id);
             return ' И добавлен в torrent-клиент.';
         }
@@ -285,7 +285,7 @@ class Sys
             return ' Но не добавлен в torrent-клиент и сохраненён.';
         }
 	}
-	
+
 	//созраняем torrent файл
 	public static function saveTorrent($tracker, $name, $torrent, $id, $hash, $message, $date_str)
 	{
@@ -301,32 +301,32 @@ class Sys
         //отправляем уведомлении о новом торренте
         Notification::sendNotification('notification', $date_str, $tracker, $message.$messageAdd);
 	}
-	
+
 	//преобразуем месяц из числового в текстовый
 	public static function dateNumToString($date)
 	{
 	    $monthes_num = array('/10/', '/11/', '/12/', '/0?1/', '/0?2/', '/0?3/', '/0?4/', '/0?5/', '/0?6/', '/0?7/', '/0?8/', '/0?9/');
 	    $monthes_ru = array('Окт', 'Ноя', 'Дек', 'Янв', 'Фев', 'Мар', 'Апр', 'Мая', 'Июн', 'Июл', 'Авг', 'Сен');
 	    $month = preg_replace($monthes_num, $monthes_ru, $date);
-	    
+
 	    return $month;
 	}
-	
+
 	//преобразуем месяц из текстового в числовый
 	public static function dateStringToNum($date)
 	{
 	    $monthes = array('/янв|Янв|Jan/i', '/фев|Фев|Feb/i', '/мар|Мар|Mar/i', '/апр|Апр|Apr/i', '/мая|май|Мая|мая|May/i', '/июн|Июн|Jun/i', '/июл|Июл|Jul/i', '/авг|Авг|Aug/i', '/сен|Сен|Sep/i', '/окт|Окт|Oct/i', '/ноя|Ноя|Nov/i', '/дек|Дек|Dec/i');
 	    $monthes_num = array('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12');
 	    $month = preg_replace($monthes, $monthes_num, $date);
-	    
+
 	    return $month;
 	}
-	
+
 	//записываем время последнего запуска системы
 	public static function lastStart()
 	{
         $dir = dirname(__FILE__);
-		$dir = str_replace('class', '', $dir);	   
+		$dir = str_replace('class', '', $dir);
 		$date = date('d-m-Y H:i:s');
 		file_put_contents($dir.'/laststart.txt', $date);
 	}

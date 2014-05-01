@@ -415,7 +415,7 @@ function changefunc()
 {
     var select = document.getElementById("selectfunc");
     var selectedText = select.options[select.selectedIndex].text;
-    var a = ['anidub.com', 'animelayer.ru', 'baibako.tv', 'casstudio.tv', 'kinozal.tv', 'lostfilm.tv', 'newstudio.tv', 'nnm-club.me', 'novafilm.tv', 'rutracker.org', 'torrents.net.ua', 'tracker.0day.kiev.ua'];
+    var a = ['anidub.com', 'animelayer.ru', 'baibako.tv', 'casstudio.tv', 'kinozal.tv', 'lostfilm.tv', 'newstudio.tv', 'nnm-club.me', 'novafilm.tv', 'rustorka.com', 'rutracker.org', 'tracker.0day.kiev.ua'];
     for (var i = 0; i < a.length; i++)
     {
         var e = a[i];
@@ -432,12 +432,10 @@ function changefunc()
 function changeField()
 {
 	var tracker = document.getElementById("tracker").value;
-    if (tracker == 'baibako.tv' || tracker == 'newstudio.tv')
+    if (tracker == 'baibako.tv' || tracker == 'newstudio.tv' || tracker == 'novafilm.tv')
         $('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> HD 720<br /><input type="radio" name="hd" value="2"> HD 1080</span>');
 	if (tracker == 'lostfilm.tv')
 		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> Автовыбор HD 720/1080<br /><input type="radio" name="hd" value="2"> HD 720 MP4');
-	if (tracker == 'novafilm.tv')
-		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> HD 720</span>');
 }
 
 //Показать/скрыть настройки proxy
@@ -459,7 +457,6 @@ function showTorrent()
     else
         document.getElementById("torrentSettings").style.display = "none";
 }
-
 //Показать/скрыть настройки PushBullet
 function showPushBullet()
 {

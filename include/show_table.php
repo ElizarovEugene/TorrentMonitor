@@ -44,7 +44,7 @@ if ( ! empty($torrents_list))
         <tr>
             <td class='text-align-left' nowrap><span class='icon-torrent' style='background-image: url(img/<?php echo $tracker ?>.ico);'></span><?php echo $tracker ?></td>
             <td class='text-align-left'>
-    	  	<?php 
+    	  	<?php
     		if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.me' || $tracker == 'tfile.me' || $tracker == 'torrents.net.ua' || $tracker == 'rustorka.com')
     		{
     		?>
@@ -55,7 +55,7 @@ if ( ! empty($torrents_list))
     		{
             ?>
         	    <a href='http://<?php echo $tracker ?>/details.php?id=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
-        	<?php	
+        	<?php
     		}
     		elseif ($tracker == 'rutor.org')
     		{
@@ -65,9 +65,9 @@ if ( ! empty($torrents_list))
     		}
     		elseif ($tracker == 'anidub.com')
     		{
-	    	?>        		
-	    		<a href='http://tr.<?php echo $tracker ?>/details.php?id=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>	    	
-	    	<?php        		
+	    	?>
+	    		<a href='http://tr.<?php echo $tracker ?>/details.php?id=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
+	    	<?php
     		}
     		else
     		{
@@ -75,7 +75,9 @@ if ( ! empty($torrents_list))
         			echo '<img src="img/720.png">&nbsp;<img src="img/1080.png">';
                 elseif ($hd == 1 && $tracker == 'novafilm.tv' || $hd == 1 && $tracker == 'baibako.tv')
                     echo '<img src="img/720.png">';
-                elseif ($hd == 2 && $tracker == 'baibako.tv' || $hd == 2 && $tracker == 'newstudio.tv')
+                elseif ($hd == 2 && $tracker == 'lostfilm.tv')
+                    echo '<img src="img/720.png">';
+                elseif ($hd == 2 && $tracker == 'baibako.tv' || $hd == 2 && $tracker == 'newstudio.tv' || $hd == 2 && $tracker == 'novafilm.tv')
                     echo '<img src="img/1080.png">';
                 else
                     echo '<img src="img/sd.png">';
@@ -106,7 +108,7 @@ if ( ! empty($torrents_list))
                 		echo '<u>'.$date_update.'</u>';
                 	else
                 		echo $date_update;
-                	?>			
+                	?>
             		</div>
             	<?php
             	if ($timestamp != '0000-00-00 00:00:00')
@@ -126,16 +128,16 @@ if ( ! empty($torrents_list))
             	}
             	?>
             	</div>
-            <?php	
+            <?php
             }
-            ?>          
+            ?>
             </td>
             <td><a href='#' class='delete' onclick='del(<?php echo $id?>)'></td>
         </tr>
-<?php 
-	} 
+<?php
+	}
 ?>
-	</tbody> 
+	</tbody>
 </table>
 
 <div class='update'>Последний запуск:
@@ -150,6 +152,6 @@ else
 	echo 'Ещё не производился.';
 ?>
 </div>
-<?php 
-} 
+<?php
+}
 ?>
