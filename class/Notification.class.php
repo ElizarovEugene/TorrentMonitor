@@ -24,7 +24,7 @@ class Notification
 		$pushbullet_api = Database::getSetting('pushbulletapi') . ":";
 		echo $pushbullet_api;
 		$devices = explode(",", Database::getSetting('pushbulletdevices'));
-		$msg = 'Дата: ' . $date . '<br>Трекер: ' . $tracker . '<br>Сообщение: ' . $message;
+		$msg = 'Дата: ' . $date . '\nТрекер: ' . $tracker . '\nСообщение: ' . $message;
 		$basequery = http_build_query(array("type" => "note", "title" => "TorrentMonitor: " . $header_message, "body" => $msg));
 		foreach ($devices as $device)
 		{
@@ -41,8 +41,8 @@ class Notification
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, FALSE);
 			curl_setopt($ch, CURLOPT_POST, TRUE);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
-			curl_setopt($ch, CURLOPT_PROXY, $settingProxyAddress);
-			curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
+        	curl_setopt($ch, CURLOPT_PROXY, $settingProxyAddress);
+            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
 			curl_exec($ch);
 			curl_close($ch);
 		}
