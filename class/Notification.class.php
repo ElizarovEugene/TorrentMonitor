@@ -41,8 +41,8 @@ class Notification
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, FALSE);
 			curl_setopt($ch, CURLOPT_POST, TRUE);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
-        	curl_setopt($ch, CURLOPT_PROXY, $settingProxyAddress);
-            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
+			curl_setopt($ch, CURLOPT_PROXY, $settingProxyAddress);
+			curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
 			curl_exec($ch);
 			curl_close($ch);
 		}
