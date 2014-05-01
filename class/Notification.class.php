@@ -19,12 +19,7 @@ class Notification
 
 	public static function send_pushbullet($settingPushBullet, $date, $tracker, $message, $header_message)
 	{
-		$settingProxy = Database::getSetting('proxy');
-
-		if ($settingProxy)
-		{
-			$settingProxyAddress = Database::getSetting('proxyAddress');
-		}
+      	$settingProxyAddress = (Database::getSetting('proxy') == 1) ? Database::getSetting('proxyAddress') : null;
 
 		$pushbullet_api = Database::getSetting('pushbulletapi') . ":";
 		echo $pushbullet_api;
@@ -39,11 +34,6 @@ class Notification
 		     $query = $basequery . "&" . http_build_query(array("device_iden" => $device));
 		    }
 			$ch = curl_init();
-			if ($settingProxy)
-			{
-				curl_setopt($ch, CURLOPT_PROXY, $settingProxyAddress);
-				curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
-			}
 			curl_setopt($ch, CURLOPT_URL, "https://api.pushbullet.com/api/pushes");
 			curl_setopt($ch, CURLOPT_USERPWD, $pushbullet_api);
 			curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -51,6 +41,8 @@ class Notification
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, FALSE);
 			curl_setopt($ch, CURLOPT_POST, TRUE);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
+        	curl_setopt($ch, CURLOPT_PROXY, $settingProxyAddress);
+            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
 			curl_exec($ch);
 			curl_close($ch);
 		}
