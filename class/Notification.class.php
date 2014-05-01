@@ -19,12 +19,19 @@ class Notification
 
 	public static function send_pushbullet($settingPushBullet, $date, $tracker, $message, $header_message)
 	{
+		$settingProxy = Database::getSetting('proxy');
+
+		if ($settingProxy)
+		{
+			$settingProxyAddress = Database::getSetting('proxyAddress');
+		}
+
 		$pushbullet_api = Database::getSetting('pushbulletapi') . ":";
 		echo $pushbullet_api;
 		$devices = explode(",", Database::getSetting('pushbulletdevices'));
 		$msg = 'Дата: ' . $date . '<br>Трекер: ' . $tracker . '<br>Сообщение: ' . $message;
 		$basequery = http_build_query(array("type" => "note", "title" => "TorrentMonitor: " . $header_message, "body" => $msg));
-		foreach ($devices as $devices)
+		foreach ($devices as $device)
 		{
 		    $query = $basequery;
 		    if (!empty($device))
@@ -32,6 +39,11 @@ class Notification
 		     $query = $basequery . "&" . http_build_query(array("device_iden" => $device));
 		    }
 			$ch = curl_init();
+			if ($settingProxy)
+			{
+				curl_setopt($ch, CURLOPT_PROXY, $settingProxyAddress);
+				curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
+			}
 			curl_setopt($ch, CURLOPT_URL, "https://api.pushbullet.com/api/pushes");
 			curl_setopt($ch, CURLOPT_USERPWD, $pushbullet_api);
 			curl_setopt($ch, CURLOPT_HEADER, FALSE);

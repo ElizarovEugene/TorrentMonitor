@@ -50,7 +50,7 @@ foreach ($settings as $row)
         <label><input type="checkbox" id="torrent" name="torrent" <?php if ($useTorrent) echo "checked" ?> onclick="showTorrent()"> Управлять торрент-клиентом</label>
     </p>
     <div id="torrentSettings" <?php if (!$useTorrent) echo 'class="result"' ?>>
-    <p>        
+    <p>
         <label class="label-name">Торрент-клиент</label>
         <label>
             <select id="torrentClient" name="torrentClient">
@@ -87,8 +87,27 @@ foreach ($settings as $row)
         <label class="label-name"></label>
         <label><input type="checkbox" name="deleteOldFiles" <?php if ($deleteOldFiles) echo "checked" ?>> Удалять файлы старых раздач</label>
         <span class="subinput-text">Только для lostfilm.tv и novafilm.tv</span>
-    </p>    
+    </p>
     </div>
+    <p>
+        <label class="label-name"></label>
+        <label><input type="checkbox" id="send_pushbullet" name="send_pushbullet" <?php if ($send_pushbullet) echo "checked" ?> onclick="showPushBullet()"> Отправлять уведомления PushBullet</label>
+    </p>
+    <p>
+        <label class="label-name"></label>
+        <label><input type="checkbox" id="send_warning_pushbullet" name="send_warning_pushbullet" <?php if ($send_warning_pushbullet) echo "checked" ?> onclick="showPushBullet()"> Отправлять уведомления об ошибках PushBullet</label>
+    </p>
+    <div id="pushbulletSettings" <?php if (!$send_pushbullet && !$send_warning_pushbullet) echo 'class="result"' ?>>
+    <p>
+        <label class="label-name">API</label>
+        <input type="text" name="pushbulletapi" value="<?php echo $pushbulletapi ?>"><br>
+    </p>
+    <p>
+        <label class="label-name">Устройства</label>
+        <input type="text" name="pushbulletdevices" value="<?php echo $pushbulletdevices ?>"><br>
+    </p>
+    </div>
+
     <button class="form-button">Сохранить</button>
 </form>
 <br/>

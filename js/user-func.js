@@ -11,7 +11,7 @@ $(function()
             }
         }
     );
-    
+
     // Раскрывающийся список торрентов пользователя
     $(".user-torrent").click(function() {
         $(this).toggleClass("active");
@@ -53,7 +53,7 @@ function show(name)
 		window.clearTimeout(this.timeoutID);
 		delete this.timeoutID;
 	}
-	
+
 	return false;
 }
 
@@ -63,7 +63,7 @@ function expand(id)
 	var div = "#"+id;
 	if ($(div).is(":hidden"))
 		$(div).slideDown("slow");
-	else 
+	else
 		$(div).slideUp("slow");
 	return false;
 }
@@ -81,7 +81,7 @@ $("#enter").submit(function() {
           	console.log(data.error)
 		}, "json"
 	);
-	
+
 	return false;
 });
 
@@ -95,14 +95,14 @@ $("#torrent_add").submit(function()
 		u_f = $form.find('input[name="url"]'),
 		u = $(u_f).val(),
 		p_f = $form.find('input[name="path"]'),
-		p = $(p_f).val(); 
-	
+		p = $(p_f).val();
+
     if (u == '')
     {
     	alert("Вы не указали ссылку на тему!");
     	return false;
     }
-								
+
 	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
 	$.post("action.php",{action: 'torrent_add', name: n, url: u, path: p},
 		function(data) {
@@ -140,12 +140,12 @@ $("#serial_add").submit(function()
     	alert("Вы не выбрали трекер!");
     	return false;
     }
-    
+
     if (n == '')
     {
     	alert("Вы не указали название сериала!");
     	return false;
-    }     
+    }
 
 	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
 	$.post("action.php",{action: 'serial_add', tracker: t, name: n, hd: h, path: p},
@@ -172,13 +172,13 @@ $("#user_add").submit(function()
     	alert("Вы не выбрали трекер!");
     	return false;
     }
-    
+
     if (n == '')
     {
     	alert("Вы не указали имя пользователя!");
     	return false;
-    }    
-	
+    }
+
 	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
 	$.post("action.php",{action: 'user_add', tracker: t, name: n},
 		function(data) {
@@ -257,14 +257,14 @@ function threme_add(id, user_id)
 						$('#content').empty().append(data);
 					}
 				);
-				return false;				
+				return false;
 			}
 		}, "json"
 	);
 	return false;
 }
 
-//Удаляем темы 
+//Удаляем темы
 $("#threme_clear").submit(function()
 {
 	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
@@ -295,13 +295,13 @@ $("#credential").submit(function()
 		alert("Вы не указали логин!");
 		return false;
 	}
-	
+
 	if (p == '')
 	{
 		alert("Вы не указали пароль!");
 		return false;
-	}	
-								
+	}
+
 	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
 	$.post("action.php",{action: 'update_credentials', id: id, log: l, pass: p},
 		function(data) {
@@ -311,7 +311,7 @@ $("#credential").submit(function()
 	);
 	return false;
 });
-	
+
 //Передаём настройки
 $("#setting").submit(function()
 {
@@ -332,25 +332,25 @@ $("#setting").submit(function()
 		ptd = $form.find('input[name="pathToDownload"]').val();
 		dt = $form.find('input[name="deleteTorrent"]').prop('checked');
 		dof = $form.find('input[name="deleteOldFiles"]').prop('checked');
-	
+
 	if (p == '')
 	{
 		alert('Вы не указали путь сохранения torrent-файлов.');
 		return false;
 	}
-	
+
 	if (pr == 'checked' && pa == '')
 	{
 		alert('Вы не указали адрес proxy-сервера.');
 		return false;
 	}
-	
+
 	if (t == 'checked' && tc == ''  && ta == '' && ptd == '')
 	{
     	alert('Вы не указали настройки торрент-клиента.');
 		return false;
 	}
-	
+
 	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
 	$.post("action.php",{action: 'update_settings', path: p, email: e, send: s, send_warning: s_w, auth: a, proxy: pr, proxyAddress: pa, torrent: t, torrentClient: tc, torrentAddress: ta, torrentLogin: tl, torrentPassword: tp, pathToDownload: ptd, deleteTorrent: dt, deleteOldFiles: dof},
 		function(data) {
@@ -368,19 +368,19 @@ $("#change_pass").submit(function()
 		s = $form.find('input[type=submit]'),
 		p = $form.find('input[name="password"]').val(),
 		p2 = $form.find('input[name="password2"]').val();
-		
+
 	if (p == '')
 	{
     	alert('Пароль не может быть пустым.');
 		return false;
 	}
-	
-	if (p != p2) 
+
+	if (p != p2)
 	{
 		alert('Пароль и подтверждение должны совпадать.');
 		return false;
 	}
-	
+
 	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
 	$.post("action.php",{action: 'change_pass', pass: p},
 		function(data) {
@@ -406,12 +406,12 @@ function del(id)
         		}
         	);
 		}
-	);	
+	);
 	return false;
 }
 
 //Выводим логин/пароль в зависимости от выбранного в списке
-function changefunc() 
+function changefunc()
 {
     var select = document.getElementById("selectfunc");
     var selectedText = select.options[select.selectedIndex].text;
@@ -458,4 +458,14 @@ function showTorrent()
 	    document.getElementById("torrentSettings").style.display = "block";
     else
         document.getElementById("torrentSettings").style.display = "none";
+}
+
+//Показать/скрыть настройки PushBullet
+function showPushBullet()
+{
+    var pushbullet = (document.getElementById("send_pushbullet").checked || document.getElementById("send_warning_pushbullet").checked);
+	if (pushbullet)
+	    document.getElementById("pushbulletSettings").style.display = "block";
+    else
+        document.getElementById("pushbulletSettings").style.display = "none";
 }
