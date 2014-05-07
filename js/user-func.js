@@ -339,7 +339,7 @@ $("#setting").submit(function()
 
 	if ((pb == 'checked' || pbw == 'checked') && (pba == ''))
 	{
-		alert('Вы не Pushbullet API.');
+		alert('Вы не указали Pushbullet API.');
 		return false;
 	}
 
