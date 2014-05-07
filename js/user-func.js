@@ -332,6 +332,16 @@ $("#setting").submit(function()
 		ptd = $form.find('input[name="pathToDownload"]').val();
 		dt = $form.find('input[name="deleteTorrent"]').prop('checked');
 		dof = $form.find('input[name="deleteOldFiles"]').prop('checked');
+		pb = $form.find('input[name="send_pushbullet"]').prop('checked');
+		pbw = $form.find('input[name="send_warning_pushbullet"]').prop('checked');
+		pba = $form.find('input[name="pushbulletapi"]').val();
+		pbd = $form.find('input[name="pushbulletdevices"]').val();
+
+	if ((pb == 'checked' || pbw == 'checked') && (pba == ''))
+	{
+		alert('Вы не Pushbullet API.');
+		return false;
+	}
 
 	if (p == '')
 	{
@@ -352,7 +362,7 @@ $("#setting").submit(function()
 	}
 
 	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-	$.post("action.php",{action: 'update_settings', path: p, email: e, send: s, send_warning: s_w, auth: a, proxy: pr, proxyAddress: pa, torrent: t, torrentClient: tc, torrentAddress: ta, torrentLogin: tl, torrentPassword: tp, pathToDownload: ptd, deleteTorrent: dt, deleteOldFiles: dof},
+	$.post("action.php",{action: 'update_settings', path: p, email: e, send: s, send_warning: s_w, auth: a, proxy: pr, proxyAddress: pa, torrent: t, torrentClient: tc, torrentAddress: ta, torrentLogin: tl, torrentPassword: tp, pathToDownload: ptd, deleteTorrent: dt, deleteOldFiles: dof, send_pushbullet: pb, send_warning_pushbullet: pbw, pushbulletapi: pba, pushbulletdevices: pbd},
 		function(data) {
 			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
 			$(s).removeAttr('disabled');
@@ -457,6 +467,7 @@ function showTorrent()
     else
         document.getElementById("torrentSettings").style.display = "none";
 }
+
 //Показать/скрыть настройки PushBullet
 function showPushBullet()
 {

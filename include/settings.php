@@ -107,7 +107,6 @@ foreach ($settings as $row)
         <input type="text" name="pushbulletdevices" value="<?php echo $pushbulletdevices ?>"><br>
     </p>
     </div>
-
     <button class="form-button">Сохранить</button>
 </form>
 <br/>
