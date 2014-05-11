@@ -68,6 +68,25 @@ if (Sys::checkInternet())
 			<?php	
 			}
 			
+            $neededver = Database::$currentversion;
+            $actualver = Database::getSetting("dbversion");
+			if($neededver == $actualver)
+			{
+			?>
+		<tr>
+			<td>База данных имеет актуальную версию.</td>
+		<tr>
+			<?php	
+			}
+			else
+			{
+			?>
+		<tr>
+			<td class="test-error">База данных устарела! Нужно: <?php echo $neededver; ?>, сейчас:<?php echo $actualver?>. <a id="upgrade_db" onclick="UpgradeDB();" href="#">ОБНОВИТЬ</a></td>
+		<tr>
+			<?php	
+			}
+
 			$trackers = Database::getTrackersList();
 			foreach ($trackers as $tracker)
 			{

@@ -1,8 +1,13 @@
 <?php include_once "header.php"; ?>
-<script language="javascript" type="text/javascript">
-window.onload = function(){
-    show('show_table');
-}
+<script type="text/javascript">
+$(document).ready(function() {
+	view = $.query.get('view');
+	if(!view)
+		view = 'show_table'; 
+    show(view);
+    if($.query.get('autostart'))
+		MakeNextStep();
+});
 </script>
 
 <div id="wrapper">

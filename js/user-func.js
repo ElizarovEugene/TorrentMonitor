@@ -1,4 +1,4 @@
-$(function()
+$(document).ready(function()
 {
     // Скользящее меню
     $(".h-menu li").hover(
@@ -17,14 +17,266 @@ $(function()
         $(this).toggleClass("active");
         $(this).next().toggle();
     });
-});
 
-// Меню
-$(".h-menu li").click(function() {
-    $(".h-menu li").stop().animate({width: "27px"}, 500);
-    $(".h-menu li").removeClass("active");
-    $(this).stop().animate({width: "235px"}, 500);
-    $(this).addClass("active");
+
+	// Меню
+	$(".h-menu li").click(function() {
+	    $(".h-menu li").stop().animate({width: "27px"}, 500);
+	    $(".h-menu li").removeClass("active");
+	    $(this).stop().animate({width: "235px"}, 500);
+	    $(this).addClass("active");
+	});
+	
+	//Передаём пароль
+    $("#enter").submit(function() {
+        var $form = $(this),p = $form.find('input[name="password"]').val();
+        $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+        $.post("action.php",{action: 'enter', password: p},
+            function(data) {
+                if (data.error)
+                    $('#notice').empty().attr('background', '#FF6633').append(data.msg).delay(3000).fadeOut(400);
+                else
+                    document.location.reload();
+                console.log(data.error)
+            }, "json"
+        );
+        
+        return false;
+    });
+
+    //Передаём тему для мониторинга
+    $("#torrent_add").submit(function()
+    {
+        var $form = $(this),
+            s = $form.find('input[type=submit]'),
+            n_f = $form.find('input[name="name"]'),
+            n = $(n_f).val(),
+		u_f = $form.find('input[name="url"]'),
+		u = $(u_f).val(),
+		p_f = $form.find('input[name="path"]'),
+		p = $(p_f).val(); 
+        
+        if (u == '')
+        {
+            alert("Вы не указали ссылку на тему!");
+            return false;
+        }
+                                    
+        $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+	$.post("action.php",{action: 'torrent_add', name: n, url: u, path: p},
+            function(data) {
+                $('#notice').empty().append(data).delay(3000).fadeOut(400);
+                $(n_f).val('');
+                $(u_f).val('');
+            }
+        );
+        return false;
+    });
+
+    //Передаём сериал для мониторинга
+    $("#serial_add").submit(function()
+    {
+        var $form = $(this),
+            s = $form.find('input[type=submit]'),
+            t = $form.find('select[name="tracker"]').val(),
+            n_f = $form.find('input[name="name"]'),
+            n = $(n_f).val(),
+		h_f = $form.find('input[name="hd"]'),
+		p_f = $form.find('input[name="path"]'),
+		p = $(p_f).val();
+            
+        h = $(h_f).val();
+        for (var i = 0; i < h_f.length; i++)
+        {
+            if (h_f[i].checked)
+            {
+                var $form = $(this), h = h_f[i].value
+            }
+        }
+
+        if (t == '')
+        {
+            alert("Вы не выбрали трекер!");
+            return false;
+        }
+        
+        if (n == '')
+        {
+            alert("Вы не указали название сериала!");
+            return false;
+        }     
+
+        $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+	$.post("action.php",{action: 'serial_add', tracker: t, name: n, hd: h, path: p},
+            function(data) {
+                $('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+                $(n_f).val('');
+                $(h_f).removeAttr('checked');
+            }
+        );
+        return false;
+    });
+
+    //Передаём пользователя для мониторинга
+    $("#user_add").submit(function()
+    {
+        var $form = $(this),
+            s = $form.find('input[type=submit]'),
+            t = $form.find('select[name="tracker"]').val(),
+            n_f = $form.find('input[name="name"]'),
+            n = $(n_f).val();
+
+        if (t == '')
+        {
+            alert("Вы не выбрали трекер!");
+            return false;
+        }
+        
+        if (n == '')
+        {
+            alert("Вы не указали имя пользователя!");
+            return false;
+        }    
+        
+        $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+        $.post("action.php",{action: 'user_add', tracker: t, name: n},
+            function(data) {
+                $('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+                $(n_f).val('');
+            }
+        );
+        return false;
+    });
+
+	//Удаляем темы 
+	$("#threme_clear").submit(function()
+	{
+		$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+		$.post("action.php",{action: 'threme_clear'},
+			function(data) {
+				$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+				$.get("include/show_watching.php",
+					function(data) {
+						$('#content').empty().append(data);
+					}
+				);
+			}
+		);
+		return false;
+	});
+
+	//Передаём личные данные
+	$("#credential").submit(function()
+	{
+		var $form = $(this),
+			b = $form.find('input[type=button]'),
+			id = $form.find('input[name="id"]').val(),
+			l = $form.find('input[name="log"]').val(),
+			p = $form.find('input[name="pass"]').val();
+
+		if (l == '')
+		{
+			alert("Вы не указали логин!");
+			return false;
+		}
+		
+		if (p == '')
+		{
+			alert("Вы не указали пароль!");
+			return false;
+		}	
+									
+		$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+		$.post("action.php",{action: 'update_credentials', id: id, log: l, pass: p},
+			function(data) {
+				$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+				$(b).removeAttr('disabled');
+			}
+		);
+		return false;
+	});
+		
+	//Передаём настройки
+	$("#setting").submit(function()
+	{
+		var $form = $(this),
+			s = $form.find('input[type=submit]'),
+			p = $form.find('input[name="path"]').val(),
+			e = $form.find('input[name="email"]').val(),
+		s = $form.find('input[name="send"]').prop('checked');
+		s_w = $form.find('input[name="send_warning"]').prop('checked');
+		a = $form.find('input[name="auth"]').prop('checked');
+		pr = $form.find('input[name="proxy"]').prop('checked');
+			pa = $form.find('input[name="proxyAddress"]').val();
+		t = $form.find('input[name="torrent"]').prop('checked');
+			tc = $form.find('select[name="torrentClient"]').val();
+			ta = $form.find('input[name="torrentAddress"]').val();
+			tl = $form.find('input[name="torrentLogin"]').val();
+			tp = $form.find('input[name="torrentPassword"]').val();
+			ptd = $form.find('input[name="pathToDownload"]').val();
+		dt = $form.find('input[name="deleteTorrent"]').prop('checked');
+		dof = $form.find('input[name="deleteOldFiles"]').prop('checked');
+		
+		if (p == '')
+		{
+			alert('Вы не указали путь сохранения torrent-файлов.');
+			return false;
+		}
+		
+		if (pr == 'checked' && pa == '')
+		{
+			alert('Вы не указали адрес proxy-сервера.');
+			return false;
+		}
+		
+		if (t == 'checked' && tc == ''  && ta == '' && ptd == '')
+		{
+	    	alert('Вы не указали настройки торрент-клиента.');
+			return false;
+		}
+		
+		$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+		$.post("action.php",{action: 'update_settings', path: p, email: e, send: s, send_warning: s_w, auth: a, proxy: pr, proxyAddress: pa, torrent: t, torrentClient: tc, torrentAddress: ta, torrentLogin: tl, torrentPassword: tp, pathToDownload: ptd, deleteTorrent: dt, deleteOldFiles: dof},
+			function(data) {
+				$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+				$(s).removeAttr('disabled');
+			}
+		);
+		return false;
+	});
+
+	//Передаём пароль
+	$("#change_pass").submit(function()
+	{
+		var $form = $(this),
+			s = $form.find('input[type=submit]'),
+			p = $form.find('input[name="password"]').val(),
+			p2 = $form.find('input[name="password2"]').val();
+			
+		if (p == '')
+		{
+	    	alert('Пароль не может быть пустым.');
+			return false;
+		}
+		
+		if (p != p2) 
+		{
+			alert('Пароль и подтверждение должны совпадать.');
+			return false;
+		}
+		
+		$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+		$.post("action.php",{action: 'change_pass', pass: p},
+			function(data) {
+				if (data.error)
+					$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+				else
+					document.location.reload();
+			}, "json"
+		);
+		return false;
+	});
+
 });
 
 //Подгрузка страниц
@@ -33,11 +285,12 @@ function show(name)
     if (name == 'check' || name == 'execution')
         $('#content').empty().append('<img src="img/ajax-loader.gif" class="loader">');
 
-    $.get("include/"+name+".php",
-        function(data) {
-            $('#content').empty().append(data);
-    });
-
+	$.get("include/"+name+".php",
+		function(data) {
+			$('#content').empty().append(data);
+		}
+	);
+	
 	if (name == 'show_table')
 	{
 		window.clearTimeout(this.timeoutID);
@@ -53,7 +306,7 @@ function show(name)
 		window.clearTimeout(this.timeoutID);
 		delete this.timeoutID;
 	}
-	
+		
 	return false;
 }
 
@@ -67,127 +320,6 @@ function expand(id)
 		$(div).slideUp("slow");
 	return false;
 }
-
-//Передаём пароль
-$("#enter").submit(function() {
-	var $form = $(this),p = $form.find('input[name="password"]').val();
-	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-	$.post("action.php",{action: 'enter', password: p},
-		function(data) {
-			if (data.error)
-				$('#notice').empty().attr('background', '#FF6633').append(data.msg).delay(3000).fadeOut(400);
-			else
-          		document.location.reload();
-          	console.log(data.error)
-		}, "json"
-	);
-	
-	return false;
-});
-
-//Передаём тему для мониторинга
-$("#torrent_add").submit(function()
-{
-	var $form = $(this),
-		s = $form.find('input[type=submit]'),
-		n_f = $form.find('input[name="name"]'),
-		n = $(n_f).val(),
-		u_f = $form.find('input[name="url"]'),
-		u = $(u_f).val(),
-		p_f = $form.find('input[name="path"]'),
-		p = $(p_f).val(); 
-	
-    if (u == '')
-    {
-    	alert("Вы не указали ссылку на тему!");
-    	return false;
-    }
-								
-	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-	$.post("action.php",{action: 'torrent_add', name: n, url: u, path: p},
-		function(data) {
-			$('#notice').empty().append(data).delay(3000).fadeOut(400);
-			$(n_f).val('');
-			$(u_f).val('');
-		}
-	);
-	return false;
-});
-
-//Передаём сериал для мониторинга
-$("#serial_add").submit(function()
-{
-	var $form = $(this),
-		s = $form.find('input[type=submit]'),
-		t = $form.find('select[name="tracker"]').val(),
-		n_f = $form.find('input[name="name"]'),
-		n = $(n_f).val(),
-		h_f = $form.find('input[name="hd"]'),
-		p_f = $form.find('input[name="path"]'),
-		p = $(p_f).val();
-
-	h = $(h_f).val();
-	for (var i = 0; i < h_f.length; i++)
-	{
-		if (h_f[i].checked)
-		{
-			var $form = $(this), h = h_f[i].value
-		}
-	}
-
-    if (t == '')
-    {
-    	alert("Вы не выбрали трекер!");
-    	return false;
-    }
-    
-    if (n == '')
-    {
-    	alert("Вы не указали название сериала!");
-    	return false;
-    }     
-
-	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-	$.post("action.php",{action: 'serial_add', tracker: t, name: n, hd: h, path: p},
-		function(data) {
-			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
-			$(n_f).val('');
-			$(h_f).removeAttr('checked');
-		}
-	);
-	return false;
-});
-
-//Передаём пользователя для мониторинга
-$("#user_add").submit(function()
-{
-	var $form = $(this),
-		s = $form.find('input[type=submit]'),
-		t = $form.find('select[name="tracker"]').val(),
-		n_f = $form.find('input[name="name"]'),
-		n = $(n_f).val();
-
-    if (t == '')
-    {
-    	alert("Вы не выбрали трекер!");
-    	return false;
-    }
-    
-    if (n == '')
-    {
-    	alert("Вы не указали имя пользователя!");
-    	return false;
-    }    
-	
-	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-	$.post("action.php",{action: 'user_add', tracker: t, name: n},
-		function(data) {
-			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
-			$(n_f).val('');
-		}
-	);
-	return false;
-});
 
 //Удаляем пользователя
 function delete_user(id)
@@ -264,135 +396,6 @@ function threme_add(id, user_id)
 	return false;
 }
 
-//Удаляем темы 
-$("#threme_clear").submit(function()
-{
-	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-	$.post("action.php",{action: 'threme_clear'},
-		function(data) {
-			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
-			$.get("include/show_watching.php",
-				function(data) {
-					$('#content').empty().append(data);
-				}
-			);
-		}
-	);
-	return false;
-});
-
-//Передаём личные данные
-$("#credential").submit(function()
-{
-	var $form = $(this),
-		b = $form.find('input[type=button]'),
-		id = $form.find('input[name="id"]').val(),
-		l = $form.find('input[name="log"]').val(),
-		p = $form.find('input[name="pass"]').val();
-
-	if (l == '')
-	{
-		alert("Вы не указали логин!");
-		return false;
-	}
-	
-	if (p == '')
-	{
-		alert("Вы не указали пароль!");
-		return false;
-	}	
-								
-	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-	$.post("action.php",{action: 'update_credentials', id: id, log: l, pass: p},
-		function(data) {
-			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
-			$(b).removeAttr('disabled');
-		}
-	);
-	return false;
-});
-	
-//Передаём настройки
-$("#setting").submit(function()
-{
-	var $form = $(this),
-		s = $form.find('input[type=submit]'),
-		p = $form.find('input[name="path"]').val(),
-		e = $form.find('input[name="email"]').val(),
-		s = $form.find('input[name="send"]').prop('checked');
-		s_w = $form.find('input[name="send_warning"]').prop('checked');
-		a = $form.find('input[name="auth"]').prop('checked');
-		pr = $form.find('input[name="proxy"]').prop('checked');
-		pa = $form.find('input[name="proxyAddress"]').val();
-		t = $form.find('input[name="torrent"]').prop('checked');
-		tc = $form.find('select[name="torrentClient"]').val();
-		ta = $form.find('input[name="torrentAddress"]').val();
-		tl = $form.find('input[name="torrentLogin"]').val();
-		tp = $form.find('input[name="torrentPassword"]').val();
-		ptd = $form.find('input[name="pathToDownload"]').val();
-		dt = $form.find('input[name="deleteTorrent"]').prop('checked');
-		dof = $form.find('input[name="deleteOldFiles"]').prop('checked');
-	
-	if (p == '')
-	{
-		alert('Вы не указали путь сохранения torrent-файлов.');
-		return false;
-	}
-	
-	if (pr == 'checked' && pa == '')
-	{
-		alert('Вы не указали адрес proxy-сервера.');
-		return false;
-	}
-	
-	if (t == 'checked' && tc == ''  && ta == '' && ptd == '')
-	{
-    	alert('Вы не указали настройки торрент-клиента.');
-		return false;
-	}
-	
-	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-	$.post("action.php",{action: 'update_settings', path: p, email: e, send: s, send_warning: s_w, auth: a, proxy: pr, proxyAddress: pa, torrent: t, torrentClient: tc, torrentAddress: ta, torrentLogin: tl, torrentPassword: tp, pathToDownload: ptd, deleteTorrent: dt, deleteOldFiles: dof},
-		function(data) {
-			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
-			$(s).removeAttr('disabled');
-		}
-	);
-	return false;
-});
-
-//Передаём пароль
-$("#change_pass").submit(function()
-{
-	var $form = $(this),
-		s = $form.find('input[type=submit]'),
-		p = $form.find('input[name="password"]').val(),
-		p2 = $form.find('input[name="password2"]').val();
-		
-	if (p == '')
-	{
-    	alert('Пароль не может быть пустым.');
-		return false;
-	}
-	
-	if (p != p2) 
-	{
-		alert('Пароль и подтверждение должны совпадать.');
-		return false;
-	}
-	
-	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-	$.post("action.php",{action: 'change_pass', pass: p},
-		function(data) {
-			if (data.error)
-				$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
-			else
-				document.location.reload();
-		}, "json"
-	);
-	return false;
-});
-
 //Удаляем мониторинг
 function del(id)
 {
@@ -457,3 +460,43 @@ function showTorrent()
     else
         document.getElementById("torrentSettings").style.display = "none";
 }
+
+function UpgradeDB(){
+	$.post("action.php",{action: 'upgrade_db'},
+		function(data) {
+			$('#notice').empty().append(data).fadeIn(400).delay(3000).fadeOut(400);
+            show("check");
+		}
+	);
+	return false;
+}
+
+function MakeNextStep(){
+	setTimeout('TakeAction("nextstep")', 1000);
+}
+
+function TakeAction(action){
+	$.post("action.php",{"action": "update_"+action},
+		function(data) {
+			if (data.success){
+				$('#message').html(data.message);
+				$('#progress_bar').css("width",data.progress+"%");
+				$('#progress').html(data.progress+"%");
+     			$('#progress').toggleClass("invert_percents", data.progress > 50);
+				if(data.nextstep)
+				    MakeNextStep();
+				else if(data.redirect)
+					window.location = data.redirect; 
+            } 
+			else {
+				//$('#error').html(data.message);
+                if (confirm("Ошибка:"+data.message+".\nПопробуем еще раз?"))
+                	MakeNextStep();
+                else 
+                    $('#message').html("Автоматическое обновление прервано. Попробуйте еще раз. если не получится - придется обновляться вручную.");
+                    
+            }
+		}, "json"
+	);
+}
+

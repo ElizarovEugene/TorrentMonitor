@@ -20,7 +20,6 @@ if ($auth)
 		else
 			require_once "pages/main.php";
 	}
-}
-if ( ! $auth)
-	require_once "pages/main.php";
+} else
+    require_once "pages/main.php";
 ?>

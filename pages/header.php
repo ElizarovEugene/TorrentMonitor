@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
     <meta charset="utf-8">
@@ -13,7 +13,10 @@
     <script type="text/javascript">
         function FocusOnInput() { document.getElementById("password").focus(); }
     </script>
-
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="js/jquery.query.js"></script>
+    <script src="js/user-func.js"></script>
 </head>
 <body onload="FocusOnInput()">
 <?php
@@ -26,7 +29,8 @@ if ($update)
 ?>
 <div class="update">
 	Доступна новая версия TorrentMonitor<br>
-	Пожалуйста <a href="http://blog.korphome.ru/torrentmonitor/">обновитесь</a>!
+	Пожалуйста, обновитесь <a href="#" onclick="show('update');">автоматически</a><br>
+	либо <a href="http://blog.korphome.ru/torrentmonitor/">вручную</a>!
 </div>
 <?php
 }
