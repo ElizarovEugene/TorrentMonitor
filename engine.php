@@ -32,12 +32,20 @@ if (Sys::checkConfig())
 					$class = explode('.', $tracker);
 					$class = $class[0];
 					$functionClass = str_replace('-', '', $class);
+					
+					if ($tracker == 'tracker.0day.kiev.ua')
+					    $functionClass = 'kiev';
+					    
+                    if ($tracker == 'torrents.net.ua')
+					    $functionClass = 'torrentsnet';
 
+					echo $torrentsList[$i]['name']."\r\n".'<br />';
+					
 					if ($tracker == 'lostfilm.tv' || $tracker == 'novafilm.tv' || $tracker == 'baibako.tv' || $tracker == 'newstudio.tv')
 					{
     				    call_user_func($functionClass.'::main', $torrentsList[$i]['id'], $tracker, $torrentsList[$i]['name'], $torrentsList[$i]['hd'], $torrentsList[$i]['ep'], $torrentsList[$i]['timestamp'], $torrentsList[$i]['hash']);
 					}
-					if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.me' || $tracker == 'rutor.org' || $tracker == 'tfile.me' || $tracker == 'kinozal.tv' || $tracker == 'anidub.com' || $tracker == 'casstudio.tv'  || $tracker == 'animelayer.ru')
+					if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.me' || $tracker == 'rutor.org' || $tracker == 'tfile.me' || $tracker == 'kinozal.tv' || $tracker == 'anidub.com' || $tracker == 'casstudio.tv'  || $tracker == 'animelayer.ru' || $tracker == 'tracker.0day.kiev.ua' || $tracker == 'torrents.net.ua' || $tracker == 'rustorka.com')
 					{
     					call_user_func($functionClass.'::main', $torrentsList[$i]['id'], $tracker, $torrentsList[$i]['name'], $torrentsList[$i]['torrent_id'], $torrentsList[$i]['timestamp'], $torrentsList[$i]['hash']);
 					}
@@ -83,6 +91,12 @@ if (Sys::checkConfig())
 				Errors::setWarnings('system', 'credential_miss');
 		}
 		
+		$tempList = Database::getAllFromTemp();
+		$count = count($tempList);
+		for ($i=0; $i<$count; $i++)
+		{
+		    Sys::addToClient($tempList[$i]['id'], $tempList[$i]['path'], $tempList[$i]['hash'], $tempList[$i]['tracker'], $tempList[$i]['message'], $tempList[$i]['date_str']);
+		}
 		Sys::lastStart();
 	}	
 	else

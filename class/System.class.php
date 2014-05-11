@@ -65,7 +65,7 @@ class Sys
 	//версия системы
 	public static function version()
 	{
-		return '0.9.5';
+		return '0.9.7';
 	}
 
 	//проверка обновлений системы
@@ -181,56 +181,125 @@ class Sys
                 'url'            => $url,
             )
 		);
+		
+		if ($tracker == 'rustorka.com')
+		{
+		    $dir = str_replace('class', '', dirname(__FILE__));
+		    $engineFile = $dir.'trackers/'.$tracker.'.engine.php';
+			if (file_exists($engineFile))
+			{
+				Database::clearWarnings('system');
+					
+				$functionEngine = include_once $engineFile;
+				$class = explode('.', $tracker);
+				$class = $class[0];
+				$functionClass = str_replace('-', '', $class);
+			}
 
-		if ($tracker != 'rutor.org' && $tracker != 'casstudio.tv')
+    		$cookie = Database::getCookie($tracker);
+    		$exucution = FALSE;
+    		if (call_user_func($functionClass.'::checkCookie', $cookie))
+    		{
+    			$sess_cookie = $cookie;
+    			//запускам процесс выполнения
+    			$exucution = TRUE;
+    		}
+    		else
+    		{
+        		$sess_cookie = call_user_func($functionClass.'::getCookie', $tracker);
+        		//запускам процесс выполнения
+    			$exucution = TRUE;
+            } 
+
+    		if ($exucution)
+    		{
+    			//получаем страницу для парсинга
+                $forumPage = Sys::getUrlContent(
+                	array(
+                		'type'           => 'POST',
+                		'header'         => 0,
+                		'returntransfer' => 1,
+                		'url'            => $url,
+                		'cookie'         => $sess_cookie,
+                		'sendHeader'     => array('Host' => $tracker, 'Content-length' => strlen($sess_cookie)),
+                		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
+                	)
+                );
+            }
+		}
+
+		if ($tracker != 'rutor.org' && $tracker != 'casstudio.tv' && $tracker != 'torrents.net.ua' && $tracker != 'rustorka.com')
 			$forumPage = iconv('windows-1251', 'utf-8//IGNORE', $forumPage);
 
 		if ($tracker == 'tr.anidub.com')
 			$tracker = 'anidub.com';
 
-		preg_match('/<title>(.*)<\/title>/is', $forumPage, $array);
+		preg_match('/<title>(.*)<\/title>/', $forumPage, $array);
 		if ( ! empty($array[1]))
 		{
-			$name = $array[1];
 			if ($tracker == 'anidub.com')
-				$name = substr($name, 15, -50);
-			if ($tracker == 'casstudio.tv')
-				$name = substr($name, 48);
-			if ($tracker == 'kinozal.tv')
-				$name = substr($name, 0, -22);
-			if ($tracker == 'nnm-club.me')
-				$name = substr($name, 0, -20);
-			if ($tracker == 'rutracker.org')
-				$name = substr($name, 0, -34);
-			if ($tracker == 'rutor.org')
-				$name = substr($name, 13);
+				$name = substr($array[1], 15, -50);
+			elseif ($tracker == 'casstudio.tv')
+				$name = substr($array[1], 48);
+			elseif ($tracker == 'kinozal.tv')
+				$name = substr($array[1], 0, -22);
+			elseif ($tracker == 'nnm-club.me')
+				$name = substr($array[1], 0, -20);
+			elseif ($tracker == 'rutracker.org')
+				$name = substr($array[1], 0, -34);
+			elseif ($tracker == 'rutor.org')
+				$name = substr($array[1], 13);
+            elseif ($tracker == 'tracker.0day.kiev.ua')
+				$name = substr($array[1], 6, -67);
+            elseif ($tracker == 'torrents.net.ua')
+				$name = substr($array[1], 0, -96);
+            elseif ($tracker == 'rustorka.com')
+                $name = substr($array[1], 0, -111);
+            else
+                $name = $array[1];
 		}
 		else
 			$name = 'Неизвестный';
 		return $name;
 	}
 	
+	//добавляем в torrent-клиент
+	public static function addToClient($id, $path, $hash, $tracker, $message, $date_str)
+	{
+        $torrentClient = Database::getSetting('torrentClient');
+        
+        $dir = dirname(__FILE__).'/';
+        include_once $dir.$torrentClient.'.class.php';
+        if (call_user_func($torrentClient.'::addNew', $id, $path, $hash, $tracker))
+        {
+            $deleteTorrent = Database::getSetting('deleteTorrent');
+            if ($deleteTorrent)
+                unlink($path);
+            
+            Database::deleteFromTemp($id);
+            return ' И добавлен в torrent-клиент.';
+        }
+        else
+        {
+            Database::saveToTemp($id, $path, $hash, $tracker, $message, $date_str);
+            return ' Но не добавлен в torrent-клиент и сохраненён.';
+        }
+	}
+	
 	//созраняем torrent файл
-	public static function saveTorrent($tracker, $name, $torrent, $id, $hash)
+	public static function saveTorrent($tracker, $name, $torrent, $id, $hash, $message, $date_str)
 	{
 	    $name = str_replace("'", '', $name);
     	$file = '['.$tracker.']_'.$name.'.torrent';
         $path = Database::getSetting('path').$file;
         file_put_contents($path, $torrent);
+        $messageAdd = ' И сохранён.';
 
         $useTorrent = Database::getSetting('useTorrent');
         if ($useTorrent)
-        {
-            $torrentClient = Database::getSetting('torrentClient');
-            
-            $dir = dirname(__FILE__).'/';
-            include_once $dir.$torrentClient.'.class.php';
-            call_user_func($torrentClient.'::addNew', $id, $path, $hash, $tracker);
-            
-            $deleteTorrent = Database::getSetting('deleteTorrent');
-            if ($deleteTorrent)
-                unlink($path);
-        }
+            $messageAdd = Sys::addToClient($id, $path, $hash, $tracker, $message, $date_str);
+        //отправляем уведомлении о новом торренте
+        Notification::sendNotification('notification', $date_str, $tracker, $message.$messageAdd);
 	}
 	
 	//преобразуем месяц из числового в текстовый

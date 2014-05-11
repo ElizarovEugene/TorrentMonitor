@@ -57,9 +57,15 @@ function OnAction_torrent_add(){
 				$functionEngine = include_once $engineFile;
 				$class = explode('.', $tracker);
 				$class = $class[0];
-				$class = str_replace('-', '', $class);
+				$functionClass = str_replace('-', '', $class);
+					
+				if ($tracker == 'tracker.0day.kiev.ua')
+				    $functionClass = 'kiev';
 
-				if (call_user_func(array($class, 'checkRule'), $threme))
+                if ($tracker == 'torrents.net.ua')
+				    $functionClass = 'torrentsnet';
+
+			    if (call_user_func(array($functionClass, 'checkRule'), $threme))
 				{
 					if (Database::checkThremExist($tracker, $threme))
 					{

@@ -79,13 +79,17 @@ class nnmclubSearch extends nnmclub
                             		'referer'        => 'http://nnm-club.me/forum/viewtopic.php?t='.$torrent_id,
                             	)
                             );
-                            Sys::saveTorrent($tracker, $torrent_id, $torrent);
+                            $message = $toDownload[$i]['threme'].' добавлена для скачивания.';
+                            $status = Sys::saveTorrent($toDownload[$i]['tracker'], $toDownload[$i]['threme_id'], $torrent, $toDownload[$i]['threme_id'], 0, $message, date('d M Y H:i'));
+								
+							if ($status == 'add_fail' || $status == 'connect_fail' || $status == 'credential_wrong')
+							{
+							    $torrentClient = Database::getSetting('torrentClient');
+							    Errors::setWarnings($torrentClient, $status);
+							}	                            
+                            
             				//обновляем время регистрации торрента в базе
             				Database::setDownloaded($toDownload[$i]['id']);
-            				//отправляем уведомлении о новом торренте
-            				$message = $toDownload[$i]['threme'].' добавлена для скачивания.';
-            				$date = date('d M Y H:i');
-            				Notification::sendNotification('notification', $date, $tracker, $message);
                         }
                     }
                 }

@@ -54,9 +54,24 @@ class lostfilm
 	        	)
 	        );
 			preg_match('/<td align=\"left\">(.*)<br >/', $page, $out);
-			lostfilm::$sess_cookie .= ' usess='.$out[1];
-			Database::setCookie($tracker, lostfilm::$sess_cookie);
-			Database::clearWarnings('lostfilm.tv');
+			print_r($page);
+			if (isset($out[1]))
+			{
+    			lostfilm::$sess_cookie .= ' usess='.$out[1];
+    			Database::setCookie($tracker, lostfilm::$sess_cookie);
+    			Database::clearWarnings('lostfilm.tv');
+            }
+            else
+            {
+                //устанавливаем варнинг
+				if (lostfilm::$warning == NULL)
+    			{
+    				lostfilm::$warning = TRUE;
+    				Errors::setWarnings($tracker, 'not_available');
+    			}
+				//останавливаем выполнение цепочки
+				lostfilm::$exucution = FALSE;	                
+            }
 		}
 		else 
 		{
@@ -73,7 +88,7 @@ class lostfilm
 	
 	//проверяем cookie
 	public static function checkCookie($sess_cookie)
-	{
+	{echo $sess_cookie;
         $result = Sys::getUrlContent(
         	array(
         		'type'           => 'POST',
@@ -86,7 +101,7 @@ class lostfilm
         	)
         );
 
-		if (preg_match('/ПРИВЕТ, <span class=\"wh\">.* <!-- (ID: \d*) --><\/span>/U', $result))
+		if (preg_match('/ПРИВЕТ, <span class=\"wh\">.* <!-- (ID: .*) --><\/span>/U', $result))
 			return TRUE;
 		else
 			return FALSE;		  
@@ -113,6 +128,7 @@ class lostfilm
 		
 		$data = preg_split('/\s/', $data);
 		$date = $data[2].'-'.$data[1].'-'.$data[0].' '.$data[3];
+		
 		return $date;
 	}
 	
@@ -127,13 +143,14 @@ class lostfilm
 
 		$month = Sys::dateNumToString($data[1]);
 		$date = $data[2].' '.$month.' '.$data[0].' '.$time;
+		
 		return $date;
 	}
 	
 	//функция анализа эпизода
 	private static function analysisEpisode($item)
 	{
-		preg_match('/\w\d{2}\.?\w\d{2}/', $item->link, $matches);
+		preg_match('/s\d{2}\.?e\d{2}/i', $item->link, $matches);
 		if (isset($matches[0]))
 		{
 			$episode = $matches[0];
@@ -183,8 +200,8 @@ class lostfilm
 			$page = lostfilm::login('simple', $login, $password);
 			if (preg_match_all('/Set-Cookie: (\w*)=(\S*)/', $page, $array))
 			{
-				lostfilm::getCookies($tracker, $array);
 				lostfilm::$exucution = TRUE;
+				lostfilm::getCookies($tracker, $array);
 			}
 			else
 			{
@@ -216,8 +233,7 @@ class lostfilm
 					lostfilm::getCookies($tracker, $array);
 					lostfilm::$exucution = TRUE;
 				}	
-			}
-			
+			}			
 		}
 		else
 		{
@@ -238,6 +254,7 @@ class lostfilm
 		//проверяем небыло ли до этого уже ошибок
 		if (empty(lostfilm::$exucution) || (lostfilm::$exucution))
 		{
+		    /*
 			//проверяем получена ли уже кука
 			if (empty(lostfilm::$sess_cookie))
 			{
@@ -251,7 +268,10 @@ class lostfilm
         		else
             		lostfilm::getCookie($tracker);
 			}
-	
+			*/
+			lostfilm::$sess_cookie = Database::getCookie($tracker);
+			lostfilm::$exucution = TRUE;
+
 			//проверяем получена ли уже RSS лента
 			if ( ! lostfilm::$log_page)
 			{
@@ -300,7 +320,7 @@ class lostfilm
 					}
 				}
 			}
-			
+
 			//если выполнение цепочки не остановлено
 			if (lostfilm::$exucution)
 			{
@@ -321,6 +341,7 @@ class lostfilm
 						{
 							$episode = substr($serial['episode'], 4, 2);
 							$season = substr($serial['episode'], 1, 2);
+							$date_str = lostfilm::dateNumToString($serial['date']);
 						
 							if ( ! empty($ep))
 							{
@@ -355,16 +376,21 @@ class lostfilm
 						        	)
                                 );								
 								$file = str_replace(' ', '.', $name).'.S'.$season.'E'.$episode.'.'.$amp;
-								Sys::saveTorrent($tracker, $file, $torrent, $id, $hash);
+								$episode = (substr($episode, 0, 1) == 0) ? substr($episode, 1, 1) : $episode;
+								$season = (substr($season, 0, 1) == 0) ? substr($season, 1, 1) : $season;
+								$message = $name.' '.$amp.' обновлён до '.$episode.' серии, '.$season.' сезона.';
+								$status = Sys::saveTorrent($tracker, $file, $torrent, $id, $hash, $message, $date_str);
+								
+								if ($status == 'add_fail' || $status == 'connect_fail' || $status == 'credential_wrong')
+								{
+								    $torrentClient = Database::getSetting('torrentClient');
+								    Errors::setWarnings($torrentClient, $status);
+								}
+
 								//обновляем время регистрации торрента в базе
 								Database::setNewDate($id, $serial['date']);
 								//обновляем сведения о последнем эпизоде
 								Database::setNewEpisode($id, $serial['episode']);
-								$episode = (substr($episode, 0, 1) == 0) ? substr($episode, 1, 1) : $episode;
-								$season = (substr($season, 0, 1) == 0) ? substr($season, 1, 1) : $season;
-								//отправляем уведомлении о новом торренте
-								$message = $name.' '.$amp.' обновлён до '.$episode.' серии, '.$season.' сезона.';
-								Notification::sendNotification('notification', lostfilm::dateNumToString($serial['date']), $tracker, $message);
 							}
 						}
 					}

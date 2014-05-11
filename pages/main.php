@@ -43,6 +43,7 @@ $(document).ready(function() {
             }
             ?>
             </a></li>
+            <li id="execution"><a href="#" onclick="show('execution')" class="h-menu-item6">Запуск</a></li>
             <li id="check"><a href="#" onclick="show('check')" class="h-menu-item7">Тест</a></li>
         </menu>
     </header>

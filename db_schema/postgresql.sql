@@ -32,6 +32,8 @@ INSERT INTO credentials VALUES (9, 'baibako.tv', '', '', '');
 INSERT INTO credentials VALUES (10,'casstudio.tv', '', '','');
 INSERT INTO credentials VALUES (11,'newstudio.tv', '', '','');
 INSERT INTO credentials VALUES (12,'animelayer.ru', '', '','');
+INSERT INTO credentials VALUES (13,'tracker.0day.kiev.ua','','','');
+INSERT INTO credentials VALUES (14,'rustorka.com','','','');
 
 CREATE TABLE "settings" (
   "id" INTEGER  PRIMARY KEY NOT NULL,
@@ -55,6 +57,18 @@ INSERT INTO settings VALUES (13, 'torrentPassword', '');
 INSERT INTO settings VALUES (14, 'pathToDownload', '');
 INSERT INTO settings VALUES (15, 'deleteTorrent', '0');
 INSERT INTO settings VALUES (16, 'deleteOldFiles', '0');
+
+CREATE SEQUENCE auto_id_temp;
+
+CREATE TABLE "temp" (
+  "id" INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('auto_id_temp'),
+  "path" varchar(100) DEFAULT NULL,
+  "hash" varchar(40) DEFAULT NULL,
+  "tracker" varchar(30) DEFAULT NULL,
+  "message" varchar(60) DEFAULT NULL,
+  "date" varchar(120) DEFAULT NULL,
+  UNIQUE(hash)
+)
 
 CREATE SEQUENCE auto_id_torrent;
 

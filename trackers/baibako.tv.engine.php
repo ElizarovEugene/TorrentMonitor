@@ -53,7 +53,7 @@ class baibako
 	//функция анализа эпизода
 	private static function analysisEpisode($item)
 	{
-		preg_match('/\w\d{2}\.?\w\d{2}/', $item->link, $matches);
+		preg_match('/s\d{2}\.?e\d{2}/i', $item->link, $matches);
 		if (isset($matches[0]))
 		{
 			$episode = $matches[0];
@@ -293,16 +293,21 @@ class baibako
 								)
 							);							
 							$file = str_replace(' ', '.', $name).'.S'.$season.'E'.$episode.'.'.$amp;
-							Sys::saveTorrent($tracker, $file, $torrent, $id, $hash);							
+							$episode = (substr($episode, 0, 1) == 0) ? substr($episode, 1, 1) : $episode;
+							$season = (substr($season, 0, 1) == 0) ? substr($season, 1, 1) : $season;
+							$message = $name.' '.$amp.' обновлён до '.$episode.' серии, '.$season.' сезона.';
+							$status = Sys::saveTorrent($tracker, $file, $torrent, $id, $hash, $message, $date_str);
+								
+							if ($status == 'add_fail' || $status == 'connect_fail' || $status == 'credential_wrong')
+							{
+							    $torrentClient = Database::getSetting('torrentClient');
+							    Errors::setWarnings($torrentClient, $status);
+							}
+
 							//обновляем время регистрации торрента в базе
 							Database::setNewDate($id, $serial['date']);
 							//обновляем сведения о последнем эпизоде
 							Database::setNewEpisode($id, $serial['episode']);
-							$episode = (substr($episode, 0, 1) == 0) ? substr($episode, 1, 1) : $episode;
-							$season = (substr($season, 0, 1) == 0) ? substr($season, 1, 1) : $season;
-							//отправляем уведомлении о новом торренте
-							$message = $name.' '.$amp.' обновлён до '.$episode.' серии, '.$season.' сезона.';
-							Notification::sendNotification('notification', baibako::dateNumToString($serial['date']), $tracker, $message);
 						}
 					}
 				}

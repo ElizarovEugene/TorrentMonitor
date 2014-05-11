@@ -68,11 +68,24 @@ class novafilm
 	{
 		if (preg_match('/'.$name.'/i', $item->category))
 		{
-			if ($hd)
+			if ($hd == 1)
 			{
 				if (preg_match_all('/720/', $item->link, $matches))
 				{
-					preg_match('/\w\d{2}\.?\w\d{2}/', $item->link, $matches);
+					preg_match('/s\d{2}\.?e\d{2}/i', $item->link, $matches);
+					if (isset($matches[0]))
+					{
+						$episode = $matches[0];
+						$date = novafilm::dateStringToNum($item->pubDate);
+						return array('episode'=>$episode, 'date'=>$date, 'link'=>(string)$item->link);
+					}
+				}
+			}
+			elseif ($hd == 2)
+			{
+				if (preg_match_all('/1080/', $item->link, $matches))
+				{
+					preg_match('/s\d{2}\.?e\d{2}/i', $item->link, $matches);
 					if (isset($matches[0]))
 					{
 						$episode = $matches[0];
@@ -83,9 +96,9 @@ class novafilm
 			}
 			else
 			{
-				if (preg_match_all('/^(?!(.*720))/', $item->link, $matches))
+				if (preg_match_all('/^(?!(.*720|.*1080))/', $item->link, $matches))
 				{
-					preg_match('/\w\d{2}\.?\w\d{2}/', $item->link, $matches);
+					preg_match('/s\d{2}\.?e\d{2}/i', $item->link, $matches);
 					if (isset($matches[0]))
 					{
 						$episode = $matches[0];
@@ -266,6 +279,7 @@ class novafilm
 					{
 						$episode = substr($serial['episode'], 4, 2);
 						$season = substr($serial['episode'], 1, 2);
+						$date_str = novafilm::dateNumToString($serial['date']);
 						
 						if ( ! empty($ep))
 						{
@@ -295,16 +309,21 @@ class novafilm
 								)
 							);							
 							$file = str_replace(' ', '.', $name).'.S'.$season.'E'.$episode.'.'.$amp;
-							Sys::saveTorrent($tracker, $file, $torrent, $id, $hash);							
+							$episode = (substr($episode, 0, 1) == 0) ? substr($episode, 1, 1) : $episode;
+							$season = (substr($season, 0, 1) == 0) ? substr($season, 1, 1) : $season;
+							$message = $name.' '.$amp.' обновлён до '.$episode.' серии, '.$season.' сезона.';
+							$status = Sys::saveTorrent($tracker, $file, $torrent, $id, $hash, $message, $date_str);
+								
+							if ($status == 'add_fail' || $status == 'connect_fail' || $status == 'credential_wrong')
+							{
+							    $torrentClient = Database::getSetting('torrentClient');
+							    Errors::setWarnings($torrentClient, $status);
+							}
+
 							//обновляем время регистрации торрента в базе
 							Database::setNewDate($id, $serial['date']);
 							//обновляем сведения о последнем эпизоде
 							Database::setNewEpisode($id, $serial['episode']);
-							$episode = (substr($episode, 0, 1) == 0) ? substr($episode, 1, 1) : $episode;
-							$season = (substr($season, 0, 1) == 0) ? substr($season, 1, 1) : $season;
-							//отправляем уведомлении о новом торренте
-							$message = $name.' '.$amp.' обновлён до '.$episode.' серии, '.$season.' сезона.';
-							Notification::sendNotification('notification', novafilm::dateNumToString($serial['date']), $tracker, $message);
 						}
 					}
 				}

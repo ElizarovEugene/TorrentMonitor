@@ -30,6 +30,8 @@ INSERT INTO "credentials" VALUES (9, 'baibako.tv', '', '', '');
 INSERT INTO "credentials" VALUES (10,'casstudio.tv', '', '','');
 INSERT INTO "credentials" VALUES (11,'newstudio.tv', '', '','');
 INSERT INTO "credentials" VALUES (12,'animelayer.ru', '', '','');
+INSERT INTO "credentials" VALUES (13,'tracker.0day.kiev.ua','','','');
+INSERT INTO "credentials" VALUES (14,'rustorka.com','','','');
 
 CREATE TABLE `settings` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -53,6 +55,16 @@ INSERT INTO "settings" VALUES (13, 'torrentPassword', '');
 INSERT INTO "settings" VALUES (14, 'pathToDownload', '');
 INSERT INTO "settings" VALUES (15, 'deleteTorrent', '0');
 INSERT INTO "settings" VALUES (16, 'deleteOldFiles', '0');
+
+CREATE TABLE `temp` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  `path` varchar(100) NOT NULL DEFAULT '',
+  `hash` varchar(40) NOT NULL DEFAULT '' UNIQUE,
+  `tracker` varchar(30) NOT NULL DEFAULT '',
+  `message` varchar(60) NOT NULL DEFAULT '',
+  `date` varchar(120) NOT NULL DEFAULT '',
+  UNIQUE KEY `hash` (`hash`)
+)
 
 CREATE TABLE `torrent` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,

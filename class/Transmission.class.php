@@ -33,10 +33,10 @@ class Transmission
 
         #добавляем торрент в torrent-клиента
         $command = `transmission-remote $torrentAddress $opt -a '$file' -w '$pathToDownload'`;
-        if ( ! preg_match('/responded: \"success\"/', $command))
-        {
-            Errors::setWarnings('Transmission', 'add_fail');
-        }
+        if ( ! preg_match('/responded\:\s\"success\"/', $command))
+            return 'add_fail';
+        elseif (preg_match('/Couldn\'t connect to server/', $command))
+            return 'connect_fail';
         else
         {
             #получаем хэш раздачи
@@ -46,6 +46,7 @@ class Transmission
         
             //сбрасываем варнинг
             Database::clearWarnings('Transmission');
+            return TRUE;
         }
     }
 }
