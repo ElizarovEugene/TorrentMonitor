@@ -10,7 +10,7 @@
 * Слежение за темами на nnm-club.ru
 * Слежение за темами на rustorka.com
 * Слежение за темами на rutracker.org
-* Слежение за темами на rutor.org
+* Слежение за темами на new-rutor.org
 * Слежение за темами на tfile.me
 * Слежение за темами на tracker.0day.kiev.ua
 * Слежение за релизерами на nnm-club.ru

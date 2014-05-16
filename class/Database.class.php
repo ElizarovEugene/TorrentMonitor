@@ -334,7 +334,7 @@ class Database
     {
         if ($tracker == 'lostfilm.tv' || $tracker == 'novafilm.tv')
             $fields = 'hd, ep';
-        if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.ru' || $tracker == 'rutor.org')
+        if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.ru' || $tracker == 'new-rutor.org')
             $fields = 'torrent_id';
             
         $stmt = self::newStatement("SELECT name, timestamp, ".$fields." FROM torrent WHERE tracker = :tracker ORDER BY id");
@@ -351,7 +351,7 @@ class Database
                     $resultArray[$i]['hd'] = $row['hd'];
                     $resultArray[$i]['ep'] = $row['ep'];
                 }
-                if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.ru' || $tracker == 'rutor.org')
+                if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.ru' || $tracker == 'new-rutor.org')
                     $resultArray[$i]['torrent_id'] = $row['torrent_id'];
                 $i++;
             }
