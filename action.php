@@ -38,7 +38,7 @@ if (isset($_POST['action']))
 			if ($tracker == 'tr.anidub.com')
 				$tracker = 'anidub.com';
 			
-			if ($tracker != 'rutor.org')
+			if ($tracker != 'new-rutor.org')
 			{
 				$query = explode('=', $url['query']);
 				$threme = $query[1];

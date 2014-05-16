@@ -57,7 +57,7 @@ if ( ! empty($torrents_list))
         	    <a href='http://<?php echo $tracker ?>/details.php?id=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
         	<?php	
     		}
-    		elseif ($tracker == 'rutor.org')
+    		elseif ($tracker == 'new-rutor.org')
     		{
     		?>
     			<a href='http://<?php echo $tracker ?>/torrent/<?php echo $torrent_id ?>/' target='_blank'><?php echo $name ?></a>
@@ -90,7 +90,7 @@ if ( ! empty($torrents_list))
             if ($timestamp == '0000-00-00 00:00:00' || $timestamp == NULL) {}
             else
             {
-            	if ($tracker != 'rutracker.org' && $tracker != 'nnm-club.me' && $tracker != 'rutor.org' && $tracker != 'kinozal.tv')
+            	if ($tracker != 'rutracker.org' && $tracker != 'nnm-club.me' && $tracker != 'new-rutor.org' && $tracker != 'kinozal.tv')
             	{
             	?>
             	<div onclick='expand("div<?php echo $id ?>")' class='cut' style='cursor: pointer;'>
@@ -116,7 +116,7 @@ if ( ! empty($torrents_list))
             		$season = substr($ep, 1, 2);
             		$episode = substr($ep, -2);
 
-                	if ($tracker != 'rutracker.org' && $tracker != 'nnm-club.me' && $tracker != 'rutor.org' && $tracker != 'kinozal.tv')
+                	if ($tracker != 'rutracker.org' && $tracker != 'nnm-club.me' && $tracker != 'new-rutor.org' && $tracker != 'kinozal.tv')
                 	{
                 	?>
             		<div id='div<?php echo $id ?>' class='result'>

@@ -44,7 +44,7 @@ VALUES
 	(2,'nnm-club.me','','',''),
 	(3,'lostfilm.tv','','',''),
 	(4,'novafilm.tv','','',''),
-	(5,'rutor.org', ' ', ' ',''),
+	(5,'new-rutor.org', ' ', ' ',''),
 	(6,'tfile.me', ' ', ' ',''),
 	(7,'kinozal.tv', '', '',''),
 	(8,'anidub.com', '', '',''),

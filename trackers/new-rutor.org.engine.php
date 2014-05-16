@@ -1,5 +1,5 @@
 <?php
-class rutor
+class newrutor
 {
 	protected static $exucution;
 	protected static $warning;
@@ -35,9 +35,8 @@ class rutor
 	//основная функция
 	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash)
 	{
-		rutor::$exucution = TRUE;
-
-		if (rutor::$exucution)
+		newrutor::$exucution = TRUE;
+		if (newrutor::$exucution)
 		{
 			//получаем страницу для парсинга
 			$page = Sys::getUrlContent(
@@ -45,10 +44,9 @@ class rutor
             		'type'           => 'GET',
             		'header'         => 0,
             		'returntransfer' => 1,
-            		'url'            => 'http://rutor.org/torrent/'.$torrent_id
+            		'url'            => 'http://new-rutor.org/torrent/'.$torrent_id.'/'
             	)
             );
-
 			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
@@ -63,8 +61,8 @@ class rutor
 							//сбрасываем варнинг
 							Database::clearWarnings($tracker);
 							//приводим дату к общему виду
-							$date = rutor::dateStringToNum($array[1]);
-							$date_str = rutor::dateNumToString($array[1]);
+							$date = newrutor::dateStringToNum($array[1]);
+							$date_str = newrutor::dateNumToString($array[1]);
 							//если даты не совпадают, перекачиваем торрент
 							if ($date != $timestamp)
 							{
@@ -73,7 +71,7 @@ class rutor
                                 	array(
                                 		'type'           => 'GET',
                                 		'returntransfer' => 0,
-                                		'url'            => 'http://d.rutor.org/download/'.$torrent_id,
+                                		'url'            => 'http://new-rutor.org/parse/d.rutor.org/download/'.$torrent_id.'/',
                                 	)
                                 );
 								$message = $name.' обновлён.';
@@ -92,49 +90,49 @@ class rutor
 						else
 						{
 							//устанавливаем варнинг
-							if (rutor::$warning == NULL)
+							if (newrutor::$warning == NULL)
 							{
-								rutor::$warning = TRUE;
+								newrutor::$warning = TRUE;
 								Errors::setWarnings($tracker, 'not_available');
 							}
 							//останавливаем процесс выполнения, т.к. не может работать без кук
-							rutor::$exucution = FALSE;
+							newrutor::$exucution = FALSE;
 						}
 					}
 					else
 					{
 						//устанавливаем варнинг
-						if (rutor::$warning == NULL)
+						if (newrutor::$warning == NULL)
 						{
-							rutor::$warning = TRUE;
+							newrutor::$warning = TRUE;
 							Errors::setWarnings($tracker, 'not_available');
 						}
 						//останавливаем процесс выполнения, т.к. не может работать без кук
-						rutor::$exucution = FALSE;
+						newrutor::$exucution = FALSE;
 					}
 				}
 				else
 				{
 					//устанавливаем варнинг
-					if (rutor::$warning == NULL)
+					if (newrutor::$warning == NULL)
 					{
-						rutor::$warning = TRUE;
+						newrutor::$warning = TRUE;
 						Errors::setWarnings($tracker, 'not_available');
 					}
 					//останавливаем процесс выполнения, т.к. не может работать без кук
-					rutor::$exucution = FALSE;
+					newrutor::$exucution = FALSE;
 				}
 			}
 			else
 			{
 				//устанавливаем варнинг
-				if (rutor::$warning == NULL)
+				if (newrutor::$warning == NULL)
 				{
-					rutor::$warning = TRUE;
+					newrutor::$warning = TRUE;
 					Errors::setWarnings($tracker, 'not_available');
 				}
 				//останавливаем процесс выполнения, т.к. не может работать без кук
-				rutor::$exucution = FALSE;
+				newrutor::$exucution = FALSE;
 			}
 		}
 	}
