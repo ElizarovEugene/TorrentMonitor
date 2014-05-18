@@ -146,7 +146,7 @@ class nnmclub
             		'type'           => 'POST',
             		'header'         => 0,
             		'returntransfer' => 1,
-            		'url'            => 'http://nnm-club.me/forum/viewtopic.php?t='.$torrent_id,
+            		'url'            => 'http://nnm-club.me/forum/viewtopic.php?p='.$torrent_id,
             		'cookie'         => nnmclub::$sess_cookie,
             		'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-length' => strlen(nnmclub::$sess_cookie)),
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
@@ -184,7 +184,7 @@ class nnmclub
 	                                		'url'            => 'http://nnm-club.me/forum/download.php?id='.$torrent_id,
 	                                		'cookie'         => nnmclub::$sess_cookie,
 	                                		'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-length' => strlen(nnmclub::$sess_cookie)),
-	                                		'referer'        => 'http://nnm-club.me/forum/viewtopic.php?t='.$torrent_id,
+	                                		'referer'        => 'http://nnm-club.me/forum/viewtopic.php?p='.$torrent_id,
 	                                	)
 	                                );
 									$message = $name.' обновлён.';

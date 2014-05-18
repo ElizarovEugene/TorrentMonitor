@@ -45,10 +45,16 @@ if ( ! empty($torrents_list))
             <td class='text-align-left' nowrap><span class='icon-torrent' style='background-image: url(img/<?php echo $tracker ?>.ico);'></span><?php echo $tracker ?></td>
             <td class='text-align-left'>
     	  	<?php 
-    		if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.me' || $tracker == 'tfile.me' || $tracker == 'torrents.net.ua' || $tracker == 'rustorka.com')
+    		if ($tracker == 'rutracker.org' || $tracker == 'tfile.me' || $tracker == 'torrents.net.ua' || $tracker == 'rustorka.com')
     		{
     		?>
 				<a href='http://<?php echo $tracker ?>/forum/viewtopic.php?t=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
+    		<?php
+    		}
+    		elseif ($tracker == 'nnm-club.me')
+    		{
+    		?>
+				<a href='http://<?php echo $tracker ?>/forum/viewtopic.php?p=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
     		<?php
     		}
     		elseif ($tracker == 'casstudio.tv' || $tracker == 'kinozal.tv'  || $tracker == 'animelayer.ru' || $tracker == 'tracker.0day.kiev.ua')
