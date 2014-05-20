@@ -45,7 +45,7 @@ class rutor
             		'type'           => 'GET',
             		'header'         => 0,
             		'returntransfer' => 1,
-            		'url'            => 'http://rutor.org/torrent/'.$torrent_id
+            		'url'            => 'http://new-rutor.org/torrent/'.$torrent_id.'/'
             	)
             );
 
@@ -73,7 +73,7 @@ class rutor
                                 	array(
                                 		'type'           => 'GET',
                                 		'returntransfer' => 0,
-                                		'url'            => 'http://d.rutor.org/download/'.$torrent_id,
+                                		'url'            => 'http://new-rutor.org/parse/d.rutor.org/download/'.$torrent_id.'/',
                                 	)
                                 );
 								$message = $name.' обновлён.';

@@ -37,6 +37,9 @@ if (isset($_POST['action']))
 			$tracker = preg_replace('/www\./', '', $tracker);
 			if ($tracker == 'tr.anidub.com')
 				$tracker = 'anidub.com';
+				
+            if ($tracker == 'new-rutor.org')
+				$tracker = 'rutor.org';
 			
 			if ($tracker != 'rutor.org')
 			{

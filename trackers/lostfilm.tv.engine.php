@@ -54,7 +54,6 @@ class lostfilm
 	        	)
 	        );
 			preg_match('/<td align=\"left\">(.*)<br >/', $page, $out);
-			print_r($page);
 			if (isset($out[1]))
 			{
     			lostfilm::$sess_cookie .= ' usess='.$out[1];
@@ -88,7 +87,7 @@ class lostfilm
 	
 	//проверяем cookie
 	public static function checkCookie($sess_cookie)
-	{echo $sess_cookie;
+	{
         $result = Sys::getUrlContent(
         	array(
         		'type'           => 'POST',
@@ -147,6 +146,17 @@ class lostfilm
 		return $date;
 	}
 	
+	//функция учёта часового пояса
+	private static function dateOffset($date)
+	{
+        $this_tz_str = date_default_timezone_get();
+        $this_tz = new DateTimeZone($this_tz_str);
+        $now = new DateTime("now", $this_tz);
+        $offset = $this_tz->getOffset($now);
+
+        return date('Y-m-d H:i:s', strtotime($date) + $offset);    	
+	}
+	
 	//функция анализа эпизода
 	private static function analysisEpisode($item)
 	{
@@ -155,7 +165,7 @@ class lostfilm
 		{
 			$episode = $matches[0];
 			$date = lostfilm::dateStringToNum($item->pubDate);
-			return array('episode'=>$episode, 'date'=>$date, 'link'=>(string)$item->link);
+			return array('episode'=>$episode, 'date'=>lostfilm::dateOffset($date), 'link'=>(string)$item->link);
 		}
 	}
 	

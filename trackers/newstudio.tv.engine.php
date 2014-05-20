@@ -286,7 +286,9 @@ class newstudio
 				
 				foreach ($nodes as $item)
 				{
+
 					$serial = newstudio::analysis($name, $hd, $item);
+
 					if ( ! empty($serial))
 					{
 						$episode = substr($serial['episode'], 4, 2);
