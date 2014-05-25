@@ -65,7 +65,7 @@ class Sys
 	//версия системы
 	public static function version()
 	{
-		return '0.9.7';
+		return '0.9.8';
 	}
 
 	//проверка обновлений системы
@@ -231,7 +231,7 @@ class Sys
             }
 		}
 
-		if ($tracker != 'new-rutor.org' && $tracker != 'casstudio.tv' && $tracker != 'torrents.net.ua' && $tracker != 'rustorka.com')
+		if ($tracker != 'new-rutor.org' && $tracker != 'casstudio.tv' && $tracker != 'torrents.net.ua' && $tracker != 'rustorka.com' && $tracker != 'tr.anidub.com')
 			$forumPage = iconv('windows-1251', 'utf-8//IGNORE', $forumPage);
 
 		if ($tracker == 'tr.anidub.com')
@@ -241,7 +241,7 @@ class Sys
 		if ( ! empty($array[1]))
 		{
 			if ($tracker == 'anidub.com')
-				$name = substr($array[1], 15, -50);
+				$name = substr($array[1], 0, -23);
 			elseif ($tracker == 'casstudio.tv')
 				$name = substr($array[1], 48);
 			elseif ($tracker == 'kinozal.tv')

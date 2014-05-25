@@ -15,11 +15,10 @@ class anidub
         		'url'            => 'http://tr.anidub.com',
         		'cookie'         => $sess_cookie,
         		'sendHeader'     => array('Host' => 'tr.anidub.com', 'Content-length' => strlen($sess_cookie)),
-        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
         	)
         );
 
-		if (preg_match('/<span style=\"color:#000000;\" title=\"Пользователь\">.*<\/span>/', $result))
+		if (preg_match('/Добро пожаловать <a href=\"http:\/\/tr\.anidub\.com\/user\/.*\/\" target=\"_blank\">/', $result))
 			return TRUE;
 		else
 			return FALSE;
@@ -28,23 +27,36 @@ class anidub
 	//функция проверки введёного URL`а
 	public static function checkRule($data)
 	{
-		if (preg_match('/\D+/', $data))
+		if (preg_match('/\D\d\/+/', $data))
 			return FALSE;
 		else
 			return TRUE;
 	}
 	
 	//функция преобразования даты
-	private static function dateNumToString($data)
+	private static function dateStringToNum($data)
 	{
-        $pieces = explode(' ', $data);
-        $dates = explode('-', $pieces[0]);
-        $m = Sys::dateNumToString($dates[1]);
-        $date = $dates[2].' '.$m.' '.$dates[0];
-        $time = substr($pieces[1], 0, -3);
-        $dateTime = $date.' '.$time;
-        
-        return $dateTime;
+	    if (strstr($data, 'Сегодня') || strstr($data, 'Вчера'))
+	    {
+	        $pieces = explode(', ', $data);
+	        if ($pieces[0] == 'Вчера')
+	            $timestamp = strtotime('-1 day');
+	        else         
+	            $timestamp = strtotime('now');
+	        $date = date('Y-m-d', $timestamp);
+	        $time = $pieces[1].':00';
+	        $dateTime = $date.' '.$time;
+
+	        return $dateTime;
+	    }
+	    else
+	    {
+			$pieces = explode(', ', $data);
+			$pieces2 = explode('-', $pieces[0]);
+			$dateTime = $pieces2[2].'-'.$pieces2[1].'-'.$pieces2[0].' '.$pieces[1].':00';
+			
+			return $dateTime;
+	    }
 	}
 	
 	//функция получения кук
@@ -64,34 +76,25 @@ class anidub
             		'type'           => 'POST',
             		'header'         => 1,
             		'returntransfer' => 1,
-            		'url'            => 'http://tr.anidub.com/takelogin.php',
-            		'postfields'     => 'username='.$login.'&password='.$password,
-            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
+            		'url'            => 'http://tr.anidub.com',
+            		'postfields'     => 'login_name='.$login.'&login_password='.$password.'&login=submit',
             	)
             );
 
 			if ( ! empty($page))
 			{
 				//проверяем подходят ли учётные данные
-				if (preg_match('/<td class=\"embedded\">Вы не зарегистрированы в системе\.<\/td>/', $page, $array))
+				if (preg_match('/<a href=\"http:\/\/tr\.anidub\.com\/index\.php\?do=register\">Регистрация<\/a>/', $page, $array))
 				{
 					//устанавливаем варнинг
 					Errors::setWarnings($tracker, 'credential_wrong');
 					//останавливаем процесс выполнения, т.к. не может работать без кук
 					anidub::$exucution = FALSE;
 				}
-                //проверяем подходят ли учётные данные
-				elseif (preg_match_all('/<td class=\"embedded\">Имя пользователя или пароль неверны<\/td>/', $page, $array))
-				{
-					//устанавливаем варнинг
-					Errors::setWarnings($tracker, 'credential_wrong');
-					//останавливаем процесс выполнения, т.к. не может работать без кук
-					anidub::$exucution = FALSE;
-				}				
 				//если подходят - получаем куки
 				elseif (preg_match_all('/Set-Cookie: (.*);/U', $page, $array))
 				{
-					anidub::$sess_cookie = $array[1][1].'; '.$array[1][2].';';
+					anidub::$sess_cookie = $array[1][1].'; '.$array[1][2].'; '.$array[1][3].';';
 					Database::setCookie($tracker, anidub::$sess_cookie);
 					//запускам процесс выполнения, т.к. не может работать без кук
 					anidub::$exucution = TRUE;
@@ -146,7 +149,7 @@ class anidub
 		}			
 		else
     		anidub::getCookie($tracker);
-    		
+
 		if (anidub::$exucution)
 		{
 			//получаем страницу для парсинга
@@ -155,17 +158,16 @@ class anidub
             		'type'           => 'POST',
             		'header'         => 0,
             		'returntransfer' => 1,
-            		'url'            => 'http://tr.anidub.com/details.php?id='.$torrent_id,
+            		'url'            => 'http://tr.anidub.com'.$torrent_id,
             		'cookie'         => anidub::$sess_cookie,
             		'sendHeader'     => array('Host' => 'tr.anidub.com', 'Content-length' => strlen(anidub::$sess_cookie)),
-            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
-//print_r($page);
+
 			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
-				if (preg_match('/<td width=\"\" class=\"heading\" valign=\"top\" align=\"right\">Добавлен<\/td><td valign=\"top\" align=\"left\">(.*)<\/td>/', $page, $array))
+				if (preg_match('/<li><b>Дата:<\/b> (.*)<\/li>/', $page, $array))
 				{
 					//проверяем удалось ли получить дату со страницы
 					if (isset($array[1]))
@@ -176,27 +178,26 @@ class anidub
 							//сбрасываем варнинг
 							Database::clearWarnings($tracker);
 							//приводим дату к общему виду
-							$date = $array[1];
-							$date_str = anidub::dateNumToString($array[1]);
+							$date = anidub::dateStringToNum($array[1]);
+							$date_str = $array[1];
 							//если даты не совпадают, перекачиваем торрент
 							if ($date != $timestamp)
 							{
-                                preg_match('/<a href=\"download\.php\?id=(\d{2,6})&amp;name=(.*)\">/U', $page, $array);
-                                $torrent_id = $array[1];
-                                $torrent_id_name = $array[2];
+                                preg_match('/<a href=\"\/engine\/download\.php\?id=(.*)\" class=\" \">/U', $page, $array);
+                                $download_id = $array[1];
 								//сохраняем торрент в файл
                                 $torrent = Sys::getUrlContent(
                                 	array(
-                                		'type'           => 'POST',
+                                		'type'           => 'GET',
                                 		'returntransfer' => 1,
-                                		'url'            => 'http://tr.anidub.com/download.php?id='.$torrent_id.'&name='.$torrent_id_name,
+                                		'url'            => 'http://tr.anidub.com/engine/download.php?id='.$download_id,
                                 		'cookie'         => anidub::$sess_cookie,
                                 		'sendHeader'     => array('Host' => 'tr.anidub.com', 'Content-length' => strlen(anidub::$sess_cookie)),
-                                		'referer'        => 'http://tr.anidub.com/details.php?id='.$torrent_id,
+                                		'referer'        => 'http://tr.anidub.com'.$torrent_id,
                                 	)
                                 );
 								$message = $name.' обновлён.';
-								$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str);
+								$status = Sys::saveTorrent($tracker, $download_id, $torrent, $id, $hash, $message, $date_str);
 								
 								if ($status == 'add_fail' || $status == 'connect_fail' || $status == 'credential_wrong')
 								{

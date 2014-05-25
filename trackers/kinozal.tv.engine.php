@@ -47,6 +47,7 @@ class kinozal
 	        $date = date('Y-m-d', $timestamp);
 	        $time = $pieces[2].':00';
 	        $dateTime = $date.' '.$time;
+
 	        return $dateTime;
 	    }
 	    elseif (preg_match('/\d{1,2} \D* \d{4} в \d{2}:\d{2}/', $data))
@@ -58,9 +59,9 @@ class kinozal
 			$date = $pieces[2].'-'.$month.'-'.$pieces[0];
 			$time = $pieces[4].':00';
 			$dateTime = $date.' '.$time;
+
 			return $dateTime;
 	    }
-	    
 	}
 
 	//функция преобразования даты

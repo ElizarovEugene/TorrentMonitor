@@ -66,7 +66,7 @@ if ( ! empty($torrents_list))
     		elseif ($tracker == 'anidub.com')
     		{
 	    	?>        		
-	    		<a href='http://tr.<?php echo $tracker ?>/details.php?id=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>	    	
+	    		<a href='http://tr.anidub.com<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>	    	
 	    	<?php        		
     		}
     		else

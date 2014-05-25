@@ -71,8 +71,8 @@ CREATE TABLE `torrent` (
   `tracker` varchar(30) NOT NULL,
   `name` varchar(250) NOT NULL DEFAULT '',
   `hd` INTEGER NOT NULL DEFAULT '0',
-  `path` varchar(1000) NOT NULL DEFAULT '',
-  `torrent_id` INTEGER NOT NULL DEFAULT '0',
+  `path` varchar(100) NOT NULL DEFAULT '',
+  `torrent_id` varchar(100) NOT NULL DEFAULT '',
   `ep` varchar(10) DEFAULT '',
   `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `hash` varchar(40) NOT NULL DEFAULT ''
