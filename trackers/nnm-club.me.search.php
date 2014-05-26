@@ -36,7 +36,7 @@ class nnmclubSearch extends nnmclub
 				Database::clearWarnings($tracker);
 
 	    		preg_match_all('/<a class=\"gen\" href=\"tracker\.php\?f=\d{3,9}\">(.*)<\/a>/', $page, $section);
-	    		preg_match_all('/<a class=\"(genmed|leechmed|seedmed) (topicpremod|topictitle)\" href=\"viewtopic\.php\?t=(\d{3,9})\"><b>(.*)<\/b><\/a>/', $page, $threme);
+	    		preg_match_all('/<a class=\"(genmed|leechmed|seedmed) (topicpremod|topictitle)\" href=\"viewtopic\.php\?p=(\d{3,9})\"><b>(.*)<\/b><\/a>/', $page, $threme);
 	
 	    		for ($i=0; $i<count($threme[1]); $i++)
 	    			Database::addThremeToBuffer($user_id, $section[1][$i], $threme[3][$i], $threme[4][$i], $tracker);
@@ -53,7 +53,7 @@ class nnmclubSearch extends nnmclub
 		            		'type'           => 'POST',
 		            		'header'         => 0,
 		            		'returntransfer' => 1,
-		            		'url'            => 'http://nnm-club.me/forum/viewtopic.php?t='.$toDownload[$i]['threme_id'],
+		            		'url'            => 'http://nnm-club.me/forum/viewtopic.php?p='.$toDownload[$i]['threme_id'],
 		            		'cookie'         => nnmclub::$sess_cookie,
 		            		'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-length' => strlen(nnmclub::$sess_cookie)),
 		            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
@@ -76,7 +76,7 @@ class nnmclubSearch extends nnmclub
                             		'url'            => 'http://nnm-club.me/forum/download.php?id='.$torrent_id,
                             		'cookie'         => nnmclub::$sess_cookie,
                             		'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-length' => strlen(nnmclub::$sess_cookie)),
-                            		'referer'        => 'http://nnm-club.me/forum/viewtopic.php?t='.$torrent_id,
+                            		'referer'        => 'http://nnm-club.me/forum/viewtopic.php?p='.$torrent_id,
                             	)
                             );
                             $message = $toDownload[$i]['threme'].' добавлена для скачивания.';
