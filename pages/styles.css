@@ -224,7 +224,8 @@ body {
                 .h-menu-item4,
                 .h-menu-item5,
                 .h-menu-item6,
-                .h-menu-item7 {
+                .h-menu-item7,
+                .h-menu-item8 {
                     background-image: url(../img/icon1.png);
                     background-position: 4px 4px;
                     background-repeat: no-repeat;
@@ -236,6 +237,7 @@ body {
                     .h-menu-item5 {    background-image: url(../img/icon5.png); }
                     .h-menu-item6 {    background-image: url(../img/icon6.png); }
                     .h-menu-item7 {    background-image: url(../img/icon7.png); }
+                    .h-menu-item8 {    background-image: url(../img/icon8.png); }
 
 /* ==========================================================================
    Middle

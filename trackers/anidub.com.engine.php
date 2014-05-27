@@ -59,6 +59,17 @@ class anidub
 	    }
 	}
 	
+	//функция поиска нужной ссылки
+	protected static function findLynk($page)
+	{
+	    if (preg_match('/<div id=\".*1080\">\t\t<div>\n\s{20}<div class=\"torrent_h\">\n\s{24}<a href=\"\/engine\/download\.php\?id=(.*)\" class=\" \">/U', $page, $array))
+    	     return $array[1];
+	    elseif (preg_match('/<div id=\".*720\">\t\t<div>\n\s{20}<div class=\"torrent_h\">\n\s{24}<a href=\"\/engine\/download\.php\?id=(.*)\" class=\" \">/U', $page, $array))
+    	    return $array[1];
+	    else
+	        return FALSE;
+	}
+	
 	//функция получения кук
 	protected static function getCookie($tracker)
 	{
@@ -183,30 +194,32 @@ class anidub
 							//если даты не совпадают, перекачиваем торрент
 							if ($date != $timestamp)
 							{
-                                preg_match('/<a href=\"\/engine\/download\.php\?id=(.*)\" class=\" \">/U', $page, $array);
-                                $download_id = $array[1];
-								//сохраняем торрент в файл
-                                $torrent = Sys::getUrlContent(
-                                	array(
-                                		'type'           => 'GET',
-                                		'returntransfer' => 1,
-                                		'url'            => 'http://tr.anidub.com/engine/download.php?id='.$download_id,
-                                		'cookie'         => anidub::$sess_cookie,
-                                		'sendHeader'     => array('Host' => 'tr.anidub.com', 'Content-length' => strlen(anidub::$sess_cookie)),
-                                		'referer'        => 'http://tr.anidub.com'.$torrent_id,
-                                	)
-                                );
-								$message = $name.' обновлён.';
-								$status = Sys::saveTorrent($tracker, $download_id, $torrent, $id, $hash, $message, $date_str);
-								
-								if ($status == 'add_fail' || $status == 'connect_fail' || $status == 'credential_wrong')
-								{
-								    $torrentClient = Database::getSetting('torrentClient');
-								    Errors::setWarnings($torrentClient, $status);
-								}
-								
-								//обновляем время регистрации торрента в базе
-								Database::setNewDate($id, $date);
+							    $download_id = anidub::findLynk($page);
+                                if ($download_id !== FALSE)
+                                {
+    								//сохраняем торрент в файл
+                                    $torrent = Sys::getUrlContent(
+                                    	array(
+                                    		'type'           => 'GET',
+                                    		'returntransfer' => 1,
+                                    		'url'            => 'http://tr.anidub.com/engine/download.php?id='.$download_id,
+                                    		'cookie'         => anidub::$sess_cookie,
+                                    		'sendHeader'     => array('Host' => 'tr.anidub.com', 'Content-length' => strlen(anidub::$sess_cookie)),
+                                    		'referer'        => 'http://tr.anidub.com'.$torrent_id,
+                                    	)
+                                    );
+    								$message = $name.' обновлён.';
+    								$status = Sys::saveTorrent($tracker, $download_id, $torrent, $id, $hash, $message, $date_str);
+    								
+    								if ($status == 'add_fail' || $status == 'connect_fail' || $status == 'credential_wrong')
+    								{
+    								    $torrentClient = Database::getSetting('torrentClient');
+    								    Errors::setWarnings($torrentClient, $status);
+    								}
+    								
+    								//обновляем время регистрации торрента в базе
+    								Database::setNewDate($id, $date);
+                                }
 							}
 						}
 						else
