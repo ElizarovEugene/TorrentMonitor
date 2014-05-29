@@ -63,7 +63,6 @@ CREATE TABLE `temp` (
   `tracker` varchar(30) NOT NULL DEFAULT '',
   `message` varchar(60) NOT NULL DEFAULT '',
   `date` varchar(120) NOT NULL DEFAULT '',
-  UNIQUE KEY `hash` (`hash`)
 )
 
 CREATE TABLE `torrent` (
