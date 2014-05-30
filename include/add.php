@@ -64,6 +64,7 @@
         <select name="tracker">
             <option></option>
             <option>nnm-club.me</option>
+            <option>pornolab.net</option>
             <option>rutracker.org</option>
             <option>tfile.me</option>
         </select>

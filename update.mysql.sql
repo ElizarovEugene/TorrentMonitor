@@ -1,1 +1,1 @@
-ALTER TABLE `torrent` CHANGE `torrent_id` `torrent_id` VARCHAR(100)
+INSERT INTO "credentials" VALUES (15,'pornolab.net', '', '','');

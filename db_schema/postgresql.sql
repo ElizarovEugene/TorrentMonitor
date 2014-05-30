@@ -34,6 +34,7 @@ INSERT INTO credentials VALUES (11,'newstudio.tv', '', '','');
 INSERT INTO credentials VALUES (12,'animelayer.ru', '', '','');
 INSERT INTO credentials VALUES (13,'tracker.0day.kiev.ua','','','');
 INSERT INTO credentials VALUES (14,'rustorka.com','','','');
+INSERT INTO credentials VALUES (15,'pornolab.net','','','');
 
 CREATE TABLE "settings" (
   "id" INTEGER  PRIMARY KEY NOT NULL,

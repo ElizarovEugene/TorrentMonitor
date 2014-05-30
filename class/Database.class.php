@@ -60,12 +60,26 @@ class Database
         return Database::getInstance()->dbType;
     }
     
-    public static function newStatement($request) {
+    public static function newStatement($request)
+    {
         if (self::getDbType() == 'pgsql')
             $request = str_replace('`','"',$request);
 	    return self::getInstance()->dbh->prepare($request);
     }
-	
+    
+    public static function updateQuery($request)
+    {
+        $stmt = self::newStatement($request);
+        if ($stmt->execute())
+        {
+            foreach ($stmt as $row)
+            {
+                return $row['val'];
+            }
+        }
+        $stmt = NULL;        
+    }
+
     public static function getSetting($param)
     {
         $stmt = self::newStatement("SELECT `val` FROM `settings` WHERE `key` = :param");

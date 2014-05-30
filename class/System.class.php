@@ -65,7 +65,7 @@ class Sys
 	//версия системы
 	public static function version()
 	{
-		return '0.9.9';
+		return '1.0.0';
 	}
 
 	//проверка обновлений системы
@@ -256,6 +256,8 @@ class Sys
 				$name = substr($array[1], 6, -67);
             elseif ($tracker == 'torrents.net.ua')
 				$name = substr($array[1], 0, -96);
+            elseif ($tracker == 'pornolab.net')
+                $name = substr($array[1], 0, -16);
             elseif ($tracker == 'rustorka.com')
                 $name = substr($array[1], 0, -111);
             else

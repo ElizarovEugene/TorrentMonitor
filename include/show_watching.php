@@ -33,14 +33,7 @@ if ( ! empty($users))
 			<?php
 			for ($x=0; $x<count($thremes); $x++)
 			{
-			    if ($users[$i]['tracker'] == 'nnm-club.me')
-					$url = 'http://nnm-club.me/forum/viewtopic.php?t='; 
-				elseif ($users[$i]['tracker'] == 'rutracker.org')
-					$url = 'http://rutracker.org/forum/viewtopic.php?t=';
-				elseif ($users[$i]['tracker'] == 'tapochek.net')
-					$url = 'http://tapochek.net/viewtopic.php?t=';
-				elseif ($users[$i]['tracker'] == 'tfile.me')
-					$url = 'http://tfile.me/forum/viewtopic.php?t=';
+				$url = 'http://'.$users[$i]['tracker'].'/forum/viewtopic.php?t=';
 				?>
 		<tr>
             <td ><img src="img/icon1.png" onclick="threme_add(<?php echo $thremes[$x]['id']?>, <?php echo $users[$i]['id']?>)"></td>

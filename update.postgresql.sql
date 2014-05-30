@@ -1,1 +1,1 @@
-ALTER TABLE torrent ALTER COLUMN torrent_id TYPE varchar USING (trim(torrent_id)::varchar);
+INSERT INTO credentials VALUES (15,'pornolab.net', '', '','');
