@@ -8,12 +8,14 @@
 * Слежение за темами на casstudio.tv
 * Слежение за темами на kinozal.tv
 * Слежение за темами на nnm-club.ru
+* Слежение за темами на pornolab.net
 * Слежение за темами на rustorka.com
 * Слежение за темами на rutracker.org
 * Слежение за темами на rutor.org
 * Слежение за темами на tfile.me
 * Слежение за темами на tracker.0day.kiev.ua
 * Слежение за релизерами на nnm-club.ru
+* Слежение за релизерами на pornolab.net
 * Слежение за релизерами на rutracker.org
 * Слежение за релизерами на tfile.me
 * Поиск новых серий на baibako.tv (SD/HD 720/HD 1080 версии на выбор)
