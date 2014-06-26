@@ -54,7 +54,7 @@ VALUES
 	(12,'animelayer.ru', '', '',''),
 	(13,'tracker.0day.kiev.ua','','',''),
 	(14,'rustorka.com','','',''),
-	(15,'pornolab.net','','','');)
+	(15,'pornolab.net','','','');
 
 
 /*!40000 ALTER TABLE `credentials` ENABLE KEYS */;
