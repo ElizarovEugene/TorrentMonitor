@@ -192,35 +192,41 @@ $("#user_add").submit(function()
 //Удаляем пользователя
 function delete_user(id)
 {
-	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-	$.post("action.php",{action: 'delete_user', user_id: id},
-		function(data) {
-			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
-			$.get("include/show_watching.php",
-        		function(data) {
-        			$('#content').delay(3000).empty().append(data);
-        		}
-        	);
-		}
-	);
-	return false;
+    if (confirm("Удалить?"))
+    {
+    	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+    	$.post("action.php",{action: 'delete_user', user_id: id},
+    		function(data) {
+    			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+    			$.get("include/show_watching.php",
+            		function(data) {
+            			$('#content').delay(3000).empty().append(data);
+            		}
+            	);
+    		}
+    	);
+    	return false;
+    }
 }
 
 //Удаляем тему из буфера
 function delete_from_buffer(id)
 {
-	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-	$.post("action.php",{action: 'delete_from_buffer', id: id},
-		function(data) {
-			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
-			$.get("include/show_watching.php",
-        		function(data) {
-        			$('#content').delay(3000).empty().append(data);
-        		}
-        	);
-		}
-	);
-	return false;
+    if (confirm("Удалить?"))
+    {
+    	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+    	$.post("action.php",{action: 'delete_from_buffer', id: id},
+    		function(data) {
+    			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+    			$.get("include/show_watching.php",
+            		function(data) {
+            			$('#content').delay(3000).empty().append(data);
+            		}
+            	);
+    		}
+    	);
+    	return false;
+    }
 }
 
 //Перемещаем тему из буфера в мониторинг постоянный
@@ -396,18 +402,21 @@ $("#change_pass").submit(function()
 //Удаляем мониторинг
 function del(id)
 {
-	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-	$.post("action.php",{action: 'del', id: id},
-		function(data) {
-			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
-			$.get("include/show_table.php",
-        		function(data) {
-        			$('#content').delay(3000).empty().append(data);
-        		}
-        	);
-		}
-	);	
-	return false;
+    if (confirm("Удалить?"))
+    {
+    	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+    	$.post("action.php",{action: 'del', id: id},
+    		function(data) {
+    			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+    			$.get("include/show_table.php",
+            		function(data) {
+            			$('#content').delay(3000).empty().append(data);
+            		}
+            	);
+    		}
+    	);
+    	return false;
+    }
 }
 
 //Выводим логин/пароль в зависимости от выбранного в списке

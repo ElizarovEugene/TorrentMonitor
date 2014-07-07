@@ -264,6 +264,7 @@ class baibako
 					{
 						$episode = substr($serial['episode'], 4, 2);
 						$season = substr($serial['episode'], 1, 2);
+						$date_str = baibako::dateNumToString($serial['date']);
 						
 						if ( ! empty($ep))
 						{
@@ -285,7 +286,7 @@ class baibako
 							//сохраняем торрент в файл
 							$torrent = Sys::getUrlContent(
 								array(
-									'type'           => 'POST',
+									'type'           => 'GET',
 									'returntransfer' => 1,
 									'url'            => $serial['link'],
 									'cookie'         => baibako::$sess_cookie,

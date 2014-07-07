@@ -66,7 +66,7 @@ class novafilm
 	//функция анализа xml ленты
 	private static function analysis($name, $hd, $item)
 	{
-		if (preg_match('/'.$name.'/i', $item->category))
+		if (preg_match('/'.$name.'/i', $item->title))
 		{
 			if ($hd == 1)
 			{
@@ -221,7 +221,7 @@ class novafilm
 			        	array(
 			        		'type'           => 'GET',
 			        		'returntransfer' => 1,
-			        		'url'            => 'http://www.ulitka.tv/novafilm.xml',
+			        		'url'            => 'http://novafilm.tv/rss/rssd.xml',
 			        	)
 			        );
 			        
@@ -271,7 +271,7 @@ class novafilm
 				{
 				    array_unshift($nodes, $item);
 				}
-				
+
 				foreach ($nodes as $item)
 				{
 					$serial = novafilm::analysis($name, $hd, $item);
