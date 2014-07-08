@@ -63,8 +63,8 @@ CREATE TABLE `temp` (
   `hash` varchar(40) NOT NULL DEFAULT '' UNIQUE,
   `tracker` varchar(30) NOT NULL DEFAULT '',
   `message` varchar(60) NOT NULL DEFAULT '',
-  `date` varchar(120) NOT NULL DEFAULT '',
-)
+  `date` varchar(120) NOT NULL DEFAULT ''
+);
 
 CREATE TABLE `torrent` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
