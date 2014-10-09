@@ -34,9 +34,7 @@ class Transmission
         #добавляем торрент в torrent-клиента
         $command = `transmission-remote $torrentAddress $opt -a '$file' -w '$pathToDownload'`;
         if ( ! preg_match('/responded\:\s\"success\"/', $command))
-            return 'add_fail';
-        elseif (preg_match('/Couldn\'t connect to server/', $command))
-            return 'connect_fail';
+            return FALSE;
         else
         {
             #получаем хэш раздачи
