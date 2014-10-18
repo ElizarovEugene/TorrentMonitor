@@ -208,17 +208,21 @@ class anidub
                                     		'referer'        => 'http://tr.anidub.com'.$torrent_id,
                                     	)
                                     );
-    								$message = $name.' обновлён.';
-    								$status = Sys::saveTorrent($tracker, $download_id, $torrent, $id, $hash, $message, $date_str);
-    								
-    								if ($status == 'add_fail' || $status == 'connect_fail' || $status == 'credential_wrong')
-    								{
-    								    $torrentClient = Database::getSetting('torrentClient');
-    								    Errors::setWarnings($torrentClient, $status);
-    								}
-    								
-    								//обновляем время регистрации торрента в базе
-    								Database::setNewDate($id, $date);
+                                    
+                                    if (Sys::checkTorrentFile($torrent))
+                                    {
+        								$message = $name.' обновлён.';
+        								$status = Sys::saveTorrent($tracker, $download_id, $torrent, $id, $hash, $message, $date_str);
+        								
+        								if ($status == 'add_fail' || $status == 'connect_fail' || $status == 'credential_wrong')
+        								{
+        								    $torrentClient = Database::getSetting('torrentClient');
+        								    Errors::setWarnings($torrentClient, $status);
+        								}
+        								
+        								//обновляем время регистрации торрента в базе
+        								Database::setNewDate($id, $date);
+                                    }
                                 }
 							}
 						}

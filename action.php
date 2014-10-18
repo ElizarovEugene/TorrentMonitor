@@ -330,8 +330,7 @@ if (isset($_POST['action']))
         Database::updateSettings('torrentAddress', $_POST['torrentAddress']);
         Database::updateSettings('torrentLogin', $_POST['torrentLogin']);
         Database::updateSettings('torrentPassword', $_POST['torrentPassword']);
-        $pathToDownload = Sys::checkPath($_POST['pathToDownload']);
-        Database::updateSettings('pathToDownload', $pathToDownload);
+        Database::updateSettings('pathToDownload', $_POST['pathToDownload']);
         
         if ($_POST['deleteTorrent'] == 'true')
 			$deleteTorrent = 1;

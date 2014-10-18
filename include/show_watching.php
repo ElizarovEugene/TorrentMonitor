@@ -1,3 +1,22 @@
+<script language="javascript">
+// возвращает cookie с именем name, если есть, если нет, то undefined
+function getCookie(name)
+{
+    var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+    return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+
+$(document).ready(function(){
+    var id = getCookie('id');
+    if (typeof id !== 'undefined')
+    {
+        var div = "#"+id;
+        $(this).toggleClass("active");
+        $(div).next().toggle();
+    }
+});
+</script>
+
 <form id="threme_clear" method="post">
 <?php
 $dir = dirname(__FILE__)."/../";
@@ -14,12 +33,13 @@ if ( ! empty($users))
 		$thremes = Database::getThremesFromBuffer($users[$i]['id']);
 		?>
 <div class="user-torrent-del" onclick="delete_user(<?php echo $users[$i]['id']?>)"></div>
-<div class="user-torrent">Раздачи пользователя <strong><?php echo $users[$i]['name']?></strong> на трекере <b><?php echo $users[$i]['tracker']?></b>:</div>
+<div class="user-torrent" id="<?php echo $users[$i]['id']?>">Раздачи пользователя <strong><?php echo $users[$i]['name']?></strong> на трекере <b><?php echo $users[$i]['tracker']?></b>:</div>
 		<?php
 		if (count($thremes) > 0)
 		{
 		?>
-<table class="user-table">
+<div id='<?php echo $users[$i]['id'] ?>' class='result'>
+<table>
     <thead>
         <tr>
             <th>Скачать</th>
@@ -57,9 +77,12 @@ if ( ! empty($users))
             <td colspan="5">Нет новых тем от пользователя <strong><?php echo $users[$i]['name']?></strong>.</td>
         </tr>
     </tbody>
-</table>        
+</table>
         <?php
 		}
+		?>
+</div>
+    <?php
 	}
 	?>
 <br>
