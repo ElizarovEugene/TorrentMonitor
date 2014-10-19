@@ -30,11 +30,7 @@ class Deluge
         #добавляем торрент в torrent-клиента
         $command = `deluge-console 'connect $torrentAddress $torrentLogin $torrentPassword; add -p '$pathToDownload' $file'`;
         if ( ! preg_match('/Torrent added!/', $command))
-            return 'add_fail';
-        elseif (preg_match('/Password does not match/', $command))
-            return 'credential_wrong';
-        elseif (preg_match('/Username does not exist/', $command))
-            return 'credential_wrong';
+            return FALSE;
         else
         {
             #получаем хэш раздачи

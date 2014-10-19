@@ -321,7 +321,8 @@ class newstudio
 									'cookie'         => newstudio::$sess_cookie,
 									'sendHeader'     => array('Host' => 'newstudio.tv', 'Content-length' => strlen(newstudio::$sess_cookie)),
 								)
-							);							
+							);
+							
 							$file = str_replace(' ', '.', $name).'.S'.$season.'E'.$episode.'.'.$amp;
 							$episode = (substr($episode, 0, 1) == 0) ? substr($episode, 1, 1) : $episode;
 							$season = (substr($season, 0, 1) == 0) ? substr($season, 1, 1) : $season;

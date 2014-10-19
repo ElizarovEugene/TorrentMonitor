@@ -15,7 +15,7 @@ class Errors
     	Errors::write('max_torrent', 'Вы использовали доступное Вам количество торрент-файлов в сутки.');
     	Errors::write('update', 'Невозможно проверить обновление системы.');
     	Errors::write('add_fail', 'Не удалось добавить torrent-файл в torrent-клиент.');
-    	Errors::write('connect_fail', 'Не удалось подключиться к torrent-клиенту.');
+    	Errors::write('torrent_file_fail', 'Не удалось получить данные torrent-файла.');
 	}
 	
 	public static function getInstance()
