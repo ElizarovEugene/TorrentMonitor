@@ -60,7 +60,7 @@ if ( ! empty($torrents_list))
     		elseif ($tracker == 'rutor.org')
     		{
     		?>
-    			<a href='http://new-rutor.org/torrent/<?php echo $torrent_id ?>/' target='_blank'><?php echo $name ?></a>
+    			<a href='http://alt.rutor.org/torrent/<?php echo $torrent_id ?>/' target='_blank'><?php echo $name ?></a>
     		<?php
     		}
     		elseif ($tracker == 'anidub.com')
@@ -84,6 +84,9 @@ if ( ! empty($torrents_list))
     			echo '&nbsp;'.$name;
             }
     		?>
+            <?php
+            if (! empty($path)) echo '<br /><font size="1">Путь сохранения: '.$path.'</font>';
+            ?>
     		</td>
             <td nowrap>
             <?php

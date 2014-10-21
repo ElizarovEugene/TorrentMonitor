@@ -287,7 +287,7 @@ class Database
     		
         if (Database::getDbType() == 'pgsql')
         {
-            $stmt = Database::getInstance()->dbh->prepare("SELECT id, tracker, name, hd, torrent_id, ep, timestamp, 
+            $stmt = Database::getInstance()->dbh->prepare("SELECT id, tracker, name, hd, path, torrent_id, ep, timestamp, 
                             to_char(timestamp, 'dd') AS day,
                             to_char(timestamp, 'mm') AS month,
                             to_char(timestamp, 'YYYY') AS year,
@@ -298,7 +298,7 @@ class Database
         }
         elseif (Database::getDbType() == 'mysql')
         {
-            $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `tracker`, `name`, `hd`, `torrent_id`, `ep`, `timestamp`, 
+            $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `tracker`, `name`, `hd`, `path`, `torrent_id`, `ep`, `timestamp`, 
                             DATE_FORMAT(`timestamp`, '%d') AS `day`, 
                             DATE_FORMAT(`timestamp`, '%m') AS `month`, 
                             DATE_FORMAT(`timestamp`, '%Y') AS `year`, 
@@ -309,7 +309,7 @@ class Database
         }
         elseif (Database::getDbType() == 'sqlite')
         {
-            $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `tracker`, `name`, `hd`, `torrent_id`, `ep`, `timestamp`, 
+            $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `tracker`, `name`, `hd`, `path`, `torrent_id`, `ep`, `timestamp`, 
                             strftime('%d', `timestamp`) AS `day`, 
                             strftime('%m', `timestamp`) AS `month`, 
                             strftime('%Y', `timestamp`) AS `year`, 
@@ -327,6 +327,7 @@ class Database
                 $resultArray[$i]['tracker'] = $row['tracker'];
                 $resultArray[$i]['name'] = $row['name'];
                 $resultArray[$i]['hd'] = $row['hd'];
+                $resultArray[$i]['path'] = $row['path'];
                 $resultArray[$i]['torrent_id'] = $row['torrent_id'];
                 $resultArray[$i]['ep'] = $row['ep'];
                 $resultArray[$i]['timestamp'] = $row['timestamp'];
