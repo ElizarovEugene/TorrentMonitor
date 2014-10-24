@@ -264,6 +264,7 @@ class lostfilm
 		//проверяем небыло ли до этого уже ошибок
 		if (empty(lostfilm::$exucution) || (lostfilm::$exucution))
 		{
+		    /*
 			//проверяем получена ли уже кука
 			if (empty(lostfilm::$sess_cookie))
 			{
@@ -277,7 +278,8 @@ class lostfilm
         		else
             		lostfilm::getCookie($tracker);
 			}
-
+            */
+			
 			lostfilm::$sess_cookie = Database::getCookie($tracker);
 			lostfilm::$exucution = TRUE;
 
