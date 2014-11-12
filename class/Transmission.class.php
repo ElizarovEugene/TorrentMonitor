@@ -24,18 +24,19 @@ class Transmission
         	$individualPath = Database::getTorrentDownloadPath($id);
         	if ( ! empty($individualPath))
 	            $pathToDownload = $individualPath;
-
-    	    if ( ! empty($hash))
-	        {
-    	        $delOpt = 'false';
-        	    if ($tracker == 'lostfilm.tv' || $tracker == 'novafilm.tv')
-            	{
-                	if ($deleteOldFiles)
-                   	$delOpt = 'true';
-	            }
-            
-    	        #удяляем существующую закачку из torrent-клиента
-        	     $result = $rpc->remove($hash, $delOpt);
+        	
+        	if (!empty($hash) && !($tracker == 'lostfilm.tv' || $tracker == 'novafilm.tv'))
+        	{
+        		$delOpt = 'false';
+        		#удяляем существующую закачку из torrent-клиента
+        		$result = $rpc->remove($hash, $delOpt);
+        	}
+        	
+        	if (!empty($hash) && ($tracker == 'lostfilm.tv' || $tracker == 'novafilm.tv') && $deleteOldFiles)
+        	{
+        		$delOpt = 'true';
+        		#удяляем существующую закачку из torrent-клиента
+        		$result = $rpc->remove($hash, $delOpt);
         	}
 
         	#добавляем торрент в torrent-клиент
