@@ -1,3 +1,10 @@
+/* 
+Postgres схема: torrentmonitor
+*/
+
+-- Дамп таблицы buffer
+-- ------------------------------------------------------------
+
 CREATE SEQUENCE auto_id_buffer;
 
 CREATE TABLE "buffer" (
@@ -12,8 +19,14 @@ CREATE TABLE "buffer" (
   "tracker" varchar(20) DEFAULT NULL
 );
 
+
+-- Дамп таблицы credentials
+-- ------------------------------------------------------------
+
+CREATE SEQUENCE "auto_id_credentials" START 16;
+
 CREATE TABLE "credentials" (
-  "id" INTEGER PRIMARY KEY NOT NULL,
+  "id" INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('auto_id_credentials'),
   "tracker" varchar(30) DEFAULT NULL,
   "log" varchar(30) DEFAULT NULL,
   "pass" varchar(30) DEFAULT NULL,
@@ -36,8 +49,14 @@ INSERT INTO credentials VALUES (13,'tracker.0day.kiev.ua','','','');
 INSERT INTO credentials VALUES (14,'rustorka.com','','','');
 INSERT INTO credentials VALUES (15,'pornolab.net','','','');
 
+
+-- Дамп таблицы settings
+-- ------------------------------------------------------------
+
+CREATE SEQUENCE "auto_id_settings" START 17;
+
 CREATE TABLE "settings" (
-  "id" INTEGER  PRIMARY KEY NOT NULL,
+  "id" INTEGER  PRIMARY KEY NOT NULL DEFAULT nextval('auto_id_settings'),
   "key" varchar(32) NOT NULL,
   "val" varchar(100) NOT NULL
 );
@@ -59,6 +78,10 @@ INSERT INTO settings VALUES (14, 'pathToDownload', '');
 INSERT INTO settings VALUES (15, 'deleteTorrent', '0');
 INSERT INTO settings VALUES (16, 'deleteOldFiles', '0');
 
+
+-- Дамп таблицы temp
+-- ------------------------------------------------------------
+
 CREATE SEQUENCE auto_id_temp;
 
 CREATE TABLE "temp" (
@@ -71,6 +94,10 @@ CREATE TABLE "temp" (
   UNIQUE(hash)
 );
 
+
+-- Дамп таблицы torrent
+-- ------------------------------------------------------------
+
 CREATE SEQUENCE auto_id_torrent;
 
 CREATE TABLE "torrent" (
@@ -79,11 +106,15 @@ CREATE TABLE "torrent" (
   "name" varchar(250) NOT NULL DEFAULT '',
   "hd" INTEGER NOT NULL DEFAULT '0',
   "path" varchar(100) NOT NULL,
-  "torrent_id" varchar(100) NOT NULL DEFAULT '0',
+  "torrent_id" INTEGER NOT NULL DEFAULT '0',
   "ep" varchar(10) DEFAULT '',
   "timestamp" timestamp,
   "hash" varchar(40) NOT NULL DEFAULT '0'
 );
+
+
+-- Дамп таблицы warning
+-- ------------------------------------------------------------
 
 CREATE SEQUENCE auto_id_warning;
 
@@ -93,6 +124,10 @@ CREATE TABLE "warning" (
   "where" varchar(40) NOT NULL,
   "reason" varchar(200) NOT NULL
 );
+
+
+-- Дамп таблицы watch
+-- ------------------------------------------------------------
 
 CREATE SEQUENCE auto_id_watch;
 
