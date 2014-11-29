@@ -16,6 +16,8 @@ class Errors
     	Errors::write('update', 'Невозможно проверить обновление системы.');
     	Errors::write('add_fail', 'Не удалось добавить torrent-файл в torrent-клиент.');
     	Errors::write('torrent_file_fail', 'Не удалось получить данные torrent-файла.');
+    	Errors::write('save_file_fail', 'Не удалось сохранить torrent-файл.');
+    	Errors::write('connect_fail', 'Не удалось подключиться к torrent-клиенту.');
 	}
 	
 	public static function getInstance()

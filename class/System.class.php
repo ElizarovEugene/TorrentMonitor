@@ -275,23 +275,42 @@ class Sys
         
         $dir = dirname(__FILE__).'/';
         include_once $dir.$torrentClient.'.class.php';
-        if (call_user_func($torrentClient.'::addNew', $id, $path, $hash, $tracker))
+        $status = call_user_func($torrentClient.'::addNew', $id, $path, $hash, $tracker);
+        $res_arr = array ('success', ''); 
+        if ($status === 'success')
         {
             $deleteTorrent = Database::getSetting('deleteTorrent');
             if ($deleteTorrent)
                 unlink($path);
             
             Database::deleteFromTemp($id);
-            return ' И добавлен в torrent-клиент.';
+            $res_arr[1] = ' И добавлен в torrent-клиент.';
+            return $res_arr;
+        }
+        elseif ($status === 'add_fail')
+        {
+        	$res_arr[0] = 'add_fail';
+        	$res_arr[1] = ' Но не добавлен в torrent-клиент и сохраненён.';
+        	Database::saveToTemp($id, $path, $hash, $tracker, $message, $date_str);
+        	return $res_arr;
+        }
+        elseif (preg_match('/username/', $status))
+        {
+        	$res_arr[0] = 'credential_wrong';
+        	$res_arr[1] = ' Но не добавлен в torrent-клиент и сохраненён.';
+        	Database::saveToTemp($id, $path, $hash, $tracker, $message, $date_str);
+        	return $res_arr;
         }
         else
         {
-            Database::saveToTemp($id, $path, $hash, $tracker, $message, $date_str);
-            return ' Но не добавлен в torrent-клиент и сохраненён.';
+        	$res_arr[0] = 'connect_fail';
+        	$res_arr[1] = ' Но не добавлен в torrent-клиент и сохраненён. Ошибка';
+        	Database::saveToTemp($id, $path, $hash, $tracker, $message, $date_str);
+        	return $res_arr;
         }
 	}
 	
-	//созраняем torrent файл
+	//сохраняем torrent файл
 	public static function saveTorrent($tracker, $name, $torrent, $id, $hash, $message, $date_str)
 	{
 	    $name = str_replace("'", '', $name);
@@ -302,9 +321,20 @@ class Sys
 
         $useTorrent = Database::getSetting('useTorrent');
         if ($useTorrent)
-            $messageAdd = Sys::addToClient($id, $path, $hash, $tracker, $message, $date_str);
-        //отправляем уведомлении о новом торренте
-        Notification::sendNotification('notification', $date_str, $tracker, $message.$messageAdd);
+        {
+        	list ($status, $msg) = Sys::addToClient($id, $path, $hash, $tracker, $message, $date_str);
+            $messageAdd = $msg;
+            //отправляем уведомлении о новом торренте
+            Notification::sendNotification('notification', $date_str, $tracker, $message.$messageAdd);
+            
+            if ($status == 'success') {}
+            elseif ($status == 'credential_wrong')
+            	return 'credential_wrong';
+            elseif ($status == 'add_fail')
+            	return 'add_fail';
+        	else
+        		return 'connect_fail';
+        }
 	}
 	
 	//преобразуем месяц из числового в текстовый
