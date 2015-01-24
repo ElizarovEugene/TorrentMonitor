@@ -29,6 +29,8 @@
 
 * Уведомления на E-mail и через https://pushover.net
 
+* RSS-лента
+
 ###Скриншоты:
  ![Screenshot0](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-53-42.jpg "Screenshot0")
  ![Screenshot1](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-54-16.jpg "Screenshot1")
