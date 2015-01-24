@@ -126,7 +126,7 @@ class casstudio
 	}
 
 	//основная функция
-	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash)
+	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash, $auto_update)
 	{
 		$cookie = Database::getCookie($tracker);
 		if (casstudio::checkCookie($cookie))
@@ -187,14 +187,15 @@ class casstudio
     								$message = $name.' обновлён.';
     								$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str);
 								
-    								if ($status == 'add_fail' || $status == 'connect_fail' || $status == 'credential_wrong')
-    								{
-    								    $torrentClient = Database::getSetting('torrentClient');
-    								    Errors::setWarnings($torrentClient, $status);
-    								}
-    								
     								//обновляем время регистрации торрента в базе
     								Database::setNewDate($id, $date);
+    								
+    								if ($auto_update)
+    								{
+    								    $name = Sys::getHeader('http://casstudio.tv/details.php?id='.$torrent_id);
+    								    //обновляем заголовок торрента в базе
+                                        Database::setNewName($id, $name);
+    								}
                                 }
                                 else
                                 {

@@ -117,6 +117,56 @@ $( document ).ready(function()
         );
         return false;
     });
+    
+    //Передаём данные для обновления
+    $("#torrent_update").submit(function()
+    {
+        var $form = $(this),
+            s = $form.find('input[type=submit]'),
+            i_f = $form.find('input[name="id"]'),
+            id = $(i_f).val(),
+            t_f = $form.find('input[name="tracker"]'),
+            t = $(t_f).val(),
+            n_f = $form.find('input[name="name"]'),
+            n = $(n_f).val(),
+            u_f = $form.find('input[name="url"]'),
+            u = $(u_f).val(),
+            update = $form.find('input[name="update"]').prop('checked'),
+            p_f = $form.find('input[name="path"]'),
+            p = $(p_f).val();
+            h_f = $form.find('input[name="hd"]'),
+            r_f = $form.find('input[name="reset"]').prop('checked');
+            
+        h = $(h_f).val();
+        for (var i = 0; i < h_f.length; i++)
+        {
+            if (h_f[i].checked)
+            {
+                var $form = $(this), h = h_f[i].value
+            }
+        }
+            
+        if (u == '')
+        {
+            alert("Вы не указали ссылку на тему!");
+            return false;
+        }
+        
+        if (n == '')
+        {
+            alert("Вы не указали название сериала!");
+            return false;
+        }                          
+
+        $('#notice_sub').empty().append('Обрабатывается запрос...').fadeIn();
+        $.post("action.php",{action: 'update', id: id, tracker: t, name: n, url: u, update: update, path: p, hd: h, reset: r_f},
+            function(data) {
+                $('#notice_sub').empty().append(data).delay(3000).fadeOut(400);
+            }
+        );
+
+        return false;
+    });    
 
     //Передаём пользователя для мониторинга
     $("#user_add").submit(function()
@@ -202,42 +252,47 @@ $( document ).ready(function()
     {
         var $form = $(this),
             s = $form.find('input[type=submit]'),
-            p = $form.find('input[name="path"]').val(),
-            e = $form.find('input[name="email"]').val(),
-            s = $form.find('input[name="send"]').prop('checked');
-            s_w = $form.find('input[name="send_warning"]').prop('checked');
-            a = $form.find('input[name="auth"]').prop('checked');
-            pr = $form.find('input[name="proxy"]').prop('checked');
-            pa = $form.find('input[name="proxyAddress"]').val();
-            t = $form.find('input[name="torrent"]').prop('checked');
-            tc = $form.find('select[name="torrentClient"]').val();
-            ta = $form.find('input[name="torrentAddress"]').val();
-            tl = $form.find('input[name="torrentLogin"]').val();
-            tp = $form.find('input[name="torrentPassword"]').val();
-            ptd = $form.find('input[name="pathToDownload"]').val();
-            dt = $form.find('input[name="deleteTorrent"]').prop('checked');
-            dof = $form.find('input[name="deleteOldFiles"]').prop('checked');
+            serverAddress = $form.find('input[name="serverAddress"]').val();
+            send = $form.find('input[name="send"]').prop('checked');
+            sendUpdate = $form.find('input[name="sendUpdate"]').prop('checked');
+            sendUpdateEmail = $form.find('input[name="sendUpdateEmail"]').val();
+            sendUpdatePushover = $form.find('input[name="sendUpdatePushover"]').val();            
+            sendWarning = $form.find('input[name="sendWarning"]').prop('checked');
+            sendWarningEmail = $form.find('input[name="sendWarningEmail"]').val();
+            sendWarningPushover = $form.find('input[name="sendWarningPushover"]').val();            
+            auth = $form.find('input[name="auth"]').prop('checked');
+            proxy = $form.find('input[name="proxy"]').prop('checked');
+            proxyAddress = $form.find('input[name="proxyAddress"]').val();
+            torrent = $form.find('input[name="torrent"]').prop('checked');
+            torrentClient = $form.find('select[name="torrentClient"]').val();
+            torrentAddress = $form.find('input[name="torrentAddress"]').val();
+            torrentLogin = $form.find('input[name="torrentLogin"]').val();
+            torrentPassword = $form.find('input[name="torrentPassword"]').val();
+            pathToDownload = $form.find('input[name="pathToDownload"]').val();
+            deleteDistribution = $form.find('input[name="deleteDistribution"]').prop('checked');
+            deleteOldFiles = $form.find('input[name="deleteOldFiles"]').prop('checked');
         
-        if (p == '')
+        if (serverAddress == '')
         {
-            alert('Вы не указали путь сохранения torrent-файлов.');
+            alert('Вы не указали адрес сервера TM.');
             return false;
         }
         
-        if (pr == 'checked' && pa == '')
+        if (proxy == 'checked' && proxyAddress == '')
         {
             alert('Вы не указали адрес proxy-сервера.');
             return false;
         }
         
-        if (t == 'checked' && tc == ''  && ta == '' && ptd == '')
+        if (torrent == 'checked' && torrentClient == ''  && torrentAddress == '' && pathToDownload == '')
         {
             alert('Вы не указали настройки торрент-клиента.');
             return false;
         }
-        
+
         $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-        $.post("action.php",{action: 'update_settings', path: p, email: e, send: s, send_warning: s_w, auth: a, proxy: pr, proxyAddress: pa, torrent: t, torrentClient: tc, torrentAddress: ta, torrentLogin: tl, torrentPassword: tp, pathToDownload: ptd, deleteTorrent: dt, deleteOldFiles: dof},
+        $.post("action.php",{action: 'update_settings', serverAddress: serverAddress, send: send, sendUpdate: sendUpdate,
+            sendUpdateEmail: sendUpdateEmail, sendUpdatePushover: sendUpdatePushover, sendWarning: sendWarning, sendWarningEmail: sendWarningEmail, sendWarningPushover: sendWarningPushover, auth: auth, proxy: proxy, proxyAddress: proxyAddress, torrent: torrent, torrentClient: torrentClient, torrentAddress: torrentAddress, torrentLogin: torrentLogin, torrentPassword: torrentPassword, pathToDownload: pathToDownload, deleteDistribution: deleteDistribution, deleteOldFiles: deleteOldFiles},
             function(data) {
                 $('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
                 $(s).removeAttr('disabled');
@@ -310,7 +365,7 @@ function show(name)
 	return false;
 }
 
-//Разворачивание подробностей о сезоне и серии
+//Развернуть/свернуть слой
 function expand(id)
 {
 	var div = "#"+id;
@@ -320,7 +375,6 @@ function expand(id)
 		$(div).slideUp("slow");
 	return false;
 }
-
 
 //Удаляем пользователя
 function delete_user(id)
@@ -404,9 +458,9 @@ function threme_add(id, user_id)
 }
 
 //Удаляем мониторинг
-function del(id)
+function del(id, name)
 {
-    if (confirm("Удалить?"))
+    if (confirm('Удалить '+name+'?'))
     {
     	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
     	$.post("action.php",{action: 'del', id: id},
@@ -451,22 +505,13 @@ function changeField()
 		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> Автовыбор HD 720/1080<br /><input type="radio" name="hd" value="2"> HD 720 MP4');
 }
 
-//Показать/скрыть настройки proxy
-function showProxy()
+//Форма редактирования записи
+function showForm(id)
 {
-    var proxy = document.getElementById("proxy").checked;
-	if (proxy)
-	    document.getElementById("proxySettings").style.display = "block";
-    else
-        document.getElementById("proxySettings").style.display = "none";
-}
-
-//Показать/скрыть настройки торрент-клиента
-function showTorrent()
-{
-    var torrent = document.getElementById("torrent").checked;
-	if (torrent)
-	    document.getElementById("torrentSettings").style.display = "block";
-    else
-        document.getElementById("torrentSettings").style.display = "none";
+    $.get("include/form.php", {'id': id},
+        function(data) {
+            $('.blok').empty().append(data);
+        }
+    );
+    $(".coverAll").show();
 }

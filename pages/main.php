@@ -38,10 +38,16 @@ window.onload = function(){
             }
             ?>
             </a></li>
-            <li id="execution"><a href="#" onclick="show('execution')" class="h-menu-item8">Запуск</a></li>
             <li id="check"><a href="#" onclick="show('check')" class="h-menu-item7">Тест</a></li>
+            <li id="execution"><a href="#" onclick="show('execution')" class="h-menu-item8">Запуск</a></li>
+            <li id="news"><a href="#" onclick="show('news')" class="h-menu-item9">Новости</a></li>
+            <li id="help"><a href="#" onclick="show('help')" class="h-menu-item10">Помощь</a></li>
         </menu>
     </header>
+    <div class="coverAll" style="display: none">
+        <div class="blok">
+        </div>
+    </div>
     <div id="content">
 
     </div>

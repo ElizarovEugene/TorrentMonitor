@@ -6,12 +6,11 @@ include_once $dir.'class/Database.class.php';
 
 $date_today = date('d-m-Y');
 
-@session_start();
-if (isset($_SESSION['order']))
+if (isset($_COOKIE['order']))
 {
-    if ($_SESSION['order'] == 'date')
+    if ($_COOKIE['order'] == 'date')
         $torrents_list = Database::getTorrentsList('date');
-    elseif ($_SESSION['order'] == 'dateDesc')
+    elseif ($_COOKIE['order'] == 'dateDesc')
         $torrents_list = Database::getTorrentsList('dateDesc');
 }
 else
@@ -66,14 +65,14 @@ if ( ! empty($torrents_list))
     		elseif ($tracker == 'anidub.com')
     		{
 	    	?>        		
-	    		<a href='http://tr.anidub.com<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>	    	
+	    		<a href='http://tr.anidub.com/<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>	    	
 	    	<?php        		
     		}
     		else
     		{
                 if ($hd == 1 && $tracker == 'lostfilm.tv')
         			echo '<img src="img/720.png">&nbsp;<img src="img/1080.png">';
-                elseif ($hd == 1 && $tracker == 'novafilm.tv' || $hd == 1 && $tracker == 'baibako.tv')
+                elseif ($hd == 1 && $tracker == 'baibako.tv' || $hd == 1 && $tracker == 'newstudio.tv' || $hd == 1 && $tracker == 'novafilm.tv')
                     echo '<img src="img/720.png">';
                 elseif ($hd == 2 && $tracker == 'lostfilm.tv')
                     echo '<img src="img/720.png">';
@@ -135,7 +134,10 @@ if ( ! empty($torrents_list))
             }
             ?>          
             </td>
-            <td><a href='#' class='delete' onclick='del(<?php echo $id?>)'></td>
+            <td>
+               <a href='#' class='edit' onclick='showForm(<?php echo $id?>)'></a>
+               <a href='#' class='delete' onclick='del(<?php echo $id.',"'.$name.'"'?>)'></a>
+            </td>
         </tr>
 <?php 
 	} 

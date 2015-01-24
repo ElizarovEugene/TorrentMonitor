@@ -1,6 +1,7 @@
 <?php 
 $dir = dirname(__FILE__)."/../";
 include_once $dir."class/System.class.php";
+include_once $dir."class/Database.class.php";
 ?>
 <table class="test">
     <thead>
@@ -31,9 +32,7 @@ if (Sys::checkInternet())
 			<td>Расширение cURL установлено.</td>
 		<tr>
 			<?php
-			include_once $dir."class/Database.class.php";
-			
-			$torrentPath = Database::getSetting('path');
+			$torrentPath = str_replace('class/../', '', $dir).'torrents/';
 			if (Sys::checkWriteToPath($torrentPath))
 			{
 			?>

@@ -21,12 +21,11 @@ $trackers = Database::getTrackersList();
 		}
 		?>
 	</select>
-</p>
-    
-	<?php
-	for ($i=0; $i<count($credential); $i++)
-	{
-	?>
+</p>    
+    	<?php
+    	for ($i=0; $i<count($credential); $i++)
+    	{
+    	?>
 <div id="<?php echo $credential[$i]['tracker'] ?>_label" class="result">
 <form id="credential">
     <input type="hidden" name="id" value="<?php echo $credential[$i]['id'] ?>">
@@ -41,8 +40,8 @@ $trackers = Database::getTrackersList();
 	<button class="form-button">Сохранить</button>
 </form>
 </div>
-	<?php
-	}
-	?>
+    	<?php
+    	}
+    	?>
 <div class="clear-both"></div>
 <script src="js/user-func.js"></script>

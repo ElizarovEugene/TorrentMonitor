@@ -395,12 +395,6 @@ class lostfilm
     								$message = $name.' '.$amp.' обновлён до '.$episode.' серии, '.$season.' сезона.';
     								$status = Sys::saveTorrent($tracker, $file, $torrent, $id, $hash, $message, $date_str);
 
-    								if ($status == 'add_fail' || $status == 'connect_fail' || $status == 'credential_wrong')
-    								{
-    								    $torrentClient = Database::getSetting('torrentClient');
-    								    Errors::setWarnings($torrentClient, $status);
-    								}
-    
     								//обновляем время регистрации торрента в базе
     								Database::setNewDate($id, $serial['date']);
     								//обновляем сведения о последнем эпизоде

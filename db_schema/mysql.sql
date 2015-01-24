@@ -1,10 +1,12 @@
-# ************************************************************
-# Схема: torrentmonitor
-# Время создания: 2012-11-03 18:31:11 +0000
-# ************************************************************
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-# Дамп таблицы buffer
-# ------------------------------------------------------------
+
 
 DROP TABLE IF EXISTS `buffer`;
 
@@ -21,8 +23,7 @@ CREATE TABLE `buffer` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-# Дамп таблицы credentials
-# ------------------------------------------------------------
+
 
 DROP TABLE IF EXISTS `credentials`;
 
@@ -35,6 +36,8 @@ CREATE TABLE `credentials` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+
+
 LOCK TABLES `credentials` WRITE;
 /*!40000 ALTER TABLE `credentials` DISABLE KEYS */;
 
@@ -44,25 +47,33 @@ VALUES
 	(2,'nnm-club.me','','',''),
 	(3,'lostfilm.tv','','',''),
 	(4,'novafilm.tv','','',''),
-	(5,'rutor.org', ' ', ' ',''),
-	(6,'tfile.me', ' ', ' ',''),
-	(7,'kinozal.tv', '', '',''),
-	(8,'anidub.com', '', '',''),
-	(9,'baibako.tv', '', '',''),
-	(10,'casstudio.tv', '', '',''),
-	(11,'newstudio.tv', '', '',''),
-	(12,'animelayer.ru', '', '',''),
+	(5,'rutor.org',' ',' ',NULL),
+	(6,'tfile.me',' ',' ',NULL),
+	(7,'kinozal.tv','','',''),
+	(8,'anidub.com','','',''),
+	(9,'casstudio.tv','','',''),
+	(10,'baibako.tv','','',''),
+	(11,'newstudio.tv','','',''),
+	(12,'animelayer.ru','','',''),
 	(13,'tracker.0day.kiev.ua','','',''),
-	(14,'rustorka.com','','',''),
-	(15,'pornolab.net','','','');
-
+	(15,'pornolab.net','','',''),
+	(14,'rustorka.com','','','');
 
 /*!40000 ALTER TABLE `credentials` ENABLE KEYS */;
 UNLOCK TABLES;
 
 
-# Дамп таблицы settings
-# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `news`;
+
+CREATE TABLE `news` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `text` text,
+  `new` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 
 DROP TABLE IF EXISTS `settings`;
 
@@ -73,34 +84,38 @@ CREATE TABLE `settings` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+
+
 LOCK TABLES `settings` WRITE;
 /*!40000 ALTER TABLE `settings` DISABLE KEYS */;
 
 INSERT INTO `settings` (`id`, `key`, `val`)
 VALUES
-	(1,'email',''),
-	(2,'path',''),
 	(3,'send','1'),
-	(4,'send_warning','0'),
 	(5,'password','1f10c9fd49952a7055531975c06c5bd8'),
 	(6,'auth','1'),
-	(7,'proxy','0'),
+	(4,'sendWarning','0'),
 	(8,'proxyAddress','127.0.0.1:9050'),
-	(9,'useTorrent','0'),
-	(10,'torrentClient',''),
-	(11,'torrentAddress',''),
-	(12,'torrentLogin',''),
+	(7,'proxy','0'),
 	(13,'torrentPassword',''),
+	(12,'torrentLogin',''),
+	(11,'torrentAddress','127.0.0.1:9091'),
 	(14,'pathToDownload',''),
-	(15,'deleteTorrent','0'),
-	(16,'deleteOldFiles','0');
+	(16,'deleteOldFiles','0'),
+	(10,'torrentClient',''),
+	(9,'useTorrent','0'),
+	(28,'sendWarningPushover',''),
+	(19,'serverAddress',''),
+	(20,'deleteDistribution','0'),
+	(27,'sendWarningEmail',''),
+	(24,'sendUpdate','0'),
+	(25,'sendUpdateEmail',''),
+	(26,'sendUpdatePushover','');
 
 /*!40000 ALTER TABLE `settings` ENABLE KEYS */;
 UNLOCK TABLES;
 
 
-# Дамп таблицы temp
-# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `temp`;
 
@@ -115,8 +130,6 @@ CREATE TABLE `temp` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
-# Дамп таблицы torrent
-# ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `torrent`;
 
@@ -125,16 +138,16 @@ CREATE TABLE `torrent` (
   `tracker` varchar(30) NOT NULL,
   `name` varchar(250) NOT NULL DEFAULT '',
   `hd` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `path` varchar(100) NOT NULL,
-  `torrent_id` int(12) unsigned NOT NULL DEFAULT '0',
+  `path` varchar(100) DEFAULT NULL,
+  `torrent_id` varchar(100) DEFAULT NULL,
   `ep` varchar(10) DEFAULT '',
   `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `auto_update` tinyint(11) unsigned NOT NULL DEFAULT '0',
   `hash` varchar(40) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-# Дамп таблицы warning
-# ------------------------------------------------------------
+
 
 DROP TABLE IF EXISTS `warning`;
 
@@ -148,9 +161,6 @@ CREATE TABLE `warning` (
 
 
 
-# Дамп таблицы watch
-# ------------------------------------------------------------
-
 DROP TABLE IF EXISTS `watch`;
 
 CREATE TABLE `watch` (
@@ -159,3 +169,12 @@ CREATE TABLE `watch` (
   `name` varchar(30) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

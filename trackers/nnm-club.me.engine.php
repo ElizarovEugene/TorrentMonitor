@@ -126,7 +126,7 @@ class nnmclub
 		}
 	}
 	
-	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash)
+	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash, $auto_update)
 	{
 		$cookie = Database::getCookie($tracker);
 		if (nnmclub::checkCookie($cookie))
@@ -190,15 +190,15 @@ class nnmclub
 									$message = $name.' обновлён.';
 									$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str);
 								
-    								if ($status == 'add_fail' || $status == 'connect_fail' || $status == 'credential_wrong')
-    								{
-    								    $torrentClient = Database::getSetting('torrentClient');
-    								    Errors::setWarnings($torrentClient, $status);
-    								}
-    								
-									//обновляем время регистрации торрента в базе
+    								//обновляем время регистрации торрента в базе
 									Database::setNewDate($id, $date);
-									//отправляем уведомлении о новом торренте
+									
+									if ($auto_update)
+    								{
+    								    $name = Sys::getHeader('http://nnm-club.me/forum/viewtopic.php?t='.$torrent_id);
+    								    //обновляем заголовок торрента в базе
+                                        Database::setNewName($id, $name);
+    								}
 								}
 							}
 							else

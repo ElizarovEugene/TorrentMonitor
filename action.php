@@ -173,6 +173,89 @@ if (isset($_POST['action']))
 		return TRUE;
 	}
 	
+	//Обновляем отслеживаемый item
+	if ($_POST['action'] == 'update')
+	{
+	    $tracker = $_POST['tracker'];
+	    if ($_POST['reset'] == 'true')
+	        $reset = 1;
+        else
+            $reset = 0;
+	    if ($tracker == 'lostfilm.tv' || $tracker == 'novafilm.tv' || $tracker == 'baibako.tv' || $tracker == 'newstudio.tv')
+        {
+            $engineFile = $dir.'/trackers/'.$tracker.'.engine.php';
+            $functionEngine = include_once $engineFile;
+			$class = explode('.', $tracker);
+			$class = $class[0];
+			$class = str_replace('-', '', $class);
+			if (call_user_func(array($class, 'checkRule'), $_POST['name']))	
+			{
+                if ( ! empty($_POST['name']))
+                	$name = $_POST['name'];
+                else
+                	$name = Sys::getHeader($_POST['url']);				
+				Database::updateSerial($_POST['id'], $_POST['name'], $_POST['path'], $_POST['hd'], $reset);
+				?>
+				Сериал обновлён.
+				<?php
+			}
+			else
+			{
+			?>
+			    Название содержит недопустимые символы.
+			<?php
+            }
+        }        
+        else
+        {
+            $url = parse_url($_POST['url']);
+            $tracker = $url['host'];
+			$tracker = preg_replace('/www\./', '', $tracker);
+			if ($tracker == 'tr.anidub.com')
+				$tracker = 'anidub.com';
+				
+            if ($tracker == 'new-rutor.org')
+				$tracker = 'rutor.org';
+			
+			if ($tracker == 'anidub.com')
+			    $threme = $url['path'];
+			elseif ($tracker != 'rutor.org')
+			{
+				$query = explode('=', $url['query']);
+				$threme = $query[1];
+			}
+			else
+			{
+				preg_match('/\d{4,8}/', $url['path'], $array);
+				$threme = $array[0];
+			}
+			
+            if ($_POST['update'] == 'true')
+    	        $update = 1;
+            else
+                $update = 0;
+		
+			$engineFile = $dir.'/trackers/'.$tracker.'.engine.php';
+            $functionEngine = include_once $engineFile;
+			$class = explode('.', $tracker);
+			$class = $class[0];
+			$class = str_replace('-', '', $class);
+			if (call_user_func(array($class, 'checkRule'), $threme))
+			{
+				Database::updateThreme($_POST['id'], $_POST['name'], $_POST['path'], $threme, $update, $reset);
+				?>
+				Тема обновлена.
+				<?php
+            }
+            else
+            {
+            ?>
+                Название содержит недопустимые символы.
+            <?php
+            }
+        }
+	}
+	
 	//Добавляем пользователя для мониторинга
 	if ($_POST['action'] == 'user_add')
 	{
@@ -292,56 +375,32 @@ if (isset($_POST['action']))
 	//Обновляем настройки
 	if ($_POST['action'] == 'update_settings')
 	{
-		$path = Sys::checkPath($_POST['path']);
-		Database::updateSettings('path', $path);
-		Database::updateSettings('email', $_POST['email']);
-
-		if ($_POST['send'] == 'true')
-			$send = 1;
-		else 
-			$send = 0;
+		Database::updateSettings('serverAddress', $_POST['serverAddress']);
+		$send = ($_POST['send']) ? 1 : 0;
 		Database::updateSettings('send', $send);
-		
-		if ($_POST['send_warning'] == 'true')
-			$send_warning = 1;
-		else 
-			$send_warning = 0;
-		Database::updateSettings('send_warning', $send_warning);
-		
-		if ($_POST['auth'] == 'true')
-			$auth = 1;
-		else 
-			$auth = 0;
+		$sendUpdate = ($_POST['sendUpdate']) ? 1 : 0;
+		Database::updateSettings('sendUpdate', $sendUpdate);
+		Database::updateSettings('sendUpdateEmail', $_POST['sendUpdateEmail']);
+		Database::updateSettings('sendUpdatePushover', $_POST['sendUpdatePushover']);
+		$sendWarning = ($_POST['sendWarning']) ? 1 : 0;
+		Database::updateSettings('sendWarning', $sendWarning);		
+		Database::updateSettings('sendWarningEmail', $_POST['sendWarningEmail']);
+		Database::updateSettings('sendWarningPushover', $_POST['sendWarningPushover']);
+		$auth = ($_POST['auth']) ? 1 : 0;
 		Database::updateSettings('auth', $auth);
-		
-		if ($_POST['proxy'] == 'true')
-			$proxy = 1;
-		else 
-			$proxy = 0;
+		$proxy = ($_POST['proxy']) ? 1 : 0;
 		Database::updateSettings('proxy', $proxy);
 		Database::updateSettings('proxyAddress', $_POST['proxyAddress']);
-
-        if ($_POST['torrent'] == 'true')
-			$torrent = 1;
-		else 
-			$torrent = 0;
+        $torrent = ($_POST['torrent']) ? 1 : 0;
         Database::updateSettings('useTorrent', $torrent);
         Database::updateSettings('torrentClient', $_POST['torrentClient']);
         Database::updateSettings('torrentAddress', $_POST['torrentAddress']);
         Database::updateSettings('torrentLogin', $_POST['torrentLogin']);
         Database::updateSettings('torrentPassword', $_POST['torrentPassword']);
         Database::updateSettings('pathToDownload', $_POST['pathToDownload']);
-        
-        if ($_POST['deleteTorrent'] == 'true')
-			$deleteTorrent = 1;
-		else 
-			$deleteTorrent = 0;
-        Database::updateSettings('deleteTorrent', $deleteTorrent);
-        
-        if ($_POST['deleteOldFiles'] == 'true')
-			$deleteOldFiles = 1;
-		else 
-			$deleteOldFiles = 0;
+        $deleteDistribution = ($_POST['deleteDistribution']) ? 1 : 0;
+        Database::updateSettings('deleteDistribution', $deleteDistribution);
+        $deleteOldFiles = ($_POST['deleteOldFiles']) ? 1 : 0;
         Database::updateSettings('deleteOldFiles', $deleteOldFiles);
 		?>
 		Настройки монитора обновлены.
@@ -390,11 +449,11 @@ if (isset($_GET['action']))
 	{
 		session_start();
 		if ($_GET['order'] == 'date')
-			$_SESSION['order'] = 'date';
+			setcookie('order', 'date', time()+3600*24*365);
 		elseif ($_GET['order'] == 'dateDesc')
-			$_SESSION['order'] = 'dateDesc';			
+			setcookie('order', 'dateDesc', time()+3600*24*365);			
 		elseif ($_GET['order'] == 'name')
-			unset($_SESSION['order']);
+			setcookie('order', '', time()+3600*24*365);
 		header('Location: index.php');
 	}	
 }

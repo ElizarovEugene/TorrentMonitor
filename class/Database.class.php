@@ -287,7 +287,7 @@ class Database
     		
         if (Database::getDbType() == 'pgsql')
         {
-            $stmt = Database::getInstance()->dbh->prepare("SELECT id, tracker, name, hd, path, torrent_id, ep, timestamp, 
+            $stmt = Database::getInstance()->dbh->prepare("SELECT id, tracker, name, hd, path, torrent_id, ep, timestamp, auto_update,
                             to_char(timestamp, 'dd') AS day,
                             to_char(timestamp, 'mm') AS month,
                             to_char(timestamp, 'YYYY') AS year,
@@ -298,7 +298,7 @@ class Database
         }
         elseif (Database::getDbType() == 'mysql')
         {
-            $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `tracker`, `name`, `hd`, `path`, `torrent_id`, `ep`, `timestamp`, 
+            $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `tracker`, `name`, `hd`, `path`, `torrent_id`, `ep`, `timestamp`, `auto_update`,
                             DATE_FORMAT(`timestamp`, '%d') AS `day`, 
                             DATE_FORMAT(`timestamp`, '%m') AS `month`, 
                             DATE_FORMAT(`timestamp`, '%Y') AS `year`, 
@@ -309,7 +309,7 @@ class Database
         }
         elseif (Database::getDbType() == 'sqlite')
         {
-            $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `tracker`, `name`, `hd`, `path`, `torrent_id`, `ep`, `timestamp`, 
+            $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `tracker`, `name`, `hd`, `path`, `torrent_id`, `ep`, `timestamp`, `auto_update`,
                             strftime('%d', `timestamp`) AS `day`, 
                             strftime('%m', `timestamp`) AS `month`, 
                             strftime('%Y', `timestamp`) AS `year`, 
@@ -336,6 +336,7 @@ class Database
                 $resultArray[$i]['year'] = $row['year'];
                 $resultArray[$i]['time'] = $row['time'];
                 $resultArray[$i]['hash'] = $row['hash'];
+                $resultArray[$i]['auto_update'] = $row['auto_update'];
                 $i++;
             }
             if ( ! empty($resultArray))
@@ -344,6 +345,40 @@ class Database
         $stmt = NULL;
         $resultArray = NULL;
     }
+    
+    public static function getTorrent($id)
+    {
+        if (Database::getDbType() == 'pgsql')
+        {
+            $stmt = Database::getInstance()->dbh->prepare("SELECT id, tracker, name, hd, path, torrent_id, auto_update FROM torrent WHERE id = {$id}");
+        }
+        elseif (Database::getDbType() == 'mysql')
+        {
+            $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `tracker`, `name`, `hd`, `path`, `torrent_id`, `auto_update` FROM `torrent` WHERE `id` = '{$id}'");
+        }
+        elseif (Database::getDbType() == 'sqlite')
+        {
+            $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `tracker`, `name`, `hd`, `path`, `torrent_id`, `auto_update` FROM `torrent` WHERE `id` = '{$id}'");    		
+        }
+        if ($stmt->execute())
+        {
+            $i = 0;
+            foreach ($stmt as $row)
+            {
+                $resultArray[$i]['id'] = $row['id'];
+                $resultArray[$i]['tracker'] = $row['tracker'];
+                $resultArray[$i]['name'] = $row['name'];
+                $resultArray[$i]['hd'] = $row['hd'];
+                $resultArray[$i]['path'] = $row['path'];
+                $resultArray[$i]['torrent_id'] = $row['torrent_id'];
+                $resultArray[$i]['auto_update'] = $row['auto_update'];
+            }
+            if ( ! empty($resultArray))
+                return $resultArray;
+        }
+        $stmt = NULL;
+        $resultArray = NULL;
+    }    
     
     public static function getTorrentsListByTracker($tracker)
     {
@@ -666,6 +701,18 @@ class Database
         $stmt = NULL;
     }
     
+    public static function setNewName($id, $name)
+    {
+        $stmt = self::newStatement("UPDATE `torrent` SET `name` = :name WHERE `id` = :id");        
+        $stmt->bindParam(':name', $name);
+        $stmt->bindParam(':id', $id);
+        if ($stmt->execute())
+            return TRUE;
+        else
+            return FALSE;
+        $stmt = NULL;
+    }
+    
     public static function setNewEpisode($id, $ep)
     {
         $stmt = self::newStatement("UPDATE `torrent` SET `ep` = :ep WHERE `id` = :id");        
@@ -677,6 +724,55 @@ class Database
             return FALSE;
         $stmt = NULL;
     }
+    
+    public static function updateSerial($id, $name, $path, $hd, $reset)
+    {
+        if ($reset)
+            $stmt = self::newStatement("UPDATE `torrent` SET `name` = :name, `path` = :path, `hd` = :hd, `ep` = '' WHERE `id` = :id");
+        else
+            $stmt = self::newStatement("UPDATE `torrent` SET `name` = :name, `path` = :path, `hd` = :hd WHERE `id` = :id");
+        $stmt->bindParam(':name', $name);
+        $stmt->bindParam(':path', $path);
+        $stmt->bindParam(':hd', $hd);
+        $stmt->bindParam(':id', $id);
+        if ($stmt->execute())
+            return TRUE;
+        else
+            return FALSE;
+        $stmt = NULL;
+    }
+    
+    public static function updateThreme($id, $name, $path, $threme, $update, $reset)
+    {
+        $stmt = self::newStatement("UPDATE `torrent` SET `name` = :name, `path` = :path, `torrent_id` = :torrent_id WHERE `id` = :id");
+        $stmt->bindParam(':name', $name);
+        $stmt->bindParam(':path', $path);
+        $stmt->bindParam(':torrent_id', $threme);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        
+        if ($update)
+        {
+            $stmt = self::newStatement("UPDATE `torrent` SET `auto_update` = '1' WHERE `id` = :id");
+            $stmt->bindParam(':id', $id);
+            if ($stmt->execute())
+                return TRUE;
+            else
+                return FALSE;
+            $stmt = NULL;
+        }
+
+        if ($reset)
+        {
+            $stmt = self::newStatement("UPDATE `torrent` SET `timestamp` = '0000-00-00 00:00:00' WHERE `id` = :id");
+            $stmt->bindParam(':id', $id);
+            if ($stmt->execute())
+                return TRUE;
+            else
+                return FALSE;
+            $stmt = NULL;
+        }
+    }    
     
     public static function updateHash($id, $hash)
     {
@@ -876,5 +972,54 @@ class Database
             return FALSE;
         $stmt = NULL;        
     }
+    
+    public static function getNews()
+    {
+        $stmt = self::newStatement("SELECT `id`, `text`, `new` FROM `news` ORDER BY `id` DESC");        
+        if ($stmt->execute())
+        {
+            $i = 0;
+            foreach ($stmt as $row)
+            {
+                $resultArray[$i]['id'] = $row['id'];
+                $resultArray[$i]['text'] = $row['text'];
+                $resultArray[$i]['new'] = $row['new'];
+                $i++;
+            }
+            if ( ! empty($resultArray))
+                return $resultArray;
+        }
+        $stmt = NULL;
+        $resultArray = NULL;
+    }   
+    
+    public static function checkNewsExist($id)
+    {
+        $stmt = self::newStatement("SELECT `id` FROM `news` WHERE `id` = :id");        
+        $stmt->bindParam(':id', $id);
+        if ($stmt->execute())
+        {
+            foreach ($stmt as $row)
+            {
+                if ( ! empty($row['id']))
+                    return TRUE;
+                else
+                    return FALSE;
+            }
+        }
+        $stmt = NULL;        
+    }
+    
+    public static function insertNews($id, $text)
+    {
+        $stmt = self::newStatement("INSERT INTO `news` (`id`, `text`) VALUES (:id, :text)");        
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':text', $text);
+        if ($stmt->execute())
+            return TRUE;
+        else
+            return FALSE;
+        $stmt = NULL;
+    }    
 }
 ?>

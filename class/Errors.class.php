@@ -16,6 +16,9 @@ class Errors
     	Errors::write('update', 'Невозможно проверить обновление системы.');
     	Errors::write('add_fail', 'Не удалось добавить torrent-файл в torrent-клиент.');
     	Errors::write('torrent_file_fail', 'Не удалось получить данные torrent-файла.');
+    	Errors::write('save_file_fail', 'Не удалось сохранить torrent-файл в директорию.');
+    	Errors::write('duplicate_torrent', 'Не удалось добавить в torrent-клиент, такая закачка уже запущена.');
+    	Errors::write('404', 'Не удалось добавить в torrent-клиент, не верная ссылка на torrent-файл.');
 	}
 	
 	public static function getInstance()
@@ -49,7 +52,7 @@ class Errors
     	Database::setWarnings($date, $tracker, $warning);
     	$countErrors = Database::getWarningsCount($tracker);
     	if ($countErrors[0]['count'] == 1)
-			Notification::sendNotification('warning', $date, $tracker, Errors::getWarning($warning));
+			Notification::sendNotification('warning', $date, $tracker, Errors::getWarning($warning), 0);
     }
 }
 ?>

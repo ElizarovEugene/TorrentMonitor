@@ -225,7 +225,9 @@ body {
                 .h-menu-item5,
                 .h-menu-item6,
                 .h-menu-item7,
-                .h-menu-item8 {
+                .h-menu-item8,
+                .h-menu-item9,
+                .h-menu-item10 {
                     background-image: url(../img/icon1.png);
                     background-position: 4px 4px;
                     background-repeat: no-repeat;
@@ -238,6 +240,8 @@ body {
                     .h-menu-item6 {    background-image: url(../img/icon6.png); }
                     .h-menu-item7 {    background-image: url(../img/icon7.png); }
                     .h-menu-item8 {    background-image: url(../img/icon8.png); }
+                    .h-menu-item9 {    background-image: url(../img/icon9-2.png); }
+                    .h-menu-item10 {    background-image: url(../img/icon10.png); }
 
 /* ==========================================================================
    Middle
@@ -296,14 +300,18 @@ body {
                 td { border-right: 1px #E2E6EF solid; }
                     
                     .delete,
+                    .edit,
                     .add {
                         display: block;
+                        float:left;
+                        padding-left: 7px;
                         margin: auto;
                         width: 18px;
                         height: 18px;
                         background: url(../img/delete.png) 0 0 no-repeat;
                         }
                         
+                        .edit { background: url(../img/edit.png) 2px 2px no-repeat; }
                         .add { background: url(../img/add.png) 2px 2px no-repeat; }
     
     .update {
@@ -447,6 +455,10 @@ div.cut_box {
 	cursor: pointer;
 }
 
+div.unhide {
+	display: block; 
+}
+
 div.result {
 	display: none; 
 }
@@ -457,4 +469,35 @@ span.quality {
 
 img.loader {
     padding: 0 40% 0px;
+}
+
+div.coverAll {
+    z-index: 1000;
+    background: rgba(245, 222, 179, 0.7);
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+}
+
+div.blok {
+    background-color: #ffffff;
+    position: relative;
+    width: 40%;
+    left: 30%;
+    padding: 1em;
+    margin: 2em 10px 4em;
+    background: #fff;
+    -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+    -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+    -webkit-box-shadow: 0 15px 10px -10px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+    -moz-box-shadow: 0 15px 10px -10px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+    box-shadow: 0 15px 10px -10px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+}
+
+div.blok:before, div.blok:after {
+    position:absolute;
+    z-index:-2;
 }
