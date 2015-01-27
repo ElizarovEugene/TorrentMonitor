@@ -37,7 +37,7 @@ INSERT INTO "credentials" VALUES (15,'pornolab.net','','','');
 CREATE TABLE `news` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   `text` TEXT,
-  `new` INTEGER NOT NULL DEFAULT '1',
+  `new` INTEGER NOT NULL DEFAULT '1'
 );
 
 CREATE TABLE `settings` (
