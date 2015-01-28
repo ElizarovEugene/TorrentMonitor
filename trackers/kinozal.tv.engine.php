@@ -244,7 +244,7 @@ class kinozal
     }
 	
 	//основная функция
-	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash)
+	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash, $auto_update)
 	{
 		$cookie = Database::getCookie($tracker);
 		if (kinozal::checkCookie($cookie))
@@ -275,9 +275,9 @@ class kinozal
 			{
 				//ищем на странице дату регистрации торрента
 				if (preg_match('/<li>Обновлен<span class=\"floatright green n\">(.*)<\/span><\/li>/', $page, $array))
-    				kinozal::work($array, $id, $tracker, $name, $torrent_id, $timestamp, $hash);
+    				kinozal::work($array, $id, $tracker, $name, $torrent_id, $timestamp, $hash, $auto_update);
 				elseif (preg_match('/<li>Залит<span class=\"floatright green n\">(.*)<\/span><\/li>/', $page, $array))
-				    kinozal::work($array, $id, $tracker, $name, $torrent_id, $timestamp, $hash);
+				    kinozal::work($array, $id, $tracker, $name, $torrent_id, $timestamp, $hash, $auto_update);
 				else
 				{
 					//устанавливаем варнинг

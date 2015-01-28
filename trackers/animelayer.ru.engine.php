@@ -131,7 +131,7 @@ class animelayer
 	}
 
 	// Основная функция
-	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash)
+	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash, $auto_update)
 	{
 		$cookie = Database::getCookie($tracker);
 		if (animelayer::checkCookie($cookie))

@@ -297,7 +297,7 @@ class lostfilm
 			        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
 			        	)
 			        );
-			        
+
 					lostfilm::$page = str_replace('<?xml version="1.0" encoding="windows-1251" ?>','<?xml version="1.0" encoding="utf-8"?>', $page);
 					if ( ! empty(lostfilm::$page))
 					{
