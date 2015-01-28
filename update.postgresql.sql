@@ -26,3 +26,5 @@ INSERT INTO settings VALUES (27, 'sendWarningEmail', '');
 INSERT INTO settings VALUES (24, 'sendUpdate', '0');
 INSERT INTO settings VALUES (25, 'sendUpdateEmail', '');
 INSERT INTO settings VALUES (26, 'sendUpdatePushover', '');
+
+ALTER TABLE torrent ADD COLUMN auto_update INTEGER NOT NULL DEFAULT '0';

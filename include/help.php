@@ -19,6 +19,6 @@ TorrentMonitor работает с двумя типами torrent-трекер�
 <div>
 Разработка дизайна <a href="http://vk.com/tasslab" target="_blank">Татьяна Смирнова</a><br />
 Вёрстка и JS <a href="http://maxsof.moikrug.ru" target="_blank">Максим Софронов</a><br />
-Идея и разработка <a href="http://blog.korphome.ru" target="_blank">Евгений KorP Елизарова</a><br />
+Идея и разработка <a href="http://blog.korphome.ru" target="_blank">Евгений KorP Елизаров</a><br />
 </div>
 <div class="clear-both"></div>

@@ -10,6 +10,7 @@ include_once $dir.'class/Errors.class.php';
 include_once $dir.'class/Notification.class.php';
 
 header('Content-Type: text/html; charset=utf-8');
+$debug = Database::getSetting('debug');
 $time_start_full = microtime(true);
 if (Sys::checkConfig())
 {
@@ -17,7 +18,8 @@ if (Sys::checkConfig())
 	{
 		$torrentsList = Database::getTorrentsList('name');
 		$count = count($torrentsList);
-        echo 'Опрос новых раздач на трекерах:'."\r\n".'<br />';
+		if ($debug)
+            echo 'Опрос новых раздач на трекерах:'."\r\n".'<br />';
         $time_start_overall = microtime(true);
 		for ($i=0; $i<$count; $i++)
 		{
@@ -48,7 +50,8 @@ if (Sys::checkConfig())
     				    call_user_func($functionClass.'::main', $torrentsList[$i]['id'], $tracker, $torrentsList[$i]['name'], $torrentsList[$i]['hd'], $torrentsList[$i]['ep'], $torrentsList[$i]['timestamp'], $torrentsList[$i]['hash']);
     				    $time_end = microtime(true);
     				    $time = $time_end - $time_start;
-    				    echo 'Время выполнения: '.$time."\r\n".'<br />';
+    				    if ($debug)
+    				        echo 'Время выполнения: '.$time."\r\n".'<br />';
 					}
 					if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.me' || $tracker == 'rutor.org' || $tracker == 'tfile.me' || $tracker == 'kinozal.tv' || $tracker == 'anidub.com' || $tracker == 'casstudio.tv'  || $tracker == 'animelayer.ru' || $tracker == 'tracker.0day.kiev.ua' || $tracker == 'torrents.net.ua' || $tracker == 'pornolab.net' || $tracker == 'rustorka.com')
 					{
@@ -56,7 +59,8 @@ if (Sys::checkConfig())
     					call_user_func($functionClass.'::main', $torrentsList[$i]['id'], $tracker, $torrentsList[$i]['name'], $torrentsList[$i]['torrent_id'], $torrentsList[$i]['timestamp'], $torrentsList[$i]['hash'], $torrentsList[$i]['auto_update']);
     					$time_end = microtime(true);
     					$time = $time_end - $time_start;
-    				    echo 'Время выполнения: '.$time."\r\n".'<br />';
+    					if ($debug)
+    				        echo 'Время выполнения: '.$time."\r\n".'<br />';
 					}
 
 					$functionClass = NULL;
@@ -71,12 +75,13 @@ if (Sys::checkConfig())
 		
         $time_end_overall = microtime(true);
         $time = $time_end_overall - $time_start_overall;
-        echo 'Общее время опроса трекеров: '.$time."\r\n".'<br />';
+        if ($debug)
+            echo 'Общее время опроса трекеров: '.$time."\r\n".'<br />';
 		
 		
 		$usersList = Database::getUserToWatch();
 		$count = count($usersList);
-		echo 'Опрос новых раздач пользователей на трекеровах:'."\r\n".'<br />';
+	    echo 'Опрос новых раздач пользователей на трекерах:'."\r\n".'<br />';
 		$time_start_overall = microtime(true);
 		for ($i=0; $i<$count; $i++)
 		{
@@ -98,7 +103,8 @@ if (Sys::checkConfig())
 					call_user_func($functionClass .'::mainSearch', $usersList[$i]['id'], $tracker, $usersList[$i]['name']);
 					$time_end = microtime(true);
 					$time = $time_end - $time_start;
-    				echo 'Время выполнения: '.$time."\r\n".'<br />';
+					if ($debug)
+    				    echo 'Время выполнения: '.$time."\r\n".'<br />';
 
 					$functionClass = NULL;
 					$functionEngine = NULL;
@@ -111,10 +117,11 @@ if (Sys::checkConfig())
 		}
         $time_end_overall = microtime(true);
         $time = $time_end_overall - $time_start_overall;
-        echo 'Общее время опроса пользователей на трекерах: '.$time."\r\n".'<br />';		
+        if ($debug)
+            echo 'Общее время опроса пользователей на трекерах: '.$time."\r\n".'<br />';		
 		echo '=================='."\r\n".'<br />';
 		echo 'Выполение служебных функций:'."\r\n".'<br />';
-		echo 'Добавляем темы из Temp:'."\r\n".'<br />';
+		echo 'Добавляем темы из Temp.'."\r\n".'<br />';
 		$time_start = microtime(true);
 		$tempList = Database::getAllFromTemp();
 		$count = count($tempList);
@@ -124,13 +131,15 @@ if (Sys::checkConfig())
 		}
 		$time_end = microtime(true);
 		$time = $time_end - $time_start;
-		echo 'Время выполнения: '.$time."\r\n".'<br />';
+		if ($debug)
+		    echo 'Время выполнения: '.$time."\r\n".'<br />';
 		echo 'Обновление новостей.'."\r\n".'<br />';
 		$time_start = microtime(true);
 		Sys::getNews();
 		$time_end = microtime(true);
 		$time = $time_end - $time_start;
-        echo 'Время выполнения: '.$time."\r\n".'<br />';
+		if ($debug)
+            echo 'Время выполнения: '.$time."\r\n".'<br />';
 		echo 'Запись времени последнего запуска ТМ.'."\r\n".'<br />';
 		Sys::lastStart();
 	}	
@@ -142,5 +151,6 @@ else
 	
 $time_end_full = microtime(true);
 $time = $time_end_full - $time_start_full;
-echo 'Общее время работы скрипта: '.$time."\r\n".'<br />';
+if ($debug)
+    echo 'Общее время работы скрипта: '.$time."\r\n".'<br />';
 ?>
