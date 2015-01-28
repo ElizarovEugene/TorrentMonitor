@@ -376,31 +376,55 @@ if (isset($_POST['action']))
 	if ($_POST['action'] == 'update_settings')
 	{
 		Database::updateSettings('serverAddress', $_POST['serverAddress']);
-		$send = ($_POST['send']) ? 1 : 0;
+		if ($_POST['send'] == 'true')
+		    $send = 1;
+        else
+            $send = 0;
 		Database::updateSettings('send', $send);
-		$sendUpdate = ($_POST['sendUpdate']) ? 1 : 0;
+        if ($_POST['sendUpdate'] == 'true')
+		    $sendUpdate = 1;
+        else
+            $sendUpdate = 0;		
 		Database::updateSettings('sendUpdate', $sendUpdate);
 		Database::updateSettings('sendUpdateEmail', $_POST['sendUpdateEmail']);
 		Database::updateSettings('sendUpdatePushover', $_POST['sendUpdatePushover']);
-		$sendWarning = ($_POST['sendWarning']) ? 1 : 0;
+        if ($_POST['sendWarning'] == 'true')
+		    $sendWarning = 1;
+        else
+            $sendWarning = 0;		
 		Database::updateSettings('sendWarning', $sendWarning);		
 		Database::updateSettings('sendWarningEmail', $_POST['sendWarningEmail']);
 		Database::updateSettings('sendWarningPushover', $_POST['sendWarningPushover']);
-		$auth = ($_POST['auth']) ? 1 : 0;
+        if ($_POST['auth'] == 'true')
+		    $auth = 1;
+        else
+            $auth = 0;		
 		Database::updateSettings('auth', $auth);
-		$proxy = ($_POST['proxy']) ? 1 : 0;
+        if ($_POST['proxy'] == 'true')
+		    $proxy = 1;
+        else
+            $proxy = 0;		
 		Database::updateSettings('proxy', $proxy);
 		Database::updateSettings('proxyAddress', $_POST['proxyAddress']);
-        $torrent = ($_POST['torrent']) ? 1 : 0;
+        if ($_POST['torrent'] == 'true')
+		    $torrent = 1;
+        else
+            $torrent = 0;		
         Database::updateSettings('useTorrent', $torrent);
         Database::updateSettings('torrentClient', $_POST['torrentClient']);
         Database::updateSettings('torrentAddress', $_POST['torrentAddress']);
         Database::updateSettings('torrentLogin', $_POST['torrentLogin']);
         Database::updateSettings('torrentPassword', $_POST['torrentPassword']);
-        Database::updateSettings('pathToDownload', $_POST['pathToDownload']);
-        $deleteDistribution = ($_POST['deleteDistribution']) ? 1 : 0;
+        Database::updateSettings('pathToDownload', Sys::checkPath($_POST['pathToDownload']));
+        if ($_POST['deleteDistribution'] == 'true')
+		    $deleteDistribution = 1;
+        else
+            $deleteDistribution = 0;		
         Database::updateSettings('deleteDistribution', $deleteDistribution);
-        $deleteOldFiles = ($_POST['deleteOldFiles']) ? 1 : 0;
+        if ($_POST['deleteOldFiles'] == 'true')
+		    $deleteOldFiles = 1;
+        else
+            $deleteOldFiles = 0;		
         Database::updateSettings('deleteOldFiles', $deleteOldFiles);
 		?>
 		Настройки монитора обновлены.
@@ -439,7 +463,14 @@ if (isset($_POST['action']))
 			return TRUE;
 		}
 		Database::updateDownloadThremeNew();
-	}	
+	}
+	
+    //Помечаем новость как прочитанную
+	if ($_POST['action'] == 'markNews')
+	{
+		Database::markNews($_POST['id']);
+		return TRUE;
+	}		
 }
 
 if (isset($_GET['action']))

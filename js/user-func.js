@@ -515,3 +515,13 @@ function showForm(id)
     );
     $(".coverAll").show();
 }
+
+//Помечаем новость как прочитанную
+function newsRead(id)
+{
+    $.post("action.php", {action: 'markNews', id: id},
+        function(data) {
+            $('.'+id).removeClass();
+        }
+    );
+}
