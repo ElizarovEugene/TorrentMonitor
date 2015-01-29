@@ -1,5 +1,6 @@
 <?php
-require_once( dirname( __FILE__ ) . '/TransmissionRPC.class.php' );
+$dir = dirname(__FILE__).'/';
+include_once $dir.'TransmissionRPC.class.php';
 
 class Transmission
 {
@@ -13,7 +14,7 @@ class Transmission
         	extract($row);
         }
 
-        $rpc = new TransmissionRPC('http://'.$torrentAddress.'/transmission/rpc');
+        $rpc = new TransmissionRPC('http://'.$torrentAddress.'/transmission/rpc', $torrentLogin, $torrentPassword);
         #$rpc->debug=true;
         $result = $rpc->sstats();
 
