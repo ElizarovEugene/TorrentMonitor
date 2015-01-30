@@ -728,7 +728,7 @@ class Database
     public static function updateSerial($id, $name, $path, $hd, $reset)
     {
         if ($reset)
-            $stmt = self::newStatement("UPDATE `torrent` SET `name` = :name, `path` = :path, `hd` = :hd, `ep` = '' WHERE `id` = :id");
+            $stmt = self::newStatement("UPDATE `torrent` SET `name` = :name, `path` = :path, `hd` = :hd, `ep` = '', `timestamp` = '0000-00-00 00:00:00' WHERE `id` = :id");
         else
             $stmt = self::newStatement("UPDATE `torrent` SET `name` = :name, `path` = :path, `hd` = :hd WHERE `id` = :id");
         $stmt->bindParam(':name', $name);
@@ -755,23 +755,18 @@ class Database
         {
             $stmt = self::newStatement("UPDATE `torrent` SET `auto_update` = '1' WHERE `id` = :id");
             $stmt->bindParam(':id', $id);
-            if ($stmt->execute())
-                return TRUE;
-            else
-                return FALSE;
-            $stmt = NULL;
         }
-
         if ($reset)
         {
             $stmt = self::newStatement("UPDATE `torrent` SET `timestamp` = '0000-00-00 00:00:00' WHERE `id` = :id");
             $stmt->bindParam(':id', $id);
-            if ($stmt->execute())
-                return TRUE;
-            else
-                return FALSE;
-            $stmt = NULL;
         }
+        if ($stmt->execute())
+            return TRUE;
+        else
+            return FALSE;
+        $stmt = NULL;
+
     }    
     
     public static function updateHash($id, $hash)
@@ -1020,6 +1015,18 @@ class Database
         else
             return FALSE;
         $stmt = NULL;
-    }    
+    }
+    
+    //Помечаем новость как прочитанную
+    public static function markNews($id)
+    {
+        $stmt = self::newStatement("UPDATE `news` SET `new` = 0 WHERE `id` = :id");        
+        $stmt->bindParam(':id', $id);
+        if ($stmt->execute())
+            return TRUE;
+        else
+            return FALSE;
+        $stmt = NULL;
+    }
 }
 ?>

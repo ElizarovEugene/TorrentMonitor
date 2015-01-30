@@ -5,8 +5,8 @@ include_once $dir.'class/Database.class.php';
 $rss = Database::getSetting('rss');
 if ($rss)
 {
+    echo '<?xml version="1.0" encoding="utf-8" ?>'; //if short_open_tag :(
 ?>
-    <?xml version="1.0" encoding="utf-8" ?>
     <rss version="0.91">
     <channel>
     <title>TorrentMonitor RSS</title>
@@ -15,10 +15,10 @@ if ($rss)
     include_once $dir."config.php";
     include_once $dir."class/Database.class.php";
     
-    $url = $_SERVER["SERVER_NAME"].preg_replace('rss.php', '', $_SERVER["SCRIPT_NAME"]);
+    $url = $_SERVER["SERVER_NAME"].preg_replace('index.php', '', $_SERVER["SCRIPT_NAME"]);
     ?>
     <link>http://<?php echo $url?>/rss/</link>
-    <lastBuildDate>Fri, 24 Oct 2014 19:02:54 +0000</lastBuildDate>
+    <lastBuildDate><?php echo date("r");?></lastBuildDate>
     <language>ru</language>
     <?php
     $torrents_list = Database::getTorrentsList('dateDesc');
@@ -50,7 +50,7 @@ if ($rss)
             $app = '.S'.$season.'E'.$episode.'.';
         }
         $file = str_replace(' ', '.', $name).$app.$amp;
-        $link = 'http://'.$url.'/torrents/['.$tracker.']'.$file.'.torrent';
+        $link = 'http://'.$url.'/torrents/['.$tracker.']_'.$file.'.torrent';
         ?>
         <link><?php echo $link?></link>
     </item>
