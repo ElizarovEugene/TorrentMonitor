@@ -190,10 +190,6 @@ if (isset($_POST['action']))
 			$class = str_replace('-', '', $class);
 			if (call_user_func(array($class, 'checkRule'), $_POST['name']))	
 			{
-                if ( ! empty($_POST['name']))
-                	$name = $_POST['name'];
-                else
-                	$name = Sys::getHeader($_POST['url']);				
 				Database::updateSerial($_POST['id'], $_POST['name'], $_POST['path'], $_POST['hd'], $reset);
 				?>
 				Сериал обновлён.
@@ -211,8 +207,12 @@ if (isset($_POST['action']))
             $url = parse_url($_POST['url']);
             $tracker = $url['host'];
 			$tracker = preg_replace('/www\./', '', $tracker);
+			
 			if ($tracker == 'tr.anidub.com')
 				$tracker = 'anidub.com';
+				
+            if ($tracker == 'alt.rutor.org')
+				$tracker = 'rutor.org';
 				
             if ($tracker == 'new-rutor.org')
 				$tracker = 'rutor.org';

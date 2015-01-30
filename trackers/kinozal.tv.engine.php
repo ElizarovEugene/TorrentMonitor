@@ -37,7 +37,7 @@ class kinozal
 	//функция преобразования даты
 	private static function dateStringToNum($data)
 	{
-	    if (strstr($data, 'сегодня') || strstr($data, 'вчера'))
+	    if (strstr($data, 'сегодня') || strstr($data, 'вчера') || strstr($data, 'сейчас'))
 	    {
 	        $pieces = explode(' ', $data);
 	        if ($pieces[0] == 'вчера')
@@ -45,7 +45,10 @@ class kinozal
 	        else         
 	            $timestamp = strtotime('now');
 	        $date = date('Y-m-d', $timestamp);
-	        $time = $pieces[2].':00';
+	        if (strstr($data, 'сейчас'))
+	            $time = date('G').':00';
+            else
+	            $time = $pieces[2].':00';
 	        $dateTime = $date.' '.$time;
 
 	        return $dateTime;

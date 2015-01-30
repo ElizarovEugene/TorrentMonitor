@@ -8,7 +8,7 @@ foreach ($torrent as $row)
 }
 ?>
 <div id="notice_sub"></div>
-<div align="right"><a href="#" onclick='$(".coverAll").hide();'><img src="/img/delete.png" boder="0"></a></div>
+<div align="right"><a href="#" onclick='$(".coverAll").hide();'><img src="img/delete.png" boder="0"></a></div>
 <h2 class="monitoring-title">Редактировать</h2>
 <form id="torrent_update">
     <input type="hidden" name="id" value="<?php echo $torrent[0]['id']?>"><br/>
