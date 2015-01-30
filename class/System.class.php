@@ -299,7 +299,8 @@ class Sys
     	$file = '['.$tracker.']_'.$name.'.torrent';
     	$dir = dirname(__FILE__).'/';
         $path = str_replace('class/', '', $dir).'torrents/'.$file;
-        unlink($path);
+        if (file_exists($path))
+            unlink($path);
         file_put_contents($path, $torrent);
         $messageAdd = ' И сохранён.';
 
