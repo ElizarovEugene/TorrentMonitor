@@ -46,7 +46,7 @@ class kinozal
 	            $timestamp = strtotime('now');
 	        $date = date('Y-m-d', $timestamp);
 	        if (strstr($data, 'сейчас'))
-	            $time = date('G').':00';
+	            $time = date('G:i').':00';
             else
 	            $time = $pieces[2].':00';
 	        $dateTime = $date.' '.$time;
