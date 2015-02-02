@@ -69,13 +69,16 @@ class nnmclubSearch extends nnmclub
 							Database::clearWarnings($tracker);
                             //сохраняем торрент в файл
                             $torrent_id = $link[1];
-            				$torrent = Sys::getUrlContent(
+            				preg_match('/userid(.*);/U', nnmclub::$sess_cookie, $arr);
+                            $uid = $arr[1];
+							
+							$torrent = Sys::getUrlContent(
                             	array(
-                            		'type'           => 'POST',
+                            		'type'           => 'GET',
                             		'returntransfer' => 1,
-                            		'url'            => 'http://nnm-club.me/forum/download.php?id='.$torrent_id,
+                            		'url'            => 'http://nnm-club.ws/download.php?csid=&uid='.$uid.'&id='.$torrent_id,
                             		'cookie'         => nnmclub::$sess_cookie,
-                            		'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-length' => strlen(nnmclub::$sess_cookie)),
+                            		'sendHeader'     => array('Host' => 'nnm-club.ws', 'Content-length' => strlen(nnmclub::$sess_cookie)),
                             		'referer'        => 'http://nnm-club.me/forum/viewtopic.php?t='.$torrent_id,
                             	)
                             );
