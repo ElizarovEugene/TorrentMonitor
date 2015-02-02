@@ -3,13 +3,13 @@ CREATE SEQUENCE "auto_id_news" START 22;
 CREATE TABLE "news" (
   "id" INTEGER  PRIMARY KEY NOT NULL DEFAULT nextval('auto_id_news'),
   "text" TEXT NOT NULL,
-  "new" INTEGER NOT NULL DEFAULT '1',
+  "new" INTEGER NOT NULL DEFAULT '1'
 );
 
-DELETE FROM settings WHERE `id` = '1';
-DELETE FROM settings WHERE `id` = '2';
-DELETE FROM settings WHERE `id` = '4';
-DELETE FROM settings WHERE `id` = '15';
+DELETE FROM settings WHERE "id" = '1';
+DELETE FROM settings WHERE "id" = '2';
+DELETE FROM settings WHERE "id" = '4';
+DELETE FROM settings WHERE "id" = '15';
 
 INSERT INTO settings VALUES (4, 'sendWarning', '0');
 INSERT INTO settings VALUES (19, 'serverAddress', '');
