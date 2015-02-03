@@ -23,8 +23,5 @@ INSERT INTO settings VALUES (29, 'debug', '0');
 INSERT INTO settings VALUES (30, 'rss', '1');
 
 ALTER TABLE torrent ADD COLUMN auto_update INTEGER NOT NULL DEFAULT '0';
-<<<<<<< HEAD
 
 ALTER TABLE credentials ADD COLUMN passkey varchar(255) DEFAULT NULL;
-=======
->>>>>>> FETCH_HEAD
