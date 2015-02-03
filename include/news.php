@@ -11,7 +11,8 @@ if ( ! empty($news))
     for ($i=0; $i<count($news); $i++)
     {
 ?>
-<div><?php echo $news[$i]['text']?></div>
+<div class="<?php if ($news[$i]['new']) echo 'new' ?>" id="<?php echo $news[$i]['id']?>" onmouseover="newsRead(<?php echo $news[$i]['id']?>)">
+<?php echo $news[$i]['text']?><br /></div>
 <?php
     }
 }

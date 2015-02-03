@@ -19,6 +19,7 @@ class Errors
     	Errors::write('save_file_fail', 'Не удалось сохранить torrent-файл в директорию.');
     	Errors::write('duplicate_torrent', 'Не удалось добавить в torrent-клиент, такая закачка уже запущена.');
     	Errors::write('404', 'Не удалось добавить в torrent-клиент, не верная ссылка на torrent-файл.');
+    	Errors::write('unauthorized', 'Не удалось добавить в torrent-клиент, не прошла авторизация в torrent-клиенте.');
 	}
 	
 	public static function getInstance()

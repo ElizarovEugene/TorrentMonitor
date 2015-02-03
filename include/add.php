@@ -27,10 +27,9 @@
 <form id="serial_add">
     <p>
         <label class="label-name">Трекер</label>
-        <select id="tracker" name="tracker" onchange="changeField()">
+        <select id="tracker" name="tracker">
             <option></option>
             <option value="baibako.tv">baibako.tv</option>
-            <option value="lostfilm.tv">lostfilm.tv</option>
             <option value="newstudio.tv">newstudio.tv</option>
             <option value="novafilm.tv">novafilm.tv</option>
         </select>
@@ -42,7 +41,11 @@
     </p>
     <p>
         <label class="label-name"></label>
-        <span id="changedField"></span>
+        <span class="quality">
+            <input type="radio" name="hd" value="0"> SD<br />
+            <input type="radio" name="hd" value="1"> HD 720<br />
+            <input type="radio" name="hd" value="2"> HD 1080
+        </span>
     </p>
     <div onclick='expand("divDop2")' class='cutLink' style='cursor: pointer;'>Дополнительные параметры</div>
     <div id='divDop2' class='result'>

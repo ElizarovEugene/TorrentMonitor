@@ -65,6 +65,11 @@ class Transmission
             $return['status'] = FALSE;
             $return['msg'] = '404';
         }
+        elseif (preg_match('/gotMetadataFromURL: http error 401: Unauthorized/', $command))
+        {
+            $return['status'] = FALSE;
+            $return['msg'] = 'unauthorized';
+        }
         elseif (preg_match('/success/', $command))
         {
             #получаем хэш раздачи

@@ -13,10 +13,10 @@ CREATE TABLE `news` (
 LOCK TABLES `settings` WRITE;
 /*!40000 ALTER TABLE `settings` DISABLE KEYS */;
 
-DELETE FROM `settings` WHERE `id` = '1';
-DELETE FROM `settings` WHERE `id` = '2';
-DELETE FROM `settings` WHERE `id` = '4';
-DELETE FROM `settings` WHERE `id` = '15';
+DELETE * FROM `settings` WHERE `id` = '1';
+DELETE * FROM `settings` WHERE `id` = '2';
+DELETE * FROM `settings` WHERE `id` = '4';
+DELETE * FROM `settings` WHERE `id` = '15';
 
 INSERT INTO `settings` (`id`, `key`, `val`)
 VALUES
@@ -37,3 +37,7 @@ UNLOCK TABLES;
 ALTER TABLE `torrent` ADD auto_update tinyint(1) unsigned NOT NULL DEFAULT '0';
 
 ALTER TABLE `credentials` ADD passkey varchar(255) DEFAULT NULL;
+
+DELETE FROM `credentials` WHERE `id` = '3';
+DELETE FROM `torrent` WHERE `tracker` = 'lostfilm.tv';
+DELETE FROM `warning` WHERE `tracker` = 'lostfilm.tv';

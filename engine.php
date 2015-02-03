@@ -10,6 +10,7 @@ include_once $dir.'class/Errors.class.php';
 include_once $dir.'class/Notification.class.php';
 
 header('Content-Type: text/html; charset=utf-8');
+
 $debug = Database::getSetting('debug');
 $time_start_full = microtime(true);
 if (Sys::checkConfig())
@@ -44,7 +45,7 @@ if (Sys::checkConfig())
 
 					echo $torrentsList[$i]['name'].' на трекере '.$tracker."\r\n".'<br />';
 					
-					if ($tracker == 'lostfilm.tv' || $tracker == 'novafilm.tv' || $tracker == 'baibako.tv' || $tracker == 'newstudio.tv')
+					if ($tracker == 'novafilm.tv' || $tracker == 'baibako.tv' || $tracker == 'newstudio.tv')
 					{
     				    $time_start = microtime(true);
     				    call_user_func($functionClass.'::main', $torrentsList[$i]['id'], $tracker, $torrentsList[$i]['name'], $torrentsList[$i]['hd'], $torrentsList[$i]['ep'], $torrentsList[$i]['timestamp'], $torrentsList[$i]['hash']);
@@ -67,7 +68,7 @@ if (Sys::checkConfig())
 					$functionEngine = NULL;
 				}
 				else
-					Errors::setWarnings('system', 'missing_files');
+					Errors::setWarnings('system', 'missing_files');				
 			}
 			else
 				Errors::setWarnings('system', 'credential_miss');

@@ -37,7 +37,7 @@ class nnmclub
 	private static function dateStringToNum($data)
 	{
 		$monthes = array('Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек');
-		$month = mb_substr($data, 3, 6);
+		$month = substr($data, 3, 6);
 		$date = preg_replace('/(\d\d)\s(\d\d)\s(\d\d\d\d)/', '$3-$2-$1',str_replace($month, str_pad(array_search($month, $monthes)+1, 2, 0, STR_PAD_LEFT), $data));
 		$date = date('Y-m-d H:i:s', strtotime($date));
 	
