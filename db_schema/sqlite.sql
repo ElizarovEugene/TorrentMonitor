@@ -19,20 +19,20 @@ CREATE TABLE `credentials` (
   `passkey` varchar(255) DEFAULT NULL
 );
 
-INSERT INTO "credentials" VALUES (1, 'rutracker.org', '', '', '');
-INSERT INTO "credentials" VALUES (2, 'nnm-club.me', '', '', '');
-INSERT INTO "credentials" VALUES (4, 'novafilm.tv', '', '', '');
-INSERT INTO "credentials" VALUES (5, 'rutor.org', ' ', ' ', '');
-INSERT INTO "credentials" VALUES (6, 'tfile.me', ' ', ' ', '');
-INSERT INTO "credentials" VALUES (7, 'kinozal.tv', '', '', '');
-INSERT INTO "credentials" VALUES (8, 'anidub.com', '', '', '');
-INSERT INTO "credentials" VALUES (9, 'baibako.tv', '', '', '');
-INSERT INTO "credentials" VALUES (10,'casstudio.tv', '', '','');
-INSERT INTO "credentials" VALUES (11,'newstudio.tv', '', '','');
-INSERT INTO "credentials" VALUES (12,'animelayer.ru', '', '','');
-INSERT INTO "credentials" VALUES (13,'tracker.0day.kiev.ua','','','');
-INSERT INTO "credentials" VALUES (14,'rustorka.com','','','');
-INSERT INTO "credentials" VALUES (15,'pornolab.net','','','');
+INSERT INTO "credentials" VALUES (1, 'rutracker.org', '', '', '', '');
+INSERT INTO "credentials" VALUES (2, 'nnm-club.me', '', '', '', '');
+INSERT INTO "credentials" VALUES (4, 'novafilm.tv', '', '', '', '');
+INSERT INTO "credentials" VALUES (5, 'rutor.org', ' ', ' ', '', '');
+INSERT INTO "credentials" VALUES (6, 'tfile.me', ' ', ' ', '', '');
+INSERT INTO "credentials" VALUES (7, 'kinozal.tv', '', '', '', '');
+INSERT INTO "credentials" VALUES (8, 'anidub.com', '', '', '', '');
+INSERT INTO "credentials" VALUES (9, 'baibako.tv', '', '', '', '');
+INSERT INTO "credentials" VALUES (10,'casstudio.tv', '', '','', '');
+INSERT INTO "credentials" VALUES (11,'newstudio.tv', '', '','', '');
+INSERT INTO "credentials" VALUES (12,'animelayer.ru', '', '','', '');
+INSERT INTO "credentials" VALUES (13,'tracker.0day.kiev.ua','','','', '');
+INSERT INTO "credentials" VALUES (14,'rustorka.com','','','', '');
+INSERT INTO "credentials" VALUES (15,'pornolab.net','','','', '');
 
 CREATE TABLE `news` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
