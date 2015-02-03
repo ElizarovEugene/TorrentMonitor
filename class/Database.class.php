@@ -158,7 +158,7 @@ class Database
     
     public static function getCredentials($tracker)
     {
-        $stmt = self::newStatement("SELECT `log`, `pass` FROM `credentials` WHERE `tracker` = :tracker");        
+        $stmt = self::newStatement("SELECT `log`, `pass`, `passkey` FROM `credentials` WHERE `tracker` = :tracker");        
         $stmt->bindParam(':tracker', $tracker);
         if ($stmt->execute())
         {
@@ -168,6 +168,7 @@ class Database
                 {
                     $resultArray['login'] = $row['log'];
                     $resultArray['password'] = $row['pass'];
+                    $resultArray['passkey'] = $row['passkey'];
                 }
                 else
                     return FALSE;

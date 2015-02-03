@@ -64,7 +64,7 @@ class baibako
 	
 	//функция анализа xml ленты
 	private static function analysis($name, $hd, $item)
-	{
+	{echo '/'.$name.'/i     ', (string)$item->title."\r\n";
 		if (preg_match('/'.$name.'/i', (string)$item->title))
 		{
 			if ($hd == 1)
@@ -114,7 +114,7 @@ class baibako
 				{
 				    if (count($array[0]) == 3)
 				    {
-    					baibako::$sess_cookie = $array[1][1].'='.$array[2][1].' '.$array[1][2].'='.$array[2][2];
+    					baibako::$sess_cookie = $array[1][0].'='.$array[2][0].' '.$array[1][1].'='.$array[2][1].' '.$array[1][2].'='.$array[2][2];
     					Database::setCookie($tracker, baibako::$sess_cookie);
     					//запускам процесс выполнения, т.к. не может работать без кук
     					baibako::$exucution = TRUE;
@@ -170,7 +170,7 @@ class baibako
 			baibako::$exucution = FALSE;						
 		}	
 	}
-
+	
 	//основная функция
 	public static function main($id, $tracker, $name, $hd, $ep, $timestamp, $hash)
 	{
@@ -196,22 +196,24 @@ class baibako
 			{
 				if (baibako::$exucution)
 				{
+    				$credentials = Database::getCredentials('baibako.tv');
 					//получаем страницу
-			        $page = Sys::getUrlContent(
+			        $page_xml = Sys::getUrlContent(
 			        	array(
-			        		'type'           => 'GET',
+			        		'type'           => 'POST',
 			        		'returntransfer' => 1,
-			        		'url'            => 'http://baibako.tv/rss2.php?feed=dl',
+			        		'url'            => 'http://baibako.tv/rss2.php?feed=dl&passkey='.$credentials['passkey'],
 			        		'cookie'         => baibako::$sess_cookie,
                             'sendHeader'     => array('Host' => 'baibako.tv', 'Content-length' => strlen(baibako::$sess_cookie)),
                             'convert'        => array('windows-1251', 'utf-8//IGNORE'),
 			        	)
 			        );
 
-                    $page = str_replace('<?xml version="1.0" encoding="windows-1251" ?>','<?xml version="1.0" encoding="utf-8"?>', $page);
-					if ( ! empty($page))
+                    $page_xml = str_replace('<?xml version="1.0" encoding="windows-1251" ?>','<?xml version="1.0" encoding="utf-8"?>', $page_xml);
+                    
+					if ( ! empty($page_xml))
 					{
-					    $xml_page = str_replace(array("&amp;", "&"), array("&", "&amp;"), $page);
+					    $xml_page = str_replace(array("&amp;", "&"), array("&", "&amp;"), $page_xml);
 						//читаем xml
 						baibako::$xml_page = @simplexml_load_string($xml_page);
 						//если XML пришёл с ошибками - останавливаем выполнение, иначе - ставим флажок, что получаем страницу
@@ -228,7 +230,7 @@ class baibako
 						}
 						else
 							baibako::$log_page = TRUE;
-					}
+                    }
 					else
 					{
 						//устанавливаем варнинг

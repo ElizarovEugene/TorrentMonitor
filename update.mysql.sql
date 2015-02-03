@@ -35,3 +35,5 @@ VALUES
 UNLOCK TABLES;
 
 ALTER TABLE `torrent` ADD auto_update tinyint(1) unsigned NOT NULL DEFAULT '0';
+
+ALTER TABLE `credentials` ADD passkey varchar(255) DEFAULT NULL;

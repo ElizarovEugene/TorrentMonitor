@@ -30,7 +30,8 @@ CREATE TABLE "credentials" (
   "tracker" varchar(30) DEFAULT NULL,
   "log" varchar(30) DEFAULT NULL,
   "pass" varchar(30) DEFAULT NULL,
-  "cookie" varchar(255) DEFAULT NULL
+  "cookie" varchar(255) DEFAULT NULL,
+  "passkey" varchar(255) DEFAULT NULL
 );
 
 INSERT INTO credentials VALUES (1, 'rutracker.org', '', '', '');

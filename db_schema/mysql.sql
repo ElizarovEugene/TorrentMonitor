@@ -33,6 +33,7 @@ CREATE TABLE `credentials` (
   `log` varchar(30) DEFAULT NULL,
   `pass` varchar(30) DEFAULT NULL,
   `cookie` varchar(255) DEFAULT NULL,
+  `passkey` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

@@ -21,3 +21,5 @@ INSERT INTO "settings" VALUES (29, 'debug', '0');
 INSERT INTO "settings" VALUES (30, 'rss', '1');
 
 ALTER TABLE `torrent` ADD auto_update INTEGER NOT NULL DEFAULT '0';
+
+ALTER TABLE `credentials` ADD passkey varchar(255) DEFAULT NULL;
