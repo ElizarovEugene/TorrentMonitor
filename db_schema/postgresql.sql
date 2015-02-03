@@ -60,7 +60,7 @@ CREATE SEQUENCE "auto_id_news" START 22;
 CREATE TABLE "news" (
   "id" INTEGER  PRIMARY KEY NOT NULL DEFAULT nextval('auto_id_news'),
   "text" TEXT NOT NULL,
-  "new" INTEGER NOT NULL DEFAULT '1',
+  "new" INTEGER NOT NULL DEFAULT '1'
 );
 
 
