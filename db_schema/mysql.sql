@@ -42,7 +42,7 @@ CREATE TABLE `credentials` (
 LOCK TABLES `credentials` WRITE;
 /*!40000 ALTER TABLE `credentials` DISABLE KEYS */;
 
-INSERT INTO `credentials` (`id`, `tracker`, `log`, `pass`, `cookie`)
+INSERT INTO `credentials` (`id`, `tracker`, `log`, `pass`, `cookie`, `passkey`)
 VALUES
 	(1,'rutracker.org','','','', ''),
 	(2,'nnm-club.me','','','', ''),
@@ -110,7 +110,9 @@ VALUES
 	(27,'sendWarningEmail',''),
 	(24,'sendUpdate','0'),
 	(25,'sendUpdateEmail',''),
-	(26,'sendUpdatePushover','');
+	(26,'sendUpdatePushover',''),
+	(29,'debug','0'),
+	(30,'rss','1');
 
 /*!40000 ALTER TABLE `settings` ENABLE KEYS */;
 UNLOCK TABLES;

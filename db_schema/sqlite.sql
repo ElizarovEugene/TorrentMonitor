@@ -66,6 +66,8 @@ INSERT INTO "settings" VALUES (27, 'sendWarningEmail', '');
 INSERT INTO "settings" VALUES (24, 'sendUpdate', '0');
 INSERT INTO "settings" VALUES (25, 'sendUpdateEmail', '');
 INSERT INTO "settings" VALUES (26, 'sendUpdatePushover', '');
+INSERT INTO "settings" VALUES (29, 'debug', '0');
+INSERT INTO "settings" VALUES (30, 'rss', '1');
 
 CREATE TABLE `temp` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
