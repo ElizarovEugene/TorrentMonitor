@@ -130,6 +130,7 @@ CREATE TABLE "torrent" (
   "torrent_id" INTEGER NOT NULL DEFAULT '0',
   "ep" varchar(10) DEFAULT '',
   "timestamp" timestamp,
+  "auto_update" INTEGER NOT NULL DEFAULT '0',
   "hash" varchar(40) NOT NULL DEFAULT '0'
 );
 
