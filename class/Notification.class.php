@@ -20,7 +20,7 @@ class Notification
 	public static function sendMail($settingEmail, $date, $tracker, $message, $header_message, $name=0)
 	{
 		$smtp = Database::getSetting('smtp');
-		$mail = empty;
+		$mail = NULL;
 		if  ($smtp) {
 			require_once("class.phpmailer.php");
 			$mail = new PHPMailer(); // create a new object
