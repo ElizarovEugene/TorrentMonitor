@@ -22,7 +22,7 @@ class Notification
 		$smtp = Database::getSetting('smtp');
 		$mail = NULL;
 		if  ($smtp) {
-			require_once("class.phpmailer.php");
+			require_once("libphp-phpmailer/class.phpmailer.php");
 			$mail = new PHPMailer(); // create a new object
 			$mail->IsSMTP(); // enable SMTP
 			$mail->SMTPDebug = Database::getSetting('smtpDebug'); // debugging: 1 = errors and messages, 2 = messages only
