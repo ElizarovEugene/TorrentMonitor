@@ -276,8 +276,9 @@ class Sys
         include_once $dir.$torrentClient.'.class.php';
         $server = Database::getSetting('serverAddress');
         $url = $server.$path;
-        $dir = str_replace('class/', '', $dir);
-        $url = str_replace($dir, '', $url);
+        //commeted due to not work with Transmission RPC. Required full path
+        //$dir = str_replace('class/', '', $dir);
+        //$url = str_replace($dir, '', $url);
         $status = call_user_func($torrentClient.'::addNew', $id, $url, $hash, $tracker);
         if ($status['status'])
         {
