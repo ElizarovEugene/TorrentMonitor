@@ -29,7 +29,17 @@ VALUES
 	(27,'sendWarningEmail',''),
 	(28,'sendWarningPushover',''),
 	(29,'debug','0'),
-	(30,'rss','1');	
+	(30,'rss','1'),	
+	(3000,'smtp','0'),	
+	(3001,'smtpHost',''),	
+	(3002,'smtpPort','25'),	
+	(3003,'smtpSecure','0'),	
+	(3004,'smtpAuth','0'),	
+	(3005,'smtpUser',''),	
+	(3006,'smtpPassword',''),	
+	(3007,'smtpFrom',''),	
+	(3008,'smtpDebug','0');	
+
 
 /*!40000 ALTER TABLE `settings` ENABLE KEYS */;
 UNLOCK TABLES;

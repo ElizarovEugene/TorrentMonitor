@@ -19,9 +19,30 @@ class Notification
 	
 	public static function sendMail($settingEmail, $date, $tracker, $message, $header_message, $name=0)
 	{
-        $headers = 'From: TorrentMonitor'."\r\n";
-		$headers .= 'MIME-Version: 1.0'."\r\n";
-		$headers .= 'Content-type: text/html; charset=utf-8'."\r\n";
+		$smtp = Database::getSetting('smtp');
+		$mail = empty
+		if  ($smtp) {
+			require_once("class.phpmailer.php");
+			$mail = new PHPMailer(); // create a new object
+			$mail->IsSMTP(); // enable SMTP
+			$mail->SMTPDebug = Database::getSetting('smtpDebug'); // debugging: 1 = errors and messages, 2 = messages only
+			$mail->SMTPAuth = Database::getSetting('smtpAuth') == 1; // authentication enabled
+			$mail->SMTPSecure = Database::getSetting('smtpSecure'); // secure transfer enabled REQUIRED for GMail
+			$mail->Host = Database::getSetting('smtpHost');
+			$mail->Port = Database::getSetting('smtpPort'); // or 587
+			$mail->IsHTML(true);
+			$mail->Username = Database::getSetting('smtpUser');
+			$mail->Password = Database::getSetting('smtpPassword');
+			$mail->FromName = "TorrentMonitor";
+			$mail->From = Database::getSetting('smtpFrom');
+			$mail->Subject = '=?UTF-8?B?'.base64_encode("TorrentMonitor: ".$header_message).'?=';
+			$mail->AddAddress($settingEmail);
+		}
+		else {
+        	$headers = 'From: TorrentMonitor'."\r\n";
+        	$headers .= 'MIME-Version: 1.0'."\r\n";
+        	$headers .= 'Content-type: text/html; charset=utf-8'."\r\n";
+        }
 		$msg = 'Дата: '.$date.'<br>Трекер: '.$tracker.'<br>Сообщение: '.$message."\r\n";
 		if ($name != '' || $name != 0)
 		{
@@ -34,8 +55,19 @@ class Notification
     		elseif ($tracker == 'anidub.com')
                 $msg .= "http://tr.anidub.com/{$name}";
         }
-
-		mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor: ".$header_message).'?=', $msg, $headers);
+		if  ($smtp) {
+			$mail->Body = $msg;
+			$mail->AddAddress($settingEmail);
+			if(!$mail->Send()){
+		    	//echo "Mailer Error: " . $mail->ErrorInfo;
+			}
+			else{
+		    	//echo "Message has been sent";
+			}
+		}
+		else {
+			mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor: ".$header_message).'?=', $msg, $headers);
+		}
 	}
 	
 	public static function sendPushover($sendUpdatePushover, $date, $tracker, $message)
