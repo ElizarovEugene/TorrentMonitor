@@ -45,7 +45,7 @@ if (Sys::checkConfig())
 
 					echo $torrentsList[$i]['name'].' на трекере '.$tracker."\r\n".'<br />';
 					
-					if ($tracker == 'novafilm.tv' || $tracker == 'baibako.tv' || $tracker == 'newstudio.tv')
+					if ($tracker == 'lostfilm.tv' || $tracker == 'novafilm.tv' || $tracker == 'baibako.tv' || $tracker == 'newstudio.tv')
 					{
     				    $time_start = microtime(true);
     				    call_user_func($functionClass.'::main', $torrentsList[$i]['id'], $tracker, $torrentsList[$i]['name'], $torrentsList[$i]['hd'], $torrentsList[$i]['ep'], $torrentsList[$i]['timestamp'], $torrentsList[$i]['hash']);
