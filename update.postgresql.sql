@@ -21,6 +21,7 @@ INSERT INTO settings VALUES (27, 'sendWarningEmail', '');
 INSERT INTO settings VALUES (28, 'sendWarningPushover', '');
 INSERT INTO settings VALUES (29, 'debug', '0');
 INSERT INTO settings VALUES (30, 'rss', '1');
+INSERT INTO settings VALUES (2001, 'httpTimeout', '15');
 INSERT INTO settings VALUES (3000,'smtp','0');	
 INSERT INTO settings VALUES (3001,'smtpHost','');	
 INSERT INTO settings VALUES (3002,'smtpPort','25');	

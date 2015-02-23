@@ -114,6 +114,7 @@ VALUES
 	(26,'sendUpdatePushover',''),
 	(29,'debug','0'),
 	(30,'rss','1'),
+	(2001, 'httpTimeout', '15'),
 	(3000,'smtp','0'),	
 	(3001,'smtpHost',''),	
 	(3002,'smtpPort','25'),	

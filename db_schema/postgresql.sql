@@ -98,6 +98,7 @@ INSERT INTO settings VALUES (25, 'sendUpdateEmail', '');
 INSERT INTO settings VALUES (26, 'sendUpdatePushover', '');
 INSERT INTO settings VALUES (29, 'debug', '0');
 INSERT INTO settings VALUES (30, 'rss', '1');
+INSERT INTO settings VALUES (2001, 'httpTimeout', '15');
 INSERT INTO settings VALUES (3000,'smtp','0');	
 INSERT INTO settings VALUES (3001,'smtpHost','');	
 INSERT INTO settings VALUES (3002,'smtpPort','25');	

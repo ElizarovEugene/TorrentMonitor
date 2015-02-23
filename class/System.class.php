@@ -106,7 +106,7 @@ class Sys
     		if (isset($param['header']))
     			curl_setopt($ch, CURLOPT_HEADER, 1);
 
-   			curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+   			curl_setopt($ch, CURLOPT_TIMEOUT, Database::getSetting('httpTimeout'));
 
     		if (isset($param['returntransfer']))
     			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
