@@ -42,7 +42,7 @@ CREATE TABLE `credentials` (
 LOCK TABLES `credentials` WRITE;
 /*!40000 ALTER TABLE `credentials` DISABLE KEYS */;
 
-INSERT INTO `credentials` (`id`, `tracker`, `log`, `pass`, `cookie`, `passkey`)
+INSERT INTO `credentials` (`id`, `tracker`, `log`, `pass`, `cookie`)
 VALUES
 	(1,'rutracker.org','','',''),
 	(2,'nnm-club.me','','',''),
