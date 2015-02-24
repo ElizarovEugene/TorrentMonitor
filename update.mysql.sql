@@ -13,10 +13,10 @@ CREATE TABLE `news` (
 LOCK TABLES `settings` WRITE;
 /*!40000 ALTER TABLE `settings` DISABLE KEYS */;
 
-DELETE * FROM `settings` WHERE `id` = '1';
-DELETE * FROM `settings` WHERE `id` = '2';
-DELETE * FROM `settings` WHERE `id` = '4';
-DELETE * FROM `settings` WHERE `id` = '15';
+DELETE FROM `settings` WHERE `id` = '1';
+DELETE FROM `settings` WHERE `id` = '2';
+DELETE FROM `settings` WHERE `id` = '4';
+DELETE FROM `settings` WHERE `id` = '15';
 
 INSERT INTO `settings` (`id`, `key`, `val`)
 VALUES
