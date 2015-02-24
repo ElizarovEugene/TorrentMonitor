@@ -31,6 +31,8 @@ class Update {
             $description = $xml_page->update->description[$i];
             $files = $xml_page->update->files[$i];
             $queryes = $xml_page->update->queryes[$i];
+            $deleteFolders = $xml_page->update->deleteFolders[$i];
+            $createFolders = $xml_page->update->createFolders[$i];
             
             if ($version < $updVersion)
             {
@@ -45,6 +47,18 @@ class Update {
                         $zip = new ZipArchive;
                         if ($zip->open($ROOTPATH.'master.zip') === TRUE)
                         {
+                            foreach($deleteFolders->folder as $folder)
+                	        {
+                    	        Update::delTree($ROOTPATH.$folder);
+                            }
+                            foreach($deleteFolders->create as $folder)
+                	        {
+                    	        if ( ! mkdir($structure, 0777, true))
+                    	        {
+                        	        echo 'Не удалось создать директорию: '.$file.", обновление прервано.<br>";
+                	                break;
+                                }
+                            }
                             $zip->extractTo($ROOTPATH.'tmp');
                             $zip->close();
                             unlink($ROOTPATH.'master.zip');
@@ -65,7 +79,7 @@ class Update {
                 	            Database::updateQuery($query);
                 	            $x++;
                             }
-                            echo 'Выполнено '.$x.' запросов на обновление.<br>';           
+                            echo 'Выполнено '.$x.' запросов на обновление.<br>';
                         }
                         else
                             echo 'Не могу разархивировать master.zip<br>';
