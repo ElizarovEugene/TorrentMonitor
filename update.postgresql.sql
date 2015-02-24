@@ -38,3 +38,7 @@ ALTER TABLE torrent ADD COLUMN auto_update INTEGER NOT NULL DEFAULT '0';
 ALTER TABLE credentials ADD COLUMN passkey varchar(255) DEFAULT NULL;
 
 DELETE FROM settings WHERE "id" = '1';
+
+DELETE FROM credentials WHERE "id" = '3';
+DELETE FROM torrent WHERE "tracker" = 'lostfilm.tv';
+DELETE FROM warning WHERE "tracker" = 'lostfilm.tv';

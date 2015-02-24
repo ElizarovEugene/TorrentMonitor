@@ -482,7 +482,7 @@ function changefunc()
 {
     var select = document.getElementById("selectfunc");
     var selectedText = select.options[select.selectedIndex].text;
-    var a = ['anidub.com', 'animelayer.ru', 'baibako.tv', 'casstudio.tv', 'kinozal.tv', 'lostfilm.tv', 'newstudio.tv', 'nnm-club.me', 'novafilm.tv', 'pornolab.net', 'rustorka.com', 'rutracker.org', 'tracker.0day.kiev.ua'];
+    var a = ['anidub.com', 'animelayer.ru', 'baibako.tv', 'casstudio.tv', 'kinozal.tv', 'newstudio.tv', 'nnm-club.me', 'novafilm.tv', 'pornolab.net', 'rustorka.com', 'rutracker.org', 'tracker.0day.kiev.ua'];
     for (var i = 0; i < a.length; i++)
     {
         var e = a[i];

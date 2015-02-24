@@ -44,21 +44,20 @@ LOCK TABLES `credentials` WRITE;
 
 INSERT INTO `credentials` (`id`, `tracker`, `log`, `pass`, `cookie`)
 VALUES
-	(1,'rutracker.org','','',''),
-	(2,'nnm-club.me','','',''),
-	(3,'lostfilm.tv','','',''),
-	(4,'novafilm.tv','','',''),
-	(5,'rutor.org',' ',' ',NULL),
-	(6,'tfile.me',' ',' ',NULL),
-	(7,'kinozal.tv','','',''),
-	(8,'anidub.com','','',''),
-	(9,'casstudio.tv','','',''),
-	(10,'baibako.tv','','',''),
-	(11,'newstudio.tv','','',''),
-	(12,'animelayer.ru','','',''),
-	(13,'tracker.0day.kiev.ua','','',''),
-	(15,'pornolab.net','','',''),
-	(14,'rustorka.com','','','');
+	(1,'rutracker.org','','','', ''),
+	(2,'nnm-club.me','','','', ''),
+	(4,'novafilm.tv','','','', ''),
+	(5,'rutor.org',' ',' ', '', ''),
+	(6,'tfile.me',' ',' ', '', ''),
+	(7,'kinozal.tv','','','', ''),
+	(8,'anidub.com','','','', ''),
+	(9,'casstudio.tv','','','', ''),
+	(10,'baibako.tv','','','', ''),
+	(11,'newstudio.tv','','','', ''),
+	(12,'animelayer.ru','','','', ''),
+	(13,'tracker.0day.kiev.ua','','','', ''),
+	(15,'pornolab.net','','','', ''),
+	(14,'rustorka.com','','','', '');
 
 /*!40000 ALTER TABLE `credentials` ENABLE KEYS */;
 UNLOCK TABLES;
