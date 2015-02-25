@@ -43,6 +43,11 @@ if (isset($_POST['action']))
 			
 			if ($tracker == 'anidub.com')
 			    $threme = $url['path'];
+            elseif ($tracker == 'casstudio.tv')
+			{
+				$query = explode('=', $url['query']);
+				$threme = $query[2];
+			}
 			elseif ($tracker != 'rutor.org')
 			{
 				$query = explode('=', $url['query']);
@@ -365,7 +370,7 @@ if (isset($_POST['action']))
 	//Обновляем личные данные
 	if ($_POST['action'] == 'update_credentials')
 	{
-		Database::setCredentials($_POST['id'], $_POST['log'], $_POST['pass']);
+		Database::setCredentials($_POST['id'], $_POST['log'], $_POST['pass'], $_POST['passkey']);
 		?>
 		Данные для трекера обновлены!
 		<?php
@@ -426,6 +431,16 @@ if (isset($_POST['action']))
         else
             $deleteOldFiles = 0;		
         Database::updateSettings('deleteOldFiles', $deleteOldFiles);
+        if ($_POST['rss'] == 'true')
+		    $rss = 1;
+        else
+            $rss = 0;		
+        Database::updateSettings('rss', $rss);
+        if ($_POST['debug'] == 'true')
+		    $debug = 1;
+        else
+            $debug = 0;		
+        Database::updateSettings('debug', $debug);
 		?>
 		Настройки монитора обновлены.
 		<?php
