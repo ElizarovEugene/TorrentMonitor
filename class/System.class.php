@@ -106,7 +106,7 @@ class Sys
     		if (isset($param['header']))
     			curl_setopt($ch, CURLOPT_HEADER, 1);
 
-   			curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+   			curl_setopt($ch, CURLOPT_TIMEOUT, Database::getSetting('httpTimeout'));
 
     		if (isset($param['returntransfer']))
     			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -276,8 +276,9 @@ class Sys
         include_once $dir.$torrentClient.'.class.php';
         $server = Database::getSetting('serverAddress');
         $url = $server.$path;
-        $dir = str_replace('class/', '', $dir);
-        $url = str_replace($dir, '', $url);
+        //commeted due to not work with Transmission RPC. Required full path
+        //$dir = str_replace('class/', '', $dir);
+        //$url = str_replace($dir, '', $url);
         $status = call_user_func($torrentClient.'::addNew', $id, $url, $hash, $tracker);
         if ($status['status'])
         {

@@ -66,13 +66,13 @@ class tfileSearch extends tfile
 					//сбрасываем варнинг
 					Database::clearWarnings($tracker);
 					//ищем на странице id торрента
-					$torrent_id = $link[1];
+					$download_id = $link[1];
 					//сохраняем торрент в файл
 					$torrent = Sys::getUrlContent(
                     	array(
                     		'type'           => 'GET',
                     		'returntransfer' => 1,
-                    		'url'            => 'http://tfile.me/forum/download.php?id='.$torrent_id.'&uk=1111111111',
+                    		'url'            => 'http://tfile.me/forum/download.php?id='.$download_id.'&uk=1111111111',
                     		'sendHeader'     => array('Host' => 'tfile.me'),
                     		'referer'        => 'http://tfile.me/forum/viewtopic.php?t='.$torrent_id,
                     	)

@@ -68,6 +68,16 @@ INSERT INTO "settings" VALUES (25, 'sendUpdateEmail', '');
 INSERT INTO "settings" VALUES (26, 'sendUpdatePushover', '');
 INSERT INTO "settings" VALUES (29, 'debug', '0');
 INSERT INTO "settings" VALUES (30, 'rss', '1');
+INSERT INTO "settings" VALUES (2001, 'httpTimeout', '15');
+INSERT INTO "settings" VALUES (3000,'smtp','0');	
+INSERT INTO "settings" VALUES (3001,'smtpHost','');	
+INSERT INTO "settings" VALUES (3002,'smtpPort','25');	
+INSERT INTO "settings" VALUES (3003,'smtpSecure','0');	
+INSERT INTO "settings" VALUES (3004,'smtpAuth','0');	
+INSERT INTO "settings" VALUES (3005,'smtpUser','');	
+INSERT INTO "settings" VALUES (3006,'smtpPassword','');	
+INSERT INTO "settings" VALUES (3007,'smtpFrom','');	
+INSERT INTO "settings" VALUES (3008,'smtpDebug','0');	
 
 CREATE TABLE `temp` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
