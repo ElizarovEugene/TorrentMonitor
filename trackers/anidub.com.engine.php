@@ -62,9 +62,11 @@ class anidub
 	//функция поиска нужной ссылки
 	protected static function findLynk($page)
 	{
-	    if (preg_match('/<div id=\".*1080\">\t\t<div>\n\s{20}<div class=\"torrent_h\">\n\s{24}<a href=\"\/engine\/download\.php\?id=(.*)\" class=\" \">/U', $page, $array))
+	    if (preg_match('/<div id=\".*1080\"><div id=\'torrent_.*_info\'>\s{20}<div class=\"torrent_h\">\n\s{24}<a href=\"\/engine\/download\.php\?id=(.*)\" class=\" \">/U', $page, $array))
     	     return $array[1];
-	    elseif (preg_match('/<div id=\".*720\">\t\t<div>\n\s{20}<div class=\"torrent_h\">\n\s{24}<a href=\"\/engine\/download\.php\?id=(.*)\" class=\" \">/U', $page, $array))
+	    elseif (preg_match('/<div id=\".*720\"><div id=\'torrent_.*_info\'>\s{20}<div class=\"torrent_h\">\n\s{24}<a href=\"\/engine\/download\.php\?id=(.*)\" class=\" \">/U', $page, $array))
+    	    return $array[1];
+        elseif (preg_match('/<div id=\'torrent_.*_info\'>\s{20}<div class=\"torrent_h\">\n\s{24}<a href=\"\/engine\/download\.php\?id=(.*)\" class=\" \">/U', $page, $array))
     	    return $array[1];
 	    else
 	        return FALSE;
@@ -195,6 +197,7 @@ class anidub
 							if ($date != $timestamp)
 							{
 							    $download_id = anidub::findLynk($page);
+							    var_dump($download_id);
                                 if ($download_id !== FALSE)
                                 {
     								//сохраняем торрент в файл
@@ -211,12 +214,6 @@ class anidub
                                     
                                     if (Sys::checkTorrentFile($torrent))
                                     {
-        								$message = $name.' обновлён.';
-        								$status = Sys::saveTorrent($tracker, $download_id, $torrent, $id, $hash, $message, $date_str);
-        								
-        								//обновляем время регистрации торрента в базе
-        								Database::setNewDate($id, $date);
-        								
    										if ($auto_update)
                                         {
                                             $name = Sys::getHeader('http://tr.anidub.com'.$torrent_id);
@@ -224,6 +221,11 @@ class anidub
                                             Database::setNewName($id, $name);
                                         }
 
+        								$message = $name.' обновлён.';
+        								$status = Sys::saveTorrent($tracker, $download_id, $torrent, $id, $hash, $message, $date_str);
+        								
+        								//обновляем время регистрации торрента в базе
+        								Database::setNewDate($id, $date);
                                     }
                                 }
 							}
