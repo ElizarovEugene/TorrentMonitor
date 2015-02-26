@@ -54,8 +54,10 @@ class casstudio
 			$month = Sys::dateStringToNum(substr($pieces[1], 0, 6));
 			if (strlen($pieces[0]) == 1)
 			    $pieces[0] = '0'.$pieces[0];
-			$date = $pieces[2].'-'.$month.'-'.$pieces[0];
-			$time = $pieces[4].':00';
+			
+			$year = substr($pieces[2], 0, -1);
+			$date = $year.'-'.$month.'-'.$pieces[0];
+			$time = $pieces[3].':00';
 			$dateTime = $date.' '.$time;
 
 			return $dateTime;
@@ -213,7 +215,6 @@ class casstudio
                                     		'referer'        => 'http://casstudio.tv/viewtopic.php?t='.$link[1],
                                         	)
                                     );
-                                    echo 'http://casstudio.tv/download/file.php?id='.$link[1];
 
     								if ($auto_update)
     								{
