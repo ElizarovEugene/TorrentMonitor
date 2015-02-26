@@ -286,7 +286,7 @@ class Sys
         }
         else
         {
-            Database::saveToTemp($id, $url, $hash, $tracker, $message, $date_str);
+            Database::saveToTemp($id, $path, $hash, $tracker, $message, $date_str);
             Errors::setWarnings($torrentClient, $status['msg']);
             return ' Но не добавлен в torrent-клиент и сохраненён.';
         }
