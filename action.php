@@ -380,7 +380,7 @@ if (isset($_POST['action']))
 	//Обновляем настройки
 	if ($_POST['action'] == 'update_settings')
 	{
-		Database::updateSettings('serverAddress', $_POST['serverAddress']);
+		Database::updateSettings('serverAddress', Sys::checkPath($_POST['serverAddress']));
 		if ($_POST['send'] == 'true')
 		    $send = 1;
         else

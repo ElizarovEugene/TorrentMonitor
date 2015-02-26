@@ -37,6 +37,16 @@ $trackers = Database::getTrackersList();
 	   <label class="label-name">Пароль</label>
 	   <input type="password" name="pass" value="<?php echo $credential[$i]['password'] ?>">
     </p>
+    <?php if ($credential[$i]['tracker'] == 'baibako.tv')
+    {
+    ?>
+    <p>
+	   <label class="label-name">Passkey</label>
+	   <input type="text" name="passkey" value="<?php echo $credential[$i]['passkey'] ?>">
+    </p>    
+    <?php
+    }
+    ?>
 	<button class="form-button">Сохранить</button>
 </form>
 </div>

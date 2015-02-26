@@ -17,4 +17,4 @@ if ( ! empty($news))
     }
 }
 ?>
-<div class="clear-both"></div>
+<br /><br />
