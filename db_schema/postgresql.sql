@@ -127,7 +127,7 @@ CREATE TABLE "torrent" (
   "name" varchar(250) NOT NULL DEFAULT '',
   "hd" INTEGER NOT NULL DEFAULT '0',
   "path" varchar(100) NOT NULL,
-  "torrent_id" INTEGER NOT NULL DEFAULT '0',
+  "torrent_id" varchar(150) NOT NULL DEFAULT '',
   "ep" varchar(10) DEFAULT '',
   "timestamp" timestamp,
   "auto_update" INTEGER NOT NULL DEFAULT '0',

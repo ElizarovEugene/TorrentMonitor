@@ -84,7 +84,7 @@ CREATE TABLE `torrent` (
   `name` varchar(250) NOT NULL DEFAULT '',
   `hd` INTEGER NOT NULL DEFAULT '0',
   `path` varchar(100) NOT NULL DEFAULT '',
-  `torrent_id` varchar(100) NOT NULL DEFAULT '',
+  `torrent_id` varchar(150) NOT NULL DEFAULT '',
   `ep` varchar(10) DEFAULT '',
   `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `auto_update` INTEGER NOT NULL DEFAULT '0',
