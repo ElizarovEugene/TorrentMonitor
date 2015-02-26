@@ -68,10 +68,8 @@ class casstudio
 	private static function dateNumToString($data)
     {
     	$arr = preg_split('/\s/', $data);
-    	
     	$dates = preg_split('/-/', $arr[0]);
     	$date = $dates[2].' '.Sys::dateNumToString($dates[1]).' '.$dates[0];
-    	
     	$time = substr($arr[1], 0, -3);
     	
     	return $date.' в '.$time;
