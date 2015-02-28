@@ -26,6 +26,6 @@ ALTER TABLE "credentials" ADD passkey varchar(255) DEFAULT NULL;
 
 DELETE FROM "credentials" WHERE `id` = '3';
 DELETE FROM "torrent" WHERE `tracker` = 'lostfilm.tv';
-DELETE FROM "warning" WHERE `tracker` = 'lostfilm.tv';
+DELETE FROM "warning" WHERE `where` = 'lostfilm.tv';
 
 ALTER TABLE "torrent" MODIFY (torrent_id varchar(150));
