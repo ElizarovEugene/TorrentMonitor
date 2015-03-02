@@ -56,7 +56,7 @@ class Update {
                 	        {
                     	        Update::delTree($ROOTPATH.$folder);
                             }
-                            foreach($deleteFolders->create as $folder)
+                            foreach($createFolders->create as $folder)
                 	        {
                     	        if ( ! mkdir($structure, 0777, true))
                     	        {
