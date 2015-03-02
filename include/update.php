@@ -1,6 +1,7 @@
 <?php
 include_once('../class/System.class.php');
 include_once('../class/Database.class.php');
+include_once('../config.php');
 
 class Update {
     private static function delTree($dir)
@@ -23,16 +24,20 @@ class Update {
         
         $xml_page = @simplexml_load_string($page);
         $version = Sys::version();
-        $ROOTPATH = str_replace('include', '', dirname(__FILE__));        
+        $ROOTPATH = str_replace('include', '', dirname(__FILE__));
+        $dbType = Config::read('db.type');
         
-        for ($i=0; $i<count($xml_page->update->version); $i++)
+        $count = count($xml_page->update) - 1;     
+        
+        for ($i=$count; $i>=0; $i--)
         {
-            $updVersion = $xml_page->update->version[$i];
-            $description = $xml_page->update->description[$i];
-            $files = $xml_page->update->files[$i];
-            $queryes = $xml_page->update->queryes[$i];
-            $deleteFolders = $xml_page->update->deleteFolders[$i];
-            $createFolders = $xml_page->update->createFolders[$i];
+            $updVersion = $xml_page->update[$i]->version;
+            $description = $xml_page->update[$i]->description;
+            $files = $xml_page->update[$i]->files;
+            $queryes = $xml_page->update[$i]->$dbType;
+            $queryes_common = $xml_page->update[$i]->queryes;
+            $deleteFolders = $xml_page->update[$i]->deleteFolders;
+            $createFolders = $xml_page->update[$i]->createFolders;
             
             if ($version < $updVersion)
             {
@@ -80,6 +85,13 @@ class Update {
                 	            $x++;
                             }
                             echo 'Выполнено '.$x.' запросов на обновление.<br>';
+                            $y=0;
+                            foreach($queryes_common->query as $query)
+                	        {
+                	            Database::updateQuery($query);
+                	            $y++;
+                            }
+                            echo 'Выполнено '.$y.' запросов на обновление.<br>';                            
                         }
                         else
                             echo 'Не могу разархивировать master.zip<br>';
