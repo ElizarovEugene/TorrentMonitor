@@ -34,9 +34,7 @@ class Notification
     		elseif ($tracker == 'anidub.com')
                 $msg .= "http://tr.anidub.com/{$name}";
             elseif ($tracker == 'casstudio.tv')
-    		    $ms .= "http://casstudio.tv/viewtopic.php?t={$name}";
-	    	<?php        		
-    		}
+    		    $msg .= "http://casstudio.tv/viewtopic.php?t={$name}";
         }
 
 		mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor: ".$header_message).'?=', $msg, $headers);
