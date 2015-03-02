@@ -27,12 +27,16 @@ class Notification
 		{
     		if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.me' || $tracker == 'tfile.me' || $tracker == 'torrents.net.ua' || $tracker == 'pornolab.net' || $tracker == 'rustorka.com')
     			$msg .= "http://{$tracker}/forum/viewtopic.php?t={$name}";
-    		elseif ($tracker == 'casstudio.tv' || $tracker == 'kinozal.tv'  || $tracker == 'animelayer.ru' || $tracker == 'tracker.0day.kiev.ua')
+    		elseif ($tracker == 'kinozal.tv'  || $tracker == 'animelayer.ru' || $tracker == 'tracker.0day.kiev.ua')
         	    $msg .= "http://{$tracker}/details.php?id={$name}";
     		elseif ($tracker == 'rutor.org')
     			$msg .= "http://alt.rutor.org/torrent/{$name}/";
     		elseif ($tracker == 'anidub.com')
                 $msg .= "http://tr.anidub.com/{$name}";
+            elseif ($tracker == 'casstudio.tv')
+    		    $ms .= "http://casstudio.tv/viewtopic.php?t={$name}";
+	    	<?php        		
+    		}
         }
 
 		mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor: ".$header_message).'?=', $msg, $headers);
