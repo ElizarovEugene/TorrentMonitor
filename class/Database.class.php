@@ -182,7 +182,7 @@ class Database
     
     public static function getAllCredentials()
     {
-        $stmt = self::newStatement("SELECT `id`, `tracker`, `log`, `pass` FROM `credentials`");        
+        $stmt = self::newStatement("SELECT `id`, `tracker`, `log`, `pass`, `passkey` FROM `credentials`");        
         if ($stmt->execute())
         {
             $i = 0;
@@ -192,6 +192,7 @@ class Database
                 $resultArray[$i]['tracker'] = $row['tracker'];
                 $resultArray[$i]['login'] = $row['log'];
                 $resultArray[$i]['password'] = $row['pass'];
+                $resultArray[$i]['passkey'] = $row['passkey'];
                 $i++;
             }
             if ( ! empty($resultArray))
@@ -229,12 +230,13 @@ class Database
         $stmt = NULL;
     }
     
-    public static function setCredentials($id, $login, $password)
+    public static function setCredentials($id, $login, $password, $passkey)
     {
-        $stmt = self::newStatement("UPDATE `credentials` SET `log` = :login, `pass` = :password WHERE `id` = :id");        
+        $stmt = self::newStatement("UPDATE `credentials` SET `log` = :login, `pass` = :password, `passkey` = :passkey WHERE `id` = :id");        
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':login', $login);
         $stmt->bindParam(':password', $password);
+        $stmt->bindParam(':passkey', $passkey);
         if ($stmt->execute())
             return TRUE;
         else

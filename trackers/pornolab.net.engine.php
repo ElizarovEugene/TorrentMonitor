@@ -192,18 +192,19 @@ class pornolab
                                 		'referer'        => 'http://pornolab.net/forum/viewtopic.php?t='.$torrent_id,
                                 	)
                                 );
-								$message = $name.' обновлён.';
-								$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str);
-								
-								//обновляем время регистрации торрента в базе
-								Database::setNewDate($id, $date);
-								
+
 								if ($auto_update)
 								{
 								    $name = Sys::getHeader('http://pornolab.net/forum/viewtopic.php?t='.$torrent_id);
 								    //обновляем заголовок торрента в базе
                                     Database::setNewName($id, $name);
 								}
+
+								$message = $name.' обновлён.';
+								$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str);
+								
+								//обновляем время регистрации торрента в базе
+								Database::setNewDate($id, $date);
 							}
 						}
 						else

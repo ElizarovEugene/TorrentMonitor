@@ -28,7 +28,7 @@ class Deluge
         }
 
         #добавляем торрент в torrent-клиента
-        $command = `deluge-console 'connect $torrentAddress $torrentLogin $torrentPassword; add -p "$pathToDownload" $file'`;
+        $command = `deluge-console 'connect $torrentAddress $torrentLogin $torrentPassword; add -p '$pathToDownload' $file'`;
         if ( ! preg_match('/Torrent added!/', $command))
             return FALSE;
         else

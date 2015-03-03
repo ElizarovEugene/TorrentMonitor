@@ -224,6 +224,7 @@ $( document ).ready(function()
             id = $form.find('input[name="id"]').val(),
             l = $form.find('input[name="log"]').val(),
             p = $form.find('input[name="pass"]').val();
+            passkey = $form.find('input[name="passkey"]').val();
 
         if (l == '')
         {
@@ -238,7 +239,7 @@ $( document ).ready(function()
         }	
                                     
         $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-        $.post("action.php",{action: 'update_credentials', id: id, log: l, pass: p},
+        $.post("action.php",{action: 'update_credentials', id: id, log: l, pass: p, passkey: passkey},
             function(data) {
                 $('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
                 $(b).removeAttr('disabled');
@@ -271,6 +272,8 @@ $( document ).ready(function()
             pathToDownload = $form.find('input[name="pathToDownload"]').val();
             deleteDistribution = $form.find('input[name="deleteDistribution"]').prop('checked');
             deleteOldFiles = $form.find('input[name="deleteOldFiles"]').prop('checked');
+            rss = $form.find('input[name="rss"]').prop('checked');
+            debug = $form.find('input[name="debug"]').prop('checked');
         
         if (serverAddress == '')
         {
@@ -292,7 +295,7 @@ $( document ).ready(function()
 
         $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
         $.post("action.php",{action: 'update_settings', serverAddress: serverAddress, send: send, sendUpdate: sendUpdate,
-            sendUpdateEmail: sendUpdateEmail, sendUpdatePushover: sendUpdatePushover, sendWarning: sendWarning, sendWarningEmail: sendWarningEmail, sendWarningPushover: sendWarningPushover, auth: auth, proxy: proxy, proxyAddress: proxyAddress, torrent: torrent, torrentClient: torrentClient, torrentAddress: torrentAddress, torrentLogin: torrentLogin, torrentPassword: torrentPassword, pathToDownload: pathToDownload, deleteDistribution: deleteDistribution, deleteOldFiles: deleteOldFiles},
+            sendUpdateEmail: sendUpdateEmail, sendUpdatePushover: sendUpdatePushover, sendWarning: sendWarning, sendWarningEmail: sendWarningEmail, sendWarningPushover: sendWarningPushover, auth: auth, proxy: proxy, proxyAddress: proxyAddress, torrent: torrent, torrentClient: torrentClient, torrentAddress: torrentAddress, torrentLogin: torrentLogin, torrentPassword: torrentPassword, pathToDownload: pathToDownload, deleteDistribution: deleteDistribution, deleteOldFiles: deleteOldFiles, rss: rss, debug: debug},
             function(data) {
                 $('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
                 $(s).removeAttr('disabled');

@@ -192,11 +192,6 @@ class rutracker
                                 		'referer'        => 'http://rutracker.org/forum/viewtopic.php?t='.$torrent_id,
                                 	)
                                 );
-								$message = $name.' обновлён.';
-								$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str);
-								
-								//обновляем время регистрации торрента в базе
-								Database::setNewDate($id, $date);
 
 								if ($auto_update)
 								{
@@ -204,6 +199,12 @@ class rutracker
 								    //обновляем заголовок торрента в базе
                                     Database::setNewName($id, $name);
 								}
+
+								$message = $name.' обновлён.';
+								$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str);
+								
+								//обновляем время регистрации торрента в базе
+								Database::setNewDate($id, $date);
 							}
 						}
 						else
