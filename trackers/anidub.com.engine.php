@@ -53,6 +53,8 @@ class anidub
 	    {
 			$pieces = explode(', ', $data);
 			$pieces2 = explode('-', $pieces[0]);
+			if (strlen($pieces2[0]) == 1)
+			    $pieces2[0] = '0'.$pieces2[0];
 			$dateTime = $pieces2[2].'-'.$pieces2[1].'-'.$pieces2[0].' '.$pieces[1].':00';
 			
 			return $dateTime;
@@ -197,7 +199,6 @@ class anidub
 							if ($date != $timestamp)
 							{
 							    $download_id = anidub::findLynk($page);
-							    var_dump($download_id);
                                 if ($download_id !== FALSE)
                                 {
     								//сохраняем торрент в файл
