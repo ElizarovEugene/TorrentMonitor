@@ -53,13 +53,15 @@ class Update {
                         if ($zip->open($ROOTPATH.'master.zip') === TRUE)
                         {
                             
-                            if( isset($deleteFolders->folder) && !empty($deleteFolders->folder) )
+                            if (isset($deleteFolders->folder) && ! empty($deleteFolders->folder))
+                            {
                                 foreach($deleteFolders->folder as $folder)
                                 {
                                     Update::delTree($ROOTPATH.$folder);
                                 }
-                            
-                            if( isset($createFolders->create) && !empty($createFolders->create) )
+                            }
+                            if (isset($createFolders->create) && ! empty($createFolders->create))
+                            {
                                 foreach($createFolders->create as $folder)
                                 {
                                     if ( ! mkdir($structure, 0777, true))
@@ -68,12 +70,14 @@ class Update {
                                         break;
                                     }
                                 }
+                            }
                             
                             $zip->extractTo($ROOTPATH.'tmp');
                             $zip->close();
                             unlink($ROOTPATH.'master.zip');
                             
-                            if( isset($files->file) && !empty($files->file) )
+                            if (isset($files->file) && ! empty($files->file))
+                            {
                                 foreach($files->file as $file)
                                 {
                                     if ( ! copy($ROOTPATH.'tmp/TorrentMonitor-master/'.$file, $ROOTPATH.$file))
@@ -84,10 +88,11 @@ class Update {
                                     else
                                         echo 'Файл: '.$file.' обновлён.<br>';
                                 }
+                            }
                                 
                             Update::delTree($ROOTPATH.'tmp');
                             
-                            if( isset($queryes->query) && !empty($queryes->query) )
+                            if (isset($queryes->query) && ! empty($queryes->query))
                             {
                                 $x=0;
                                 foreach($queryes->query as $query)
@@ -98,7 +103,7 @@ class Update {
                                 echo 'Выполнено '.$x.' запросов на обновление.<br>';
                             }
                             
-                            if( isset($queryes_common->query) && !empty($queryes_common->query) )
+                            if( isset($queryes_common->query) && ! empty($queryes_common->query) )
                             {
                                  $y=0;
                                 foreach($queryes_common->query as $query)
