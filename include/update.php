@@ -15,11 +15,11 @@ class Update {
     public static function main()
     {
         $page = Sys::getUrlContent(
-        	array(
-        		'type'           => 'GET',
-        		'returntransfer' => 1,
-        		'url'            => 'http://korphome.ru/torrent_monitor/update.xml',
-        	)
+            array(
+                'type'           => 'GET',
+                'returntransfer' => 1,
+                'url'            => 'http://korphome.ru/torrent_monitor/update.xml',
+            )
         );
         
         $xml_page = @simplexml_load_string($page);
@@ -52,46 +52,63 @@ class Update {
                         $zip = new ZipArchive;
                         if ($zip->open($ROOTPATH.'master.zip') === TRUE)
                         {
-                            foreach($deleteFolders->folder as $folder)
-                	        {
-                    	        Update::delTree($ROOTPATH.$folder);
-                            }
-                            foreach($createFolders->create as $folder)
-                	        {
-                    	        if ( ! mkdir($structure, 0777, true))
-                    	        {
-                        	        echo 'Не удалось создать директорию: '.$file.", обновление прервано.<br>";
-                	                break;
+                            
+                            if( isset($deleteFolders->folder) && !empty($deleteFolders->folder) )
+                                foreach($deleteFolders->folder as $folder)
+                                {
+                                    Update::delTree($ROOTPATH.$folder);
                                 }
-                            }
+                            
+                            if( isset($createFolders->create) && !empty($createFolders->create) )
+                                foreach($createFolders->create as $folder)
+                                {
+                                    if ( ! mkdir($structure, 0777, true))
+                                    {
+                                        echo 'Не удалось создать директорию: '.$file.", обновление прервано.<br>";
+                                        break;
+                                    }
+                                }
+                            
                             $zip->extractTo($ROOTPATH.'tmp');
                             $zip->close();
                             unlink($ROOTPATH.'master.zip');
-                	        foreach($files->file as $file)
-                	        {
-                	            if ( ! copy($ROOTPATH.'tmp/TorrentMonitor-master/'.$file, $ROOTPATH.$file))
-                	            {
-                	                echo 'Не удалось скопировать файл: '.$file.", обновление прервано.<br>";
-                	                break;
+                            
+                            if( isset($files->file) && !empty($files->file) )
+                                foreach($files->file as $file)
+                                {
+                                    if ( ! copy($ROOTPATH.'tmp/TorrentMonitor-master/'.$file, $ROOTPATH.$file))
+                                    {
+                                        echo 'Не удалось скопировать файл: '.$file.", обновление прервано.<br>";
+                                        break;
+                                    }
+                                    else
+                                        echo 'Файл: '.$file.' обновлён.<br>';
                                 }
-                                else
-                                    echo 'Файл: '.$file.' обновлён.<br>';
-                            }
+                                
                             Update::delTree($ROOTPATH.'tmp');
-                            $x=0;
-                            foreach($queryes->query as $query)
-                	        {
-                	            Database::updateQuery($query);
-                	            $x++;
+                            
+                            if( isset($queryes->query) && !empty($queryes->query) )
+                            {
+                                $x=0;
+                                foreach($queryes->query as $query)
+                                {
+                                    Database::updateQuery($query);
+                                    $x++;
+                                }
+                                echo 'Выполнено '.$x.' запросов на обновление.<br>';
                             }
-                            echo 'Выполнено '.$x.' запросов на обновление.<br>';
-                            $y=0;
-                            foreach($queryes_common->query as $query)
-                	        {
-                	            Database::updateQuery($query);
-                	            $y++;
+                            
+                            if( isset($queryes_common->query) && !empty($queryes_common->query) )
+                            {
+                                 $y=0;
+                                foreach($queryes_common->query as $query)
+                                {
+                                    Database::updateQuery($query);
+                                    $y++;
+                                }
+                                echo 'Выполнено '.$y.' запросов на обновление.<br>';                            
                             }
-                            echo 'Выполнено '.$y.' запросов на обновление.<br>';                            
+                            
                         }
                         else
                             echo 'Не могу разархивировать master.zip<br>';
