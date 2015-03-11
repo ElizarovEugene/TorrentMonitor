@@ -196,7 +196,7 @@ class kinozal
                     	array(
                     		'type'           => 'POST',
                     		'returntransfer' => 1,
-                    		'url'            => 'http://kinozal.tv/download.php/'.$torrent_id.'/%5Bkinozal.tv%5Did'.$torrent_id.'.torrent',
+                    		'url'            => 'http://kinozal.tv/download.php?id='.$torrent_id,
                     		'cookie'         => kinozal::$sess_cookie,
                     		'sendHeader'     => array('Host' => 'kinozal.tv', 'Content-length' => strlen(kinozal::$sess_cookie)),
                     		'referer'        => 'http://kinozal.tv/details.php?id='.$torrent_id,
