@@ -11,10 +11,6 @@ if ($rss)
     <channel>
     <title>TorrentMonitor RSS</title>
     <?php
-    $dir = dirname(__FILE__)."/";
-    include_once $dir."config.php";
-    include_once $dir."class/Database.class.php";
-
     $url = $_SERVER["HTTP_HOST"].str_replace('/rss/index.php', '', $_SERVER["SCRIPT_NAME"]);
     ?>
     <link>http://<?php echo $url?>/rss/</link>
