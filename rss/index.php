@@ -11,7 +11,6 @@ if ($rss)
     <channel>
     <title>TorrentMonitor RSS</title>
     <?php
-    $dir = dirname(__FILE__)."/";
     include_once $dir."config.php";
     include_once $dir."class/Database.class.php";
 
