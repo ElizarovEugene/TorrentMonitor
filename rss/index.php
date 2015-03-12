@@ -4,6 +4,7 @@ include_once $dir.'class/Database.class.php';
 $rss = Database::getSetting('rss');
 if ($rss)
 {
+    header('Content-type: text/xml')
     echo '<?xml version="1.0" encoding="utf-8" ?>'; //if short_open_tag :(
 ?>
     <rss version="0.91">
@@ -57,6 +58,7 @@ if ($rss)
     }
     ?>
     </channel>
+    </rss>
 <?php
 }
 else
