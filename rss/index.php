@@ -4,7 +4,7 @@ include_once $dir.'class/Database.class.php';
 $rss = Database::getSetting('rss');
 if ($rss)
 {
-    header('Content-type: text/xml')
+    header('Content-type: text/xml');
     echo '<?xml version="1.0" encoding="utf-8" ?>'; //if short_open_tag :(
 ?>
     <rss version="0.91">
@@ -14,8 +14,8 @@ if ($rss)
     $dir = dirname(__FILE__)."/";
     include_once $dir."config.php";
     include_once $dir."class/Database.class.php";
-    
-    $url = $_SERVER["SERVER_NAME"].preg_replace('index.php', '', $_SERVER["SCRIPT_NAME"]);
+
+    $url = $_SERVER["HTTP_HOST"].str_replace('/rss/index.php', '', $_SERVER["SCRIPT_NAME"]);
     ?>
     <link>http://<?php echo $url?>/rss/</link>
     <lastBuildDate><?php echo date("r");?></lastBuildDate>
