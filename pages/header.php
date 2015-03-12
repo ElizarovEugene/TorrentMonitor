@@ -16,20 +16,5 @@
 
 </head>
 <body onload="FocusOnInput()">
-<?php
-//Проверка обновления
-$dir = __DIR__.'/';
-include_once $dir.'../class/System.class.php';
-$update = Sys::checkUpdate();
-if ($update)
-{
-?>
-<div class="update">
-	Доступна новая версия TorrentMonitor<br>
-	Пожалуйста, обновитесь <a href="#" onclick="show('update');">автоматически</a><br>
-	либо <a href="http://blog.korphome.ru/torrentmonitor/">вручную</a>!
-</div>
-<?php
-}
-?>
+
 <div id="notice"></div>
