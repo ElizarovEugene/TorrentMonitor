@@ -65,7 +65,7 @@ class Sys
 	//версия системы
 	public static function version()
 	{
-		return '1.1.1';
+		return '1.1.2';
 	}
 
 	//проверка обновлений системы
@@ -175,8 +175,8 @@ class Sys
 		$tracker = preg_replace('/www\./', '', $tracker);
 		
 		if ($tracker == 'rutor.org')
-			$tracker = 'new-rutor.org';
-	
+			$url = preg_replace('/rutor.org/', 'alt.rutor.org', $url);
+
 		$forumPage = Sys::getUrlContent(
             array(
                 'type'           => 'GET',
@@ -231,7 +231,7 @@ class Sys
             }
 		}
 
-		if ($tracker != 'new-rutor.org' && $tracker != 'casstudio.tv' && $tracker != 'torrents.net.ua' && $tracker != 'rustorka.com' && $tracker != 'tr.anidub.com')
+		if ($tracker != 'rutor.org' && $tracker != 'casstudio.tv' && $tracker != 'torrents.net.ua' && $tracker != 'rustorka.com' && $tracker != 'tr.anidub.com')
 			$forumPage = iconv('windows-1251', 'utf-8//IGNORE', $forumPage);
 
 		if ($tracker == 'tr.anidub.com')
