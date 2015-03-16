@@ -747,18 +747,14 @@ class Database
     
     public static function updateThreme($id, $name, $path, $threme, $update, $reset)
     {
-        $stmt = self::newStatement("UPDATE `torrent` SET `name` = :name, `path` = :path, `torrent_id` = :torrent_id WHERE `id` = :id");
+        $stmt = self::newStatement("UPDATE `torrent` SET `name` = :name, `path` = :path, `torrent_id` = :torrent_id, `auto_update`=:auto_update WHERE `id` = :id");
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':path', $path);
         $stmt->bindParam(':torrent_id', $threme);
+	    $stmt->bindParam(':auto_update', $update);
         $stmt->bindParam(':id', $id);
         $stmt->execute();
-        
-        if ($update)
-        {
-            $stmt = self::newStatement("UPDATE `torrent` SET `auto_update` = '1' WHERE `id` = :id");
-            $stmt->bindParam(':id', $id);
-        }
+
         if ($reset)
         {
             $stmt = self::newStatement("UPDATE `torrent` SET `timestamp` = '0000-00-00 00:00:00' WHERE `id` = :id");
