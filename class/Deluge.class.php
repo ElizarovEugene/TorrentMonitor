@@ -22,7 +22,7 @@ class Deluge
                 if ($deleteOldFiles)
                     $delOpt = '--remove_data';
             }
-                
+
             #удяляем существующую закачку из torrent-клиента
             $command = `deluge-console 'connect $torrentAddress $torrentLogin $torrentPassword; rm $hash $delOpt'`;
         }
@@ -30,18 +30,22 @@ class Deluge
         #добавляем торрент в torrent-клиента
         $command = `deluge-console 'connect $torrentAddress $torrentLogin $torrentPassword; add -p "$pathToDownload" $file'`;
         if ( ! preg_match('/Torrent added!/', $command))
-            return FALSE;
+        {
+            $return['status'] = FALSE;
+            $return['msg'] = 'add_fail';
+        }
         else
         {
             #получаем хэш раздачи
             $hashNew = `deluge-console 'connect $torrentAddress $torrentLogin $torrentPassword; info --sort-reverse=active_time' | grep ID: | awk '{print $2}' | tail -n -1`;
             #обновляем hash в базе
             Database::updateHash($id, $hashNew);
-        
+
             //сбрасываем варнинг
             Database::clearWarnings('Deluge');
-            return TRUE;
+            $return['status'] = TRUE;
         }
+        return $return;
     }
 }
 ?>
