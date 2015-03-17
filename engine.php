@@ -7,7 +7,7 @@ include_once $dir.'config.php';
 include_once $dir.'class/System.class.php';
 include_once $dir.'class/Database.class.php';
 include_once $dir.'class/Errors.class.php';
-include_once $dir.'class/Notification.class.php';
+include_once $dir.'notifiers/Notifier.class.php';
 
 header('Content-Type: text/html; charset=utf-8');
 
@@ -31,20 +31,20 @@ if (Sys::checkConfig())
 				if (file_exists($engineFile))
 				{
 					Database::clearWarnings('system');
-					
+
 					$functionEngine = include_once $engineFile;
 					$class = explode('.', $tracker);
 					$class = $class[0];
 					$functionClass = str_replace('-', '', $class);
-					
+
 					if ($tracker == 'tracker.0day.kiev.ua')
 					    $functionClass = 'kiev';
-					    
+
                     if ($tracker == 'torrents.net.ua')
 					    $functionClass = 'torrentsnet';
 
 					echo $torrentsList[$i]['name'].' на трекере '.$tracker."\r\n".'<br />';
-					
+
 					if ($tracker == 'novafilm.tv' || $tracker == 'baibako.tv' || $tracker == 'newstudio.tv')
 					{
     				    $time_start = microtime(true);
@@ -68,18 +68,18 @@ if (Sys::checkConfig())
 					$functionEngine = NULL;
 				}
 				else
-					Errors::setWarnings('system', 'missing_files');				
+					Errors::setWarnings('system', 'missing_files');
 			}
 			else
 				Errors::setWarnings('system', 'credential_miss');
 		}
-		
+
         $time_end_overall = microtime(true);
         $time = $time_end_overall - $time_start_overall;
         if ($debug)
             echo 'Общее время опроса трекеров: '.$time."\r\n".'<br />';
-		
-		
+
+
 		$usersList = Database::getUserToWatch();
 		$count = count($usersList);
 	    echo 'Опрос новых раздач пользователей на трекерах:'."\r\n".'<br />';
@@ -119,7 +119,7 @@ if (Sys::checkConfig())
         $time_end_overall = microtime(true);
         $time = $time_end_overall - $time_start_overall;
         if ($debug)
-            echo 'Общее время опроса пользователей на трекерах: '.$time."\r\n".'<br />';		
+            echo 'Общее время опроса пользователей на трекерах: '.$time."\r\n".'<br />';
 		echo '=================='."\r\n".'<br />';
 		echo 'Выполение служебных функций:'."\r\n".'<br />';
 		echo 'Добавляем темы из Temp.'."\r\n".'<br />';
@@ -143,13 +143,13 @@ if (Sys::checkConfig())
             echo 'Время выполнения: '.$time."\r\n".'<br />';
 		echo 'Запись времени последнего запуска ТМ.'."\r\n".'<br />';
 		Sys::lastStart();
-	}	
+	}
 	else
 		Errors::setWarnings('system', 'curl');
 }
 else
 	echo 'Для корректной работы необходимо внести изменения в конфигурационный файл.';
-	
+
 $time_end_full = microtime(true);
 $time = $time_end_full - $time_start_full;
 if ($debug)
