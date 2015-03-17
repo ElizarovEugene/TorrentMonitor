@@ -52,5 +52,18 @@ class Deluge
         }
         return $return;
     }
+
+    public static function checkSettings()
+    {
+        $settings = Database::getAllSetting();
+        foreach ($settings as $row)
+            extract($row);
+
+        $result = `deluge-console 'connect $torrentAddress $torrentLogin $torrentPassword; '`;
+        if ( ! empty($result) )
+            return array('text' => '<p>'.$result.'</p>', 'error' => true);
+        else
+            return array('text' => 'OK', 'error' => false);
+    }
 }
 ?>

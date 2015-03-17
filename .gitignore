@@ -2,7 +2,9 @@
 laststart.txt
 .DC_Store
 config.php
-
+logs/*
+cache/
 .DS_Store
+*.swp
 
 *.torrent

@@ -14,8 +14,8 @@ class Transmission
         	extract($row);
         }
 
-	try
-	{
+    	try
+	    {
     	    $rpc = new TransmissionRPC('http://'.$torrentAddress.'/transmission/rpc', $torrentLogin, $torrentPassword);
     	    #$rpc->debug=true;
     	    $result = $rpc->sstats();
@@ -33,7 +33,7 @@ class Transmission
                 	$delOpt = 'true';
             	    #удяляем существующую закачку из torrent-клиента
             	    if ($deleteDistribution)
-                	$result = $rpc->remove($hash, $delOpt);                    
+                	$result = $rpc->remove($hash, $delOpt);
         	}
         	else
         	{
@@ -46,7 +46,7 @@ class Transmission
             $result = $rpc->add($file, $pathToDownload);
             $command = $result->result;
             $idt = @$result->arguments->torrent_added->id;
-        
+
             if (preg_match('/Couldn\'t connect to server/', $command))
             {
                 $return['status'] = FALSE;
@@ -89,7 +89,7 @@ class Transmission
                 $hashNew = $result->arguments->torrents[0]->hashString;
                 #обновляем hash в базе
                 Database::updateHash($id, $hashNew);
-            
+
                 //сбрасываем варнинг
                 Database::clearWarnings('Transmission');
                 $return['status'] = TRUE;
@@ -117,6 +117,28 @@ class Transmission
     	    }
 
     	return $return;
+    }
+
+    public static function checkSettings()
+    {
+        $settings = Database::getAllSetting();
+        foreach ($settings as $row)
+            extract($row);
+
+    	try
+	    {
+    	    $rpc = new TransmissionRPC('http://'.$torrentAddress.'/transmission/rpc', $torrentLogin, $torrentPassword);
+    	    $result = $rpc->sstats()->result;
+        }
+        catch (Exception $e)
+        {
+            return array('text' => '<p>'.$e->getMessage().'</p>', 'error' => true);
+        }
+
+        if ( $result != "success" )
+            return array('text' => '<p>'.$result.'</p>', 'error' => true);
+        else
+            return array('text' => 'OK', 'error' => false);
     }
 }
 ?>
