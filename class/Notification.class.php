@@ -40,10 +40,10 @@ class Notification
 		mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor: ".$header_message).'?=', $msg, $headers);
 	}
 	
-	public static function sendPushover($sendUpdatePushover, $date, $tracker, $message)
+	public static function sendPushover($sendUpdatePushover, $date, $tracker, $message, $header_message, $priority=0)
 	{
 	    $msg = 'Дата: '.$date."\r\n".'Трекер: '.$tracker."\r\n".'Сообщение: '.$message."\r\n";
-        $postfields = 'token=a9784KuYUoUdT4z47BassBLxWQGqFV&user='.$sendUpdatePushover.'&message='.$msg;
+        $postfields = 'token=a9784KuYUoUdT4z47BassBLxWQGqFV&user='.$sendUpdatePushover.'&message='.$msg.'&title=TorrentMonitor: '.$header_message.'&priority='.$priority;
         $forumPage = Sys::getUrlContent(
         	array(
         		'type'           => 'POST',
@@ -76,7 +76,7 @@ class Notification
                         
                     $sendWarningPushover = Database::getSetting('sendWarningPushover');
                     if ( ! empty($sendWarningPushover))
-                        Notification::sendPushover($sendWarningPushover, $date, $tracker, $message, $header_message);
+                        Notification::sendPushover($sendWarningPushover, $date, $tracker, $message, $header_message, 1);
                 }
             }
 
@@ -91,7 +91,7 @@ class Notification
                         
                     $sendUpdatePushover = Database::getSetting('sendUpdatePushover');
                     if ( ! empty($sendUpdatePushover))
-                        Notification::sendPushover($sendUpdatePushover, $date, $tracker, $message, $header_message);
+                        Notification::sendPushover($sendUpdatePushover, $date, $tracker, $message, $header_message, 0);
                 }
             }
 		}
