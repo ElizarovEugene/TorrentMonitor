@@ -37,7 +37,9 @@ class Notification
     		    $msg .= "http://casstudio.tv/viewtopic.php?t={$name}";
         }
 
-		mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor: ".$header_message).'?=', $msg, $headers);
+		$mail_result = mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor: ".$header_message).'?=', $msg, $headers);
+		if (!$mail_result)
+			Errors::setWarnings('system', 'mail_fail');
 	}
 	
 	public static function sendPushover($sendUpdatePushover, $date, $tracker, $message, $header_message, $priority=0)

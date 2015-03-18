@@ -20,6 +20,7 @@ class Errors
     	Errors::write('duplicate_torrent', 'Не удалось добавить в torrent-клиент, такая закачка уже запущена.');
     	Errors::write('404', 'Не удалось добавить в torrent-клиент, не верная ссылка на torrent-файл.');
     	Errors::write('unauthorized', 'Не удалось добавить в torrent-клиент, не прошла авторизация в torrent-клиенте.');
+    	Errors::write('mail_fail', 'Не удалось отправить уведомление на электронную почту. Настройте MTA!');
 	}
 	
 	public static function getInstance()
