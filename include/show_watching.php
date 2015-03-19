@@ -23,6 +23,8 @@ $dir = dirname(__FILE__)."/../";
 include_once $dir."config.php";
 include_once $dir."class/System.class.php";
 include_once $dir."class/Database.class.php";
+if(!Sys::checkAuth())
+    die(header('Location: '.Database::getSetting('serverAddress')));
 
 $users = Database::getUserToWatch();
 

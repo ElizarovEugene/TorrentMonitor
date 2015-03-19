@@ -373,5 +373,31 @@ class Sys
                 Database::insertNews($page->news[$i]->id, $page->news[$i]->text);
         }
     }
+
+    //проверяем авторизован пользователь или нет (если авторизация включена)
+    public static function checkAuth()
+    {
+        if (session_id() == '')
+            session_start();
+        include_once "Database.class.php";
+        $auth = Database::getSetting('auth');
+
+        if ($auth)
+        {
+            if (empty($_SESSION['TM']))
+                return FALSE;
+
+            if ( ! empty($_SESSION['TM']))
+            {
+                $hash_pass = Database::getSetting('password');
+                if ($_SESSION['TM'] != $hash_pass)
+                    return FALSE;
+                else
+                    return TRUE;
+            }
+        }
+        if ( ! $auth)
+            return TRUE;
+    }
 }
 ?>

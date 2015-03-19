@@ -1,3 +1,13 @@
+<?php
+
+$dir = dirname(__FILE__)."/../";
+include_once $dir."class/System.class.php";
+include_once $dir."class/Database.class.php";
+if(!Sys::checkAuth())
+    die(header('Location: '.Database::getSetting('serverAddress')));
+
+?>
+
 <h2 class="monitoring-title">Добавить тему</h2>
 <form id="torrent_add">
     <p>
@@ -85,9 +95,6 @@
 $(function() {
     var availableTags = [
     <?php
-    $dir = dirname(__FILE__)."/../";
-    include_once $dir."class/Database.class.php";
-    
     $paths = Database::getPaths();
     if ( ! empty($paths))
     {

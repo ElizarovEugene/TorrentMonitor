@@ -1,5 +1,8 @@
 <?php
 include_once('../class/Database.class.php');
+include_once('../class/System.class.php');
+if(!Sys::checkAuth())
+    die(header('Location: '.Database::getSetting('serverAddress')));
 $torrent = Database::getTorrent($_GET['id']);
 
 foreach ($torrent as $row)

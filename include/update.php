@@ -2,6 +2,8 @@
 include_once('../class/System.class.php');
 include_once('../class/Database.class.php');
 include_once('../config.php');
+if(!Sys::checkAuth())
+    die(header('Location: '.Database::getSetting('serverAddress')));
 
 class Update {
     private static function delTree($dir)
