@@ -1,3 +1,13 @@
+<?php
+
+$dir = dirname(__FILE__).'/../';
+include_once $dir."class/Database.class.php";
+include_once $dir."class/System.class.php";
+if(!Sys::checkAuth())
+    die(header('Location: '.Database::getSetting('serverAddress')));
+
+?>
+
 <h2 class="settings-title">Помощь</h2>
 <div>
 TorrentMonitor работает с двумя типами torrent-трекеров и работа с ними несколько отличается друг от друга.<br />
