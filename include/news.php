@@ -1,9 +1,9 @@
 <?php 
 $dir = dirname(__FILE__)."/../";
-include_once $dir."class/Database.class.php";
 include_once $dir."class/System.class.php";
-if(!Sys::checkAuth())
-    die(header('Location: '.Database::getSetting('serverAddress')));
+include_once $dir."class/Database.class.php";
+if ( ! Sys::checkAuth())
+    die(header('Location: ../'));
 ?>
 <h2 class="settings-title">Новости</h2>
 <?php

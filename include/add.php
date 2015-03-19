@@ -1,11 +1,9 @@
 <?php
-
 $dir = dirname(__FILE__)."/../";
 include_once $dir."class/System.class.php";
 include_once $dir."class/Database.class.php";
-if(!Sys::checkAuth())
-    die(header('Location: '.Database::getSetting('serverAddress')));
-
+if ( ! Sys::checkAuth())
+    die(header('Location: ../'));
 ?>
 
 <h2 class="monitoring-title">Добавить тему</h2>
