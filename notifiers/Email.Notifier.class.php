@@ -4,7 +4,7 @@ include_once dirname(__FILE__).'/Notifier.class.php';
 
 class EmailNotifier extends Notifier
 {
-    protected function localSend($address, $date, $tracker, $message, $header_message, $name=0)
+    protected function localSend($address, $type, $date, $tracker, $message, $header_message, $name=0)
     {
         $headers = 'From: TorrentMonitor'."\r\n";
 		$headers .= 'MIME-Version: 1.0'."\r\n";

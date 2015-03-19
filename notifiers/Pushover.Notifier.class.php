@@ -4,10 +4,15 @@ include_once dirname(__FILE__).'/Notifier.class.php';
 
 class PushoverNotifier extends Notifier
 {
-    protected function localSend($address, $date, $tracker, $message, $header_message, $name=0)
+    protected function localSend($address, $type, $date, $tracker, $message, $header_message, $name=0)
     {
+        if ($type == 'notification')
+            $priority = 0;
+        if ($type == 'warning')
+            $priority = 1;
+
         $msg = 'Дата: '.$date."\r\n".'Трекер: '.$tracker."\r\n".'Сообщение: '.$message."\r\n";
-        $postfields = 'token=a9784KuYUoUdT4z47BassBLxWQGqFV&user='.$address.'&message='.$msg.'&title='.$header_message;
+        $postfields = 'token=a9784KuYUoUdT4z47BassBLxWQGqFV&user='.$address.'&message='.$msg.'&title='.$header_message.'&priority='.$priority;
         $forumPage = Sys::getUrlContent(
         	array(
         		'type'           => 'POST',

@@ -18,7 +18,7 @@ abstract class Notifier
 
     // Место для реализации непосредственной отправки для наследников.
     // Возвращает лог выполнения (HTML)
-    protected abstract function localSend($address, $date, $tracker, $message, $header_message, $name=0);
+    protected abstract function localSend($address, $type, $date, $tracker, $message, $header_message, $name=0);
 
     private static function Create($notifierName)
     {
@@ -61,7 +61,7 @@ abstract class Notifier
                 if ($notifier == null)
                     return $result."Class for ".$sendService." not found!<br/>";
 
-                $result .= $notifier->localSend($sendAddress, $date, $tracker, $message, $header_message, $name);
+                $result .= $notifier->localSend($sendAddress, $type, $date, $tracker, $message, $header_message, $name);
                 $notifier = null;
             }
         }

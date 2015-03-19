@@ -4,7 +4,7 @@ include_once dirname(__FILE__).'/Notifier.class.php';
 
 class PushbulletNotifier extends Notifier
 {
-    protected function localSend($address, $date, $tracker, $message, $header_message, $name=0)
+    protected function localSend($address, $type, $date, $tracker, $message, $header_message, $name=0)
     {
         $msg = 'Дата: '.$date."\r\n".'Трекер: '.$tracker."\r\n".'Сообщение: '.$message."\r\n";
         $postData = array('type' => 'note',
