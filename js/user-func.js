@@ -77,6 +77,7 @@ $( document ).ready(function()
     //Передаём сериал для мониторинга
     $("#serial_add").submit(function()
     {
+        formError = "";
         var $form = $(this),
             s = $form.find('input[type=submit]'),
             t = $form.find('select[name="tracker"]').val(),
@@ -97,23 +98,26 @@ $( document ).ready(function()
             }
         }
 
-        if (!qualitySelected)
-        {
-            alert("Вы не выбрали качество!");
-            return false;
-        }
-
         if (t == '')
         {
-            alert("Вы не выбрали трекер!");
-            return false;
+            formError += "Вы не выбрали трекер!\n";
         }
         
         if (n == '')
         {
-            alert("Вы не указали название сериала!");
+            formError += "Вы не указали название сериала!\n";
+        }
+
+        if (!qualitySelected)
+        {
+            formError += "Вы не выбрали качество!";
+        }
+
+        if (formError != "")
+        {
+            alert(formError);
             return false;
-        }     
+        }
 
         $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
         $.post("action.php",{action: 'serial_add', tracker: t, name: n, hd: h, path: p},
@@ -129,6 +133,7 @@ $( document ).ready(function()
     //Передаём данные для обновления
     $("#torrent_update").submit(function()
     {
+        formError = "";
         var $form = $(this),
             s = $form.find('input[type=submit]'),
             i_f = $form.find('input[name="id"]'),
@@ -156,15 +161,19 @@ $( document ).ready(function()
             
         if (u == '')
         {
-            alert("Вы не указали ссылку на тему!");
-            return false;
+            formError += "Вы не указали ссылку на тему!\n";
         }
         
         if (n == '')
         {
-            alert("Вы не указали название сериала!");
+            formError += "Вы не указали название сериала!";
+        }
+
+        if (formError != "")
+        {
+            alert(formError);
             return false;
-        }                          
+        }
 
         $('#notice_sub').empty().append('Обрабатывается запрос...').fadeIn();
         $.post("action.php",{action: 'update', id: id, tracker: t, name: n, url: u, update: update, path: p, hd: h, reset: r_f},
@@ -179,6 +188,7 @@ $( document ).ready(function()
     //Передаём пользователя для мониторинга
     $("#user_add").submit(function()
     {
+        formError = "";
         var $form = $(this),
             s = $form.find('input[type=submit]'),
             t = $form.find('select[name="tracker"]').val(),
@@ -187,15 +197,19 @@ $( document ).ready(function()
 
         if (t == '')
         {
-            alert("Вы не выбрали трекер!");
-            return false;
+            formError += "Вы не выбрали трекер!\n";
         }
         
         if (n == '')
         {
-            alert("Вы не указали имя пользователя!");
+            formError += "Вы не указали имя пользователя!";
+        }
+
+        if (formError != "")
+        {
+            alert(formError);
             return false;
-        }    
+        }
         
         $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
         $.post("action.php",{action: 'user_add', tracker: t, name: n},
@@ -227,6 +241,7 @@ $( document ).ready(function()
     //Передаём личные данные
     $("#credential").submit(function()
     {
+        formError = "";
         var $form = $(this),
             b = $form.find('input[type=button]'),
             id = $form.find('input[name="id"]').val(),
@@ -236,15 +251,19 @@ $( document ).ready(function()
 
         if (l == '')
         {
-            alert("Вы не указали логин!");
-            return false;
+            formError += "Вы не указали логин!\n";
         }
         
         if (p == '')
         {
-            alert("Вы не указали пароль!");
+            formError += "Вы не указали пароль!";
+        }
+
+        if (formError != "")
+        {
+            alert(formError);
             return false;
-        }	
+        }
                                     
         $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
         $.post("action.php",{action: 'update_credentials', id: id, log: l, pass: p, passkey: passkey},
@@ -259,6 +278,7 @@ $( document ).ready(function()
     //Передаём настройки
     $("#setting").submit(function()
     {
+        formError = "";
         var $form = $(this),
             s = $form.find('input[type=submit]'),
             serverAddress = $form.find('input[name="serverAddress"]').val();
@@ -285,19 +305,22 @@ $( document ).ready(function()
         
         if (serverAddress == '')
         {
-            alert('Вы не указали адрес сервера TM.');
-            return false;
+            formError += "Вы не указали адрес сервера TM.\n";
         }
         
         if (proxy == 'checked' && proxyAddress == '')
         {
-            alert('Вы не указали адрес proxy-сервера.');
-            return false;
+            formError += "Вы не указали адрес proxy-сервера.\n";
         }
         
         if (torrent == 'checked' && torrentClient == ''  && torrentAddress == '' && pathToDownload == '')
         {
-            alert('Вы не указали настройки торрент-клиента.');
+            formError += "Вы не указали настройки торрент-клиента.";
+        }
+
+        if (formError != "")
+        {
+            alert(formError);
             return false;
         }
 
@@ -315,6 +338,7 @@ $( document ).ready(function()
     //Передаём пароль
     $("#change_pass").submit(function()
     {
+        formError = "";
         var $form = $(this),
             s = $form.find('input[type=submit]'),
             p = $form.find('input[name="password"]').val(),
@@ -322,13 +346,17 @@ $( document ).ready(function()
             
         if (p == '')
         {
-            alert('Пароль не может быть пустым.');
-            return false;
+            formError += "Пароль не может быть пустым.\n";
         }
         
         if (p != p2) 
         {
-            alert('Пароль и подтверждение должны совпадать.');
+            formError += "Пароль и подтверждение должны совпадать.";
+        }
+
+        if (formError != "")
+        {
+            alert(formError);
             return false;
         }
         
