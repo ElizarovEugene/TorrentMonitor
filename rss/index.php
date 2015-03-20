@@ -57,9 +57,6 @@ if ($rss) {
     // выполняем сортировку массива в порядке убывания значения
     arsort($torrentsList);
     
-    // обрезаем массив до заданной длины
-    $torrentsList = array_splice($torrentsList, $maxCount+1);
-    
     ////////////////////////////////////
     // Заполняем тело документа
     
@@ -83,6 +80,9 @@ if ($rss) {
         // формируем элемент 'link'
         $link = $item->appendChild($xml->createElement('link'));
         $link->appendChild($xml->createTextNode($url.'/torrents/'.$fileName));
+        
+        if ($count > $maxCount)
+            break;
     } 
     
     // выводим содержимое XML документа
