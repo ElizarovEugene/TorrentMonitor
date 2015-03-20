@@ -1,8 +1,9 @@
 <?php
 
-include_once dirname(__FILE__)."/../notifiers/Notifier.class.php";
-include_once dirname(__FILE__)."/../class/System.class.php";
-include_once dirname(__FILE__)."/../class/Database.class.php";
+$dir = dirname(__FILE__)."/../";
+include_once $dir."notifiers/Notifier.class.php";
+include_once $dir."class/System.class.php";
+include_once $dir."class/Database.class.php";
 $dir = dirname(__FILE__)."/";
 
 if ( ! Sys::checkAuth())

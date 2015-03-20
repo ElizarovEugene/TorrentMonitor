@@ -56,7 +56,7 @@ foreach ($settings as $row)
                     </select>
                 </label>
                 <br />
-                <label class="label-name">Адресс для уведомлений:</label>
+                <label class="label-name">Адрес для уведомлений:</label>
                 <input type="text" name="sendUpdateAddress" value="<?php echo $sendUpdateAddress ?>">
             </p>
         </div>
@@ -91,7 +91,7 @@ foreach ($settings as $row)
                     </select>
                 </label>
                 <br />
-                <label class="label-name">Адресс для уведомлений:</label>
+                <label class="label-name">Адрес для уведомлений:</label>
                 <input type="text" name="sendWarningAddress" value="<?php echo $sendWarningAddress ?>">
             </p>
         </div>

@@ -55,7 +55,7 @@ abstract class Notifier
                 (($type == 'notification') and $sendUpdate))
             {
                 if ( empty($sendService) || empty($sendAddress) )
-                    return $result."Для уведомлений типа '".$type."' не задан сенвис либо адрес для отправки.<br/>";
+                    return $result."Для уведомлений типа '".$type."' не задан сервис либо адрес для отправки.<br/>";
 
                 $notifier = Notifier::Create($sendService);
                 if ($notifier == null)

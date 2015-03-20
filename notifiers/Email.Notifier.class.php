@@ -1,6 +1,7 @@
 <?php
 
 include_once dirname(__FILE__).'/Notifier.class.php';
+include_once dirname(__FILE__).'/../class/Errors.class.php';
 
 class EmailNotifier extends Notifier
 {
@@ -26,7 +27,7 @@ class EmailNotifier extends Notifier
 
 		$mail_result = mail($address, '=?UTF-8?B?'.base64_encode("TorrentMonitor: ".$header_message).'?=', $msg, $headers);
         if (!$mail_result)
-            Errors::setWarnings('system', 'mail_fail');
+            Errors::setWarnings('notifier', 'mail_fail');
         return 'Отправили уведомление на email &lt;'.$address.'&gt;<br />';
     }
 }

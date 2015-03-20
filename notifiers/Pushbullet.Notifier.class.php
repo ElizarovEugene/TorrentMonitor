@@ -1,6 +1,7 @@
 <?php
 
 include_once dirname(__FILE__).'/Notifier.class.php';
+include_once dirname(__FILE__).'/../class/Errors.class.php';
 
 class PushbulletNotifier extends Notifier
 {
@@ -18,6 +19,11 @@ class PushbulletNotifier extends Notifier
                                                                  'Content-Type: application/json'),
                                      CURLOPT_POSTFIELDS => json_encode($postData) ));
         $response = curl_exec($ch);
+        if (!preg_match('/\"created\"/', $response))
+            Errors::setWarnings('notifier', 'pushbullet_fail');
+
+        curl_close($ch);
+
         return 'Отправили уведомление в сервис Pushbullet на адрес "'.$address.'"<br />';
     }
 }
