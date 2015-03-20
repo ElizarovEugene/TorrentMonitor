@@ -20,9 +20,7 @@ class Errors
     	Errors::write('duplicate_torrent', 'Не удалось добавить в torrent-клиент, такая закачка уже запущена.');
     	Errors::write('404', 'Не удалось добавить в torrent-клиент, не верная ссылка на torrent-файл.');
     	Errors::write('unauthorized', 'Не удалось добавить в torrent-клиент, не прошла авторизация в torrent-клиенте.');
-        Errors::write('mail_fail', 'Не удалось отправить уведомление на электронную почту. Настройте MTA!');
-        Errors::write('pushover_fail', 'Не удалось отправить уведомление в сервис Pushover. Проверьте корректность адреса!');
-        Errors::write('pushbullet_fail', 'Не удалось отправить уведомление в сервис Pushbullet. Проверьте корректность адреса!');
+        Errors::write('notif_fail', 'Не удалось отправить уведомление!');
 	}
 
 	public static function getInstance()

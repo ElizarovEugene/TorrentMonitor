@@ -23,11 +23,8 @@ class PushoverNotifier extends Notifier
                 'postfields'     => $postfields,
             )
         );
-        if (!preg_match('/\"status\":1/', $response))
-            Errors::setWarnings('notifier', 'pushover_fail');
-
         curl_close($ch);
-        return 'Отправили уведомление в сервис Pushover на адрес "'.$address.'"<br />';
+        return preg_match('/\"status\":1/', $response);
     }
 }
 

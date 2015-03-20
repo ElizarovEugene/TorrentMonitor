@@ -61,7 +61,17 @@ abstract class Notifier
                 if ($notifier == null)
                     return $result."Class for ".$sendService." not found!<br/>";
 
-                $result .= $notifier->localSend($sendAddress, $type, $date, $tracker, $message, $header_message, $name);
+                $success = $notifier->localSend($sendAddress, $type, $date, $tracker, $message, $header_message, $name);
+                if ($success)
+                {
+                    $result .= 'Отправили уведомление на '.$sendService.' &lt;'.$sendAddress.'&gt;<br/>';
+                    Database::clearWarnings($sendService)
+                }
+                else
+                {
+                    $result .= 'Ошибка при отправке уведомления на '.$sendService.' &lt;'.$sendAddress.'&gt;<br/>';
+                    Errors::setWarnings($sendService, 'notif_fail');
+                }
                 $notifier = null;
             }
         }

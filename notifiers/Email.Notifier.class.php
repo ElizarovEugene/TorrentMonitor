@@ -26,9 +26,7 @@ class EmailNotifier extends Notifier
         }
 
 		$mail_result = mail($address, '=?UTF-8?B?'.base64_encode("TorrentMonitor: ".$header_message).'?=', $msg, $headers);
-        if (!$mail_result)
-            Errors::setWarnings('notifier', 'mail_fail');
-        return 'Отправили уведомление на email &lt;'.$address.'&gt;<br />';
+        return !empty($mail_result);
     }
 }
 
