@@ -87,12 +87,20 @@ $( document ).ready(function()
             p = $(p_f).val();
 
         h = $(h_f).val();
+        qualitySelected = false;
         for (var i = 0; i < h_f.length; i++)
         {
             if (h_f[i].checked)
             {
-                var $form = $(this), h = h_f[i].value
+                var $form = $(this), h = h_f[i].value;
+                qualitySelected = true;
             }
+        }
+
+        if (!qualitySelected)
+        {
+            alert("Вы не выбрали качество!");
+            return false;
         }
 
         if (t == '')
