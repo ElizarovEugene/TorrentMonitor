@@ -1,4 +1,10 @@
 <?php
+
+$classInfo = ['class_name'   => 'baibako',
+              'tracker_type' => 'episodes',];
+
+return $classInfo;
+
 class baibako
 {
     protected static $sess_cookie;

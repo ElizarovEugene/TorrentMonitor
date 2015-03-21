@@ -1,4 +1,10 @@
 <?php
+
+$classInfo = ['class_name'   => 'novafilm',
+              'tracker_type' => 'episodes',];
+
+return $classInfo;
+
 class novafilm
 {
 	protected static $sess_cookie;

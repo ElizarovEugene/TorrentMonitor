@@ -1,5 +1,10 @@
 <?php
 
+$classInfo = ['class_name'   => 'animelayer',
+              'tracker_type' => 'torrents',];
+
+return $classInfo;
+
 class animelayer
 {
 	protected static $sess_cookie;

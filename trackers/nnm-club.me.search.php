@@ -1,6 +1,10 @@
 <?php
 include_once('nnm-club.me.engine.php');
 
+$classInfo = ['class_name'   => 'nnmclubSearch',];
+
+return $classInfo;
+
 class nnmclubSearch extends nnmclub
 {
 	//ищем темы пользователя

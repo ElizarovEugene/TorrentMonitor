@@ -1,4 +1,10 @@
 <?php
+
+$classInfo = ['class_name'   => 'rutor',
+              'tracker_type' => 'torrents',];
+
+return $classInfo;
+
 class rutor
 {
 	protected static $exucution;

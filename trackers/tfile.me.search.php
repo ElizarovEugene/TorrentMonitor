@@ -1,6 +1,10 @@
 <?php
 include_once('tfile.me.engine.php');
 
+$classInfo = ['class_name' => 'tfileSearch',];
+
+return $classInfo;
+
 class tfileSearch extends tfile
 {
 	//ищем темы пользователя	

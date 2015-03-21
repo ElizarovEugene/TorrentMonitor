@@ -1,4 +1,10 @@
 <?php
+
+$classInfo = ['class_name'   => 'casstudio',
+              'tracker_type' => 'torrents',];
+
+return $classInfo;
+
 class casstudio
 {
 	protected static $sess_cookie;

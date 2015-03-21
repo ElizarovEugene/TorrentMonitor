@@ -1,4 +1,10 @@
 <?php
+
+$classInfo = ['class_name'   => 'kinozal',
+              'tracker_type' => 'torrents',];
+
+return $classInfo;
+
 class kinozal
 {
 	protected static $sess_cookie;

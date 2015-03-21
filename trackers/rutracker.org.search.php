@@ -1,6 +1,10 @@
 <?php
 include_once('rutracker.org.engine.php');
 
+$classInfo = ['class_name'   => 'rutrackerSearch',];
+
+return $classInfo;
+
 class rutrackerSearch extends rutracker
 {
 	//ищем темы пользователя

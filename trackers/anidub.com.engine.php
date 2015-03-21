@@ -1,4 +1,10 @@
 <?php
+
+$classInfo = ['class_name'   => 'anidub',
+              'tracker_type' => 'torrents',];
+
+return $classInfo;
+
 class anidub
 {
 	protected static $sess_cookie;

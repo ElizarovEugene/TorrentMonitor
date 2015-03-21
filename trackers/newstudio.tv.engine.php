@@ -1,4 +1,10 @@
 <?php
+
+$classInfo = ['class_name'   => 'newstudio',
+              'tracker_type' => 'episodes',];
+
+return $classInfo;
+
 class newstudio
 {
 	protected static $sess_cookie;

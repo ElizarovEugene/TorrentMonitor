@@ -1,4 +1,10 @@
 <?php
+
+$classInfo = ['class_name'   => 'tfile',
+              'tracker_type' => 'torrents',];
+
+return $classInfo;
+
 class tfile
 {
 	protected static $exucution;

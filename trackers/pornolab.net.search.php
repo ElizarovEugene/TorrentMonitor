@@ -1,6 +1,10 @@
 <?php
 include_once('pornolab.net.engine.php');
 
+$classInfo = ['class_name'   => 'pornolabSearch',];
+
+return $classInfo;
+
 class pornolabSearch extends pornolab
 {
 	//ищем темы пользователя

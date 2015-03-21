@@ -1,4 +1,10 @@
 <?php
+
+$classInfo = ['class_name'   => 'pornolab',
+              'tracker_type' => 'torrents',];
+
+return $classInfo;
+
 class pornolab
 {
 	protected static $sess_cookie;

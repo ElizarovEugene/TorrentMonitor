@@ -1,4 +1,10 @@
 <?php
+
+$classInfo = ['class_name'   => 'rutracker',
+              'tracker_type' => 'torrents',];
+
+return $classInfo;
+
 class rutracker
 {
 	protected static $sess_cookie;
