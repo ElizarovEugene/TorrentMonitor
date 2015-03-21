@@ -1,6 +1,6 @@
 <?php
 
-include_once dirname(__FILE__).'/Notifier.class.php';
+include_once dirname(__FILE__).'/../class/Notifier.class.php';
 include_once dirname(__FILE__).'/../class/Errors.class.php';
 
 class PushbulletNotifier extends Notifier

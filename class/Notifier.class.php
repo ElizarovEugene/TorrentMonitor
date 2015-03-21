@@ -1,8 +1,8 @@
 <?php
 
 $dr = dirname(__FILE__);
-include_once $dr.'/../class/Database.class.php';
-foreach (glob($dr."/*.Notifier.class.php") as $file)
+include_once $dr.'/Database.class.php';
+foreach (glob($dr."/../notifiers/*.Notifier.class.php") as $file)
          include_once $file;
 
 abstract class Notifier

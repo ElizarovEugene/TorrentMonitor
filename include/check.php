@@ -1,7 +1,7 @@
 <?php
 
 $dir = dirname(__FILE__)."/../";
-include_once $dir."notifiers/Notifier.class.php";
+include_once $dir."class/Notifier.class.php";
 include_once $dir."class/System.class.php";
 include_once $dir."class/Database.class.php";
 $dir = dirname(__FILE__)."/";

@@ -4,7 +4,7 @@ include_once $dir.'config.php';
 include_once $dir.'class/System.class.php';
 include_once $dir.'class/Database.class.php';
 include_once $dir.'class/Errors.class.php';
-include_once $dir.'notifiers/Notifier.class.php';
+include_once $dir.'class/Notifier.class.php';
 
 if (isset($_POST['action']))
 {
