@@ -35,18 +35,10 @@ foreach ($settings as $row)
                 <label>
                     <select id="sendUpdateService" name="sendUpdateService">
                         <?php
-                        $files = array_map("htmlspecialchars", scandir("../notifiers/"));
-                        foreach ($files as $file)
+                        foreach (glob("../notifiers/*.Notifier.class.php") as $file)
                         {
-                            // Берём из папки все файлы вида *.Notifier.class.php
-                            // и добавляем их имя в качестве выбираемых значений
-                            if (($file == '.') || ($file == '..') ||
-                                ($file == 'Notifier.class.php') ||
-                                ((substr($file, -19) != '.Notifier.class.php')))
-                                continue;
-
                             // Отнимаем от имени файла константу .Notifier.class.php
-                            $notifier = substr($file, 0, -19);
+                            $notifier = substr(basename($file), 0, -19);
                             $selected = '';
                             if ($sendUpdateService == $notifier)
                                 $selected = 'selected';
@@ -70,18 +62,10 @@ foreach ($settings as $row)
                 <label>
                     <select id="sendWarningService" name="sendWarningService">
                         <?php
-                        $files = array_map("htmlspecialchars", scandir("../notifiers/"));
-                        foreach ($files as $file)
+                        foreach (glob("../notifiers/*.Notifier.class.php") as $file)
                         {
-                            // Берём из папки все файлы вида *.Notifier.class.php
-                            // и добавляем их имя в качестве выбираемых значений
-                            if (($file == '.') || ($file == '..') ||
-                                ($file == 'Notifier.class.php') ||
-                                ((substr($file, -19) != '.Notifier.class.php')))
-                                continue;
-
                             // Отнимаем от имени файла константу .Notifier.class.php
-                            $notifier = substr($file, 0, -19);
+                            $notifier = substr(basename($file), 0, -19);
                             $selected = '';
                             if ($sendWarningService == $notifier)
                                 $selected = 'selected';

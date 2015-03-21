@@ -1,16 +1,9 @@
 <?php
 
-include_once dirname(__FILE__).'/../class/Database.class.php';
-$files = array_map("htmlspecialchars", scandir(dirname(__FILE__)."/"));
-foreach ($files as $file)
-{
-    if (($file == '.') || ($file == '..') ||
-        ($file == 'Notifier.class.php') ||
-        (substr($file, -19) != '.Notifier.class.php'))
-        continue;
-
-    include_once $file;
-}
+$dr = dirname(__FILE__);
+include_once $dr.'/../class/Database.class.php';
+foreach (glob($dr."/*.Notifier.class.php") as $file)
+         include_once $file;
 
 abstract class Notifier
 {
@@ -65,7 +58,7 @@ abstract class Notifier
                 if ($success)
                 {
                     $result .= 'Отправили уведомление на '.$sendService.' &lt;'.$sendAddress.'&gt;<br/>';
-                    Database::clearWarnings($sendService)
+                    Database::clearWarnings($sendService);
                 }
                 else
                 {
