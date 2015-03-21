@@ -3,7 +3,7 @@ class Errors
 {
     static $errorsArray;
     private static $instance;
-    
+
     private function __construct()
     {
     	Errors::write('curl', 'Для работы системы необходимо включить <a href=\"http://php.net/manual/en/book.curl.php\">расширение cURL</a>.');
@@ -20,8 +20,9 @@ class Errors
     	Errors::write('duplicate_torrent', 'Не удалось добавить в torrent-клиент, такая закачка уже запущена.');
     	Errors::write('404', 'Не удалось добавить в torrent-клиент, не верная ссылка на torrent-файл.');
     	Errors::write('unauthorized', 'Не удалось добавить в torrent-клиент, не прошла авторизация в torrent-клиенте.');
+        Errors::write('notif_fail', 'Не удалось отправить уведомление!');
 	}
-	
+
 	public static function getInstance()
     {
         if ( ! isset(self::$instance))
@@ -31,7 +32,7 @@ class Errors
         }
         return self::$instance;
     }
-	
+
     public static function read($name)
     {
         return self::$errorsArray[$name];
@@ -41,19 +42,19 @@ class Errors
     {
         self::$errorsArray[$name] = $value;
     }
-    
+
     public static function getWarning($warning)
     {
 	 	return Errors::getInstance()->read($warning);
     }
-    
+
 	public static function setWarnings($tracker, $warning)
     {
         $date = date('Y-m-d H:i:s');
     	Database::setWarnings($date, $tracker, $warning);
     	$countErrors = Database::getWarningsCount($tracker);
     	if ($countErrors[0]['count'] == 1)
-			Notification::sendNotification('warning', $date, $tracker, Errors::getWarning($warning), 0);
+			Notifier::send('warning', $date, $tracker, Errors::getWarning($warning), 0);
     }
 }
 ?>

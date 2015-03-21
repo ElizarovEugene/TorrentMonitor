@@ -30,26 +30,54 @@ foreach ($settings as $row)
             <label><input type="checkbox" name="sendUpdate" <?php if ($sendUpdate) echo "checked" ?> onclick="expand('sendUpdate')"> Отправлять уведомления об обновлениях</label>
         </p>
         <div id="sendUpdate" <?php if ( ! $sendUpdate) echo 'class="result"' ?>>
-            <label class="label-name">E-mail</label>
-            <input type="text" name="sendUpdateEmail" value="<?php echo $sendUpdateEmail ?>">
-            <span class="subinput-text">Например: vasya@test.ru</span>
-            <br />
-            <label class="label-name">Pushover (<a href="https://pushover.net" target="_blank">?</a>)</label>
-            <input type="text" name="sendUpdatePushover" value="<?php echo $sendUpdatePushover ?>">
-            <span class="subinput-text">Например: uyrxppPbPgetdh7neWr4NZ8rYuyTXD</span>
+            <p>
+                <label class="label-name">Служба уведомлений:</label>
+                <label>
+                    <select id="sendUpdateService" name="sendUpdateService">
+                        <?php
+                        foreach (glob("../notifiers/*.Notifier.class.php") as $file)
+                        {
+                            // Отнимаем от имени файла константу .Notifier.class.php
+                            $notifier = substr(basename($file), 0, -19);
+                            $selected = '';
+                            if ($sendUpdateService == $notifier)
+                                $selected = 'selected';
+
+                            echo "<option value=\"".$notifier."\" ".$selected.">".$notifier."</option>";
+                        } ?>
+                    </select>
+                </label>
+                <br />
+                <label class="label-name">Адрес для уведомлений:</label>
+                <input type="text" name="sendUpdateAddress" value="<?php echo $sendUpdateAddress ?>">
+            </p>
         </div>
         <p>
             <label class="label-name"></label>
             <label><input type="checkbox" name="sendWarning" <?php if ($sendWarning) echo "checked" ?> onclick="expand('sendWarning')"> Отправлять уведомления об ошибках</label>
         </p>
         <div id="sendWarning" <?php if ( ! $sendWarning) echo 'class="result"' ?>>
-            <label class="label-name">E-mail</label>
-            <input type="text" name="sendWarningEmail" value="<?php echo $sendWarningEmail ?>">
-            <span class="subinput-text">Например: vasya@test.ru</span>
-            <br />
-            <label class="label-name">Pushover (<a href="https://pushover.net" target="_blank">?</a>)</label>
-            <input type="text" name="sendWarningPushover" value="<?php echo $sendWarningPushover ?>">
-            <span class="subinput-text">Например: uyrxppPbPgetdh7neWr4NZ8rYuyTXD</span>
+            <p>
+                <label class="label-name">Служба уведомлений:</label>
+                <label>
+                    <select id="sendWarningService" name="sendWarningService">
+                        <?php
+                        foreach (glob("../notifiers/*.Notifier.class.php") as $file)
+                        {
+                            // Отнимаем от имени файла константу .Notifier.class.php
+                            $notifier = substr(basename($file), 0, -19);
+                            $selected = '';
+                            if ($sendWarningService == $notifier)
+                                $selected = 'selected';
+
+                            echo "<option value=\"".$notifier."\" ".$selected.">".$notifier."</option>";
+                        } ?>
+                    </select>
+                </label>
+                <br />
+                <label class="label-name">Адрес для уведомлений:</label>
+                <input type="text" name="sendWarningAddress" value="<?php echo $sendWarningAddress ?>">
+            </p>
         </div>
     </div>
     <p>
