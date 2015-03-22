@@ -165,6 +165,7 @@ if (isset($_POST['action']))
         }
         else if ($trackerType == 'threme')
         {
+            $url = parse_url($_POST['url']);
             $tracker = Trackers::getTrackerName( preg_replace('/www\./', '', $url['host']) );
             $threme  = Trackers::getThreme($tracker, $_POST['url']);
             

@@ -303,7 +303,7 @@ class casstudiotv
     public static function getThreme($url) {
         $url = parse_url($url);
         $query = explode('=', $url['query']);
-        return $query[2];
+        return (isset($query[2])) ? $query[2] : $query[1];
     }
 }
 ?>
