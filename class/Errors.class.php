@@ -19,7 +19,11 @@ class Errors
     	Errors::write('save_file_fail', 'Не удалось сохранить torrent-файл в директорию.');
     	Errors::write('duplicate_torrent', 'Не удалось добавить в torrent-клиент, такая закачка уже запущена.');
     	Errors::write('404', 'Не удалось добавить в torrent-клиент, не верная ссылка на torrent-файл.');
+    	Errors::write('log_passwd', 'Не удалось подключиться к torrent-клиенту, неправильный логин или пароль.');
+    	Errors::write('connect_fail', 'Не удалось подключиться к torrent-клиенту. Клиент  недоступен по указанному адресу.');
+    	Errors::write('no_response', 'Не удалось добавить torrent-файл в torrent-клиент. Клиент не может получить доступ к файлу по указанному адресу. Проверьте адрес TorrentMonitor\'а в настройках.');    	
     	Errors::write('unauthorized', 'Не удалось добавить в torrent-клиент, не прошла авторизация в torrent-клиенте.');
+    	Errors::write('unknown', 'Неизвестная ошибка при добавлении torrent-файла в torrent-клиент. Требуется дополнительная диагностика.');    	
 	}
 	
 	public static function getInstance()

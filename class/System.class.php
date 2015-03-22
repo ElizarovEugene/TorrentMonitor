@@ -292,7 +292,7 @@ class Sys
         }
 	}
 	
-	//созраняем torrent файл
+	//сохраняем torrent файл
 	public static function saveTorrent($tracker, $name, $torrent, $id, $hash, $message, $date_str)
 	{
 	    $name = str_replace("'", '', $name);
