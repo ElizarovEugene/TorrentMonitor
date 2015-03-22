@@ -246,7 +246,7 @@ $( document ).ready(function()
             b = $form.find('input[type=button]'),
             id = $form.find('input[name="id"]').val(),
             l = $form.find('input[name="log"]').val(),
-            p = $form.find('input[name="pass"]').val();
+            p = $form.find('input[name="pass"]').val(),
             passkey = $form.find('input[name="passkey"]').val();
 
         if (l == '')
