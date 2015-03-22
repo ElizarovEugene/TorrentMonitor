@@ -14,8 +14,15 @@ class Transmission
         	extract($row);
         }
 
-        $rpc = new TransmissionRPC('http://'.$torrentAddress.'/transmission/rpc', $torrentLogin, $torrentPassword);
-        #$rpc->debug=true;
+        try
+        {
+            $rpc = new TransmissionRPC('http://' . $torrentAddress . '/transmission/rpc', $torrentLogin, $torrentPassword);
+            #$rpc->debug=true;
+        } catch (Exception $e)
+        {
+            Errors::setWarnings('system', 'unauthorized');
+            die();
+        }
         $result = $rpc->sstats();
 
         $individualPath = Database::getTorrentDownloadPath($id);
