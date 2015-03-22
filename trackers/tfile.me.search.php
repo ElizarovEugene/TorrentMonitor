@@ -1,15 +1,13 @@
 <?php
 include_once('tfile.me.engine.php');
 
-$classInfo = ['class_name' => 'tfileSearch',];
-
-return $classInfo;
-
-class tfileSearch extends tfile
+class tfilemeSearch extends tfileme
 {
 	//ищем темы пользователя	
-	public static function mainSearch($user_id, $tracker, $user)
+	public static function mainSearch($userInfo)
 	{
+		extract($userInfo);
+		
 		$user = str_replace(' ', '+', iconv('utf-8', 'windows-1251', $user));
         //получаем страницу для парсинга
     	$page = Sys::getUrlContent(
@@ -96,13 +94,13 @@ class tfileSearch extends tfile
 				else
 				{
 					//устанавливаем варнинг
-					if (tfile::$warning == NULL)
+					if (tfileme::$warning == NULL)
 					{
-						tfile::$warning = TRUE;
+						tfileme::$warning = TRUE;
 						Errors::setWarnings($tracker, 'not_available');
 					}
 					//останавливаем процесс выполнения, т.к. не может работать без кук
-					tfile::$exucution = FALSE;
+					tfileme::$exucution = FALSE;
 				}
             }
         }

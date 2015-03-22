@@ -2,6 +2,8 @@
 $dir = dirname(__FILE__)."/../";
 include_once $dir."class/System.class.php";
 include_once $dir."class/Database.class.php";
+include_once $dir."class/Trackers.class.php";
+
 if ( ! Sys::checkAuth())
     die(header('Location: ../'));
 ?>
@@ -37,9 +39,14 @@ if ( ! Sys::checkAuth())
         <label class="label-name">Трекер</label>
         <select id="tracker" name="tracker">
             <option></option>
-            <option value="baibako.tv">baibako.tv</option>
-            <option value="newstudio.tv">newstudio.tv</option>
-            <option value="novafilm.tv">novafilm.tv</option>
+            <?php
+            $trackers = Trackers::getTrackersByType('series');
+            foreach($trackers as $trackerData){
+	    	?>        		
+	    		<option value='<?php echo $trackerData['tracker'] ?>'><?php echo $trackerData['tracker'] ?></option>
+	    	<?php        		
+            }
+            ?>
         </select>
     </p>
     <p>
@@ -74,10 +81,14 @@ if ( ! Sys::checkAuth())
         <label class="label-name">Трекер</label>
         <select name="tracker">
             <option></option>
-            <option>nnm-club.me</option>
-            <option>pornolab.net</option>
-            <option>rutracker.org</option>
-            <option>tfile.me</option>
+            <?php
+            $trackers = Trackers::getTrackersByType('search');
+            foreach($trackers as $trackerData){
+	    	?>        		
+	    		<option value='<?php echo $trackerData['tracker'] ?>'><?php echo $trackerData['tracker'] ?></option>
+	    	<?php        		
+            }
+            ?>
         </select>
     </p>
     <p>
