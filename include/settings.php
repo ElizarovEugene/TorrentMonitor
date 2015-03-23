@@ -104,12 +104,12 @@ foreach ($settings as $row)
         <p>
             <label class="label-name"></label>
             <label><input type="checkbox" name="deleteDistribution" <?php if ($deleteDistribution) echo "checked" ?>> Удалять раздачи</label>
-            <span class="subinput-text">Только для novafilm.tv, baibako.tv и newstudio.tv</span>
+            <span class="subinput-text">Только для lostfilm.tv, novafilm.tv, baibako.tv и newstudio.tv</span>
         </p>
         <p>
             <label class="label-name"></label>
             <label><input type="checkbox" name="deleteOldFiles" <?php if ($deleteOldFiles) echo "checked" ?>> Удалять файлы старых раздач</label>
-            <span class="subinput-text">Только для novafilm.tv, baibako.tv и newstudio.tv</span>
+            <span class="subinput-text">Только для lostfilm.tv, novafilm.tv, baibako.tv и newstudio.tv</span>
         </p>
     </div>
     <p>

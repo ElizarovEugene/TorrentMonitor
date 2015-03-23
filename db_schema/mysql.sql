@@ -46,6 +46,7 @@ INSERT INTO `credentials` (`id`, `tracker`, `log`, `pass`, `cookie`, `passkey`)
 VALUES
 	(1,'rutracker.org','','','', ''),
 	(2,'nnm-club.me','','','', ''),
+	(3,'lostfilm.tv','','','', ''),
 	(4,'novafilm.tv','','','', ''),
 	(5,'rutor.org',' ',' ', '', ''),
 	(6,'tfile.me',' ',' ', '', ''),
