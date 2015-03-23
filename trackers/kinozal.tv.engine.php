@@ -85,6 +85,7 @@ class kinozal
 	    }
 	    elseif (strstr($data, 'сейчас'))
 	    {
+    	    $pieces = explode(' ', $data);
 	        $timestamp = strtotime('now');
 	        $day = date('d', $timestamp);
 			$month = Sys::dateNumToString(date('m', $timestamp));
@@ -189,7 +190,7 @@ class kinozal
 				$date = kinozal::dateStringToNum($array[1]);
 				$date_str = kinozal::dateNumToString($array[1]);
 				//если даты не совпадают, перекачиваем торрент
-				if ($date != $timestamp)
+				if ($date > $timestamp)
 				{
 					//сохраняем торрент в файл
                     $torrent = Sys::getUrlContent(
