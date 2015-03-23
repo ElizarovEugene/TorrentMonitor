@@ -149,7 +149,7 @@ if (isset($_POST['action']))
         
         if ($trackerType == 'series')
         {
-            if (Trackers::checkRule($_POST['name']))    
+            if (Trackers::checkRule($tracker ,$_POST['name']))    
             {
                 Database::updateSerial($_POST['id'], $_POST['name'], $_POST['path'], $_POST['hd'], $reset);
                 ?>
