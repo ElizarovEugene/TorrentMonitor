@@ -274,11 +274,7 @@ class Sys
         $torrentClient = Database::getSetting('torrentClient');
         $dir = dirname(__FILE__).'/';
         include_once $dir.$torrentClient.'.class.php';
-        $server = Database::getSetting('serverAddress');
-        $url = $server.$path;
-        $dir = str_replace('class/', '', $dir);
-        $url = str_replace($dir, '', $url);
-        $status = call_user_func($torrentClient.'::addNew', $id, $url, $hash, $tracker);
+        $status = call_user_func($torrentClient.'::addNew', $id, $path, $hash, $tracker);
         if ($status['status'])
         {
             Database::deleteFromTemp($id);
