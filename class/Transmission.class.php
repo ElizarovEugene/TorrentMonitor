@@ -7,6 +7,9 @@ class Transmission
     #добавляем новую закачку в torrent-клиент, обновляем hash в базе
     public static function addNew($id, $file, $hash, $tracker)
     {
+        $server = Database::getSetting('serverAddress');
+        $url = $server.str_replace(str_replace('class/', '', $dir), '', $file);
+
         #получаем настройки из базы
         $settings = Database::getAllSetting();
         foreach ($settings as $row)
@@ -43,7 +46,7 @@ class Transmission
     	    }
 
             #добавляем торрент в torrent-клиент
-            $result = $rpc->add($file, $pathToDownload);
+            $result = $rpc->add($url, $pathToDownload);
             $command = $result->result;
             $idt = @$result->arguments->torrent_added->id;
         
