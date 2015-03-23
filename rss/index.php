@@ -33,11 +33,7 @@ if ($rss) {
     // формируем элемент 'link'
     $link = $channel->appendChild($xml->createElement('link'));
     $link->appendChild($xml->createTextNode($url.'/rss/'));
-    
-    // формируем элемент 'lastBuildDate'
-    $lastBuildDate = $channel->appendChild($xml->createElement('lastBuildDate'));
-    $lastBuildDate->appendChild($xml->createTextNode(date("r")));
-    
+
     // формируем элемент 'language'
     $language = $channel->appendChild($xml->createElement('language'));
     $language->appendChild($xml->createTextNode('ru'));
@@ -47,7 +43,7 @@ if ($rss) {
     
     // формируем ассоциативный массив, где ключем выступает имя файла, а значением время изменения
     $torrentsList = array();
-    foreach (glob("$dir/torrents/*.torrent") as $torrentFile) {
+    foreach (glob($dir.'torrents/*.torrent') as $torrentFile) {
         $fileName = basename($torrentFile);
         $timestam = filemtime($torrentFile);
         
@@ -56,6 +52,14 @@ if ($rss) {
     
     // выполняем сортировку массива в порядке убывания значения
     arsort($torrentsList);
+    
+    // формируем элемент 'lastBuildDate'
+    if (count($torrentsList)) {
+        $first = reset($torrentsList);
+        
+        $lastBuildDate = $channel->appendChild($xml->createElement('lastBuildDate'));
+        $lastBuildDate->appendChild($xml->createTextNode(date("r", $first)));
+    }
     
     ////////////////////////////////////
     // Заполняем тело документа
