@@ -17,14 +17,19 @@ class Deluge
         if ( ! empty($hash))
         {
             $delOpt = '';
-            if ($tracker == 'lostfilm.tv' || $tracker == 'novafilm.tv')
+            if ($tracker == 'lostfilm.tv' || $tracker == 'novafilm.tv' ||  $tracker == 'baibako.tv' || $tracker == 'newstudio.tv')
             {
                 if ($deleteOldFiles)
                     $delOpt = '--remove_data';
+                #удяляем существующую закачку из torrent-клиента
+                if ($deleteDistribution)
+                   $command = `deluge-console 'connect $torrentAddress $torrentLogin $torrentPassword; rm $hash $delOpt'`;
             }
-
-            #удяляем существующую закачку из torrent-клиента
-            $command = `deluge-console 'connect $torrentAddress $torrentLogin $torrentPassword; rm $hash $delOpt'`;
+            else
+            {
+                #удяляем существующую закачку из torrent-клиента
+                $command = `deluge-console 'connect $torrentAddress $torrentLogin $torrentPassword; rm $hash $delOpt'`;
+            }
         }
 
         #добавляем торрент в torrent-клиента
