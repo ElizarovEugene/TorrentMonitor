@@ -25,14 +25,14 @@ if (Sys::checkInternet())
 	?>
 		<tr>
 			<td>Конфигурационный файл существует и заполнен.</td>
-		<tr>
+		</tr>
 		<?php
 		if (Sys::checkCurl())
 		{
 		?>
 		<tr>
 			<td>Расширение cURL установлено.</td>
-		<tr>
+		</tr>
 			<?php
 			$torrentPath = str_replace('class/../', '', $dir).'torrents/';
 			if (Sys::checkWriteToPath($torrentPath))
@@ -40,7 +40,7 @@ if (Sys::checkInternet())
 			?>
 		<tr>
 			<td>Запись в директорию для torrent-файлов <?php echo $torrentPath?> разрешена.</td>
-		<tr>
+		</tr>
 			<?php
 			}
 			else
@@ -48,7 +48,7 @@ if (Sys::checkInternet())
 			?>
 		<tr>
 			<td class="test-error">Запись в директорию для torrent-файлов <?php echo $torrentPath?> запрещена.</td>
-		<tr>			
+		</tr>			
 			<?php	
 			}
 			$dir = str_replace('include', '', dirname(__FILE__));
@@ -57,7 +57,7 @@ if (Sys::checkInternet())
 			?>
 		<tr>
 			<td>Запись в системную директорию <?php echo $dir?> разрешена.</td>
-		<tr>
+		</tr>
 			<?php	
 			}
 			else
@@ -65,7 +65,7 @@ if (Sys::checkInternet())
 			?>
 		<tr>
 			<td class="test-error">Запись в системную директорию <?php echo $dir?> запрещена.</td>
-		<tr>
+		</tr>
 			<?php	
 			}
 			
@@ -77,7 +77,7 @@ if (Sys::checkInternet())
 				?>
 		<tr>
 			<td>Основной файл для работы с трекером <?php echo $tracker?> найден.</td>
-		<tr>
+		</tr>
 				<?php	
 				}
 				else
@@ -85,7 +85,7 @@ if (Sys::checkInternet())
 				?>
 		<tr>
 			<td class="test-error">Основной файл для работы с трекером <?php echo $tracker?> не найден.</td>
-		<tr>
+		</tr>
 				<?php	
 				}
 				if ($tracker == 'nnm-club.me' || $tracker == 'pornolab.net' || $tracker == 'rutracker.org' || $tracker == 'tapochek.net' || $tracker == 'tfile.me')
@@ -95,7 +95,7 @@ if (Sys::checkInternet())
 					?>
 		<tr>
 			<td>Дополнительный файл для работы с трекером <?php echo $tracker?> найден.</td>
-		<tr>
+		</tr>
 					<?php	
 					}
 					else
@@ -103,7 +103,7 @@ if (Sys::checkInternet())
 					?>
 		<tr>
 			<td class="test-error">Дополнительный файл для работы с трекером <?php echo $tracker?> не найден.</td>
-		<tr>
+		</tr>
 					<?php	
 					}
 				}
@@ -113,7 +113,7 @@ if (Sys::checkInternet())
 				?>
 		<tr>
 			<td>Учётные данные для работы с трекером <?php echo $tracker?> найдены.</td>
-		<tr>
+		</tr>
 				<?php	
 				}
 				else
@@ -121,7 +121,7 @@ if (Sys::checkInternet())
 				?>
 		<tr>
 			<td class="test-error">Учётные данные для работы с трекером <?php echo $tracker?> не найдены.</td>
-		<tr>
+		</tr>
 				<?php	
 				}
 				if ($tracker == 'lostfilm.tv')
@@ -135,7 +135,7 @@ if (Sys::checkInternet())
 				?>
 		<tr>
 			<td>Трекер <?php echo $tracker?> доступен.</td>
-		<tr>
+		</tr>
 				<?php	
 				}
 				else
@@ -143,7 +143,7 @@ if (Sys::checkInternet())
 				?>
 		<tr>
 			<td class="test-error">Трекер <?php echo $tracker?> не доступен.</td>
-		<tr>
+		</tr>
 				<?php	
 				}
 			}
@@ -153,7 +153,7 @@ if (Sys::checkInternet())
 		?>
 		<tr>
 			<td class="test-error">Для работы системы необходимо включить <a href="http://php.net/manual/en/book.curl.php">расширение cURL</a>.</td>
-		<tr>
+		</tr>
 		<?php	
 		}
 	}
@@ -162,7 +162,7 @@ if (Sys::checkInternet())
 	?>
 		<tr>
 			<td class="test-error">Для корректной работы необходимо внести изменения в конфигурационный файл.</td>
-		<tr>
+		</tr>
 	<?php 
 	}	
 }
