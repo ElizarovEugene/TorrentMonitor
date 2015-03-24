@@ -295,6 +295,8 @@ if (isset($_POST['action']))
     //Обновляем личные данные
     if ($_POST['action'] == 'update_credentials')
     {
+        if ( ! isset($_POST['passkey']))
+            $_POST['passkey'] = '';
         Database::setCredentials($_POST['id'], $_POST['log'], $_POST['pass'], $_POST['passkey']);
         ?>
         Данные для трекера обновлены!

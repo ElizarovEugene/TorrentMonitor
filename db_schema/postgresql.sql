@@ -36,6 +36,7 @@ CREATE TABLE "credentials" (
 
 INSERT INTO credentials VALUES (1, 'rutracker.org', '', '', '', '');
 INSERT INTO credentials VALUES (2, 'nnm-club.me', '', '', '', '');
+INSERT INTO credentials VALUES (3, 'lostfilm.tv', '', '', '', '');
 INSERT INTO credentials VALUES (4, 'novafilm.tv', '', '', '', '');
 INSERT INTO credentials VALUES (5, 'rutor.org', ' ', ' ', '', '');
 INSERT INTO credentials VALUES (6, 'tfile.me', ' ', ' ', '', '');

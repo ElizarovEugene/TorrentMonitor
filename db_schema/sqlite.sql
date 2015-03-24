@@ -21,6 +21,7 @@ CREATE TABLE `credentials` (
 
 INSERT INTO "credentials" VALUES (1, 'rutracker.org', '', '', '', '');
 INSERT INTO "credentials" VALUES (2, 'nnm-club.me', '', '', '', '');
+INSERT INTO "credentials" VALUES (3, 'lostfilm.tv', '', '', '', '');
 INSERT INTO "credentials" VALUES (4, 'novafilm.tv', '', '', '', '');
 INSERT INTO "credentials" VALUES (5, 'rutor.org', ' ', ' ', '', '');
 INSERT INTO "credentials" VALUES (6, 'tfile.me', ' ', ' ', '', '');
@@ -72,7 +73,7 @@ INSERT INTO "settings" VALUES (30, 'rss', '1');
 CREATE TABLE `temp` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   `path` varchar(100) NOT NULL DEFAULT '',
-  `hash` varchar(40) NOT NULL DEFAULT '' UNIQUE,
+  `hash` varchar(40) NOT NULL DEFAULT '',
   `tracker` varchar(30) NOT NULL DEFAULT '',
   `message` varchar(60) NOT NULL DEFAULT '',
   `date` varchar(120) NOT NULL DEFAULT ''
