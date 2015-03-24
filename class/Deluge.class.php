@@ -24,15 +24,6 @@ class Deluge
             #удяляем существующую закачку из torrent-клиента
                 if ($deleteDistribution)
             $command = `deluge-console 'connect $torrentAddress $torrentLogin $torrentPassword; rm $hash $delOpt'`;
-                #удяляем существующую закачку из torrent-клиента
-                if ($deleteDistribution)
-                   $command = `deluge-console 'connect $torrentAddress $torrentLogin $torrentPassword; rm $hash $delOpt'`;
-            }
-            else
-            {
-                #удяляем существующую закачку из torrent-клиента
-                $command = `deluge-console 'connect $torrentAddress $torrentLogin $torrentPassword; rm $hash $delOpt'`;
-            }
         }
             else
             {
