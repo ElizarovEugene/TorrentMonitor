@@ -85,7 +85,7 @@ class kinozaltv
         }
         elseif (strstr($data, 'сейчас'))
         {
-    	    $pieces = explode(' ', $data);
+            $pieces = explode(' ', $data);
             $timestamp = strtotime('now');
             $day = date('d', $timestamp);
             $month = Sys::dateNumToString(date('m', $timestamp));
@@ -173,6 +173,50 @@ class kinozaltv
             }
             //останавливаем процесс выполнения, т.к. не может работать без кук
             kinozaltv::$exucution = FALSE;
+                $time = $pieces[2].':00';
+            $dateTime = $date.' '.$time;
+
+            return $dateTime;
+        }
+        elseif (preg_match('/\d{1,2} \D* \d{4} в \d{2}:\d{2}/', $data))
+        {
+            $pieces = explode(' ', $data);
+            $month = Sys::dateStringToNum(substr($pieces[1], 0, 6));
+            if (strlen($pieces[0]) == 1)
+                $pieces[0] = '0'.$pieces[0];
+            $date = $pieces[2].'-'.$month.'-'.$pieces[0];
+            $time = $pieces[4].':00';
+            $dateTime = $date.' '.$time;
+
+            return $dateTime;
+        }
+    }
+
+    //функция преобразования даты
+    private static function dateNumToString($data)
+    {
+        if (strstr($data, 'сегодня') || strstr($data, 'вчера'))
+        {
+            $pieces = explode(' ', $data);
+            if ($pieces[0] == 'вчера')
+                $timestamp = strtotime('-1 day');
+            else         
+                $timestamp = strtotime('now');
+            $day = date('d', $timestamp);
+            $month = Sys::dateNumToString(date('m', $timestamp));
+            $year = date('Y', $timestamp);
+            $dateTime = $day.' '.$month.' '.$year.' в '.$pieces[2];
+            return $dateTime;
+        }
+        elseif (strstr($data, 'сейчас'))
+        {
+            $pieces = explode(' ', $data);
+            $timestamp = strtotime('now');
+            $day = date('d', $timestamp);
+            $month = Sys::dateNumToString(date('m', $timestamp));
+            $year = date('Y', $timestamp);
+            $dateTime = $day.' '.$month.' '.$year.' в '.$pieces[2];
+            return $dateTime;
         }
     }
     
@@ -189,6 +233,21 @@ class kinozaltv
                 //приводим дату к общему виду
                 $date = kinozaltv::dateStringToNum($array[1]);
                 $date_str = kinozaltv::dateNumToString($array[1]);
+                //если даты не совпадают, перекачиваем торрент
+                if ($date > $timestamp)
+                {
+                    //сохраняем торрент в файл
+        //проверяем удалось ли получить дату со страницы
+        if (isset($array[1]))
+        {
+            //если дата не равна ничему
+            if ( ! empty($array[1]))
+            {
+                //сбрасываем варнинг
+                Database::clearWarnings($tracker);
+                //приводим дату к общему виду
+                $date = kinozal::dateStringToNum($array[1]);
+                $date_str = kinozal::dateNumToString($array[1]);
                 //если даты не совпадают, перекачиваем торрент
                 if ($date > $timestamp)
                 {
