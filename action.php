@@ -310,6 +310,62 @@ if (isset($_POST['action']))
         Database::updateSettings('serverAddress', Sys::checkPath($_POST['serverAddress']));
         if ($_POST['send'] == 'true')
             $send = 1;
+    }   
+    
+    //Перемещаем тему из буфера в мониторинг постоянный
+    if ($_POST['action'] == 'transfer_from_buffer')
+    {
+        Database::transferFromBuffer($_POST['id']);
+        ?>
+        Переношу...
+        <?php
+        return TRUE;
+    }
+    
+    //Помечаем тему для скачивания
+    if ($_POST['action'] == 'threme_add')
+    {
+        $update = Database::updateThremesToDownload($_POST['id']);
+        if ($update)
+        {
+            $return['error'] = FALSE;
+        }
+        else
+        {       
+            $return['error'] = TRUE;
+            $return['msg'] = 'Пометить тему для закачки.';
+        }
+        echo json_encode($return);
+    }
+    
+    //Удаляем мониторинг
+    if ($_POST['action'] == 'del')
+    {
+        Database::deletItem($_POST['id']);
+        ?>
+        Удаляю...
+        <?php
+        return TRUE;
+    }
+    
+    //Обновляем личные данные
+    if ($_POST['action'] == 'update_credentials')
+    {
+        if ( ! isset($_POST['passkey']))
+            $_POST['passkey'] = '';
+        Database::setCredentials($_POST['id'], $_POST['log'], $_POST['pass'], $_POST['passkey']);
+        ?>
+        Данные для трекера обновлены!
+        <?php
+        return TRUE;
+    }
+    
+    //Обновляем настройки
+    if ($_POST['action'] == 'update_settings')
+    {
+        Database::updateSettings('serverAddress', Sys::checkPath($_POST['serverAddress']));
+        if ($_POST['send'] == 'true')
+            $send = 1;
         else
             $send = 0;
         Database::updateSettings('send', $send);
