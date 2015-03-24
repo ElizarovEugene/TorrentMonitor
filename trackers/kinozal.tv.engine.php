@@ -85,12 +85,12 @@ class kinozal
 	    }
 	    elseif (strstr($data, 'сейчас'))
 	    {
-    	    $pieces = explode(' ', $data);
 	        $timestamp = strtotime('now');
 	        $day = date('d', $timestamp);
 			$month = Sys::dateNumToString(date('m', $timestamp));
 			$year = date('Y', $timestamp);
-	        $dateTime = $day.' '.$month.' '.$year.' в '.$pieces[2];
+			$time = date('G:i').':00';
+	        $dateTime = $day.' '.$month.' '.$year.' в '.$time;
 	        return $dateTime;
         }
 	   	else
