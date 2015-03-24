@@ -39,7 +39,6 @@ if ( ! Sys::checkAuth())
         <label class="label-name">Трекер</label>
         <select id="tracker" name="tracker" onchange="changeField()">
             <option></option>
-<<<<<<< HEAD
             <?php
             $trackers = Trackers::getTrackersByType('series');
             foreach($trackers as $trackerData){
@@ -48,12 +47,6 @@ if ( ! Sys::checkAuth())
 	    	<?php        		
             }
             ?>
-=======
-            <option value="baibako.tv">baibako.tv</option>
-            <option value="lostfilm.tv">lostfilm.tv</option>
-            <option value="newstudio.tv">newstudio.tv</option>
-            <option value="novafilm.tv">novafilm.tv</option>
->>>>>>> 6dfcb297291ceb35cae6859556aa546a339e7753
         </select>
     </p>
     <p>
@@ -63,11 +56,7 @@ if ( ! Sys::checkAuth())
     </p>
     <p>
         <label class="label-name"></label>
-<<<<<<< HEAD
        <span id="changedField"></span>
-=======
-        <span id="changedField"></span>
->>>>>>> 6dfcb297291ceb35cae6859556aa546a339e7753
     </p>
     <div onclick='expand("divDop2")' class='cutLink' style='cursor: pointer;'>Дополнительные параметры</div>
     <div id='divDop2' class='result'>

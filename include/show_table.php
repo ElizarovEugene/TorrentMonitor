@@ -60,11 +60,7 @@ if ( ! empty($torrents_list))
                 if ($hd == 1 && $tracker == 'lostfilm.tv')
                 	echo '<img src="img/720.png">&nbsp;<img src="img/1080.png">';
                 elseif ($hd == 1 && $tracker == 'baibako.tv' || $hd == 1 && $tracker == 'newstudio.tv' || $hd == 1 && $tracker == 'novafilm.tv')
-<<<<<<< HEAD
                     echo '<img src="img/720.png">';
-=======
-                	echo '<img src="img/720.png">';
->>>>>>> 6dfcb297291ceb35cae6859556aa546a339e7753
                 elseif ($hd == 2 && $tracker == 'lostfilm.tv')
                 	echo '<img src="img/720.png">';
                 elseif ($hd == 2 && $tracker == 'baibako.tv' || $hd == 2 && $tracker == 'newstudio.tv' || $hd == 2 && $tracker == 'novafilm.tv')

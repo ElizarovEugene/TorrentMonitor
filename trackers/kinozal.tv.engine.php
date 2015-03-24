@@ -175,7 +175,7 @@ class kinozaltv
             kinozaltv::$exucution = FALSE;
                 $time = $pieces[2].':00';
             $dateTime = $date.' '.$time;
-
+            
             return $dateTime;
         }
         elseif (preg_match('/\d{1,2} \D* \d{4} в \d{2}:\d{2}/', $data))
@@ -187,11 +187,11 @@ class kinozaltv
             $date = $pieces[2].'-'.$month.'-'.$pieces[0];
             $time = $pieces[4].':00';
             $dateTime = $date.' '.$time;
-
+            
             return $dateTime;
         }
     }
-
+    
     //функция преобразования даты
     private static function dateNumToString($data)
     {
@@ -246,8 +246,8 @@ class kinozaltv
                 //сбрасываем варнинг
                 Database::clearWarnings($tracker);
                 //приводим дату к общему виду
-                $date = kinozal::dateStringToNum($array[1]);
-                $date_str = kinozal::dateNumToString($array[1]);
+                $date = kinozaltv::dateStringToNum($array[1]);
+                $date_str = kinozaltv::dateNumToString($array[1]);
                 //если даты не совпадают, перекачиваем торрент
                 if ($date > $timestamp)
                 {
