@@ -315,7 +315,8 @@ body {
                         .add { background: url(../img/add.png) 2px 2px no-repeat; }
     
     .update {
-        float: right;
+        float: center;
+        text-align: center;
         padding: 5px 10px;
         background: #89b1b9 url(../img/bg.png) 0 0 repeat;
         color: #FFF;
