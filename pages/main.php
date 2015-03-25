@@ -13,9 +13,7 @@ if ($update)
 {
 ?>
 <div class="update">
-	Доступна новая версия TorrentMonitor<br>
-	Пожалуйста, обновитесь <a href="#" onclick="show('update');">автоматически</a><br>
-	либо <a href="http://blog.korphome.ru/torrentmonitor/">вручную</a>!
+	Доступна новая версия TorrentMonitor. Пожалуйста, обновитесь <a href="#" onclick="show('update');">автоматически</a> либо <a href="http://blog.korphome.ru/torrentmonitor/">вручную</a>!
 </div>
 <?php
 }
