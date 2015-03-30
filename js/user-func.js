@@ -375,23 +375,13 @@ $( document ).ready(function()
     //Вызов процедуры обновления
     $("#system_update").submit(function()
     {
-        $('#changelog').empty().append('<img src="img/ajax-loader.gif" class="loader">');
+        $('#system_update').empty().append('<img src="img/ajax-loader.gif" class="loader">');
         
-        $.ajax({
-            type: "POST",
-            url: "action.php",
-            async: false,
-            cache: false,
-            data: {action: 'system_update'},
-            dataType: "html",
-            success: function(data) {
-                $('#changelog').html(data);
-            },
-            error: function(data) {
-                $('#changelog').html(data);
+        $.post("action.php",{action: 'system_update'},
+            function(data) {
+                $('#system_update').empty().html(data);
             }
-        });
-
+        );
     });
 
 });
