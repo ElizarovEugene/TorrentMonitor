@@ -1,22 +1,21 @@
 <?php 
-$dir = dirname(__FILE__)."/../";
-include_once $dir."class/System.class.php";
-include_once $dir."class/Database.class.php";
+define('ROOT_DIR', str_replace('include', '', dirname(__FILE__)) );
+
+include_once ROOT_DIR."class/System.class.php";
+
 if ( ! Sys::checkAuth())
     die(header('Location: ../'));
+
+include_once ROOT_DIR."class/Database.class.php";
+include_once ROOT_DIR."class/rain.tpl.class.php";
+
+// заполнение шаблона
+raintpl::configure("root_dir", ROOT_DIR );
+raintpl::configure("tpl_dir" , Sys::getTemplateDir() );
+
+$tpl = new RainTPL;
+$tpl->assign( "title", 'Новости' );
+$tpl->assign( "news", Database::getNews() );
+
+$tpl->draw( 'news' );
 ?>
-<h2 class="settings-title">Новости</h2>
-<?php
-$news = Database::getNews();
-if ( ! empty($news))
-{
-    for ($i=0; $i<count($news); $i++)
-    {
-?>
-<div class="<?php if ($news[$i]['new']) echo 'new' ?>" id="<?php echo $news[$i]['id']?>" onmouseover="newsRead(<?php echo $news[$i]['id']?>)">
-<?php echo $news[$i]['text']?><br /></div>
-<?php
-    }
-}
-?>
-<br /><br />

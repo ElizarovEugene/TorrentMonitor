@@ -6,6 +6,7 @@ include_once $dir.'class/Database.class.php';
 include_once $dir.'class/Errors.class.php';
 include_once $dir.'class/Notification.class.php';
 include_once $dir.'class/Trackers.class.php';
+include_once $dir.'class/Update.class.php';
 
 if (isset($_POST['action']))
 {
@@ -413,6 +414,14 @@ if (isset($_POST['action']))
         Database::markNews($_POST['id']);
         return TRUE;
     }
+    
+    //Выполняем обновление системы
+    if ($_POST['action'] == 'system_update')
+    {
+        Update::runUpdate();
+        return TRUE;
+    }
+    
 }
 
 if (isset($_GET['action']))
@@ -424,10 +433,10 @@ if (isset($_GET['action']))
         if ($_GET['order'] == 'date')
             setcookie('order', 'date', time()+3600*24*365);
         elseif ($_GET['order'] == 'dateDesc')
-            setcookie('order', 'dateDesc', time()+3600*24*365);         
+            setcookie('order', 'dateDesc', time()+3600*24*365);
         elseif ($_GET['order'] == 'name')
             setcookie('order', '', time()+3600*24*365);
         header('Location: index.php');
-    }   
+    }
 }
 ?>
