@@ -84,7 +84,6 @@ if ( ! empty($count))
 
 // заполнение шаблона
 raintpl::configure("root_dir", ROOT_DIR );
-raintpl::configure("base_url", Sys::getBaseURL(__FILE__, ROOT_DIR) );
 raintpl::configure("tpl_dir" , Sys::getTemplateDir() );
 
 $tpl = new RainTPL;
