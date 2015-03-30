@@ -8,7 +8,7 @@ include_once ROOT_DIR."class/System.class.php";
 include_once ROOT_DIR."class/Database.class.php";
 include_once ROOT_DIR."class/rain.tpl.class.php";
 
-// ���������� �������
+// заполнение шаблона
 raintpl::configure("root_dir", ROOT_DIR );
 raintpl::configure("tpl_dir" , Sys::getTemplateDir() );
 
@@ -35,6 +35,7 @@ else
 }
 
 $tpl = new RainTPL;
+$tpl->assign( "title"  , 'Мониторинг torrent трекеров' );
 $tpl->assign( "content", $content );
 $tpl->draw( "index" );
 
