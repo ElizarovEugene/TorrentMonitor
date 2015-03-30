@@ -371,6 +371,18 @@ $( document ).ready(function()
         );
         return false;
     });
+    
+    //Вызов процедуры обновления
+    $("#system_update").submit(function()
+    {
+        $('#system_update').empty().append('<img src="img/ajax-loader.gif" class="loader">');
+        
+        $.post("action.php",{action: 'system_update'},
+            function(data) {
+                $('#system_update').empty().html(data);
+            }
+        );
+    });
 
 });
 

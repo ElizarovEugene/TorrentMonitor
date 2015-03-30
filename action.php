@@ -5,6 +5,7 @@ include_once $dir.'class/System.class.php';
 include_once $dir.'class/Database.class.php';
 include_once $dir.'class/Errors.class.php';
 include_once $dir.'class/Notification.class.php';
+include_once $dir.'class/Update.class.php';
 
 if (isset($_POST['action']))
 {
@@ -487,7 +488,15 @@ if (isset($_POST['action']))
 	{
 		Database::markNews($_POST['id']);
 		return TRUE;
-	}		
+	}
+	
+	//Выполняем обновление системы
+	if ($_POST['action'] == 'system_update')
+	{
+		Update::runUpdate();
+		return TRUE;
+	}
+
 }
 
 if (isset($_GET['action']))
