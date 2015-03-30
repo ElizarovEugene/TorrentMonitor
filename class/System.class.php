@@ -231,7 +231,7 @@ class Sys
             }
 		}
 
-		if ($tracker != 'rutor.org' && $tracker != 'casstudio.tv' && $tracker != 'torrents.net.ua' && $tracker != 'rustorka.com' && $tracker != 'tr.anidub.com')
+		if ($tracker != 'rutor.org' && $tracker != 'alt.rutor.org' && $tracker != 'casstudio.tv' && $tracker != 'torrents.net.ua' && $tracker != 'rustorka.com' && $tracker != 'tr.anidub.com')
 			$forumPage = iconv('windows-1251', 'utf-8//IGNORE', $forumPage);
 
 		if ($tracker == 'tr.anidub.com')
@@ -250,8 +250,6 @@ class Sys
 				$name = substr($array[1], 0, -20);
 			elseif ($tracker == 'rutracker.org')
 				$name = substr($array[1], 0, -34);
-			elseif ($tracker == 'new-rutor.org')
-				$name = substr($array[1], 17);
             elseif ($tracker == 'tracker.0day.kiev.ua')
 				$name = substr($array[1], 6, -67);
             elseif ($tracker == 'torrents.net.ua')
