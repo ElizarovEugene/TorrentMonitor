@@ -82,10 +82,11 @@ if (Sys::checkInternet())
                 }
 
                 if ($tracker == 'lostfilm.tv')
-                    $pre = 'www.';
+                    $page = 'https://www.lostfilm.tv/';
+                elseif ($tracker == 'rutracker.org')
+                    $page = 'http://rutracker.org/forum/index.php';
                 else
-                    $pre = '';
-                $page = 'http://'.$pre.$tracker;
+                    $page = 'http://'.$tracker;
 
                 if (Sys::checkavAilability($page))
                 {
