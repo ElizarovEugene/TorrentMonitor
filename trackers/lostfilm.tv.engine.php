@@ -10,26 +10,15 @@ class lostfilm
 	protected static $xml_page;
 	
 	//получаем куки для доступа к сайту
-	private static function login($type, $login, $password)
+	private static function login($login, $password)
 	{
-		if ($type == 'simple')
-		{
-			$url = 'https://www.lostfilm.tv/useri.php';
-			$postfields = 'FormLogin='.$login.'&FormPassword='.$password.'&module=1&repage=user&act=login';
-		}
-		if ($type == 'hard')
-		{
-			$url = 'http://login1.bogi.ru/login.php?referer=https%3A%2F%2Fwww.lostfilm.tv%2F';
-			$postfields = 'login='.$login.'&password='.$password.'&module=1&target=https%3A%2F%2Flostfilm.tv%2F&repage=user&act=login';
-		}
-
         $result = Sys::getUrlContent(
         	array(
         		'type'           => 'POST',
         		'header'         => 1,
         		'returntransfer' => 1,
-        		'url'            => $url,
-        		'postfields'     => $postfields,
+        		'url'            => 'http://login1.bogi.ru/login.php?referer=https%3A%2F%2Fwww.lostfilm.tv%2F',
+        		'postfields'     => $postfields = 'login='.$login.'&password='.$password.'&module=1&target=https%3A%2F%2Flostfilm.tv%2F&repage=user&act=login',
         	)
         );
 		return $result;
@@ -48,6 +37,7 @@ class lostfilm
 	        		'returntransfer' => 1,
 	        		'url'            => 'https://www.lostfilm.tv/my.php',
 	        		'cookie'         => lostfilm::$sess_cookie,
+	        		'sendHeader'     => array('Content-length' => '', 'Expect' => '', 'Content-Type' => ''),
 	        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
 	        	)
 	        );
@@ -93,11 +83,12 @@ class lostfilm
         		'returntransfer' => 1,
         		'url'            => 'https://www.lostfilm.tv/',
         		'cookie'         => $sess_cookie,
+        		'sendHeader'     => array('Content-length' => '', 'Expect' => '', 'Content-Type' => ''),
         		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
         	)
         );
 
-		if (preg_match('/ПРИВЕТ, <span class=\"wh\">.* <!-- (ID: .*) --><\/span>/U', $result))
+		if (preg_match('/ПРИВЕТ, <span class=\"wh\">.*\s<!-- \(ID: .*\) --><\/span><br \/>/', $result))
 			return TRUE;
 		else
 			return FALSE;		  
@@ -204,43 +195,37 @@ class lostfilm
 			$login = iconv('utf-8', 'windows-1251', $credentials['login']);
 			$password = $credentials['password'];
 			
-			$page = lostfilm::login('simple', $login, $password);
-			if (!preg_match_all('/Set-Cookie: (\w*)=(\S*)/', $page, $array))
+			$page = lostfilm::login($login, $password);
+			preg_match_all('/name=\"(.*)\"/iU', $page, $array_names);
+			preg_match_all('/value=\"(.*)\"/iU', $page, $array_values);
+			preg_match('/action=\"\/\/(.*)\"/iU', $page, $url_array);
+			
+			if ( ! empty($array_names) &&  ! empty($array_values) && isset($url_array[1]))
 			{
-				lostfilm::$exucution = TRUE;
-				lostfilm::getCookies($tracker, $array);
+				$post = '';
+				for($i=0; $i<count($array_values[1]); $i++)
+					$post .= $array_names[1][$i+1].'='.$array_values[1][$i].'&';
+				
+				$url = $url_array[1];
 			}
-			else
+			$post = substr($post, 0, -1);
+			
+			$page = Sys::getUrlContent(
+	        	array(
+	        		'type'           => 'POST',
+	        		'header'         => 1,
+	        		'returntransfer' => 1,
+	        		'url'            => 'https://'.$url,
+	        		'postfields'     => $post,
+	        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
+	        	)
+	        );
+	        
+			if (preg_match_all('/Set-Cookie: (\w*)=(\S*)/', $page, $array))
 			{
-				$page = lostfilm::login('hard', $login, $password);
-				preg_match_all('/name=\"(.*)\"/iU', $page, $array_names);
-				preg_match_all('/value=\"(.*)\"/iU', $page, $array_values);
-
-				if ( ! empty($array_names) &&  ! empty($array_values))
-				{
-					$post = '';
-					for($i=0; $i<count($array_values[1]); $i++)
-						$post .= $array_names[1][$i+1].'='.$array_values[1][$i].'&';
-				}
-				$post = substr($post, 0, -1);
-
-				$page = Sys::getUrlContent(
-		        	array(
-		        		'type'           => 'POST',
-		        		'header'         => 1,
-		        		'returntransfer' => 1,
-		        		'url'            => 'https://www.lostfilm.tv/blg.php?ref=aHR0cDovL3d3dy5sb3N0ZmlsbS50di8=',
-		        		'postfields'     => $post,
-		        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
-		        	)
-		        );
-
-				if (preg_match_all('/Set-Cookie: (\w*)=(\S*)/', $page, $array))
-				{
-					lostfilm::getCookies($tracker, $array);
-					lostfilm::$exucution = TRUE;
-				}	
-			}			
+				lostfilm::getCookies($tracker, $array);
+				lostfilm::$exucution = TRUE;
+			}
 		}
 		else
 		{
@@ -378,6 +363,7 @@ class lostfilm
 						        		'returntransfer' => 1,
 						        		'url'            => $serial['link'],
 						        		'cookie'         => lostfilm::$sess_cookie,
+						        		'sendHeader'     => array('Content-length' => '','Expect' => '', 'Content-Type' => ''),
 						        	)
                                 );
                                 
