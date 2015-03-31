@@ -1,18 +1,22 @@
 ﻿  <form id='system_update'>
     
-    <h2 class="settings-title">{$title}</h2>
+    {if="count($changelog)"}
     
-    <!-- content -->
-    {loop="changelog"}
-    <div>{$value.ver}</div>
-    <div class="new">{$value.desc}</div>
-    {/loop}
-    
-    <!-- Update Button -->
-    <div>
-      <button class="form-button">Установить обновление</button>
-    </div>
+      <h2 class="settings-title">{$title}</h2>
       
+      <!-- content -->
+      {loop="changelog"}
+      <div>{$value.ver}</div>
+      <div class="new">{$value.desc}</div>
+      {/loop}
+      
+      <!-- Update Button -->
+      <div>
+        <button>Установить обновление</button>
+      </div>
+    {else}
+      <div class="new">Установлена актуальная версия</div>
+    {/if}
   </form>
   
   <div class="clear-both"></div>
