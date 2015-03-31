@@ -77,13 +77,16 @@
     </p>
     <button class="form-button">Добавить</button>
 </form>
+
 <div class="clear-both"></div>
+
 <script src="js/user-func.js"></script>
+
 <script>
 $(function() {
     var availableTags = [
-    {loop="contents"}
-      "{$value.path}", 
+    {loop="paths"}
+      "{$value['path']}", 
     {/loop}
     ];
     $( "#path" ).autocomplete({

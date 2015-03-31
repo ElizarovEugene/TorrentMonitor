@@ -15,8 +15,7 @@ raintpl::configure("tpl_dir" , Sys::getTemplateDir() );
 
 $tpl = new RainTPL;
 
-$contents = array();
-
+$paths = Database::getPaths();
 $tpl->assign( "paths", $paths );
 $tpl->draw( 'add' );
 ?>
