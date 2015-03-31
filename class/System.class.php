@@ -102,7 +102,7 @@ class Sys
             if ($param['type'] == 'GET')
                 curl_setopt($ch, CURLOPT_HTTPGET, 1);
 
-            curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:16.0) Gecko/20100101 Firefox/16.0');
+            curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.1.4322)');
 
             if (isset($param['header']))
                 curl_setopt($ch, CURLOPT_HEADER, 1);
@@ -113,6 +113,12 @@ class Sys
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
             curl_setopt($ch, CURLOPT_URL, $param['url']);
+            
+            #curl_setopt($ch, CURLOPT_VERBOSE, TRUE);
+            #curl_setopt($ch, CURLOPT_SSL_CIPHER_LIST, 'ecdhe_ecdsa_aes_128_sha');
+            if (substr(curl_version()['ssl_version'], 0, 3) == 'NSS') {
+                curl_setopt($ch, CURLOPT_SSL_CIPHER_LIST, 'ecdhe_ecdsa_aes_128_sha');
+            }
 
             if (isset($param['postfields']))
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $param['postfields']);
