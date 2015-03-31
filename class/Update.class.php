@@ -118,10 +118,8 @@ class Update {
                 else
                     echo 'Не удалось скачать master.zip<br>';
             }
-            // Спамит сообщениями, когда версия блока меньше установленной версии
-            //else
-            //    echo 'Перейти на <a href="http://'.$_SERVER["HTTP_HOST"].'">главную страницу</a>.<br>';
         }
+        echo 'Новая версия установлена. Перейти на <a href="http://'.$_SERVER["HTTP_HOST"].'">главную страницу</a>';
     }
     
     private static function xml_page()
