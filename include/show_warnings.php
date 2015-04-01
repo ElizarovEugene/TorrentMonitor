@@ -88,6 +88,7 @@ raintpl::configure("tpl_dir" , Sys::getTemplateDir() );
 
 $tpl = new RainTPL;
 $tpl->assign( "contents", $contents );
+$tpl->assign( "show_table", (! empty($count)) );
 
 $tpl->draw( 'show_warnings' );
 
