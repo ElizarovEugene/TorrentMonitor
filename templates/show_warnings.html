@@ -1,5 +1,5 @@
 ﻿  <form id='show_warnings'>
-    
+    {if="$show_table"}
     <table class="warning_table" border="0" cellpadding="0" cellspacing="1">
       <thead> 
         <tr>
@@ -22,6 +22,7 @@
         {/if}
       {/loop}
     </table>
+    {/if}
   </form>
   
   <div class="clear-both"></div>

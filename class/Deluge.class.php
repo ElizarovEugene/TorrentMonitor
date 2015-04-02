@@ -21,10 +21,10 @@ class Deluge
             {
                 if ($deleteOldFiles)
                     $delOpt = '--remove_data';
-                #удяляем существующую закачку из torrent-клиента
+            #удяляем существующую закачку из torrent-клиента
                 if ($deleteDistribution)
-                   $command = `deluge-console 'connect $torrentAddress $torrentLogin $torrentPassword; rm $hash $delOpt'`;
-            }
+            $command = `deluge-console 'connect $torrentAddress $torrentLogin $torrentPassword; rm $hash $delOpt'`;
+        }
             else
             {
                 #удяляем существующую закачку из torrent-клиента

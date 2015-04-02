@@ -2,6 +2,8 @@
 $dir = dirname(__FILE__).'/../';
 include_once $dir."class/System.class.php";
 include_once $dir."class/Database.class.php";
+include_once $dir."class/Trackers.class.php";
+
 if ( ! Sys::checkAuth())
     die(header('Location: ../'));
 $torrent = Database::getTorrent($_GET['id']);
@@ -29,16 +31,9 @@ if (isset($torrent_id) && $torrent_id != 0)
     <p>
         <label class="label-name">Ссылка на тему</label>
 <?php
-if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.me' || $tracker == 'tfile.me' || $tracker == 'torrents.net.ua' || $tracker == 'pornolab.net' || $tracker == 'rustorka.com')
-    $tracker = 'http://'.$tracker.'/forum/viewtopic.php?t=';
-elseif ($tracker == 'casstudio.tv' || $tracker == 'kinozal.tv'  || $tracker == 'animelayer.ru' || $tracker == 'tracker.0day.kiev.ua')
-    $tracker = 'http://'.$tracker.'/details.php?id=';
-elseif ($tracker == 'rutor.org')
-    $tracker = 'http://alt.rutor.org/torrent/';
-elseif ($tracker == 'anidub.com')
-    $tracker = 'http://tr.anidub.com/';
+$torrent_url = Trackers::generateURL($tracker, $torrent_id);
 ?>
-        <input type="text" name="url" value="<?php echo $tracker.$torrent_id?>">
+        <input type="text" name="url" value="<?php echo $torrent_url?>">
         <span class="subinput-text">Пример: http://rutracker.org/forum/viewtopic.php?t=4201572</span>
     </p>
     <p>

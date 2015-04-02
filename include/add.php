@@ -2,6 +2,8 @@
 $dir = dirname(__FILE__)."/../";
 include_once $dir."class/System.class.php";
 include_once $dir."class/Database.class.php";
+include_once $dir."class/Trackers.class.php";
+
 if ( ! Sys::checkAuth())
     die(header('Location: ../'));
 ?>
@@ -37,10 +39,14 @@ if ( ! Sys::checkAuth())
         <label class="label-name">Трекер</label>
         <select id="tracker" name="tracker" onchange="changeField()">
             <option></option>
-            <option value="baibako.tv">baibako.tv</option>
-            <option value="lostfilm.tv">lostfilm.tv</option>
-            <option value="newstudio.tv">newstudio.tv</option>
-            <option value="novafilm.tv">novafilm.tv</option>
+            <?php
+            $trackers = Trackers::getTrackersByType('series');
+            foreach($trackers as $trackerData){
+	    	?>        		
+	    		<option value='<?php echo $trackerData['tracker'] ?>'><?php echo $trackerData['tracker'] ?></option>
+	    	<?php        		
+            }
+            ?>
         </select>
     </p>
     <p>
@@ -50,7 +56,7 @@ if ( ! Sys::checkAuth())
     </p>
     <p>
         <label class="label-name"></label>
-        <span id="changedField"></span>
+       <span id="changedField"></span>
     </p>
     <div onclick='expand("divDop2")' class='cutLink' style='cursor: pointer;'>Дополнительные параметры</div>
     <div id='divDop2' class='result'>
@@ -71,10 +77,14 @@ if ( ! Sys::checkAuth())
         <label class="label-name">Трекер</label>
         <select name="tracker">
             <option></option>
-            <option>nnm-club.me</option>
-            <option>pornolab.net</option>
-            <option>rutracker.org</option>
-            <option>tfile.me</option>
+            <?php
+            $trackers = Trackers::getTrackersByType('search');
+            foreach($trackers as $trackerData){
+	    	?>        		
+	    		<option value='<?php echo $trackerData['tracker'] ?>'><?php echo $trackerData['tracker'] ?></option>
+	    	<?php        		
+            }
+            ?>
         </select>
     </p>
     <p>

@@ -1,22 +1,24 @@
 <?php
 include_once('rutracker.org.engine.php');
 
-class rutrackerSearch extends rutracker
+class rutrackerorgSearch extends rutrackerorg
 {
 	//ищем темы пользователя
-	public static function mainSearch($user_id, $tracker, $user)
+	public static function mainSearch($userInfo)
 	{
+		extract($userInfo);
+		
 		$cookie = Database::getCookie($tracker);
-		if (rutracker::checkCookie($cookie))
+		if (rutrackerorg::checkCookie($cookie))
 		{
-			rutracker::$sess_cookie = $cookie;
+			rutrackerorg::$sess_cookie = $cookie;
 			//запускам процесс выполнения
-			rutracker::$exucution = TRUE;
+			rutrackerorg::$exucution = TRUE;
 		}
 		else
-    		rutracker::getCookie($tracker);
+    		rutrackerorg::getCookie($tracker);
 
-		if (rutracker::$exucution)
+		if (rutrackerorg::$exucution)
 		{
     		$user = iconv('utf-8', 'windows-1251', $user);
     		$page = Sys::getUrlContent(
@@ -25,7 +27,7 @@ class rutrackerSearch extends rutracker
             		'header'         => 1,
             		'returntransfer' => 1,
             		'url'            => 'http://rutracker.org/forum/tracker.php',
-            		'cookie'         => rutracker::$sess_cookie,
+            		'cookie'         => rutrackerorg::$sess_cookie,
             		'postfields'     => 'prev_my=0&prev_new=0&prev_oop=0&f%5B%5D=-1&o=1&s=2&tm=-1&pn='.$user.'&nm=',
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
@@ -59,8 +61,8 @@ class rutrackerSearch extends rutracker
                     		'type'           => 'POST',
                     		'returntransfer' => 1,
                     		'url'            => 'http://dl.rutracker.org/forum/dl.php?t='.$torrent_id,
-                    		'cookie'         => rutracker::$sess_cookie.'; bb_dl='.$torrent_id,
-                    		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen(rutracker::$sess_cookie)),
+                    		'cookie'         => rutrackerorg::$sess_cookie.'; bb_dl='.$torrent_id,
+                    		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen(rutrackerorg::$sess_cookie)),
                     		'referer'        => 'http://dl.rutracker.org/forum/dl.php?t='.$torrent_id,
                     	)
                     );

@@ -3,6 +3,8 @@ $dir = dirname(__FILE__).'/../';
 include_once $dir.'config.php';
 include_once $dir.'class/System.class.php';
 include_once $dir.'class/Database.class.php';
+include_once $dir.'class/Trackers.class.php';
+
 if ( ! Sys::checkAuth())
     die(header('Location: ../'));
 
@@ -46,34 +48,11 @@ if ( ! empty($torrents_list))
             <td class='text-align-left' nowrap><span class='icon-torrent' style='background-image: url(img/<?php echo $tracker ?>.ico);'></span><?php echo $tracker ?></td>
             <td class='text-align-left'>
     	  	<?php 
-    		if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.me' || $tracker == 'tfile.me' || $tracker == 'torrents.net.ua' || $tracker == 'pornolab.net' || $tracker == 'rustorka.com')
-    		{
-    		?>
-				<a href='http://<?php echo $tracker ?>/forum/viewtopic.php?t=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
-    		<?php
-    		}
-    		elseif ($tracker == 'kinozal.tv'  || $tracker == 'animelayer.ru' || $tracker == 'tracker.0day.kiev.ua')
-    		{
-            ?>
-        	    <a href='http://<?php echo $tracker ?>/details.php?id=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
-        	<?php	
-    		}
-    		elseif ($tracker == 'rutor.org')
-    		{
-    		?>
-    			<a href='http://alt.rutor.org/torrent/<?php echo $torrent_id ?>/' target='_blank'><?php echo $name ?></a>
-    		<?php
-    		}
-    		elseif ($tracker == 'anidub.com')
+            $torrent_url = Trackers::generateURL($tracker, $torrent_id);
+    		if ( ! empty($torrent_url) )
     		{
 	    	?>        		
-	    		<a href='http://tr.anidub.com/<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>	    	
-	    	<?php        		
-    		}
-    		elseif ($tracker == 'casstudio.tv')
-    		{
-	    	?>        		
-	    		<a href='http://<?php echo $tracker ?>/viewtopic.php?t=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
+	    		<a href='<?php echo $torrent_url ?>' target='_blank'><?php echo $name ?></a>
 	    	<?php        		
     		}
     		else
@@ -81,7 +60,7 @@ if ( ! empty($torrents_list))
                 if ($hd == 1 && $tracker == 'lostfilm.tv')
                 	echo '<img src="img/720.png">&nbsp;<img src="img/1080.png">';
                 elseif ($hd == 1 && $tracker == 'baibako.tv' || $hd == 1 && $tracker == 'newstudio.tv' || $hd == 1 && $tracker == 'novafilm.tv')
-                	echo '<img src="img/720.png">';
+                    echo '<img src="img/720.png">';
                 elseif ($hd == 2 && $tracker == 'lostfilm.tv')
                 	echo '<img src="img/720.png">';
                 elseif ($hd == 2 && $tracker == 'baibako.tv' || $hd == 2 && $tracker == 'newstudio.tv' || $hd == 2 && $tracker == 'novafilm.tv')
@@ -100,7 +79,7 @@ if ( ! empty($torrents_list))
             if ($timestamp == '0000-00-00 00:00:00' || $timestamp == NULL) {}
             else
             {
-            	if ($tracker != 'rutracker.org' && $tracker != 'nnm-club.me' && $tracker != 'rutor.org' && $tracker != 'kinozal.tv')
+               	if (Trackers::getTrackerType($tracker) == 'series')
             	{
             	?>
             	<div onclick='expand("div<?php echo $id ?>")' class='cut' style='cursor: pointer;'>
@@ -126,7 +105,7 @@ if ( ! empty($torrents_list))
             		$season = substr($ep, 1, 2);
             		$episode = substr($ep, -2);
 
-                	if ($tracker != 'rutracker.org' && $tracker != 'nnm-club.me' && $tracker != 'rutor.org' && $tracker != 'kinozal.tv')
+                	if (Trackers::getTrackerType($tracker) == 'series')
                 	{
                 	?>
             		<div id='div<?php echo $id ?>' class='result'>
