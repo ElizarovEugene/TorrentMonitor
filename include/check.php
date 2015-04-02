@@ -1,13 +1,13 @@
 <?php 
-define('ROOT_DIR', str_replace('include', '', dirname(__FILE__)) );
+$dir = str_replace('include', '', dirname(__FILE__));
 
-include_once ROOT_DIR."class/System.class.php";
+include_once $dir."class/System.class.php";
 
 if ( ! Sys::checkAuth())
     die(header('Location: ../'));
 
-include_once ROOT_DIR."class/Database.class.php";
-include_once ROOT_DIR."class/rain.tpl.class.php";
+include_once $dir."class/Database.class.php";
+include_once $dir."class/rain.tpl.class.php";
 
 $contents = array();
 
@@ -23,7 +23,7 @@ if (Sys::checkInternet())
         {
             $contents[] = array('text' => 'Расширение cURL установлено.',);
             
-            $torrentPath = ROOT_DIR.'torrents/';
+            $torrentPath = $dir.'torrents/';
             if (Sys::checkWriteToPath($torrentPath))
             {
                 $contents[] = array('text' => 'Запись в директорию для torrent-файлов "'.$torrentPath.'" разрешена.',);
@@ -34,7 +34,6 @@ if (Sys::checkInternet())
                                     'error' => true);
             }
 
-            $dir = ROOT_DIR;
             if (Sys::checkWriteToPath($dir))
             {
                 $contents[] = array('text' => 'Запись в системную директорию "'.$dir.'" разрешена.',);
@@ -48,7 +47,7 @@ if (Sys::checkInternet())
             $trackers = Database::getTrackersList();
             foreach ($trackers as $tracker)
             {
-                if (file_exists(ROOT_DIR.'trackers/'.$tracker.'.engine.php'))
+                if (file_exists($dir.'trackers/'.$tracker.'.engine.php'))
                 {
                     $contents[] = array('text' => 'Основной файл для работы с трекером "'.$tracker.'" найден.',);
                 }
@@ -60,7 +59,7 @@ if (Sys::checkInternet())
 
                 if ($tracker == 'nnm-club.me' || $tracker == 'pornolab.net' || $tracker == 'rutracker.org' || $tracker == 'tapochek.net' || $tracker == 'tfile.me')
                 {
-                    if (file_exists(ROOT_DIR.'trackers/'.$tracker.'.search.php'))
+                    if (file_exists($dir.'trackers/'.$tracker.'.search.php'))
                     {
                         $contents[] = array('text' => 'Дополнительный файл для работы с трекером "'.$tracker.'" найден.',);
                     }
@@ -118,7 +117,7 @@ else
 }
 
 // заполнение шаблона
-raintpl::configure("root_dir", ROOT_DIR );
+raintpl::configure("root_dir", $dir );
 raintpl::configure("tpl_dir" , Sys::getTemplateDir() );
 
 $tpl = new RainTPL;

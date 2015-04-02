@@ -1,8 +1,8 @@
 <?php
-define('ROOT_DIR', str_replace('class', '', dirname(__FILE__)) );
+$dir = str_replace('class', '', dirname(__FILE__));
 
 // выполняем подключение классов engine
-foreach (glob(ROOT_DIR."trackers/*.engine.php") as $trackerEngine) {
+foreach (glob($dir."trackers/*.engine.php") as $trackerEngine) {
     include_once $trackerEngine;
     
     $tracker = str_replace('.engine.php', '', basename($trackerEngine));
@@ -10,7 +10,7 @@ foreach (glob(ROOT_DIR."trackers/*.engine.php") as $trackerEngine) {
 }
     
 // выполняем подключение классов search
-foreach (glob(ROOT_DIR."trackers/*.search.php") as $trackerEngine) {
+foreach (glob($dir."trackers/*.search.php") as $trackerEngine) {
     include_once $trackerEngine;
 
     $tracker = str_replace('.search.php', '', basename($trackerEngine));
