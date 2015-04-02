@@ -391,6 +391,10 @@ class lostfilmtv
             }
         }
     }
+    
+    // функция возвращает тип раздач, которые обрабатывает треккер
+    public static function getTrackerType() {
+        return 'series';
+    }
 }
->>>>>>> dfd70170507c6e3ac3c44e493296c6d60b9ff128
 ?>

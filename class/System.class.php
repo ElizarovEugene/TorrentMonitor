@@ -410,7 +410,7 @@ class Sys
     //возвращаем путь к каталогу шаблона
     public static function getTemplateDir()
     {
-        return 'templates/';
+        return 'templates/default/';
     }
     
     //возвращаем путь к корневому каталогу

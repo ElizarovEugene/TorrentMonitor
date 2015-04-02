@@ -299,6 +299,7 @@ body {
                 
                 td { border-right: 1px #E2E6EF solid; }
                     
+                    .close,
                     .delete,
                     .edit,
                     .add {
@@ -313,6 +314,7 @@ body {
                         
                         .edit { background: url(../img/edit.png) 2px 2px no-repeat; }
                         .add { background: url(../img/add.png) 2px 2px no-repeat; }
+                        .close { float:right; }
     
     .update {
         float: right;

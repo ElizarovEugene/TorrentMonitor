@@ -10,13 +10,13 @@
       </thead>
       {loop="contents"}
         {if="$value.full"}
-          <tr class="{$value.class}">
+          <tr>
             <td align="center">{$value.date}</td>
             <td>&nbsp;&nbsp;{$value.where}</td>
             <td>&nbsp;&nbsp;{$value.reason}</td>
           </tr>
         {else}
-          <tr class="second">
+          <tr>
             <td colspan="3" align="center">...</td>
           </tr>
         {/if}

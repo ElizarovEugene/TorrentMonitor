@@ -23,37 +23,24 @@ if ( ! empty($count))
         {
             for ($x=0; $x<2; $x++)
             {
-                if (($x % 2)==0)
-                    $class = "second";
-                else
-                    $class = "first";
-                
                 $date = $errors[$x]['day']." ".Sys::dateNumToString($errors[$x]['month'])." ".$errors[$x]['year']." ".$errors[$x]['time'];
                 
-                $contents[] = array('class'  => $class,
-                                    'date'   => $date,
+                $contents[] = array('date'   => $date,
                                     'where'  => $errors[$x]['where'],
                                     'reason' => Errors::getWarning($errors[$x]['reason']),
                                     'full'   => true,
                               );
             }
             
-            $contents[] = array('class'  => $second,
-                                'full'   => false,
+            $contents[] = array('full'   => false,
                           );
             
             $errors = array_slice($errors, $countErrorsByTracker-2, 2);
             for ($x=0; $x<2; $x++)
             {
-                if (($x % 2)==0)
-                    $class = "first";
-                else
-                    $class = "second";
-                
                 $date = $errors[$x]['day']." ".Sys::dateNumToString($errors[$x]['month'])." ".$errors[$x]['year']." ".$errors[$x]['time'];
                 
-                $contents[] = array('class'  => $class,
-                                    'date'   => $date,
+                $contents[] = array('date'   => $date,
                                     'where'  => $errors[$x]['where'],
                                     'reason' => Errors::getWarning($errors[$x]['reason']),
                                     'full'   => true,
@@ -64,15 +51,9 @@ if ( ! empty($count))
         {
             for ($x=0; $x<count($errors); $x++)
             {
-                if (($x % 2)==0)
-                    $class = "second";
-                else
-                    $class = "first";
-                
                 $date = $errors[$x]['day']." ".Sys::dateNumToString($errors[$x]['month'])." ".$errors[$x]['year']." ".$errors[$x]['time'];
                 
-                $contents[] = array('class'  => $class,
-                                    'date'   => $date,
+                $contents[] = array('date'   => $date,
                                     'where'  => $errors[$x]['where'],
                                     'reason' => Errors::getWarning($errors[$x]['reason']),
                                     'full'   => true,

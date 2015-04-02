@@ -145,7 +145,7 @@ class rutororg
     
     // функция генерирует url ссылку на раздачу
     public static function generateURL($tracker, $torrent_id) {
-        return 'http://alt.rutor.org/torrent/'.$torrent_id;
+        return 'http://rutor.org/torrent/'.$torrent_id;
     }
     
     // функция возвращает перечень имен, которые могут использоваться в ссылках на текущий треккер
