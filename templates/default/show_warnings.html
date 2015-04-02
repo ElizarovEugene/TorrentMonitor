@@ -1,5 +1,5 @@
 ﻿  <form id='show_warnings'>
-    
+    {if="$show_table"}
     <table class="warning_table" border="0" cellpadding="0" cellspacing="1">
       <thead> 
         <tr>
@@ -10,18 +10,19 @@
       </thead>
       {loop="contents"}
         {if="$value.full"}
-          <tr class="{$value.class}">
+          <tr>
             <td align="center">{$value.date}</td>
             <td>&nbsp;&nbsp;{$value.where}</td>
             <td>&nbsp;&nbsp;{$value.reason}</td>
           </tr>
         {else}
-          <tr class="second">
+          <tr>
             <td colspan="3" align="center">...</td>
           </tr>
         {/if}
       {/loop}
     </table>
+    {/if}
   </form>
   
   <div class="clear-both"></div>

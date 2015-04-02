@@ -1,12 +1,13 @@
 <?php
 $dir = dirname(__FILE__)."/../";
 include_once $dir."config.php";
+include_once $dir.'class/Trackers.class.php';
 
 class Database
 {
     public $dbh;
     private static $instance;
-
+    
     private function __construct()
     {
         $this->dbType = Config::read('db.type');
@@ -19,14 +20,14 @@ class Database
                 $password = Config::read('db.password');
                 $options = array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES ".Config::read('db.charset'));
                 break;
-			case 'sqlite':
-				$dsn = "sqlite:".Config::read('db.basename');
-				$options = array(PDO::ATTR_PERSISTENT => true);
-				break;
-			case 'sqlite2':
-				$dsn = "sqlite2:".Config::read('db.basename');
-				$options = array(PDO::ATTR_PERSISTENT => true);
-				break;
+            case 'sqlite':
+                $dsn = "sqlite:".Config::read('db.basename');
+                $options = array(PDO::ATTR_PERSISTENT => true);
+                break;
+            case 'sqlite2':
+                $dsn = "sqlite2:".Config::read('db.basename');
+                $options = array(PDO::ATTR_PERSISTENT => true);
+                break;
             case 'pgsql':
                 $dsn = "pgsql:host=".Config::read('db.host').";port=".Config::read('db.port').";dbname=".Config::read('db.basename').";user=".Config::read('db.user').";password=".Config::read('db.password');
                 break;
@@ -44,7 +45,7 @@ class Database
             die();
         }
     }
-
+    
     public static function getInstance()
     {
         if ( ! isset(self::$instance))
@@ -64,7 +65,7 @@ class Database
     {
         if (self::getDbType() == 'pgsql')
             $request = str_replace('`','"',$request);
-	    return self::getInstance()->dbh->prepare($request);
+        return self::getInstance()->dbh->prepare($request);
     }
     
     public static function updateQuery($request)
@@ -79,7 +80,7 @@ class Database
         }
         $stmt = NULL;        
     }
-
+    
     public static function getSetting($param)
     {
         $stmt = self::newStatement("SELECT `val` FROM `settings` WHERE `key` = :param");
@@ -109,7 +110,7 @@ class Database
         $stmt = NULL;
         $resultArray = NULL;
     }
-
+    
     public static function getPaths()
     {
         $stmt = self::newStatement("SELECT DISTINCT(`path`) AS `path` FROM `torrent`");
@@ -129,7 +130,7 @@ class Database
         }
         $stmt = NULL; 
     }    
-
+    
     public static function getTorrentDownloadPath($id)
     {
         $stmt = self::newStatement("SELECT `path` FROM `torrent` WHERE `id` = :id");
@@ -143,7 +144,7 @@ class Database
         }
         $stmt = NULL; 
     }
-
+    
     public static function updateSettings($setting, $val)
     {
         $stmt = self::newStatement("UPDATE `settings` SET `val` = :val WHERE `key` = :setting");
@@ -281,13 +282,13 @@ class Database
     
     public static function getTorrentsList($order)
     {
-    	if ($order == 'date')
-    		$order = 'timestamp';
-    	elseif ($order == 'dateDesc')
-    		$order = 'timestamp DESC';
-    	else
-    		$order = 'tracker, name, hd';
-    		
+        if ($order == 'date')
+            $order = 'timestamp';
+        elseif ($order == 'dateDesc')
+            $order = 'timestamp DESC';
+        else
+            $order = 'tracker, name, hd';
+            
         if (Database::getDbType() == 'pgsql')
         {
             $stmt = Database::getInstance()->dbh->prepare("SELECT id, tracker, name, hd, path, torrent_id, ep, timestamp, auto_update,
@@ -319,7 +320,7 @@ class Database
                             strftime('%H:%M', `timestamp`) AS `time`,
                             `hash`
                             FROM `torrent` 
-                            ORDER BY {$order}");    		
+                            ORDER BY {$order}");            
         }
         if ($stmt->execute())
         {
@@ -361,7 +362,7 @@ class Database
         }
         elseif (Database::getDbType() == 'sqlite')
         {
-            $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `tracker`, `name`, `hd`, `path`, `torrent_id`, `auto_update` FROM `torrent` WHERE `id` = '{$id}'");    		
+            $stmt = Database::getInstance()->dbh->prepare("SELECT `id`, `tracker`, `name`, `hd`, `path`, `torrent_id`, `auto_update` FROM `torrent` WHERE `id` = '{$id}'");         
         }
         if ($stmt->execute())
         {
@@ -385,11 +386,16 @@ class Database
     
     public static function getTorrentsListByTracker($tracker)
     {
-        if ($tracker == 'lostfilm.tv' || $tracker == 'novafilm.tv')
+        $trackerType = Trackers::getTrackerType($tracker);
+        if ($trackerType == 'series')
             $fields = 'hd, ep';
-        if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.ru' || $tracker == 'rutor.org')
+        else if ($trackerType == 'threme')
             $fields = 'torrent_id';
-            
+        else
+            $fields = '';
+        
+        $keys = explode(', ', $fields);
+        
         $stmt = self::newStatement("SELECT name, timestamp, ".$fields." FROM torrent WHERE tracker = :tracker ORDER BY id");
         $stmt->bindParam(':tracker', $tracker);
         if ($stmt->execute())
@@ -399,13 +405,8 @@ class Database
             {
                 $resultArray[$i]['name'] = $row['name'];
                 $resultArray[$i]['timestamp'] = $row['timestamp'];
-                if ($tracker == 'lostfilm.tv' || $tracker == 'novafilm.tv')
-                {
-                    $resultArray[$i]['hd'] = $row['hd'];
-                    $resultArray[$i]['ep'] = $row['ep'];
-                }
-                if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.ru' || $tracker == 'rutor.org')
-                    $resultArray[$i]['torrent_id'] = $row['torrent_id'];
+                foreach($keys as $key)
+                    $resultArray[$i][$key] = $row[$key];
                 $i++;
             }
             if ( ! empty($resultArray))
@@ -417,7 +418,7 @@ class Database
     
     public static function getUserToWatch()
     {
-        $stmt = self::newStatement("SELECT `id`, `tracker`, `name` FROM `watch` ORDER BY `tracker`");	        
+        $stmt = self::newStatement("SELECT `id`, `tracker`, `name` FROM `watch` ORDER BY `tracker`");           
         if ($stmt->execute())
         {
             $i = 0;
@@ -472,7 +473,7 @@ class Database
         if ($stmt->execute())
         {
             $stmt = self::newStatement("DELETE FROM `buffer` WHERE `user_id` = :id");
-            $stmt->bindParam(':id', $id);		
+            $stmt->bindParam(':id', $id);       
             if ($stmt->execute())
                 return TRUE;
             else
@@ -535,7 +536,7 @@ class Database
                 return $resultArray;
         }
         $stmt = NULL;
-        $resultArray = NULL;	    
+        $resultArray = NULL;        
     }
     
     public static function transferFromBuffer($id)
@@ -581,7 +582,7 @@ class Database
                 return $resultArray;
         }
         $stmt = NULL;
-        $resultArray = NULL;	    
+        $resultArray = NULL;        
     }
     
     public static function updateThremesToDownload($id)
@@ -592,9 +593,9 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;	    
+        $stmt = NULL;       
     }
-
+    
     public static function takeToDownload($tracker)
     {
         $stmt = self::newStatement("SELECT `id`, `threme_id`, `threme` FROM `buffer` WHERE `accept` = '1' AND `downloaded` = '0' AND `tracker` = :tracker");        
@@ -751,10 +752,10 @@ class Database
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':path', $path);
         $stmt->bindParam(':torrent_id', $threme);
-	    $stmt->bindParam(':auto_update', $update);
+        $stmt->bindParam(':auto_update', $update);
         $stmt->bindParam(':id', $id);
         $stmt->execute();
-
+        
         if ($reset)
         {
             $stmt = self::newStatement("UPDATE `torrent` SET `timestamp` = '0000-00-00 00:00:00' WHERE `id` = :id");
@@ -765,8 +766,8 @@ class Database
         else
             return FALSE;
         $stmt = NULL;
-
-    }    
+        
+    }
     
     public static function updateHash($id, $hash)
     {
@@ -778,7 +779,7 @@ class Database
         else
             return FALSE;
         $stmt = NULL;
-    }   
+    }
     
     public static function deletItem($id)
     {
@@ -865,7 +866,7 @@ class Database
         }
         $stmt = NULL;
         $resultArray = NULL;
-    }        
+    }
     
     public static function setWarnings($date, $tracker, $message)
     {
@@ -931,7 +932,7 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;        
+        $stmt = NULL;
     }
     
     public static function getAllFromTemp()
@@ -964,7 +965,7 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;        
+        $stmt = NULL;
     }
     
     public static function getNews()
@@ -1001,7 +1002,7 @@ class Database
                     return FALSE;
             }
         }
-        $stmt = NULL;        
+        $stmt = NULL;
     }
     
     public static function insertNews($id, $text)

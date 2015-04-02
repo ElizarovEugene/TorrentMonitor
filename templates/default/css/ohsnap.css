@@ -1,0 +1,49 @@
+/* Oh Snap */
+
+#ohsnap {
+  position: fixed;
+  bottom: 5px;
+  right:5px;
+  margin-left: 5px;
+  z-index:99;
+}
+
+.alert {
+  text-align: right;
+  margin-top: 10px;
+  padding: 15px;
+  border: 1px solid #eed3d7;
+  border-radius: 4px;
+  float: right;
+  clear: right;
+  background-color: #FFFFFF;
+}
+
+.alert-error {
+  color: white;
+  background-color: #DA4453;
+}
+
+.buttons {
+  margin-bottom: 20px;
+  display: block;
+}
+
+.buttons a {
+  margin:auto;
+  margin-bottom:10px;
+  float: none !important;
+  text-align: center;
+
+}
+
+.buttons a span { 
+  padding-left: 0px; 
+}
+
+#ohsnap { text-shadow: none; }
+@media (max-width: 450px) {
+  .buttons {
+    margin-bottom: 334px;
+  }
+}

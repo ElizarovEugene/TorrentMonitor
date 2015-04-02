@@ -1,0 +1,24 @@
+﻿  <form id='system_update'>
+    
+    {if="count($changelog)"}
+    
+      <h2 class="settings-title">{$title}</h2>
+      
+      <!-- content -->
+      {loop="changelog"}
+      <div>{$value.ver}</div>
+      <div class="new">{$value.desc}</div>
+      {/loop}
+      
+      <!-- Update Button -->
+      <div>
+        <button>Установить обновление</button>
+      </div>
+    {else}
+      <div class="new">Установлена актуальная версия</div>
+    {/if}
+  </form>
+  
+  <div class="clear-both"></div>
+  
+  <script src="js/user-func.js"></script>

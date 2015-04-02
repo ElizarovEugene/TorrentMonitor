@@ -1,22 +1,24 @@
 <?php
 include_once('nnm-club.me.engine.php');
 
-class nnmclubSearch extends nnmclub
+class nnmclubmeSearch extends nnmclubme
 {
 	//ищем темы пользователя
-	public static function mainSearch($user_id, $tracker, $user)
+	public static function mainSearch($userInfo)
 	{
+		extract($userInfo);
+		
 		$cookie = Database::getCookie($tracker);
-		if (nnmclub::checkCookie($cookie))
+		if (nnmclubme::checkCookie($cookie))
 		{
-			nnmclub::$sess_cookie = $cookie;
+			nnmclubme::$sess_cookie = $cookie;
 			//запускам процесс выполнения
-			nnmclub::$exucution = TRUE;
+			nnmclubme::$exucution = TRUE;
 		}
 		else
-    		nnmclub::getCookie($tracker);
+    		nnmclubme::getCookie($tracker);
 
-		if (nnmclub::$exucution)
+		if (nnmclubme::$exucution)
 		{
     		$user = iconv('utf-8', 'windows-1251', $user);
     		$page = Sys::getUrlContent(
@@ -54,8 +56,8 @@ class nnmclubSearch extends nnmclub
 		            		'header'         => 0,
 		            		'returntransfer' => 1,
 		            		'url'            => 'http://nnm-club.me/forum/viewtopic.php?t='.$toDownload[$i]['threme_id'],
-		            		'cookie'         => nnmclub::$sess_cookie,
-		            		'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-length' => strlen(nnmclub::$sess_cookie)),
+		            		'cookie'         => nnmclubme::$sess_cookie,
+		            		'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-length' => strlen(nnmclubme::$sess_cookie)),
 		            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
 		            	)
 		            );
@@ -69,7 +71,7 @@ class nnmclubSearch extends nnmclub
 							Database::clearWarnings($tracker);
                             //сохраняем торрент в файл
                             $download_id = $link[1];
-            				preg_match('/userid(.*);/U', nnmclub::$sess_cookie, $arr);
+            				preg_match('/userid(.*);/U', nnmclubme::$sess_cookie, $arr);
                             $uid = $arr[1];
 							
 							$torrent = Sys::getUrlContent(
@@ -77,8 +79,8 @@ class nnmclubSearch extends nnmclub
                             		'type'           => 'GET',
                             		'returntransfer' => 1,
                             		'url'            => 'http://nnm-club.ws/download.php?csid=&uid='.$uid.'&id='.$download_id,
-                            		'cookie'         => nnmclub::$sess_cookie,
-                            		'sendHeader'     => array('Host' => 'nnm-club.ws', 'Content-length' => strlen(nnmclub::$sess_cookie)),
+                            		'cookie'         => nnmclubme::$sess_cookie,
+                            		'sendHeader'     => array('Host' => 'nnm-club.ws', 'Content-length' => strlen(nnmclubme::$sess_cookie)),
                             		'referer'        => 'http://nnm-club.me/forum/viewtopic.php?t='.$torrent_id,
                             	)
                             );

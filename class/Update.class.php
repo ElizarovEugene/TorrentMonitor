@@ -1,8 +1,9 @@
 <?php
-$dir = dirname(__FILE__)."/../";
-include_once $dir."config.php";
-include_once $dir."class/System.class.php";
-include_once $dir."class/Database.class.php";
+define('ROOT_DIR', str_replace('class', '', dirname(__FILE__)) );
+
+include_once ROOT_DIR."config.php";
+include_once ROOT_DIR."class/System.class.php";
+include_once ROOT_DIR."class/Database.class.php";
 
 class Update {
     private static $xml_page;
@@ -119,7 +120,7 @@ class Update {
                     echo 'Не удалось скачать master.zip<br>';
             }
         }
-        echo 'Новая версия установлена. Перейти на <a href="http://'.$_SERVER["HTTP_HOST"].'">главную страницу</a>';
+        echo 'Новая версия установлена. Перейти на <a href="'.getBaseURL(__FILE__, ROOT_DIR).'">главную страницу</a>';
     }
     
     private static function xml_page()
@@ -156,12 +157,6 @@ class Update {
                 $changelog[] = array('ver' => $updVersion,
                                      'desc' => $desc);
             }
-        }
-        
-        if (count($changelog) == 0)
-        {
-            $changelog[] = array('ver' => '',
-                                 'desc' => 'Установлена актуальная версия');
         }
         
         return $changelog;

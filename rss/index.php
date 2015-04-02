@@ -33,7 +33,7 @@ if ($rss) {
     // формируем элемент 'link'
     $link = $channel->appendChild($xml->createElement('link'));
     $link->appendChild($xml->createTextNode($url.'/rss/'));
-
+    
     // формируем элемент 'language'
     $language = $channel->appendChild($xml->createElement('language'));
     $language->appendChild($xml->createTextNode('ru'));

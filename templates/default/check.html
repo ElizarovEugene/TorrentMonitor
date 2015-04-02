@@ -10,7 +10,7 @@
         <!-- content -->
         {loop="contents"}
         <tr>
-          <td {if="$value.error"}class="test-error"{/if}>{$value.text}</td>
+          <td {if="isset($value.error) && $value.error"}class="test-error"{/if}>{$value.text}</td>
         </tr>
         {/loop}
       </tbody>

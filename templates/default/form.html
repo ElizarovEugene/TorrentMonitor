@@ -1,0 +1,53 @@
+﻿<div align="right"><a href="#" class='close' onclick='$(".coverAll").hide();'></a></div>
+<h2 class="monitoring-title">Редактировать</h2>
+<form id="torrent_update">
+  <input type="hidden" name="id" value="{$id}"><br/>
+  <input type="hidden" name="tracker" value="{$tracker}"><br/>
+  <p>
+    <label class="label-name">Название</label>
+    <input type="text" name="name" value="{$name}"><br/>
+    <span class="subinput-text">Необязательно</span>
+  </p>
+{if="$tracker_type=='threme'"} 
+  <p>
+    <label class="label-name">Ссылка на тему</label>
+    <input type="text" name="url" value="{$torrent_url}">
+    <span class="subinput-text">Пример: http://rutracker.org/forum/viewtopic.php?t=4201572</span>
+  </p>
+  <p>
+    <label class="label-name">Обновлять заголовок автоматически</label>
+    <input type="checkbox" name="update" id="update" {if="$auto_update"}checked{/if} ><br>
+  </p>
+{/if}
+{if="$tracker_type=='series'"}
+  <p>
+    <label class="label-name"></label>
+    <span id="changedField"><span class="quality">{$input}</span></span>
+  </p>
+{/if}
+  <p>
+    <label class="label-name">Директория для скачивания</label>
+    <input type="text" name="path" id='path' value='{$path}'><br>
+    <span class="subinput-text">Например: /var/lib/transmission/downloads</span>
+  </p>
+  <p>
+    <label class="label-name">Сбросить время последнего обновления</label>
+    <input type="checkbox" name="reset" id="reset"><br>
+  </p>
+	</div>
+  <button class="form-button">Сохранить</button>
+</form>
+<div class="clear-both"></div>
+<script src="js/user-func.js"></script>
+<script>
+$(function() {
+  var availableTags = [
+  {loop="paths"}
+    "{$value['path']}", 
+  {/loop}
+  ];
+  $( "#path" ).autocomplete({
+    source: availableTags
+  });
+});
+</script>

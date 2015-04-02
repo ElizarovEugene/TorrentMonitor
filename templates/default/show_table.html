@@ -1,0 +1,42 @@
+﻿{if="count($contents)"}
+<table>
+  <thead>
+    <tr>
+      <th>Трекер</th>
+      <th>Название &nbsp;&nbsp;&nbsp;<span class='arr'><a href='action.php?action=order&order=name'>&#9650;</a></span></th>
+      <th nowrap>Последнее обновление &nbsp;&nbsp;&nbsp;<span class='arr'><a href='action.php?action=order&order=date'>&#9650;</a></span>&nbsp;<span class='arr'><a href='action.php?action=order&order=dateDesc'>&#9660;</a></span></th>
+      <th>Действие</th>
+    </tr>
+  </thead>
+  <tbody>
+  {loop="contents"}
+    <tr>
+      <td class='text-align-left' nowrap><span class='icon-torrent' style='background-image: url(img/{$value.tracker}.ico);'></span>{$value.tracker}</td>
+      <td class='text-align-left'>
+        {$value.quality_icon} 
+        {if="!empty($value.torrent_url)"} <a href='{$value.torrent_url}' target='_blank'>{$value.name}</a> {else} {$value.name} {/if}
+        {if="!empty($value.path)"}<br/> <font size="1">Путь сохранения: '{$value.path}'</font> {/if}
+      </td>
+      <td nowrap>
+        <div {if="$value.tracker_type=='series'"}onclick='expand("div-{$value.id}")' style='cursor: pointer;'{/if} class='cut'>
+          {$value.date_update}
+        </div>
+        <div id='div-{$value.id}' class='result'>
+          Последняя скачаная серия:<br>
+          Сезон {$value.season}, эпизод {$value.episode}
+        </div>
+      </td>
+      <td>
+        <a href='#' class='edit' onclick='showForm({$value.id})'></a>
+        <a href='#' class='delete' onclick='del({$value.id},"{$value.name}")'></a>
+      </td>
+    </tr>
+  {/loop}
+  </tbody> 
+</table>
+
+<div class='update'>Последний запуск: {$lasrStart}</div>
+{/if}
+
+<div class="clear-both"></div>
+<script src="js/user-func.js"></script>
