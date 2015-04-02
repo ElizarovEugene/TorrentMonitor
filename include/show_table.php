@@ -1,14 +1,14 @@
 <?php
-define('ROOT_DIR', str_replace('include', '', dirname(__FILE__)) );
+$dir = str_replace('include', '', dirname(__FILE__));
 
-include_once ROOT_DIR.'class/System.class.php';
+include_once $dir.'class/System.class.php';
 
 if ( ! Sys::checkAuth())
     die(header('Location: ../'));
 
-include_once ROOT_DIR.'class/Database.class.php';
-include_once ROOT_DIR.'class/Trackers.class.php';
-include_once ROOT_DIR."class/rain.tpl.class.php";
+include_once $dir.'class/Database.class.php';
+include_once $dir.'class/Trackers.class.php';
+include_once $dir."class/rain.tpl.class.php";
 
 $date_today = date('d-m-Y');
 
@@ -77,7 +77,7 @@ if ( ! empty($torrents_list))
     }
 }
 
-$lasrStart = @file_get_contents(ROOT_DIR.'laststart.txt');
+$lasrStart = @file_get_contents($dir.'laststart.txt');
 if ( ! empty($lasrStart))
 {
     $date = explode('-', $lasrStart);
@@ -87,7 +87,7 @@ else
     $lasrStart = 'Ещё не производился.';
 
 // заполнение шаблона
-raintpl::configure("root_dir", ROOT_DIR );
+raintpl::configure("root_dir", $dir );
 raintpl::configure("tpl_dir" , Sys::getTemplateDir() );
 
 $tpl = new RainTPL;
