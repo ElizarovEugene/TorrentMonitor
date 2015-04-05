@@ -115,8 +115,8 @@ class Sys
             curl_setopt($ch, CURLOPT_URL, $param['url']);
             
             #curl_setopt($ch, CURLOPT_VERBOSE, TRUE);
-            #curl_setopt($ch, CURLOPT_SSL_CIPHER_LIST, 'ecdhe_ecdsa_aes_128_sha');
-            if (substr(curl_version()['ssl_version'], 0, 3) == 'NSS') {
+            $curl = curl_version();
+            if (substr($curl["ssl_version"], 0, 3) == 'NSS') {
                 curl_setopt($ch, CURLOPT_SSL_CIPHER_LIST, 'ecdhe_ecdsa_aes_128_sha');
             }
 
