@@ -202,25 +202,37 @@ class lostfilm
 					$post .= $array_names[1][$i+1].'='.$array_values[1][$i].'&';
 				
 				$url = $url_array[1];
-			}
-			$post = substr($post, 0, -1);
-			
-			$page = Sys::getUrlContent(
-	        	array(
-	        		'type'           => 'POST',
-	        		'header'         => 1,
-	        		'returntransfer' => 1,
-	        		'url'            => 'https://'.$url,
-	        		'postfields'     => $post,
-	        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
-	        	)
-	        );
-	        
-			if (preg_match_all('/Set-Cookie: (\w*)=(\S*)/', $page, $array))
-			{
-				lostfilm::getCookies($tracker, $array);
-				lostfilm::$exucution = TRUE;
-			}
+
+    			$post = substr($post, 0, -1);
+    			
+    			$page = Sys::getUrlContent(
+    	        	array(
+    	        		'type'           => 'POST',
+    	        		'header'         => 1,
+    	        		'returntransfer' => 1,
+    	        		'url'            => 'https://'.$url,
+    	        		'postfields'     => $post,
+    	        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
+    	        	)
+    	        );
+    	        
+    			if (preg_match_all('/Set-Cookie: (\w*)=(\S*)/', $page, $array))
+    			{
+    				lostfilm::getCookies($tracker, $array);
+    				lostfilm::$exucution = TRUE;
+    			}
+            }
+            else
+            {
+                //устанавливаем варнинг
+    			if (lostfilm::$warning == NULL)
+    			{
+    				lostfilm::$warning = TRUE;
+    				Errors::setWarnings($tracker, 'credential_wrong');
+    			}
+    			//останавливаем выполнение цепочки
+    			lostfilm::$exucution = FALSE;
+            }
 		}
 		else
 		{
