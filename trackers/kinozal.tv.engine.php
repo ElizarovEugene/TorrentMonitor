@@ -133,7 +133,7 @@ class kinozal
 				//если подходят - получаем куки
 				elseif (preg_match_all('/Set-Cookie: (.+);/iU', $page, $array))
 				{
-					kinozal::$sess_cookie = $array[1][0].'; '.$array[1][1].';';
+					kinozal::$sess_cookie = $array[1][1].'; '.$array[1][2].';';
 					Database::setCookie($tracker, kinozal::$sess_cookie);
 					//запускам процесс выполнения, т.к. не может работать без кук
 					kinozal::$exucution = TRUE;
