@@ -39,7 +39,7 @@ class Update {
             {
                 echo '<b>Changelog for '.$updVersion.':</b></br>';
                 echo $description.'<br>';
-                $file = file_get_contents('https://github.com/ElizarovEugene/TorrentMonitor/archive/master.zip');
+                $file = file_get_contents('http://korphome.ru/torrent_monitor/tm-latest.zip');
                 if ( ! empty($file))
                 {
                     if (file_put_contents($ROOTPATH.'master.zip', $file))
