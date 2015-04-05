@@ -130,6 +130,14 @@ class kinozal
 					//останавливаем процесс выполнения, т.к. не может работать без кук
 					kinozal::$exucution = FALSE;
 				}
+				//проверяем нет ли блокировки
+				if (preg_match('/Превышен лимит попыток входа в профиль <br>Попробуйте через 2 часа/', $page, $array))
+				{
+					//устанавливаем варнинг
+					Errors::setWarnings($tracker, 'limit');
+					//останавливаем процесс выполнения, т.к. не может работать без кук
+					kinozal::$exucution = FALSE;
+				}
 				//если подходят - получаем куки
 				elseif (preg_match_all('/Set-Cookie: (.+);/iU', $page, $array))
 				{

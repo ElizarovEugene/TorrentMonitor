@@ -24,6 +24,7 @@ class Errors
     	Errors::write('no_response', 'Не удалось добавить torrent-файл в torrent-клиент. Клиент не может получить доступ к файлу по указанному адресу. Проверьте адрес TorrentMonitor\'а в настройках.');    	
     	Errors::write('unauthorized', 'Не удалось добавить в torrent-клиент, не прошла авторизация в torrent-клиенте.');
     	Errors::write('unknown', 'Неизвестная ошибка при добавлении torrent-файла в torrent-клиент. Требуется дополнительная диагностика.');    	
+    	Errors::write('limit', 'Превышен лимит попыток входа в профиль. Необходимо остановить ТМ на 2-3 часа.');    	
 	}
 	
 	public static function getInstance()
