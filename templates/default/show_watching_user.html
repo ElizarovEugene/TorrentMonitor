@@ -1,30 +1,30 @@
-﻿<form id="threme_clear" method="post">
-  <div class="user-torrent-del" onclick="delete_user({$user.id})"></div>
+﻿  <div class="user-torrent-del" onclick="delete_user({$user.id})"></div>
   <div class="user-torrent" id="{$user.id}">Раздачи пользователя <strong>{$user.name}</strong> на трекере <b>{$user.tracker}</b>:</div>
   {if="count($thremes)"}
-  <div id={$value.user.id} class='result'>
-  <table>
-    <thead>
-      <tr>
-        <th>Скачать</th>
-        <th>Раздел</th>
-        <th>Тема</th>
-        <th>Удалить</th>
-        <th>Добавить для наблюдения</th>
-      </tr>
-    </thead>
-    <tbody>
-      {loop="thremes"}
-      <tr>
-        <td ><img src="img/icon1.png" onclick="threme_add({$value.id}, {$users.id})"></td>
-        <td class="text-align-left">{$value.section}</td>
-        <td class="text-align-left"><a href='http://{$users.tracker}/forum/viewtopic.php?t={$value.id}' target="_blank">{$value.threme}</a></td>
-        <td><a class="delete" onclick="delete_from_buffer({$value.id})"></a></td>
-        <td><a class="add" onclick="transfer_from_buffer({$value.id}>)"></a></td>
-      </tr>
-      {/loop}
-    </tbody>
-  </table>
+  <div id={$user.id} class='result'>
+    <table>
+      <thead>
+        <tr>
+          <th>Скачать</th>
+          <th>Раздел</th>
+          <th>Тема</th>
+          <th>Удалить</th>
+          <th>Добавить для наблюдения</th>
+        </tr>
+      </thead>
+      <tbody>
+        {loop="thremes"}
+        <tr>
+          <td ><img src="img/icon1.png" onclick="threme_add({$value.id}, {$users.id})"></td>
+          <td class="text-align-left">{$value.section}</td>
+          <td class="text-align-left"><a href='http://{$users.tracker}/forum/viewtopic.php?t={$value.id}' target="_blank">{$value.threme}</a></td>
+          <td><a class="delete" onclick="delete_from_buffer({$value.id})"></a></td>
+          <td><a class="add" onclick="transfer_from_buffer({$value.id}>)"></a></td>
+        </tr>
+        {/loop}
+      </tbody>
+    </table>
+  </div>
   {else}
   <table class="user-table">
     <tbody>
@@ -34,7 +34,3 @@
     </tbody>
   </table>
   {/if}
-  </div>
-<br>
-<button>Очистить</button>
-</form>
