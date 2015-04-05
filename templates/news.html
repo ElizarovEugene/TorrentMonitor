@@ -1,0 +1,14 @@
+﻿  <form id="help">
+    
+    <!-- content -->
+    <h2 class="settings-title">{$title}</h2>
+    {loop="news"}
+      <div {if="$value.new"}class="new"{/if} id="{$value.id}" onmouseover="newsRead({$value.id})">
+        {$value.text}
+      </div>
+    <br/>
+    {/loop}
+    
+  </form>
+  
+  <div class="clear-both"></div>
