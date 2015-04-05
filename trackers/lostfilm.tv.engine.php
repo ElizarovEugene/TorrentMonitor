@@ -352,7 +352,7 @@ class lostfilmtv
                                 elseif ($hd == 2)
                                     $amp = 'MP4';
                                 else
-                                    $amp = NULL;
+                                    $amp = 'SD';
                                 //сохраняем торрент в файл
                                 $torrent = Sys::getUrlContent(
                                     array(
