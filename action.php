@@ -14,7 +14,7 @@ if (isset($_POST['action']))
 	{
 		$password = md5($_POST['password']);
 		$count = Database::countCredentials($password);
-		
+
 		if ($count == 1)
 		{
 			session_start();
@@ -38,10 +38,10 @@ if (isset($_POST['action']))
 			$tracker = preg_replace('/www\./', '', $tracker);
 			if ($tracker == 'tr.anidub.com')
 				$tracker = 'anidub.com';
-				
+
             if ($tracker == 'new-rutor.org')
 				$tracker = 'rutor.org';
-			
+
 			if ($tracker == 'anidub.com')
 			    $threme = $url['path'];
             elseif ($tracker == 'casstudio.tv')
@@ -379,7 +379,7 @@ if (isset($_POST['action']))
 		<?php
 		return TRUE;
 	}
-	
+
 	//Обновляем настройки
 	if ($_POST['action'] == 'update_settings')
 	{
@@ -392,32 +392,34 @@ if (isset($_POST['action']))
         if ($_POST['sendUpdate'] == 'true')
 		    $sendUpdate = 1;
         else
-            $sendUpdate = 0;		
+            $sendUpdate = 0;
 		Database::updateSettings('sendUpdate', $sendUpdate);
 		Database::updateSettings('sendUpdateEmail', $_POST['sendUpdateEmail']);
 		Database::updateSettings('sendUpdatePushover', $_POST['sendUpdatePushover']);
+                Database::updateSettings('sendUpdateProwl', $_POST['sendUpdateProwl']);
         if ($_POST['sendWarning'] == 'true')
 		    $sendWarning = 1;
         else
-            $sendWarning = 0;		
-		Database::updateSettings('sendWarning', $sendWarning);		
+            $sendWarning = 0;
+		Database::updateSettings('sendWarning', $sendWarning);
 		Database::updateSettings('sendWarningEmail', $_POST['sendWarningEmail']);
 		Database::updateSettings('sendWarningPushover', $_POST['sendWarningPushover']);
+                Database::updateSettings('sendWarningProwl', $_POST['sendWarningProwl']);
         if ($_POST['auth'] == 'true')
 		    $auth = 1;
         else
-            $auth = 0;		
+            $auth = 0;
 		Database::updateSettings('auth', $auth);
         if ($_POST['proxy'] == 'true')
 		    $proxy = 1;
         else
-            $proxy = 0;		
+            $proxy = 0;
 		Database::updateSettings('proxy', $proxy);
 		Database::updateSettings('proxyAddress', $_POST['proxyAddress']);
         if ($_POST['torrent'] == 'true')
 		    $torrent = 1;
         else
-            $torrent = 0;		
+            $torrent = 0;
         Database::updateSettings('useTorrent', $torrent);
         Database::updateSettings('torrentClient', $_POST['torrentClient']);
         Database::updateSettings('torrentAddress', $_POST['torrentAddress']);

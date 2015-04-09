@@ -98,7 +98,8 @@ INSERT INTO settings VALUES (25, 'sendUpdateEmail', '');
 INSERT INTO settings VALUES (26, 'sendUpdatePushover', '');
 INSERT INTO settings VALUES (29, 'debug', '0');
 INSERT INTO settings VALUES (30, 'rss', '1');
-
+INSERT INTO settings VALUES (31, 'sendUpdateProwl', '');
+INSERT INTO settings VALUES (32, 'sendWarningProwl', '');
 
 
 -- Дамп таблицы temp

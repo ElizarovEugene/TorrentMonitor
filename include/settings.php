@@ -37,6 +37,10 @@ foreach ($settings as $row)
             <label class="label-name">Pushover (<a href="https://pushover.net" target="_blank">?</a>)</label>
             <input type="text" name="sendUpdatePushover" value="<?php echo $sendUpdatePushover ?>">
             <span class="subinput-text">Например: uyrxppPbPgetdh7neWr4NZ8rYuyTXD</span>
+            <br />
+            <label class="label-name">Prowl (<a href="https://www.prowlapp.com/" target="_blank">?</a>)</label>
+            <input type="text" name="sendUpdateProwl" value="<?php echo $sendUpdateProwl ?>">
+            <span class="subinput-text">Например: ad4f9f6d8e074b77c42ffd21007d8ac98955e715</span>
         </div>
         <p>
             <label class="label-name"></label>
@@ -50,6 +54,10 @@ foreach ($settings as $row)
             <label class="label-name">Pushover (<a href="https://pushover.net" target="_blank">?</a>)</label>
             <input type="text" name="sendWarningPushover" value="<?php echo $sendWarningPushover ?>">
             <span class="subinput-text">Например: uyrxppPbPgetdh7neWr4NZ8rYuyTXD</span>
+            <br />
+            <label class="label-name">Prowl (<a href="https://www.prowlapp.com" target="_blank">?</a>)</label>
+            <input type="text" name="sendWarningProwl" value="<?php echo $sendWarningProwl ?>">
+            <span class="subinput-text">Например: ad4f9f6d8e074b77c42ffd21007d8ac98955e715</span>
         </div>
     </div>
     <p>

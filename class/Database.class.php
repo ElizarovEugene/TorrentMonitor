@@ -151,9 +151,7 @@ class Database
         $stmt->bindParam(':val', $val);
         if ($stmt->execute())
             return TRUE;
-        else
-            return FALSE;
-        $stmt = NULL;
+        return FALSE;
     }
     
     public static function getCredentials($tracker)

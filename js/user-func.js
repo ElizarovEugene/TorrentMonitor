@@ -285,10 +285,12 @@ $( document ).ready(function()
             send = $form.find('input[name="send"]').prop('checked');
             sendUpdate = $form.find('input[name="sendUpdate"]').prop('checked');
             sendUpdateEmail = $form.find('input[name="sendUpdateEmail"]').val();
-            sendUpdatePushover = $form.find('input[name="sendUpdatePushover"]').val();            
+            sendUpdatePushover = $form.find('input[name="sendUpdatePushover"]').val();
+            sendUpdateProwl = $form.find('input[name="sendUpdateProwl"]').val();
             sendWarning = $form.find('input[name="sendWarning"]').prop('checked');
             sendWarningEmail = $form.find('input[name="sendWarningEmail"]').val();
-            sendWarningPushover = $form.find('input[name="sendWarningPushover"]').val();            
+            sendWarningPushover = $form.find('input[name="sendWarningPushover"]').val();
+            sendWarningProwl = $form.find('input[name="sendWarningProwl"]').val();
             auth = $form.find('input[name="auth"]').prop('checked');
             proxy = $form.find('input[name="proxy"]').prop('checked');
             proxyAddress = $form.find('input[name="proxyAddress"]').val();
@@ -326,7 +328,7 @@ $( document ).ready(function()
 
         $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
         $.post("action.php",{action: 'update_settings', serverAddress: serverAddress, send: send, sendUpdate: sendUpdate,
-            sendUpdateEmail: sendUpdateEmail, sendUpdatePushover: sendUpdatePushover, sendWarning: sendWarning, sendWarningEmail: sendWarningEmail, sendWarningPushover: sendWarningPushover, auth: auth, proxy: proxy, proxyAddress: proxyAddress, torrent: torrent, torrentClient: torrentClient, torrentAddress: torrentAddress, torrentLogin: torrentLogin, torrentPassword: torrentPassword, pathToDownload: pathToDownload, deleteDistribution: deleteDistribution, deleteOldFiles: deleteOldFiles, rss: rss, debug: debug},
+            sendUpdateEmail: sendUpdateEmail, sendUpdatePushover: sendUpdatePushover, sendUpdateProwl: sendUpdateProwl, sendWarning: sendWarning, sendWarningEmail: sendWarningEmail, sendWarningPushover: sendWarningPushover, sendWarningProwl: sendWarningProwl, auth: auth, proxy: proxy, proxyAddress: proxyAddress, torrent: torrent, torrentClient: torrentClient, torrentAddress: torrentAddress, torrentLogin: torrentLogin, torrentPassword: torrentPassword, pathToDownload: pathToDownload, deleteDistribution: deleteDistribution, deleteOldFiles: deleteOldFiles, rss: rss, debug: debug},
             function(data) {
                 $('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
                 $(s).removeAttr('disabled');
