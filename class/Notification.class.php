@@ -16,7 +16,7 @@ class Notification
     		}
     	}
 	}
-	
+
 	public static function sendMail($settingEmail, $date, $tracker, $message, $header_message, $name=0)
 	{
         $headers = 'From: TorrentMonitor'."\r\n";
@@ -39,21 +39,36 @@ class Notification
 
 		mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor: ".$header_message).'?=', $msg, $headers);
 	}
-	
+
 	public static function sendPushover($sendUpdatePushover, $date, $tracker, $message)
 	{
-	    $msg = 'Дата: '.$date."\r\n".'Трекер: '.$tracker."\r\n".'Сообщение: '.$message."\r\n";
-        $postfields = 'token=a9784KuYUoUdT4z47BassBLxWQGqFV&user='.$sendUpdatePushover.'&message='.$msg;
-        $forumPage = Sys::getUrlContent(
-        	array(
-        		'type'           => 'POST',
-        		'header'         => 1,
-        		'returntransfer' => 1,
-        		'url'            => 'https://api.pushover.net/1/messages.json',
-                'postfields'     => $postfields,
-        	)
-        );
+		$msg = 'Дата: '.$date."\r\n".'Трекер: '.$tracker."\r\n".'Сообщение: '.$message."\r\n";
+		$postfields = 'token=a9784KuYUoUdT4z47BassBLxWQGqFV&user='.$sendUpdatePushover.'&message='.$msg;
+		$forumPage = Sys::getUrlContent(
+			array(
+				'type'           => 'POST',
+				'header'         => 1,
+				'returntransfer' => 1,
+				'url'            => 'https://api.pushover.net/1/messages.json',
+				'postfields'     => $postfields,
+			)
+		);
 	}
+
+        public static function sendProwl($token, $date, $tracker, $message)
+        {
+                $msg = 'Дата: '.$date."\r\n".'Трекер: '.$tracker."\r\n".'Сообщение: '.$message."\r\n";
+                $postfields = 'apikey='.$token.'&application=TorrentMonitor&event=Notification&description='.$msg;
+                $forumPage = Sys::getUrlContent(
+                        array(
+                                'type'           => 'POST',
+                                'header'         => 1,
+                                'returntransfer' => 1,
+                                'url'            => 'https://api.prowlapp.com/publicapi/add',
+                                'postfields'     => $postfields,
+                        )
+                );
+        }
 
 	public static function sendNotification($type, $date, $tracker, $message, $name=0)
 	{
@@ -61,7 +76,7 @@ class Notification
 			$header_message = 'Предупреждение.';
 		if ($type == 'notification')
 			$header_message = 'Обновление.';
-			
+
         $send = Database::getSetting('send');
         if ($send)
         {
@@ -73,10 +88,14 @@ class Notification
                     $sendWarningEmail = Database::getSetting('sendWarningEmail');
                     if ( ! empty($sendWarningEmail))
                         Notification::sendMail($sendWarningEmail, $date, $tracker, $message, $header_message);
-                        
+
                     $sendWarningPushover = Database::getSetting('sendWarningPushover');
                     if ( ! empty($sendWarningPushover))
                         Notification::sendPushover($sendWarningPushover, $date, $tracker, $message, $header_message);
+
+                    $sendWarningProwl = Database::getSetting('sendWarningProwl');
+                    if ( ! empty($sendWarningProwl))
+                        Notification::sendProwl($sendWarningProwl, $date, $tracker, $message, $header_message);
                 }
             }
 
@@ -88,10 +107,14 @@ class Notification
                     $sendUpdateEmail = Database::getSetting('sendUpdateEmail');
                     if ( ! empty($sendUpdateEmail))
                         Notification::sendMail($sendUpdateEmail, $date, $tracker, $message, $header_message, $name);
-                        
+
                     $sendUpdatePushover = Database::getSetting('sendUpdatePushover');
                     if ( ! empty($sendUpdatePushover))
                         Notification::sendPushover($sendUpdatePushover, $date, $tracker, $message, $header_message);
+
+                    $sendUpdateProwl = Database::getSetting('sendUpdateProwl');
+                    if ( ! empty($sendUpdateProwl))
+                        Notification::sendProwl($sendUpdateProwl, $date, $tracker, $message, $header_message);
                 }
             }
 		}

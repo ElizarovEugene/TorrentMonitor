@@ -113,7 +113,9 @@ VALUES
 	(25,'sendUpdateEmail',''),
 	(26,'sendUpdatePushover',''),
 	(29,'debug','0'),
-	(30,'rss','1');
+	(30,'rss','1'),
+        (31, 'sendUpdateProwl', ''),
+        (32, 'sendWarningProwl', '');
 
 /*!40000 ALTER TABLE `settings` ENABLE KEYS */;
 UNLOCK TABLES;
