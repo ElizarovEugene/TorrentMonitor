@@ -26,15 +26,19 @@ class Notification
 		if ($name != '' || $name != 0)
 		{
     		if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.me' || $tracker == 'tfile.me' || $tracker == 'torrents.net.ua' || $tracker == 'pornolab.net' || $tracker == 'rustorka.com')
-    			$msg .= "http://{$tracker}/forum/viewtopic.php?t={$name}";
+    			$url = "http://{$tracker}/forum/viewtopic.php?t={$name}";
     		elseif ($tracker == 'kinozal.tv'  || $tracker == 'animelayer.ru' || $tracker == 'tracker.0day.kiev.ua')
-        	    $msg .= "http://{$tracker}/details.php?id={$name}";
+        	    $url = "http://{$tracker}/details.php?id={$name}";
     		elseif ($tracker == 'rutor.org')
-    			$msg .= "http://alt.rutor.org/torrent/{$name}/";
+    			$url = "http://alt.rutor.org/torrent/{$name}/";
     		elseif ($tracker == 'anidub.com')
-                $msg .= "http://tr.anidub.com/{$name}";
+                $url = "http://tr.anidub.com/{$name}";
             elseif ($tracker == 'casstudio.tv')
-    		    $msg .= "http://casstudio.tv/viewtopic.php?t={$name}";
+    		    $url = "http://casstudio.tv/viewtopic.php?t={$name}";
+            else
+                $url = '';
+            if ($url)
+              $msg .="<a href=\"$url\">$url</a>";
         }
 
 		mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor: ".$header_message).'?=', $msg, $headers);
@@ -72,7 +76,7 @@ class Notification
                 {
                     $sendWarningEmail = Database::getSetting('sendWarningEmail');
                     if ( ! empty($sendWarningEmail))
-                        Notification::sendMail($sendWarningEmail, $date, $tracker, $message, $header_message);
+                        Notification::sendMail($sendWarningEmail, $date, $tracker, $message, $header_message, $name);
                         
                     $sendWarningPushover = Database::getSetting('sendWarningPushover');
                     if ( ! empty($sendWarningPushover))

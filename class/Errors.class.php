@@ -3,6 +3,7 @@ class Errors
 {
     static $errorsArray;
     private static $instance;
+    private static $torrent;
     
     private function __construct()
     {
@@ -47,6 +48,11 @@ class Errors
         self::$errorsArray[$name] = $value;
     }
     
+    public static function setTorrent($torrent)
+    {
+        self::$torrent = $torrent;
+    }
+    
     public static function getWarning($warning)
     {
 	 	return Errors::getInstance()->read($warning);
@@ -57,8 +63,17 @@ class Errors
         $date = date('Y-m-d H:i:s');
     	Database::setWarnings($date, $tracker, $warning);
     	$countErrors = Database::getWarningsCount($tracker);
+        $msg = Errors::getWarning($warning);
+        $name = 0;
+        if(is_array(self::$torrent)) {
+            if(isset(self::$torrent['name'])) 
+                $msg = $msg.'<br>Раздача:'.self::$torrent['name'].'<br>';
+            if(isset(self::$torrent['torrent_id'])) {
+                $name = self::$torrent['torrent_id'];
+            }
+        }
     	if ($countErrors[0]['count'] == 1)
-			Notification::sendNotification('warning', $date, $tracker, Errors::getWarning($warning), 0);
+			Notification::sendNotification('warning', $date, $tracker, $msg, $name);
     }
 }
 ?>

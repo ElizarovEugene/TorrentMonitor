@@ -45,6 +45,7 @@ if (Sys::checkConfig())
 
 					echo $torrentsList[$i]['name'].' на трекере '.$tracker."\r\n".'<br />';
 					
+                    Errors::setTorrent($torrentsList[$i]);
 					if ($tracker == 'lostfilm.tv' || $tracker == 'novafilm.tv' || $tracker == 'baibako.tv' || $tracker == 'newstudio.tv')
 					{
     				    $time_start = microtime(true);
@@ -63,6 +64,7 @@ if (Sys::checkConfig())
     					if ($debug)
     				        echo 'Время выполнения: '.$time."\r\n".'<br />';
 					}
+                    Errors::setTorrent(NULL);
 
 					$functionClass = NULL;
 					$functionEngine = NULL;
