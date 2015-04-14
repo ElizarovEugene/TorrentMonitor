@@ -1,6 +1,6 @@
 <?php
-$dir = dirname(__FILE__).'/';
-include_once $dir.'TransmissionRPC.class.php';
+$dir = str_replace('class', '', dirname(__FILE__));
+include_once $dir.'class/TransmissionRPC.class.php';
 
 class Transmission
 {
