@@ -436,7 +436,7 @@ class Sys
     public static function getNotifiers()
     {
         $result = array();
-        foreach (glob(str_replace("/class", "", dirname(__FILE__))."/notifiers/*.Notifier.class.php") as $file)
+        foreach (glob(str_replace("class", "", dirname(__FILE__))."notifiers/*.Notifier.class.php") as $file)
         {
             $notifierClass = str_replace(".Notifier.class.php", "", basename($file));
             $notifier = Notifier::Create($notifierClass, "-1");
