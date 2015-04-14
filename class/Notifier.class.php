@@ -94,7 +94,8 @@ abstract class Notifier extends Plugin
             if ((($type == 'warning') and $notifier->SendWarning()) or
                 (($type == 'notification') and $notifier->SendUpdate()))
             {
-                if ( empty($notifier->SendAddress()) )
+                $sendAddress = $notifier->SendAddress();
+                if ( empty($sendAddress) )
                 {
                     $result .= "Для уведомлений на сервис '.$notifier->VerboseName().' не задан адрес для отправки.<br/>";
                     continue;
