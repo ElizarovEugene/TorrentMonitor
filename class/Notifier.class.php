@@ -32,12 +32,14 @@ abstract class Notifier extends Plugin
 
     final public function SendUpdate()
     {
-        return $this->GetProperty('sendUpdate') == "true";
+        $value = $this->GetProperty('sendUpdate');
+        return (($value == '1') || ($value == 'true'));
     }
 
     final public function SendWarning()
     {
-        return $this->GetProperty('sendWarning') == "true";
+        $value = $this->GetProperty('sendWarning');
+        return (($value == '1') || ($value == 'true'));
     }
 
     final public function SendAddress()

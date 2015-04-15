@@ -405,10 +405,14 @@ if (isset($_POST['action']))
 
     if ($_POST['action'] == 'updateNotifierSettings')
     {
-        $notifier = Notifier::Create($_POST['notifier'], $_POST['group']);
-        if ($notifier != NULL)
-            $notifier->SetParams($_POST['address'], $_POST['sendUpdate'], $_POST['sendWarning']);
-        $notifier = NULL;
+        $notifiersSettings = json_decode($_POST['settings'], true);
+        foreach ($notifiersSettings as $key => $settings)
+        {
+            $notifier = Notifier::Create($settings['notifier'], $settings['group']);
+            if ($notifier != NULL)
+                $notifier->SetParams($settings['address'], $settings['sendUpdate'], $settings['sendWarning']);
+            $notifier = NULL;
+        }
         echo "Настройки уведомлений обновлены.";
         return TRUE;
     }

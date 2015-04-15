@@ -383,27 +383,30 @@ $( document ).ready(function()
     //Сохраняем настройки уведомлений
     $("#notifier_settings").submit(function()
     {
-        //debugger;
-        
+        //debugger;        
         var table = document.getElementById('notifiers-table');
 
+        var notifiersSettings = {}; 
         for (var i = 1, row; row = table.rows[i]; i++) {
-            var rowGroup = parseInt(row.getAttribute('group'));
+            var notifier = {};
+            notifier["group"] = parseInt(row.getAttribute('group'));
 
             var notifSelect = row.children[0].children[0];
-            var notifier = notifSelect.options[notifSelect.selectedIndex].value;
+            notifier["notifier"] = notifSelect.options[notifSelect.selectedIndex].value;
 
-            var address = row.children[1].children[0].value;
-            var sendUpdate = row.children[2].children[0].checked;
-            var sendWarning = row.children[3].children[0].checked;
+            notifier["address"] = row.children[1].children[0].value;
+            notifier["sendUpdate"] = row.children[2].children[0].checked;
+            notifier["sendWarning"] = row.children[3].children[0].checked;
 
-            $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
-            $.post("action.php",{action: 'updateNotifierSettings', group: rowGroup, notifier: notifier, address: address, sendUpdate: sendUpdate, sendWarning: sendWarning},
-                function(data) {
-                    $('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
-                }
-            );           
+            notifiersSettings[i - 1] = notifier;
         } 
+        $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+        var settings = JSON.stringify(notifiersSettings);
+        $.post("action.php",{action: 'updateNotifierSettings', settings: settings},
+            function(data) {
+                $('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+            }
+        );           
         return false;
     });
 
