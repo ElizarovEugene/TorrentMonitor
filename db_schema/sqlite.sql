@@ -104,3 +104,13 @@ CREATE TABLE `watch` (
   `tracker` varchar(30) NOT NULL DEFAULT '',
   `name` varchar(30) NOT NULL DEFAULT ''
 );
+
+CREATE TABLE `pluginsettings` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  `type` VARCHAR(255) NOT NULL,
+  `plugin` VARCHAR(255) NOT NULL,
+  `group` INTEGER NULL,
+  `key` VARCHAR(255) NOT NULL,
+  `value` VARCHAR(255) NOT NULL
+);
+

@@ -347,6 +347,15 @@ body {
         .user-torrent.active { background-image: url(../img/minus.png); }
     
     .user-table { display: none; }
+
+    .add-notifier-title {
+        margin-bottom: 15px;
+        padding-left: 25px;
+        background: url(../img/add.png) 0px 2px no-repeat;
+        color: #5d939f;
+        font-size: 14px;
+        cursor: pointer;
+        }
     
     .monitoring-title,
     .account-title,
@@ -515,3 +524,12 @@ div.blok:before, div.blok:after {
     position:absolute;
     z-index:-2;
 }
+
+.notifierSettings {
+ vertical-align: middle; 
+ padding: 0px 5px;
+ border: 0px;
+ width: auto;
+ background: none;
+}
+

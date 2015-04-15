@@ -159,3 +159,19 @@ CREATE TABLE "watch" (
   "tracker" varchar(30) NOT NULL DEFAULT '',
   "name" varchar(30) NOT NULL DEFAULT ''
 );
+
+
+-- Дамп таблицы pluginsettings
+-- ------------------------------------------------------------
+
+CREATE SEQUENCE auto_id_pluginsettings;
+
+CREATE TABLE "pluginsettings" {
+  "id" INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('auto_id_pluginsettings'),
+  "type" varchar(255) NOT NULL,
+  "plugin" varchar(255) NOT NULL,
+  "group" INTEGER NULL,
+  "key" varchar(255) NOT NULL,
+  "value" varchar(255) NOT NULL
+};
+

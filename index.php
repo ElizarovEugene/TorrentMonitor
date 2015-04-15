@@ -15,12 +15,12 @@ raintpl::configure("tpl_dir" , Sys::getTemplateDir() );
 if (Sys::checkAuth())
 {
     $errors = Database::getWarningsCount();
-    
+
     $count = 0;
     if ( ! empty($errors))
         for ($i=0; $i<count($errors); $i++)
             $count += $errors[$i]['count'];
-    
+
     $tpl = new RainTPL;
     $tpl->assign( "update"     , Sys::checkUpdate() );
     $tpl->assign( "version"    , Sys::version() );

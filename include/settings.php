@@ -2,10 +2,11 @@
 $dir = dirname(__FILE__)."/../";
 include_once $dir."config.php";
 include_once $dir."class/System.class.php";
-include_once $dir."class/Database.class.php";
 if ( ! Sys::checkAuth())
     die(header('Location: ../'));
 
+include_once $dir."class/Notifier.class.php";
+include_once $dir."class/Database.class.php";
 $settings = Database::getAllSetting();
 foreach ($settings as $row)
 {
@@ -20,38 +21,7 @@ foreach ($settings as $row)
         <input type="text" name="serverAddress" value="<?php echo $serverAddress ?>">
         <span class="subinput-text">Например: http://torrent.test.ru/</span>
     </p>
-    <p>
-        <label class="label-name"></label>
-        <label><input type="checkbox" name="send" <?php if ($send) echo "checked" ?> onclick="expand('sendNotification')"> Отправлять уведомления</label>
-    </p>
-    <div id="sendNotification" <?php if ( ! $send) echo 'class="result"' ?>>
-        <p>
-            <label class="label-name"></label>
-            <label><input type="checkbox" name="sendUpdate" <?php if ($sendUpdate) echo "checked" ?> onclick="expand('sendUpdate')"> Отправлять уведомления об обновлениях</label>
-        </p>
-        <div id="sendUpdate" <?php if ( ! $sendUpdate) echo 'class="result"' ?>>
-            <label class="label-name">E-mail</label>
-            <input type="text" name="sendUpdateEmail" value="<?php echo $sendUpdateEmail ?>">
-            <span class="subinput-text">Например: vasya@test.ru</span>
-            <br />
-            <label class="label-name">Pushover (<a href="https://pushover.net" target="_blank">?</a>)</label>
-            <input type="text" name="sendUpdatePushover" value="<?php echo $sendUpdatePushover ?>">
-            <span class="subinput-text">Например: uyrxppPbPgetdh7neWr4NZ8rYuyTXD</span>
-        </div>
-        <p>
-            <label class="label-name"></label>
-            <label><input type="checkbox" name="sendWarning" <?php if ($sendWarning) echo "checked" ?> onclick="expand('sendWarning')"> Отправлять уведомления об ошибках</label>
-        </p>
-        <div id="sendWarning" <?php if ( ! $sendWarning) echo 'class="result"' ?>>
-            <label class="label-name">E-mail</label>
-            <input type="text" name="sendWarningEmail" value="<?php echo $sendWarningEmail ?>">
-            <span class="subinput-text">Например: vasya@test.ru</span>
-            <br />
-            <label class="label-name">Pushover (<a href="https://pushover.net" target="_blank">?</a>)</label>
-            <input type="text" name="sendWarningPushover" value="<?php echo $sendWarningPushover ?>">
-            <span class="subinput-text">Например: uyrxppPbPgetdh7neWr4NZ8rYuyTXD</span>
-        </div>
-    </div>
+   <br/>
     <p>
         <label class="label-name"></label>
         <label><input type="checkbox" name="auth" <?php if ($auth) echo "checked" ?>> Включить авторизацию</label>
@@ -120,6 +90,63 @@ foreach ($settings as $row)
         <label class="label-name"></label>
         <label><input type="checkbox" name="debug" <?php if ($debug) echo "checked" ?>> Режим отладки</label>
     </p>
+    <button class="form-button">Сохранить</button>
+</form>
+<br/>
+<br/>
+<h2 class="settings-title">Настройки уведомлений</h2>
+<form id="notifier_settings">
+    <label id="notifiers-table-hint"/>
+    <table class="notifierSettings" id="notifiers-table">
+        <tr class="notifierSettings">
+            <th>Сервис</th>
+            <th>Адрес</th>
+            <th><img src="img/icon9-2.png" title="Отправлять уведомления о добавлении/обновлении раздач"/></th>
+            <th><img src="img/icon6.png" title="Отправлять уведомления об ошибках"/></th>
+            <th/>
+        </tr>
+
+<?php
+        foreach (Database::getActivePluginsByType(Notifier::$type) as $plugin)
+        {
+            $notifier = Notifier::Create($plugin['name'], $plugin['group']);
+            if ($notifier == null)
+                continue;
+
+            $needSendUpdate = "";
+            $needSendWarning = "";
+            if ($notifier->SendUpdate() == TRUE)
+                $needSendUpdate = 'checked';
+            if ($notifier->SendWarning() == TRUE)
+                $needSendWarning = 'checked';
+            $htmlRow  = '<tr class="notifierSettings" group="'.$notifier->Group().'">';
+            $htmlRow .= '<td class="notifierSettings"><select id="sendService" name="sendService" style="width: 150px;">';
+
+            foreach(Sys::getNotifiers() as $notifInfo)
+            {
+                $selected = "";
+                if ($notifInfo["Name"] == $notifier->Name())
+                    $selected = "selected";
+                $htmlRow .= '<option value="'.$notifInfo["Name"].'" '.$selected.'>'.$notifInfo["VerboseName"].'</option>';
+            }
+
+            $htmlRow .= '</select></td>';
+            $htmlRow .=
+                   '<td class="notifierSettings"><input type="text" name="sendAddress" value="'.$notifier->SendAddress().'" style="width: 300px;"> </td>
+                    <td class="notifierSettings"><input type="checkbox" name="sendUpdate" '.$needSendUpdate.' > </td>
+                    <td class="notifierSettings"><input type="checkbox" name="sendWarning" '.$needSendWarning.' > </td>
+                    <td class="notifierSettings"><img src="img/delete.png" title="Удалить" onclick="removeNotifierSetting(this)"/> </td>
+                  </tr>';
+
+            $notifier = null;
+            echo $htmlRow;
+        }
+
+?>
+
+    </table>
+    <h2 class="add-notifier-title" >Добавить службу уведомлений</h2>
+    <label id="notifier-list-end"/>
     <button class="form-button">Сохранить</button>
 </form>
 <br/>

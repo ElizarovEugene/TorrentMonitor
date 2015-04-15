@@ -174,6 +174,19 @@ CREATE TABLE `watch` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
+DROP TABLE IF EXISTS `pluginsettings`;
+
+CREATE TABLE `pluginsettings` (
+      `id` INT NOT NULL AUTO_INCREMENT,
+      `type` VARCHAR(255) NOT NULL,
+      `plugin` VARCHAR(255) NOT NULL,
+      `group` INT NULL DEFAULT NULL,
+      `key` VARCHAR(255) NOT NULL,
+      `value` VARCHAR(255) NOT NULL,
+      PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
 
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
