@@ -116,3 +116,7 @@ open_basedir = /tmp/:/path/to/folder/torrent_monitor/:/path/to/folder/torrent_cl
 ###Страница проекта:
 
 http://blog.korphome.ru/torrentmonitor/
+
+###Форум:
+
+http://korphome.ru/TorrentMonitor/
