@@ -61,7 +61,7 @@ class Update {
                                     if ( ! mkdir($structure, 0777, true))
                                     {
                                         echo 'Не удалось создать директорию: '.$file.", обновление прервано.<br>";
-                                        break;
+                                        exit;
                                     }
                                 }
                             }
@@ -77,7 +77,7 @@ class Update {
                                     if ( ! copy($ROOTPATH.'tmp/TorrentMonitor-master/'.$file, $ROOTPATH.$file))
                                     {
                                         echo 'Не удалось скопировать файл: '.$file.", обновление прервано.<br>";
-                                        break;
+                                        exit;
                                     }
                                     else
                                         echo 'Файл: '.$file.' обновлён.<br>';

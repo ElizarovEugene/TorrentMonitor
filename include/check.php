@@ -73,7 +73,10 @@ if (Sys::checkInternet())
                 
                 if (Database::checkTrackersCredentialsExist($tracker))
                 {
-                    $contents[] = array('text' => 'Учётные данные для работы с трекером "'.$tracker.'" найдены.',);
+                    if ($tracker == 'lostfilm-mirror' || $tracker == 'rutor.org' ||$tracker == 'tfile.me')
+                        $contents[] = array('text' => 'Учётные данные для работы с трекером "'.$tracker.'" не требуются.',);
+                    else
+                        $contents[] = array('text' => 'Учётные данные для работы с трекером "'.$tracker.'" найдены.',);
                 }
                 else
                 {
@@ -83,6 +86,8 @@ if (Sys::checkInternet())
 
                 if ($tracker == 'lostfilm.tv')
                     $page = 'https://www.lostfilm.tv/';
+                elseif ($tracker == 'lostfilm-mirror')
+                    $page = 'http://korphome.ru';
                 elseif ($tracker == 'rutracker.org')
                     $page = 'http://rutracker.org/forum/index.php';
                 else

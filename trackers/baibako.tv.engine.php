@@ -64,7 +64,7 @@ class baibako
 	
 	//функция анализа xml ленты
 	private static function analysis($name, $hd, $item)
-	{echo '/'.$name.'/i     ', (string)$item->title."\r\n";
+	{
 		if (preg_match('/'.$name.'/i', (string)$item->title))
 		{
 			if ($hd == 1)

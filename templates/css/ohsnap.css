@@ -1,0 +1,64 @@
+/* Oh Snap */
+
+#ohsnap {
+  position: fixed;
+  bottom: 5px;
+  right:5px;
+  margin-left: 5px;
+  z-index:99;
+}
+
+.alert {
+  text-align: right;
+  margin-top: 10px;
+  padding: 15px;
+  border: 1px solid #eed3d7;
+  border-radius: 4px;
+  float: right;
+  clear: right;
+}
+
+.alert-red {
+  color: white;
+  background-color: #DA4453;
+}
+.alert-green {
+  color: white;
+  background-color: #37BC9B;
+}
+.alert-blue {
+  color: white;
+  background-color: #4A89DC;
+}
+.alert-yellow {
+  color: white;
+  background-color: #F6BB42;
+}
+.alert-orange {
+  color:white;
+  background-color: #E9573F;
+}
+
+.buttons {
+  margin-bottom: 20px;
+  display: block;
+}
+
+.buttons a {
+  margin:auto;
+  margin-bottom:10px;
+  float: none !important;
+  text-align: center;
+
+}
+
+.buttons a span { 
+  padding-left: 0px; 
+}
+
+#ohsnap { text-shadow: none; }
+@media (max-width: 450px) {
+  .buttons {
+    margin-bottom: 334px;
+  }
+}

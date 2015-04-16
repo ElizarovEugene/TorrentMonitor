@@ -20,6 +20,8 @@ if (isset($_POST['action']))
 			session_start();
 			$_SESSION['TM'] = $password;
 			$return['error'] = FALSE;
+			if ($POST['remember'])
+			    setcookie('hash_pass', $password, time()+3600*24*31);
 		}
 		else
 		{
@@ -47,7 +49,7 @@ if (isset($_POST['action']))
             elseif ($tracker == 'casstudio.tv')
 			{
 				$query = explode('=', $url['query']);
-				$threme = $query[2];
+				$threme = $query[1];
 			}
 			elseif ($tracker != 'rutor.org')
 			{

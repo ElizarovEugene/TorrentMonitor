@@ -31,11 +31,14 @@ $( document ).ready(function()
     //Передаём пароль
     $("#enter").submit(function() {
         var $form = $(this),p = $form.find('input[name="password"]').val();
-        $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+        ohSnap('Обрабатывается запрос...', 'yellow');
         $.post("action.php",{action: 'enter', password: p},
             function(data) {
                 if (data.error)
-                    $('#notice').empty().attr('background', '#FF6633').append(data.msg).delay(3000).fadeOut(400);
+                {
+                    ohSnapX();
+                    ohSnap(data.msg, 'green');
+                }
                 else
                     document.location.reload();
                 console.log(data.error)
@@ -59,14 +62,15 @@ $( document ).ready(function()
         
         if (u == '')
         {
-            alert("Вы не указали ссылку на тему!");
+            ohSnap('Вы не указали ссылку на тему!', 'red');
             return false;
         }
                                     
-        $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+        ohSnap('Обрабатывается запрос...', 'yellow');
         $.post("action.php",{action: 'torrent_add', name: n, url: u, path: p},
             function(data) {
-                $('#notice').empty().append(data).delay(3000).fadeOut(400);
+                ohSnapX();
+                ohSnap(data, 'green');
                 $(n_f).val('');
                 $(u_f).val('');
             }
@@ -100,12 +104,12 @@ $( document ).ready(function()
 
         if (t == '')
         {
-            formError += "Вы не выбрали трекер!\n";
+            formError += "Вы не выбрали трекер!<br>";
         }
         
         if (n == '')
         {
-            formError += "Вы не указали название сериала!\n";
+            formError += "Вы не указали название сериала!<br>";
         }
 
         if (!qualitySelected)
@@ -115,14 +119,15 @@ $( document ).ready(function()
 
         if (formError != "")
         {
-            alert(formError);
+            ohSnap(formError, 'red');
             return false;
         }
 
-        $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+        ohSnap('Обрабатывается запрос...', 'yellow');
         $.post("action.php",{action: 'serial_add', tracker: t, name: n, hd: h, path: p},
             function(data) {
-                $('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+                ohSnapX();
+                ohSnap(data, 'green');
                 $(n_f).val('');
                 $(h_f).removeAttr('checked');
             }
@@ -171,14 +176,15 @@ $( document ).ready(function()
 
         if (formError != "")
         {
-            alert(formError);
+            ohSnap(formError, 'red');
             return false;
         }
 
-        $('#notice_sub').empty().append('Обрабатывается запрос...').fadeIn();
+        ohSnap('Обрабатывается запрос...', 'yellow');
         $.post("action.php",{action: 'update', id: id, tracker: t, name: n, url: u, update: update, path: p, hd: h, reset: r_f},
             function(data) {
-                $('#notice_sub').empty().append(data).delay(3000).fadeOut(400);
+                ohSnapX();
+                ohSnap(data, 'green');
             }
         );
 
@@ -207,14 +213,15 @@ $( document ).ready(function()
 
         if (formError != "")
         {
-            alert(formError);
+            ohSnap(formError, 'red');
             return false;
         }
         
-        $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+        ohSnap('Обрабатывается запрос...', 'yellow');
         $.post("action.php",{action: 'user_add', tracker: t, name: n},
             function(data) {
-                $('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+                ohSnapX();
+                ohSnap(data, 'green');
                 $(n_f).val('');
             }
         );
@@ -224,10 +231,11 @@ $( document ).ready(function()
     //Удаляем темы 
     $("#threme_clear").submit(function()
     {
-        $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+        ohSnap('Обрабатывается запрос...', 'yellow');
         $.post("action.php",{action: 'threme_clear'},
             function(data) {
-                $('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+                ohSnapX();
+                ohSnap(data, 'green');
                 $.get("include/show_watching.php",
                     function(data) {
                         $('#content').empty().append(data);
@@ -261,14 +269,15 @@ $( document ).ready(function()
 
         if (formError != "")
         {
-            alert(formError);
+            ohSnap(formError, 'red');
             return false;
         }
                                     
-        $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+        ohSnap('Обрабатывается запрос...', 'yellow');
         $.post("action.php",{action: 'update_credentials', id: id, log: l, pass: p, passkey: passkey},
             function(data) {
-                $('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+                ohSnapX();
+                ohSnap(data, 'green');
                 $(b).removeAttr('disabled');
             }
         );
@@ -320,15 +329,16 @@ $( document ).ready(function()
 
         if (formError != "")
         {
-            alert(formError);
+            ohSnap(formError, 'red');
             return false;
         }
 
-        $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+        ohSnap('Обрабатывается запрос...', 'yellow');
         $.post("action.php",{action: 'update_settings', serverAddress: serverAddress, send: send, sendUpdate: sendUpdate,
             sendUpdateEmail: sendUpdateEmail, sendUpdatePushover: sendUpdatePushover, sendWarning: sendWarning, sendWarningEmail: sendWarningEmail, sendWarningPushover: sendWarningPushover, auth: auth, proxy: proxy, proxyAddress: proxyAddress, torrent: torrent, torrentClient: torrentClient, torrentAddress: torrentAddress, torrentLogin: torrentLogin, torrentPassword: torrentPassword, pathToDownload: pathToDownload, deleteDistribution: deleteDistribution, deleteOldFiles: deleteOldFiles, rss: rss, debug: debug},
             function(data) {
-                $('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+                ohSnapX();
+                ohSnap(data, 'green');
                 $(s).removeAttr('disabled');
             }
         );
@@ -356,15 +366,18 @@ $( document ).ready(function()
 
         if (formError != "")
         {
-            alert(formError);
+            ohSnap(formError, 'red');
             return false;
         }
         
-        $('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+        ohSnap('Обрабатывается запрос...', 'yellow');
         $.post("action.php",{action: 'change_pass', pass: p},
             function(data) {
                 if (data.error)
-                    $('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+                {
+                    ohSnapX();
+                    ohSnap(data, 'green');
+                }
                 else
                     document.location.reload();
             }, "json"
@@ -432,10 +445,11 @@ function delete_user(id)
 {
     if (confirm("Удалить?"))
     {
-    	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+    	ohSnap('Обрабатывается запрос...', 'yellow');
     	$.post("action.php",{action: 'delete_user', user_id: id},
     		function(data) {
-    			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+    			ohSnapX();
+                ohSnap(data, 'green');
     			$.get("include/show_watching.php",
             		function(data) {
             			$('#content').delay(3000).empty().append(data);
@@ -452,10 +466,11 @@ function delete_from_buffer(id)
 {
     if (confirm("Удалить?"))
     {
-    	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+    	ohSnap('Обрабатывается запрос...', 'yellow');
     	$.post("action.php",{action: 'delete_from_buffer', id: id},
     		function(data) {
-    			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+    			ohSnapX();
+                ohSnap(data, 'green');
     			$.get("include/show_watching.php",
             		function(data) {
             			$('#content').delay(3000).empty().append(data);
@@ -470,10 +485,11 @@ function delete_from_buffer(id)
 //Перемещаем тему из буфера в мониторинг постоянный
 function transfer_from_buffer(id)
 {
-	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+	ohSnap('Обрабатывается запрос...', 'yellow');
 	$.post("action.php",{action: 'transfer_from_buffer', id: id},
 		function(data) {
-			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+			ohSnapX();
+            ohSnap(data, 'green');
 			$.get("include/show_watching.php",
         		function(data) {
         			$('#content').delay(3000).empty().append(data);
@@ -488,11 +504,13 @@ function transfer_from_buffer(id)
 //Передаём темы для скачивания
 function threme_add(id, user_id)
 {
+    ohSnap('Обрабатывается запрос...', 'yellow');
 	$.post("action.php",{action: 'threme_add', id: id, user_id: user_id},
 		function(data) {
 			if (data.error)
 			{
-				$('#notice').empty().attr('background', '#FF6633').append('Ошибка передачи данных<br/>Попробуйте ещё раз.').delay(3000).fadeOut(400);
+    			ohSnapX();
+                ohSnap('Ошибка передачи данных<br/>Попробуйте ещё раз.', 'green');
 			}
 			else
 			{
@@ -513,10 +531,11 @@ function del(id, name)
 {
     if (confirm('Удалить '+name+'?'))
     {
-    	$('#notice').empty().append('Обрабатывается запрос...').fadeIn();
+    	ohSnap('Обрабатывается запрос...', 'yellow');
     	$.post("action.php",{action: 'del', id: id},
     		function(data) {
-    			$('#notice').empty().attr('background', '#FF6633').append(data).delay(3000).fadeOut(400);
+    			ohSnapX();
+                ohSnap(data, 'green');
     			$.get("include/show_table.php",
             		function(data) {
             			$('#content').delay(3000).empty().append(data);
@@ -552,7 +571,7 @@ function changeField()
 	var tracker = document.getElementById("tracker").value;
     if (tracker == 'baibako.tv' || tracker == 'newstudio.tv' || tracker == 'novafilm.tv')
         $('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> HD 720<br /><input type="radio" name="hd" value="2"> HD 1080</span>');
-	if (tracker == 'lostfilm.tv')
+	if (tracker == 'lostfilm.tv' || tracker == 'lostfilm-mirror')
 		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> Автовыбор HD 720/1080<br /><input type="radio" name="hd" value="2"> HD 720 MP4');
 }
 

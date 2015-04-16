@@ -34,6 +34,7 @@ INSERT INTO "credentials" VALUES (12,'animelayer.ru', '', '','', '');
 INSERT INTO "credentials" VALUES (13,'tracker.0day.kiev.ua','','','', '');
 INSERT INTO "credentials" VALUES (14,'rustorka.com','','','', '');
 INSERT INTO "credentials" VALUES (15,'pornolab.net','','','', '');
+INSERT INTO "credentials" VALUES (17,'lostfilm-mirror',' ',' ','', '');
 
 CREATE TABLE `news` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
