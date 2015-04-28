@@ -30,10 +30,10 @@
 * Управление торрент-клиентами (добавление/удаление раздач и файлов): Transmission (через XML-RPC), Deluge (через deluge-console).
 
 * Сервисы уведомлений:
-1 E-mail
-2 Prowl
-3 Pushbullet
-4 Pushover
+ * E-mail
+ * Prowl
+ * Pushbullet
+ * Pushover
 
 * RSS-лента
 * Выполенение собственных скриптом после обновления раздачи
