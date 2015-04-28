@@ -3,29 +3,30 @@
 
 ###Список возможностей приложения:
 
-* Слежение за темами на anidub.com
-* Слежение за темами на animelayer.ru
-* Слежение за темами на casstudio.tv
-* Слежение за темами на kinozal.tv
-* Слежение за темами на nnm-club.ru
-* Слежение за темами на pornolab.net
-* Слежение за темами на rustorka.com
-* Слежение за темами на rutracker.org
-* Слежение за темами на rutor.org
-* Слежение за темами на tfile.me
-* Слежение за темами на tracker.0day.kiev.ua
-* Слежение за темами на tv.mekc.info
-* Слежение за релизерами на nnm-club.ru
-* Слежение за релизерами на pornolab.net
-* Слежение за релизерами на rutracker.org
-* Слежение за релизерами на tfile.me
-* Поиск новых серий на baibako.tv (SD/HD 720/HD 1080 версии на выбор)
-* Поиск новых серий на hamsterstudio.org (SD/HD 720/HD 1080 версии на выбор)
-* Поиск новых серий на lostfilm.tv (SD/HD 720/HD 1080 версии на выбор)
-* Поиск новых серий на newstudio.tv (SD/HD 720/HD 1080 версии на выбор)
-* Поиск новых серий на novafilm.tv (SD/HD 720 версии на выбор)
-
-
+* Слежение за темами
+ * anidub.com
+ * animelayer.ru
+ * casstudio.tv
+ * kinozal.tv
+ * nnm-club.ru
+ * pornolab.net
+ * rustorka.com
+ * rutracker.org
+ * rutor.org
+ * tfile.me
+ * tracker.0day.kiev.ua
+ * tv.mekc.info
+* Слежение за релизерами
+ * nnm-club.ru
+ * pornolab.net
+ * rutracker.org
+ * tfile.me
+* Поиск новых серий (SD/HD 720/HD 1080 версии на выбор)
+ * baibako.tv 
+ * hamsterstudio.org
+ * lostfilm.tv
+ * newstudio.tv
+ * novafilm.tv
 * Работа через proxy (SOCKS5/HTTP)
 * Управление торрент-клиентами (добавление/удаление раздач и файлов): Transmission (через XML-RPC), Deluge (через deluge-console).
 * Сервисы уведомлений:
