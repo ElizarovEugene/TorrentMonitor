@@ -28,7 +28,9 @@
  * newstudio.tv
  * novafilm.tv
 * Работа через proxy (SOCKS5/HTTP)
-* Управление торрент-клиентами (добавление/удаление раздач и файлов): Transmission (через XML-RPC), Deluge (через deluge-console).
+* Управление торрент-клиентами (добавление/удаление раздач и файлов)
+ * Transmission (через XML-RPC)
+ * Deluge (через deluge-console)
 * Сервисы уведомлений:
  * E-mail
  * Prowl
