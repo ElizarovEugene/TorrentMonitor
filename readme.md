@@ -116,10 +116,6 @@ allow_url_fopen = on
 open_basedir = /tmp/:/path/to/folder/torrent_monitor/:/path/to/folder/torrent_client_watch/
 ```
 
-###Обновление:
-
-Наилучшим, и самым простым, способом обновления приложения является удаление всех файлов, кроме config.php и заливкой новой версии. Также, если в обновлении имеется update.sql, его необходимо выполнить в вашей базе данных.
-
 ###Страница проекта:
 
 http://blog.korphome.ru/torrentmonitor/
