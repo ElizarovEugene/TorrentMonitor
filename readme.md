@@ -14,22 +14,29 @@
 * Слежение за темами на rutor.org
 * Слежение за темами на tfile.me
 * Слежение за темами на tracker.0day.kiev.ua
+* Слежение за темами на tv.mekc.info
 * Слежение за релизерами на nnm-club.ru
 * Слежение за релизерами на pornolab.net
 * Слежение за релизерами на rutracker.org
 * Слежение за релизерами на tfile.me
 * Поиск новых серий на baibako.tv (SD/HD 720/HD 1080 версии на выбор)
+* Поиск новых серий на hamsterstudio.org (SD/HD 720/HD 1080 версии на выбор)
 * Поиск новых серий на lostfilm.tv (SD/HD 720/HD 1080 версии на выбор)
 * Поиск новых серий на newstudio.tv (SD/HD 720/HD 1080 версии на выбор)
 * Поиск новых серий на novafilm.tv (SD/HD 720 версии на выбор)
 
-* Работа через proxy (к примеру Tor)
+* Работа через proxy (SOCKS5/HTTP)
 
 * Управление торрент-клиентами (добавление/удаление раздач и файлов): Transmission (через XML-RPC), Deluge (через deluge-console).
 
-* Уведомления на E-mail и через https://pushover.net
+* Сервисы уведомлений:
+* * E-mail
+* * Prowl
+* * Pushbullet
+* * Pushover
 
 * RSS-лента
+* Выполенение собственных скриптом после обновления раздачи
 
 ###Скриншоты:
  ![Screenshot0](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-53-42.jpg "Screenshot0")
