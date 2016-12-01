@@ -36,6 +36,8 @@
  * Prowl
  * Pushbullet
  * Pushover
+ * Pushall
+ * Telegram 
 * RSS-лента
 * Выполенение собственных скриптов после обновления раздачи
 
@@ -54,67 +56,8 @@
 * PHP (5.2 или выше) с поддержкой cURL и PDO
 * MySQL, PostgreSQL, SQLite
 
-###Установка:
-
-* Импортировать дамп базы из директории db_schema в зависимости от используемой БД - *.sql
-* Перенести все файлы в папку на вашем сервере (например /path/to/folder/torrent_monitor/)
-* Внести изменения в config.php и указать данные для доступа к БД
-
-Для MySQL:
-```
-Config::write('db.host', 'localhost');
-Config::write('db.type', 'mysql');
-Config::write('db.charset', 'utf8');
-Config::write('db.port', '3306');
-Config::write('db.basename', 'torrentmonitor');
-Config::write('db.user', 'torrentmonitor');
-Config::write('db.password', 'torrentmonitor');
-```
-Для PostgreSQL:
-```
-Config::write('db.host', 'localhost');
-Config::write('db.type', 'pgsql');
-Config::write('db.port', '5432');
-Config::write('db.basename', 'torrentmonitor');
-Config::write('db.user', 'torrentmonitor');
-Config::write('db.password', 'torrentmonitor');
-```
-Для SQLite:
-```
-Config::write('db.type', 'sqlite');
-Config::write('db.basename', '/var/www/htdocs/TorrentMonitor/torrentmonitor.sqlite'); #Указывайте _абсолютный_ путь до файла с базой и не забудьте выставить на него верные права доступа.
-```
-
-* Добавить в cron engine.php ( *проверьте права на запись в каталог /path/to/log/* )
-
-```
-*/10 * * * * php -q /path/to/folder/torrent_monitor/engine.php >> /path/to/log/torrent_monitor_error.log 2>&1
-```
-* Зайти в веб-интерфейс ( **пароль по умолчанию — torrentmonitor, смените(!) его после первого входа** )
-* Указать учётные данные от трекеров
-* Настроить обязательные параметры: "Адрес TorrentMonitor" и "Директория для скачивания" (описание всех параметров настроек вы можете найти в разделе Помощь)
-* Добавить торренты для мониторинга
-* Перейти на вкладку «Тест» и проверить — всё ли верно работает
-
-###Настройки:
-
-Так же, в php.ini (для CLI) необходимо изменить следующие параметры:
-
-```
-; увеличить максимальное вермя выполнения скрипта
-max_execution_time = 300
-
-; указать date.timezone
-date.timezone = Europe/Moscow
-
-; эту опцию желательно включить в php.ini как для CLI, так и для веб-сервера
-allow_url_fopen = on
-
-; проверить - разрешена ли запись в сторонние каталоги. 
-; Нужно разрешить запись в каталог с самим приложением TorrentMonitor 
-; и каталог куда будут сохраняться *.torrent файлы для torrent клиента
-open_basedir = /tmp/:/path/to/folder/torrent_monitor/:/path/to/folder/torrent_client_watch/
-```
+###Установка и настройка
+http://korphome.ru/TorrentMonitor/viewtopic.php?f=3&t=138
 
 ###Страница проекта:
 
