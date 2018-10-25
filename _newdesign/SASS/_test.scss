@@ -1,0 +1,20 @@
+//_test.scss
+
+#testPage {
+	@include OS;
+	font-size: 14px;
+	
+		.page {
+		padding: 20px;
+		
+			p {
+				color: #1a7f03;
+				font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+			}
+	}
+		
+		.red {
+			color: #ae0808;
+			font-weight: bold;
+		}
+}

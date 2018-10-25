@@ -1,0 +1,177 @@
+//_modals.scss
+
+#addItem {
+	.modal-footer {
+		padding: 10px 0 0;
+		margin-top: 15px;
+	}
+	
+	.modal-body {
+		@include OS;
+		padding: 1.5rem;
+	}
+	
+	.modal-header {
+		border-bottom: 0px;
+		background-color: #edeff5;
+		padding-bottom: 0px;
+	}
+	
+	.nav-tabs {
+		border-bottom: 0px;
+		
+		a {
+			color: #3f3f49;
+		}
+	}
+	
+	.text-muted {
+		color: #878787 !important;
+		font-size: 12px;
+	}
+	
+	.nav-tabs .nav-link {
+		border: 0px;
+		@include OSBold;
+		font-size: 14px;
+		
+		&.active {
+				color: #858585;
+			}
+	}
+	
+	label {
+		margin-bottom: 5px;
+		margin-top: 10px;
+		font-size: 13px;
+		color: #414141;
+	}
+	
+	input {
+		@include OS;	
+		font-size: 13px;
+	}
+	
+	button {
+		@include OSBold;
+		font-size: 12px;
+		text-transform: uppercase;
+		
+		&.close {
+			font-size: 22px;
+		}
+	}
+	
+	
+	hr {
+		margin-bottom: 5px;
+	}
+	
+	.update{
+		color: #ffffff;
+		background-color: #9b9b9b;
+		border: 1px solid #8f8f8f;
+	}
+	
+	label.active {
+		background-color: #2f9a2d;
+		border: 1px solid white;
+	}
+	
+	.groupOne {
+		margin-top: 10px;
+	}
+	
+	.tracker {
+		font-size: 12px;
+	}
+}
+
+
+#editItem {
+	.modal-footer {
+		padding: 10px 0 0;
+		margin-top: 15px;
+	}
+	
+	.modal-body {
+		@include OS;
+		padding: 1.5rem;
+		margin-top: -25px;
+	}
+	
+	.modal-header {
+		padding-bottom: 5px;
+		padding-right: 25px;
+		padding-left: 25px;
+	}
+	
+	.nav-tabs {
+		border-bottom: 0px;
+		
+		a {
+			color: #4f5374;
+		}
+	}
+	
+	.text-muted {
+		color: #878787 !important;
+		font-size: 12px;
+	}
+	
+	.nav-tabs .nav-link {
+		border: 0px;
+		@include OSBold;
+		font-size: 14px;
+		
+		&.active {
+				color: #626262;
+			}
+	}
+	
+	label {
+		margin-bottom: 5px;
+		margin-top: 10px;
+		font-size: 13px;
+		color: #414141;
+	}
+	
+	input {
+		@include OS;	
+		font-size: 13px;
+	}
+	
+	button {
+		@include OSBold;
+		font-size: 12px;
+		text-transform: uppercase;
+		
+		&.close {
+			font-size: 22px;
+		}
+	}
+	
+	
+	hr {
+		margin-bottom: 5px;
+	}
+	
+	.update{
+		color: #ffffff;
+		background-color: #9b9b9b;
+		border: 1px solid #8f8f8f;
+	}
+	
+	label.active {
+		background-color: #2f9a2d;
+		border: 1px solid white;
+	}
+	
+	.groupOne {
+		margin-top: 10px;
+	}
+	
+	.tracker {
+		font-size: 12px;
+	}
+}

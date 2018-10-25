@@ -1,0 +1,38 @@
+// _help.scsss
+
+#helpPage {
+	padding: 20px;
+	
+	.info {
+		@include OS;
+		font-size: 14px;
+		padding: 15px;
+		background-color: #eff6ff;
+		@include bora(3px);
+		color: #292929;
+
+		a {
+			color: #2452e5;
+		}
+	}
+
+	.sticky-top {
+		top:  70px;
+	}
+	
+	.card-header {
+		h5 {
+			@include OSBold;
+			
+			
+			button {
+				@include OSBold;
+				color: #1a2339;
+
+				@media screen and (max-width: 400px) {
+					font-size: 12px
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,21 @@
+// _errors.scss
+
+#listErrors {
+	height: calc(90vh - 100px);
+	
+	.no-errors {
+		margin: auto;
+	}
+	
+	.message {
+		color: #ffffff;
+		font-size: 14px;
+		padding: 10px;
+		background-color: #9aadbf;
+		@include bora(3px);
+	}
+	
+	.errors {
+		height: 20px;
+	}
+}

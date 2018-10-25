@@ -1,0 +1,1323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<body>
+    <title>TorrentMonitor Update Schema</title>
+    <update>
+        <version>1.7.7</version>
+        <description>- Исправление мелких багов</description>
+        <files>
+            <file>class/Database.class.php</file>
+            <file>include/check.php</file>
+            <file>include/show_warnings.php</file>
+            <file>trackers/anidub.com.engine.php</file>
+            <file>trackers/animelayer.ru.engine.php</file>
+            <file>trackers/baibako.tv.engine.php</file>
+            <file>trackers/casstudio.tv.engine.php</file>
+            <file>trackers/hamsterstudio.org.engine.php</file>
+            <file>trackers/kinozal.me.engine.php</file>
+            <file>trackers/lostfilm-mirror.engine.php</file>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>trackers/newstudio.tv.engine.php</file>
+            <file>trackers/pornolab.net.engine.php</file>
+            <file>trackers/rustorka.com.engine.php</file>
+            <file>trackers/rutor.org.engine.php</file>
+            <file>trackers/rutracker.org.search.php</file>
+            <file>trackers/tfile.cc.engine.php</file>
+            <file>trackers/tracker.0day.kiev.ua.engine.php</file>
+            <file>trackers/tv.mekc.info.engine.php</file>
+            <file>class/System.class.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>     
+    <update>
+        <version>1.7.6</version>
+        <description>- Трекеры anidub.com, nnmclub.to, rutracker.org перешли на использование https<br />
+- Улучшена совместимость с PHP 7.2<br />
+- Удалён трекер novafilm.tv<br />
+- Добавлен трекер http://riperam.org<br />
+- Исправление мелких багов<br /></description>
+        <files>
+            <file>class/Database.class.php</file>
+            <file>class/Deluge.class.php</file>
+            <file>class/Notification.class.php</file>
+            <file>class/System.class.php</file>
+            <file>class/Transmission.class.php</file>
+            <file>class/Update.class.php</file>
+            <file>img/riperam.org.ico</file>
+            <file>img/nnmclub.to.ico</file>
+            <file>include/add.php</file>
+            <file>include/form.php</file>
+            <file>include/news.php</file>
+            <file>include/settings.php</file>
+            <file>include/show_table.php</file>
+            <file>include/show_warnings.php</file>
+            <file>js/user-func.js</file>
+            <file>pages/footer.php</file>
+            <file>trackers/anidub.com.engine.php</file>
+            <file>trackers/baibako.tv.engine.php</file>
+            <file>trackers/baibako.tv_forum.engine.php</file>
+            <file>trackers/booktracker.org.search.php</file>
+            <file>trackers/hamsterstudio.org.engine.php</file>
+            <file>trackers/lostfilm-mirror.engine.php</file>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>trackers/newstudio.tv.engine.php</file>
+            <file>trackers/nnmclub.to.engine.php</file>
+            <file>trackers/nnmclub.to.search.php</file>
+            <file>trackers/pornolab.net.search.php</file>
+            <file>trackers/riperam.org.engine.php</file>
+            <file>trackers/rustorka.com.engine.php</file>            
+            <file>trackers/rutracker.org.engine.php</file>
+            <file>trackers/rutracker.org.search.php</file>
+            <file>trackers/tfile.cc.search.php</file>
+            <file>action.php</file>
+            <file>engine.php</file>
+            <file>index.php</file>
+            <file>changelog.txt</file>
+        </files>
+        <queryes>
+            <query>UPDATE credentials SET tracker = 'nnmclub.to' WHERE id = 2;</query>
+            <query>UPDATE `torrent` SET `tracker` = 'nnmclub.to' WHERE tracker = 'nnm-club.name';</query>
+            <query>DELETE FROM credentials WHERE tracker = 'novafilm.tv'</query>
+            <query>DELETE FROM torrent WHERE tracker = 'novafilm.tv'</query>
+            <query>INSERT INTO credentials VALUES ('23', 'riperam.org', '', '', '', '', 'forum', 1);</query>
+        </queryes>
+    </update>    
+    <update>
+        <version>1.7.4</version>
+        <description>- nnm-club.name переехал на <a href="https://nnmclub.to">nnmclub.to</a></description>
+        <files>
+            <file>img/nnmclub.to.ico</file>
+            <file>include/show_table.php</file>
+            <file>trackers/nnmclub.to.engine.php</file>
+            <file>trackers/nnmclub.to.search.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>     
+    <update>        
+        <version>1.7.3</version>
+        <description>- nnm-club.name переехал на <a href="http://nnmclub.to">nnmclub.to</a><br />
+        	- Восстановление работы <a href="http://rustorka.com/forum/index.php">rustorka.com</a><br />
+        	- Добавлен отлов запроса капчи для <a href="http://www.lostfilm.tv">lostfilm.tv</a><br />
+        </description>
+        <files>
+            <file>class/Database.class.php</file>
+            <file>class/Errors.class.php</file>
+            <file>class/Notification.class.php</file>
+            <file>class/Config.class.php</file>
+            <file>include/show_table.php</file>
+            <file>include/check.php</file>
+            <file>include/add.php</file>
+            <file>include/show_warnings.php</file>
+            <file>include/form.php</file>
+            <file>trackers/rutor.org.engine.php</file>
+            <file>trackers/nnmclub.to.engine.php</file>
+            <file>trackers/nnmclub.to.search.php</file>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>trackers/rustorka.com.engine.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+        <queryes>
+            <query>UPDATE credentials SET tracker = 'nnmclub.to' WHERE id = 2;</query>
+            <query>UPDATE `torrent` SET `tracker` = 'nnmclub.to' WHERE tracker = 'nnm-club.name';</query>
+        </queryes>         
+    </update>     
+    <update>
+        <version>1.7.2</version>
+        <description>- Исправления для восстановления работоспособности <a href="http://rutracker.org">http://rutracker.org</a><br />
+            - Исправление багов функционала расширенных настроек<br />
+        </description>
+        <files>
+            <file>trackers/tracker.0day.kiev.ua.engine.php</file>
+            <file>class/System.class.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>    
+    <update>
+        <version>1.7.1</version>
+        <description>- Исправления для восстановления работоспособности <a href="http://rutracker.org">http://rutracker.org</a><br />
+            - Исправление багов функционала расширенных настроек<br />
+        </description>
+        <files>
+            <file>class/Config.class.php</file>
+            <file>include/settings.php</file>
+            <file>trackers/rutracker.org.engine.php</file>
+            <file>config.xml</file>
+            <file>action.php</file>
+            <file>config.php.example</file>
+            <file>class/System.class.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>
+    <update>
+        <version>1.7</version>
+        <description>- Исправления для восстановления работоспособности <a href="https://casstudio.tv">https://casstudio.tv</a><br />
+            - Добавлен функционал расширенных настроек. На текущий момент реализована работа с разными прокси для каждого трекера   <br />
+            - Исправление мелких багов<br /></description>
+        <files>
+            <file>class/Notification.class.php</file>
+            <file>include/settings.php</file>
+            <file>include/form.php</file>
+            <file>include/add.php</file>
+            <file>include/check.php</file>
+            <file>js/user-func.js</file>
+            <file>pages/main.php</file>
+            <file>pages/styles.css</file>
+            <file>pages/header.php</file>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>trackers/kinozal.me.engine.php</file>
+            <file>trackers/casstudio.tv.engine.php</file>
+            <file>config.php.example</file>
+            <file>action.php</file>
+            <file>class/System.class.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>
+    <update>
+        <version>1.6.9.1</version>
+        <description>- Исправление мелких багов<br /></description>
+        <files>
+            <file>include/form.php</file>
+            <file>action.php</file>
+            <file>class/System.class.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>
+    <update>
+        <version>1.6.9</version>
+        <description>- Добавлена возможность слежения за обновляемыми темами на <a href="http://baibako.tv/">http://baibako.tv/</a><br /></description>
+        <files>
+            <file>include/show_table.php</file>
+            <file>include/form.php</file>
+            <file>include/show_warnings.php</file>
+            <file>trackers/baibako.tv_forum.engine.php</file>
+            <file>engine.php</file>
+            <file>action.php</file>
+            <file>img/baibako.tv_forum.ico</file>
+            <file>class/System.class.php</file>
+            <file>changelog.txt</file>
+        </files>
+        <queryes>
+            <query>INSERT INTO credentials VALUES ('22', 'baibako.tv_forum', '', '', '', '', 'forum', 1);</query>
+        </queryes>
+    </update>
+    <update>
+        <version>1.6.8</version>
+        <description>- Исправления для восстановления работоспособности <a href="http://rutracker.org/">http://rutracker.org/</a><br /></description>
+        <files>
+            <file>trackers/rutracker.org.engine.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>
+    <update>
+        <version>1.6.7</version>
+        <description>- nnmclub.to переехал на <a href="http://nnm-club.name">nnm-club.name</a><br /></description>
+        <queryes>
+            <query>UPDATE `torrent` SET `tracker` = 'nnm-club.name' WHERE tracker = 'nnmclub.to';</query>
+        </queryes>         
+    </update>     
+    <update>
+        <version>1.6.6</version>
+        <description>- nnmclub.to переехал на <a href="http://nnm-club.name">nnm-club.name</a><br /></description>
+        <files>
+            <file>class/Notification.class.php</file>
+            <file>include/show_table.php</file>
+            <file>include/check.php</file>
+            <file>include/add.php</file>
+            <file>include/show_warnings.php</file>
+            <file>include/form.php</file>
+            <file>action.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+        <queryes>
+            <query>UPDATE credentials SET tracker = 'nnm-club.name' WHERE id = 2;</query>
+            <query>UPDATE `torrent` SET `tracker` = 'nnm-club.name' WHERE tracker = 'nnm-club.me';</query>
+        </queryes>         
+    </update>     
+    <update>
+        <version>1.6.5</version>
+        <description>- Исправления для восстановления работоспособности <a href="https://booktracker.org">https://booktracker.org</a><br />
+- Исправление мелких багов<br /><br /></description>
+        <files>
+            <file>class/Notification.class.php</file>
+            <file>trackers/booktracker.org.engine.php</file>
+            <file>trackers/booktracker.org.search.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>    
+    <update>
+        <version>1.6.4</version>
+        <description>- Исправления для восстановления работоспособности <a href="http://rutracker.org/">http://rutracker.org/</a><br />
+- Исправление мелких багов<br /><br /></description>
+        <files>
+            <file>trackers/rutracker.org.engine.php</file>
+            <file>trackers/rutracker.org.search.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+    <update>
+        <version>1.6.3</version>
+        <description>Обновление до 1.6.3</description>
+        <files>
+	        <file>class/Notification.class.php</file>
+	        <file>img/tfile.cc.ico</file>
+            <file>include/add.php</file>
+            <file>include/check.php</file>
+            <file>include/form.php</file>
+            <file>include/show_table.php</file>
+            <file>include/show_warnings.php</file>
+			<file>trackers/lostfilm.tv.engine.php</file>            
+            <file>trackers/tfile.cc.search.php</file>
+            <file>trackers/tfile.cc.engine.php</file>
+            <file>version.txt</file>
+            <file>class/System.class.php</file>
+            <file>changelog.txt</file>
+        </files>
+		<queryes>
+			<query>UPDATE credentials SET tracker = 'tfile.cc' WHERE tracker = 'tfile.co';</query>
+            <query>UPDATE torrent SET tracker = 'tfile.cc' WHERE tracker = 'tfile.co';</query>
+        </queryes>        
+    </update>
+    <update>
+        <version>1.6.2</version>
+        <description>Корректирующее обновление до 1.6.2</description>
+        <files>
+            <file>trackers/baibako.tv.engine.php</file>
+            <file>trackers/nnmclub.to.engine.php</file>
+            <file>trackers/nnmclub.to.search.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>
+    <update>
+        <version>1.6.1</version>
+        <description>Корректирующее обновление до 1.6.1</description>
+        <files>
+            <file>pages/main.php</file>
+            <file>include/update.php</file>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>
+    <update>
+        <version>1.6</version>
+        <description>Обновление до 1.6</description>
+        <files>
+            <file>class/Update.class.php</file>
+            <file>class/Database.class.php</file>
+            <file>class/Errors.class.php</file>
+            <file>class/System.class.php</file>
+            <file>include/settings.php</file>
+            <file>include/update.php</file>
+            <file>js/user-func.js</file>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>changelog.txt</file>
+            <file>action.php</file>
+            <file>version.txt</file>
+            <file>engine.php</file>
+        </files>
+        <queryes>
+            <query>INSERT INTO settings VALUES (38, 'autoUpdate', '0');</query>
+            <query>INSERT INTO settings VALUES (39, 'sentUpdateNotification', '0');</query>
+        </queryes>
+    </update>
+    <update>
+        <version>1.5.8</version>
+        <description>Корректирующее обновление до 1.5.8</description>
+        <files>
+            <file>trackers/kinozal.me.engine.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+    <update>
+        <version>1.5.7</version>
+        <description>Корректирующее обновление до 1.5.7</description>
+        <files>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+    <update>
+        <version>1.5.6</version>
+        <description>Корректирующее обновление до 1.5.6</description>
+        <files>
+            <file>trackers/rutracker.org.engine.php</file>
+            <file>trackers/animelayer.ru.engine.php</file>
+            <file>trackers/nnmclub.to.engine.php</file>
+            <file>trackers/casstudio.tv.engine.php</file>
+            <file>trackers/pornolab.net.engine.php</file>
+            <file>trackers/rutor.org.engine.php</file>
+            <file>trackers/tracker.0day.kiev.ua.engine.php</file>
+            <file>trackers/anidub.com.engine.php</file>
+            <file>trackers/kinozal.me.engine.php</file>
+            <file>trackers/tv.mekc.info.engine.php</file>
+            <file>trackers/booktracker.org.engine.php</file>
+            <file>trackers/rustorka.com.engine.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+    <update>
+        <version>1.5.5</version>
+        <description>Корректирующее обновление до 1.5.5</description>
+        <files>
+            <file>trackers/rutracker.org.engine.php</file>
+            <file>trackers/rutracker.org.search.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+    <update>
+        <version>1.5.4</version>
+        <description>Корректирующее обновление до 1.5.4</description>
+        <files>
+            <file>trackers/nnmclub.to.engine.php</file>
+            <file>trackers/nnmclub.to.search.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+    <update>
+        <version>1.5.3</version>
+        <description>Корректирующее обновление до 1.5.3</description>
+        <files>
+            <file>trackers/rutracker.org.engine.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+    <update>
+        <version>1.5.2</version>
+        <description>Корректирующее обновление до 1.5.2</description>
+        <files>
+            <file>trackers/animelayer.ru.engine.php</file>
+            <file>include/settings.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+    <update>
+        <version>1.5.1</version>
+        <description>Корректирующее обновление до 1.5.1</description>
+        <files>
+            <file>class/Database.class.php</file>
+            <file>js/user-func.js</file>
+            <file>trackers/animelayer.ru.engine.php</file>
+            <file>include/settings.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+        <queryes>
+            <query>UPDATE torrent SET tracker = 'kinozal.me' WHERE tracker = 'kinozal.tv';</query>
+        </queryes>
+    </update>
+    <update>
+        <version>1.5</version>
+        <description>Обновление до 1.5</description>
+        <files>
+            <file>class/Database.class.php</file>
+            <file>class/Notification.class.php</file>
+            <file>class/TransmissionRPC.class.php</file>
+            <file>js/user-func.js</file>
+            <file>trackers/tv.mekc.info.engine.php</file>
+            <file>trackers/nnmclub.to.engine.php</file>
+            <file>trackers/animelayer.ru.engine.php</file>
+            <file>trackers/kinozal.me.engine.php</file>
+            <file>trackers/rutracker.org.search.php</file>
+            <file>trackers/nnmclub.to.search.php</file>
+            <file>trackers/anidub.com.engine.php</file>
+            <file>trackers/rustorka.com.engine.php</file>
+            <file>trackers/rutracker.org.engine.php</file>
+            <file>trackers/booktracker.org.engine.php</file>
+            <file>trackers/casstudio.tv.engine.php</file>
+            <file>trackers/pornolab.net.engine.php</file>
+            <file>trackers/rutor.org.engine.php</file>
+            <file>trackers/pornolab.net.search.php</file>
+            <file>trackers/tracker.0day.kiev.ua.engine.php</file>
+            <file>trackers/booktracker.org.search.php</file>
+            <file>img/kinozal.me.ico</file>
+            <file>img/booktracker.org.ico</file>
+            <file>include/form.php</file>
+            <file>include/settings.php</file>
+            <file>include/show_warnings.php</file>
+            <file>include/credentials.php</file>
+            <file>include/show_table.php</file>
+            <file>include/execution.php</file>
+            <file>include/check.php</file>
+            <file>include/show_watching.php</file>
+            <file>include/add.php</file>
+            <file>action.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+        <mysql>
+            <query>ALTER TABLE `buffer` ADD `timestamp` DATE DEFAULT NULL AFTER `threme`;</query>
+            <query>ALTER TABLE `credentials` ADD `necessarily` tinyint(1) unsigned DEFAULT NULL AFTER `type`;</query>
+        </mysql>
+        <pgsql>
+            <query>ALTER TABLE buffer ADD COLUMN timestamp DATE DEFAULT NULL;</query>
+            <query>ALTER TABLE credentials ADD COLUMN necessarily INTEGER DEFAULT NULL;</query>
+        </pgsql>
+        <sqlite>
+            <query>ALTER TABLE buffer ADD COLUMN timestamp DATE DEFAULT NULL;</query>
+            <query>ALTER TABLE credentials ADD COLUMN necessarily INTEGER DEFAULT NULL;</query>
+        </sqlite>
+        <queryes>
+            <query>INSERT INTO credentials VALUES ('21', 'booktracker.org', '', '', '', '', 'forum', 1);</query>
+            <query>UPDATE credentials SET tracker = 'kinozal.me' WHERE id = 7;</query>
+            <query>UPDATE credentials SET necessarily = 1 WHERE tracker = 'anidub.com';</query>
+            <query>UPDATE credentials SET necessarily = 1 WHERE tracker = 'animelayer.ru';</query>
+            <query>UPDATE credentials SET necessarily = 1 WHERE tracker = 'baibako.tv';</query>
+            <query>UPDATE credentials SET necessarily = 1 WHERE tracker = 'casstudio.tv';</query>
+            <query>UPDATE credentials SET necessarily = 1 WHERE tracker = 'hamsterstudio.org';</query>
+            <query>UPDATE credentials SET necessarily = 1 WHERE tracker = 'kinozal.me';</query>
+            <query>UPDATE credentials SET necessarily = 0 WHERE tracker = 'lostfilm-mirror';</query>
+            <query>UPDATE credentials SET necessarily = 1 WHERE tracker = 'lostfilm.tv';</query>
+            <query>UPDATE credentials SET necessarily = 1 WHERE tracker = 'newstudio.tv';</query>
+            <query>UPDATE credentials SET necessarily = 1 WHERE tracker = 'nnmclub.to';</query>
+            <query>UPDATE credentials SET necessarily = 1 WHERE tracker = 'novafilm.tv';</query>
+            <query>UPDATE credentials SET necessarily = 1 WHERE tracker = 'pornolab.net';</query>
+            <query>UPDATE credentials SET necessarily = 1 WHERE tracker = 'rustorka.com';</query>
+            <query>UPDATE credentials SET necessarily = 0 WHERE tracker = 'rutor.org';</query>
+            <query>UPDATE credentials SET necessarily = 1 WHERE tracker = 'rutracker.org';</query>
+            <query>UPDATE credentials SET necessarily = 0 WHERE tracker = 'tfile.co';</query>
+            <query>UPDATE credentials SET necessarily = 1 WHERE tracker = 'tracker.0day.kiev.ua';</query>
+            <query>UPDATE credentials SET necessarily = 1 WHERE tracker = 'tv.mekc.info';</query>
+            <query>UPDATE torrent SET tracker = 'kinozal.me' WHERE tracker = 'kinozal.tv';</query>
+        </queryes>
+    </update>
+    <update>
+        <version>1.4.8</version>
+        <description>Обновление до 1.4.8. Исправления работы системных функций и модуля работы с Transmission.</description>
+        <files>
+            <file>trackers/nnmclub.to.engine.php</file>
+            <file>trackers/nnmclub.to.search.php</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+    <update>
+        <version>1.4.7</version>
+        <description>Обновление до 1.4.7. Исправления в БД.</description>
+        <files>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+        <mysql>
+            <query>CREATE TABLE IF NOT EXISTS `temp` (
+  `id` int(11) unsigned NOT NULL,
+  `name` varchar(200) DEFAULT NULL,
+  `path` varchar(200) DEFAULT NULL,
+  `tracker` varchar(30) DEFAULT NULL,
+  `date` varchar(120) DEFAULT NULL,
+  UNIQUE KEY `id` (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;</query>
+        </mysql>
+        <pgsql>
+            <query>CREATE TABLE IF NOT EXISTS "temp" (
+  "id" INTEGER PRIMARY KEY NOT NULL,
+  "name" varchar(200) DEFAULT NULL,
+  "path" varchar(200) DEFAULT NULL,
+  "tracker" varchar(30) DEFAULT NULL,
+  "date" varchar(120) DEFAULT NULL,
+  UNIQUE(id)
+);</query>
+        </pgsql>
+        <sqlite>
+            <query>CREATE TABLE IF NOT EXISTS `temp` (
+  `id` INTEGER NOT NULL,
+  `name` varchar(200) NOT NULL DEFAULT '',
+  `path` varchar(200) NOT NULL DEFAULT '',
+  `tracker` varchar(30) NOT NULL DEFAULT '',
+  `date` varchar(120) NOT NULL DEFAULT '',
+  unique (id)
+);</query>
+        </sqlite>
+    </update>
+    <update>
+        <version>1.4.6</version>
+        <description>Обновление до 1.4.6. Исправления работы системных функций и модуля работы с Transmission.</description>
+        <files>
+            <file>class/Errors.class.php</file>
+            <file>class/Database.class.php</file>
+            <file>class/Transmission.class.php</file>
+            <file>include/show_warnings.php</file>
+            <file>engine.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+        <queryes>
+            <query>DROP TABLE temp;</query>
+        </queryes>
+    </update>
+    <update>
+        <version>1.4.5</version>
+        <description>Обновление до 1.4.5. Исправление для корректной работы tracker.0day.kiev.ua и baibako.tv.</description>
+        <files>
+            <file>class/Database.class.php</file>
+            <file>trackers/tracker.0day.kiev.ua.engine.php</file>
+            <file>trackers/baibako.tv.engine.php</file>
+            <file>include/show_table.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+    <update>
+        <version>1.4.4</version>
+        <description>Обновление до 1.4.4. Исправление для корректной работы anidub.com, поддержка Telegram.</description>
+        <files>
+            <file>include/form.php</file>
+            <file>class/Notification.class.php</file>
+            <file>js/user-func.js</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+        <queryes>
+            <query>INSERT INTO notifications VALUES (11, 'Telegram', '', 'notification');</query>
+            <query>INSERT INTO notifications VALUES (12, 'Telegram', '', 'warning');</query>
+        </queryes>
+    </update>
+    <update>
+        <version>1.4.3</version>
+        <description>Обновление до 1.4.3. Исправление для корректной работы animelayer.ru.</description>
+        <files>
+            <file>trackers/animelayer.ru.engine.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+    <update>
+        <version>1.4.2</version>
+        <description>Обновление до 1.4.2. Исправление мелких багов.</description>
+        <mysql>
+            <query>ALTER TABLE `torrent` ADD `closed` int(11) DEFAULT NULL AFTER `error`;</query>
+        </mysql>
+        <pgsql>
+            <query>ALTER TABLE torrent ADD COLUMN closed INTEGER DEFAULT NULL;</query>
+        </pgsql>
+        <sqlite>
+            <query>ALTER TABLE torrent ADD COLUMN closed INTEGER DEFAULT NULL;</query>
+        </sqlite>
+        <files>
+            <file>class/Database.class.php</file>
+            <file>trackers/rutracker.org.engine.php</file>
+            <file>include/form.php</file>
+            <file>include/show_table.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+    <update>
+        <version>1.4.1</version>
+        <description>Обновление до 1.4.1. Исправление багов.</description>
+        <mysql>
+            <query>ALTER TABLE `warning` ADD `t_id` int(11) DEFAULT NULL AFTER `reason`;</query>
+        </mysql>
+        <pgsql>
+            <query>ALTER TABLE warning ADD COLUMN t_id INTEGER DEFAULT NULL;</query>
+        </pgsql>
+        <sqlite>
+            <query>ALTER TABLE warning ADD COLUMN t_id INTEGER DEFAULT NULL;</query>
+        </sqlite>
+        <files>
+            <file>class/Notification.class.php</file>
+            <file>include/add.php</file>
+            <file>include/form.php</file>
+            <file>rss/index.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.4</version>
+        <description>Обновление до 1.4.</description>
+        <files>
+            <file>class/Database.class.php</file>
+            <file>class/Errors.class.php</file>
+            <file>class/Notification.class.php</file>
+            <file>img/error.png</file>
+            <file>img/pause.png</file>
+            <file>include/add.php</file>
+            <file>include/check.php</file>
+            <file>include/show_table.php</file>
+            <file>include/show_watching.php</file>
+            <file>js/user-func.js</file>
+            <file>trackers/anidub.com.engine.php</file>
+            <file>trackers/animelayer.ru.engine.php</file>
+            <file>trackers/baibako.tv.engine.php</file>
+            <file>trackers/casstudio.tv.engine.php</file>
+            <file>trackers/hamsterstudio.org.engine.php</file>
+            <file>trackers/lostfilm-mirror.engine.php</file>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>trackers/newstudio.tv.engine.php</file>
+            <file>trackers/nnmclub.to.engine.php</file>
+            <file>trackers/nnmclub.to.search.php</file>
+            <file>trackers/novafilm.tv.engine.php</file>
+            <file>trackers/pornolab.net.engine.php</file>
+            <file>trackers/pornolab.net.search.php</file>
+            <file>trackers/rustorka.com.engine.php</file>
+            <file>trackers/rutor.org.engine.php</file>
+            <file>trackers/rutracker.org.engine.php</file>
+            <file>trackers/rutracker.org.search.php</file>
+            <file>trackers/tfile.co.engine.php</file>
+            <file>trackers/tfile.co.search.php</file>
+            <file>trackers/tracker.0day.kiev.ua.engine.php</file>
+            <file>trackers/tv.mekc.info.engine.php</file>
+            <file>engine.php</file>
+            <file>action.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+        <mysql>
+            <query>ALTER TABLE `credentials` ADD `type` VARCHAR(32) DEFAULT NULL AFTER `passkey`;</query>
+            <query>ALTER TABLE `torrent` ADD `pause` tinyint(1) unsigned NOT NULL DEFAULT '0' AFTER `script`;</query>
+            <query>ALTER TABLE `torrent` ADD `error` tinyint(1) unsigned NOT NULL DEFAULT '0' AFTER `pause`;</query>
+        </mysql>
+        <pgsql>
+            <query>ALTER TABLE credentials ADD COLUMN type varchar(32) DEFAULT NULL;</query>
+            <query>ALTER TABLE torrent ADD COLUMN pause INTEGER NOT NULL DEFAULT '0';</query>
+            <query>ALTER TABLE torrent ADD COLUMN error INTEGER NOT NULL DEFAULT '0';</query>
+        </pgsql>
+        <sqlite>
+            <query>ALTER TABLE credentials ADD COLUMN type varchar(32) DEFAULT NULL;</query>
+            <query>ALTER TABLE torrent ADD COLUMN pause INTEGER NOT NULL DEFAULT '0';</query>
+            <query>ALTER TABLE torrent ADD COLUMN error INTEGER NOT NULL DEFAULT '0';</query>
+        </sqlite>  
+        <queryes>
+            <query>UPDATE credentials SET type = 'forum' WHERE tracker = 'anidub.com';</query>
+            <query>UPDATE credentials SET type = 'forum' WHERE tracker = 'animelayer.ru';</query>
+            <query>UPDATE credentials SET type = 'forum' WHERE tracker = 'casstudio.tv';</query>
+            <query>UPDATE credentials SET type = 'forum' WHERE tracker = 'kinozal.tv';</query>
+            <query>UPDATE credentials SET type = 'forum' WHERE tracker = 'nnmclub.to';</query>
+            <query>UPDATE credentials SET type = 'forum' WHERE tracker = 'pornolab.net';</query>
+            <query>UPDATE credentials SET type = 'forum' WHERE tracker = 'rustorka.com';</query>
+            <query>UPDATE credentials SET type = 'forum' WHERE tracker = 'rutor.org';</query>
+            <query>UPDATE credentials SET type = 'forum' WHERE tracker = 'rutracker.org';</query>
+            <query>UPDATE credentials SET type = 'forum' WHERE tracker = 'tfile.co';</query>
+            <query>UPDATE credentials SET type = 'forum' WHERE tracker = 'tracker.0day.kiev.ua';</query>
+            <query>UPDATE credentials SET type = 'forum' WHERE tracker = 'tv.mekc.info';</query>
+            <query>UPDATE credentials SET type = 'RSS' WHERE tracker = 'baibako.tv';</query>
+            <query>UPDATE credentials SET type = 'RSS' WHERE tracker = 'hamsterstudio.org';</query>
+            <query>UPDATE credentials SET type = 'RSS' WHERE tracker = 'lostfilm-mirror';</query>
+            <query>UPDATE credentials SET type = 'RSS' WHERE tracker = 'lostfilm.tv';</query>
+            <query>UPDATE credentials SET type = 'RSS' WHERE tracker = 'newstudio.tv';</query>
+            <query>UPDATE credentials SET type = 'RSS' WHERE tracker = 'novafilm.tv';</query>
+        </queryes>        
+    </update>
+
+    <update>
+        <version>1.3.1</version>
+        <description>Обновление до 1.3.1. Исправление бага с отображение учётных данных в настройках.</description>
+        <files>
+            <file>changelog.txt</file>
+            <file>js/user-func.js</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+    
+    <update>
+        <version>1.3</version>
+        <description>Обновление до 1.3. Восстановлена работа nnm-club, novafilm.tv, исправлены мелкие баги.</description>
+        <files>
+            <file>action.php</file>
+            <file>engine.php</file>
+            <file>changelog.txt</file>
+            <file>img/nnmclub.to.ico</file>
+            <file>include/check.php</file>
+            <file>include/show_table.php</file>
+            <file>include/update.php</file>
+            <file>trackers/nnmclub.to.engine.php</file>
+            <file>trackers/nnmclub.to.search.php</file>
+            <file>trackers/novafilm.tv.engine.php</file>
+            <file>class/System.class.php</file>
+        </files>
+        <queryes>
+            <query>UPDATE credentials SET tracker = 'nnmclub.to' WHERE id = 2;</query>
+            <query>UPDATE `torrent` SET `tracker` = 'nnmclub.to' WHERE tracker = 'nnm-club.me';</query>
+        </queryes>  
+    </update>
+
+    <update>
+        <version>1.2.9.9</version>
+        <description>Обновление до 1.2.9.9. Исправление мелких багов.</description>
+        <files>
+            <file>action.php</file>
+            <file>changelog.txt</file>
+            <file>trackers/animelayer.ru.engine.php</file>
+            <file>include/update.php</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.2.9.8</version>
+        <description>Обновление до 1.2.9.8. Исправления багов для animelayer.ru и tfile.me.</description>
+        <files>
+            <file>action.php</file>
+            <file>changelog.txt</file>
+            <file>trackers/animelayer.ru.engine.php</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.2.9.7</version>
+        <description>Обновление до 1.2.9.7. Восстановлена работа tfile.me.</description>
+        <files>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.2.9.6</version>
+        <description>Обновление до 1.2.9.6. Исправление бага для работы animelayer.ru.</description>
+        <files>
+            <file>changelog.txt</file>
+            <file>include/form.php</file>           
+            <file>class/System.class.php</file>
+            <file>action.php</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.2.9.5</version>
+        <description>Обновление до 1.2.9.5. Восстановлена работа animelayer.ru.</description>
+        <files>
+            <file>changelog.txt</file>
+            <file>include/show_table.php</file>
+            <file>trackers/animelayer.ru.engine.php</file>            
+            <file>class/System.class.php</file>
+            <file>action.php</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.2.9.3</version>
+        <description>Обновление до 1.2.9.3. Исправление мелких багов.</description>
+        <files>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+        <mysql>
+            <query>ALTER TABLE `temp` ADD `name` VARCHAR(200) NULL DEFAULT NULL AFTER `id`;</query>
+            <query>ALTER TABLE `temp` DROP COLUMN `message`;</query>
+        </mysql>
+        <pgsql>
+            <query>ALTER TABLE temp ADD COLUMN name varchar(200) DEFAULT NULL;</query>
+            <query>ALTER TABLE temp DROP COLUMN message;</query>
+        </pgsql>
+        <sqlite>
+            <query>ALTER TABLE temp ADD COLUMN name varchar(200) DEFAULT NULL;</query>
+        </sqlite>     
+    </update>
+
+    <update>
+        <version>1.2.9.2</version>
+        <description>Обновление до 1.2.9.2. Исправление мелких багов.</description>
+        <files>
+            <file>class/Transmission.class.php</file>
+            <file>include/update.php</file>
+            <file>js/user-func.js</file>
+            <file>trackers/anidub.com.engine.php</file>
+            <file>trackers/animelayer.ru.engine.php</file>
+            <file>trackers/baibako.tv.engine.php</file>
+            <file>trackers/casstudio.tv.engine.php</file>
+            <file>trackers/newstudio.tv.engine.php</file>
+            <file>trackers/novafilm.tv.engine.php</file>
+            <file>trackers/pornolab.net.engine.php</file>
+            <file>trackers/pornolab.net.search.php</file>
+            <file>trackers/rustorka.com.engine.php</file>
+            <file>trackers/rutor.org.engine.php</file>
+            <file>trackers/rutracker.org.engine.php</file>
+            <file>trackers/rutracker.org.search.php</file>
+            <file>trackers/tfile.me.engine.php</file>
+            <file>trackers/tfile.me.search.php</file>
+            <file>trackers/tracker.0day.kiev.ua.engine.php</file>
+            <file>action.php</file>
+            <file>changelog.txt</file>
+            <file>engine.php</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.2.9.1</version>
+        <description>Обновление до 1.2.9.1. Исправление мелких багов.</description>
+        <files>
+            <file>include/form.php</file>
+            <file>class/Errors.class.php</file>
+            <file>class/Notification.class.php</file>
+            <file>action.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.2.9</version>
+        <description>Обновление до 1.2.9. rutor.org переехал на rutor.info.</description>
+        <files>
+            <file>include/check.php</file>
+            <file>include/show_table.php</file>
+            <file>trackers/rutor.org.engine.php</file>
+            <file>action.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.2.8</version>
+        <description>Обновление до 1.2.8.</description>
+        <files>
+            <file>class/Database.class.php</file>
+            <file>class/Notification.class.php</file>
+            <file>include/check.php</file>
+            <file>js/user-func.js</file>
+            <file>trackers/rutor.org.engine.php</file>
+            <file>trackers/rutracker.org.engine.php</file>
+            <file>action.php</file>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+        </files>
+        <queryes>
+            <query>INSERT INTO notifications VALUES (9, 'Pushall', '', 'notification');</query>
+            <query>INSERT INTO notifications VALUES (10, 'Pushall', '', 'warning');</query>
+        </queryes>  
+    </update>    
+
+    <update>
+        <version>1.2.7</version>
+        <description>Обновление до версии 1.2.7. Восстановлена работа tv.mekc.info</description>
+        <files>
+            <file>trackers/tv.mekc.info.engine.php</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.2.6</version>
+        <description>Обновление до версии 1.2.6. Восстановлена работа Rutor</description>
+        <files>
+            <file>trackers/rutor.org.engine.php</file>
+            <file>include/show_table.php</file>
+            <file>action.php</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.2.5</version>
+        <description>Обновление до версии 1.2.5. Восстановлена работа LostFilm.TV</description>
+        <files>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>trackers/rutor.org.engine.php</file>
+            <file>include/check.php</file>
+            <file>include/show_table.php</file>
+            <file>action.php</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.2.4</version>
+        <description>Обновление до версии 1.2.4. Восстановлена работа LostFilm.TV</description>
+        <files>
+            <file>include/form.php</file>
+            <file>include/show_watching.php</file>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>class/System.class.php</file>
+        </files>
+        <mysql>
+            <query>ALTER TABLE `torrent` CHANGE `path` `path` VARCHAR(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;</query>
+            <query>ALTER TABLE `temp` CHANGE `path` `path` VARCHAR(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;</query>
+        </mysql>
+        <pgsql>
+            <query>ALTER TABLE torrent ALTER COLUMN path TYPE character varying(200);</query>
+            <query>ALTER TABLE temp ALTER COLUMN path TYPE character varying(200);</query>
+        </pgsql>
+    </update>
+
+    <update>
+        <version>1.2.3.1</version>
+        <description>Обновление до версии 1.2.3.1.</description>
+        <files>
+            <file>class/Database.class.php</file>
+            <file>class/Transmission.class.php</file>
+            <file>class/Deluge.class.php</file>
+            <file>include/settings.php</file>
+            <file>include/form.php</file>
+            <file>include/show_table.php</file>
+            <file>include/show_table.php</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.2.3</version>
+        <description>Обновление до версии 1.2.3.</description>
+        <files>
+            <file>class/Notification.class.php</file>
+            <file>class/Database.class.php</file>
+            <file>img/hamsterstudio.org.ico</file>
+            <file>img/tv.mekc.info.ico</file>
+            <file>js/user-func.js</file>
+            <file>trackers/tv.mekc.info.engine.php</file>
+            <file>trackers/hamsterstudio.org.engine.php</file>
+            <file>include/help.php</file>
+            <file>include/settings.php</file>
+            <file>include/add.php</file>
+            <file>include/news.php</file>
+            <file>include/show_warnings.php</file>
+            <file>include/check.php</file>
+            <file>include/update.php</file>
+            <file>include/credentials.php</file>
+            <file>include/show_table.php</file>
+            <file>include/form.php</file>
+            <file>index.php</file>
+            <file>pages/footer.php</file>
+            <file>pages/header.php</file>
+            <file>pages/auth.php</file>
+            <file>pages/ohSnap.css</file>
+            <file>pages/styles.css</file>
+            <file>pages/main.php</file>
+            <file>action.php</file>
+            <file>engine.php</file>
+            <file>class/System.class.php</file>
+        </files>        
+        <mysql>
+            <query>CREATE TABLE `notifications` (
+  `id` int(3) unsigned NOT NULL AUTO_INCREMENT,
+  `service` varchar(32) DEFAULT NULL,
+  `address` varchar(100) DEFAULT NULL,
+  `type` varchar(13) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;</query>
+            <query>ALTER TABLE `torrent` ADD `script` VARCHAR(100) NULL DEFAULT NULL AFTER `hash`;</query>
+            <query>ALTER TABLE `credentials` CHANGE `pass` `pass` VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;</query>
+        </mysql>
+        <pgsql>
+            <query>CREATE SEQUENCE "auto_id_notifications" START 1;
+
+CREATE TABLE "notifications" (
+  "id" INTEGER  PRIMARY KEY NOT NULL DEFAULT nextval('auto_id_notifications'),
+  "service" varchar(32) NOT NULL,
+  "address" varchar(100) NOT NULL,
+  "type" varchar(13) NOT NULL
+);</query>
+            <query>ALTER TABLE torrent ADD COLUMN script varchar(100) DEFAULT NULL;</query>
+            <query>ALTER TABLE credentials ALTER COLUMN passkey TYPE character varying(255);</query>
+        </pgsql>
+        <sqlite>
+            <query>CREATE TABLE `notifications` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  `service` varchar(32) NOT NULL,
+  `address` varchar(100) NOT NULL,
+  `type` varchar(13) NOT NULL
+);</query>
+            <query>ALTER TABLE torrent ADD COLUMN script varchar(100) DEFAULT NULL;</query>
+        </sqlite>
+        <queryes>
+            <query>INSERT INTO credentials VALUES ('18', 'hamsterstudio.org', '', '', '', '');</query>
+            <query>INSERT INTO credentials VALUES ('19', 'tv.mekc.info', '', '', '', '');</query>
+            <query>INSERT INTO notifications VALUES (1, 'E-mail', '', 'notification');</query>
+            <query>INSERT INTO notifications VALUES (2, 'E-mail', '', 'warning');</query>
+            <query>INSERT INTO notifications VALUES (3, 'Prowl', '', 'notification');</query>
+            <query>INSERT INTO notifications VALUES (4, 'Prowl', '', 'warning');</query>
+            <query>INSERT INTO notifications VALUES (5, 'Pushbullet', '', 'notification');</query>
+            <query>INSERT INTO notifications VALUES (6, 'Pushbullet', '', 'warning');</query>
+            <query>INSERT INTO notifications VALUES (7, 'Pushover', '', 'notification');</query>
+            <query>INSERT INTO notifications VALUES (8, 'Pushover', '', 'warning');</query>
+            <query>DELETE FROM settings WHERE id = '25';</query>
+            <query>DELETE FROM settings WHERE id = '26';</query>
+            <query>DELETE FROM settings WHERE id = '27';</query>
+            <query>DELETE FROM settings WHERE id = '28';</query>
+            <query>INSERT INTO settings VALUES (31, 'debugFor', '');</query>
+            <query>INSERT INTO settings VALUES (33, 'sendUpdateService', '');</query>
+            <query>INSERT INTO settings VALUES (35, 'sendWarningService', '');</query>
+            <query>INSERT INTO settings VALUES (37, 'proxyType', '');</query>
+        </queryes>        
+    </update>
+        
+    <update>   
+        <version>1.2.2</version>
+        <description>Обновление до 1.2.2 необходимо установить вручную, удалив все файлы, кроме config.php и заменив их новыми из архива http://korphome.ru/torrent_monitor/tm-latest.zip.</description>
+        <queryes>
+            <query>INSERT INTO credentials VALUES (17, 'lostfilm-mirror', ' ', ' ', 'NULL', 'NULL');</query>
+            <query>INSERT INTO settings VALUES (32, 'httpTimeout', '15');</query>
+        </queryes>
+    </update>
+        
+    <update>
+        <version>1.2.1</version>
+        <description>- Корректирующий релиз для работы lostfilm.tv.</description>
+        <files>
+            <file>img/lostfilm.tv.ico</file>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.2</version>
+        <description>Обновление до 1.2.</description>
+        <files>
+            <file>class/Database.class.php</file>
+            <file>class/Deluge.class.php</file>
+            <file>class/Errors.class.php</file>
+            <file>class/Notification.class.php</file>
+            <file>class/Transmission.class.php</file>
+            <file>include/add.php</file>
+            <file>include/check.php</file>
+            <file>include/credentials.php</file>
+            <file>include/execution.php</file>
+            <file>include/form.php</file>
+            <file>include/help.php</file>
+            <file>include/news.php</file>
+            <file>include/settings.php</file>
+            <file>include/show_table.php</file>
+            <file>include/show_warnings.php</file>
+            <file>include/show_watching.php</file>
+            <file>include/update.php</file>
+            <file>js/user-func.js</file>
+            <file>rss/index.php</file>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>action.php</file>
+            <file>changelog.txt</file>
+            <file>engine.php</file>
+            <file>class/System.class.php</file>
+        </files>
+        <queryes>
+            <query>INSERT INTO credentials VALUES (3, 'lostfilm.tv', '', '', '', '');</query>
+        </queryes>        
+    </update>    
+    <update>
+        <version>1.1.2</version>
+        <description>- Исправлена проблема с получением названия торрента на rutor.org.</description>
+        <files>
+            <file>class/System.class.php</file>
+        </files>
+    </update>
+    <update>
+        <version>1.1.1</version>
+        <description>- Исправлена проблема с закачкой torrent-файлов на kinozal.tv.</description>
+        <files>
+            <file>class/System.class.php</file>
+            <file>trackers/kinozal.tv.engine.php</file>
+            <file>include/update.php</file>
+        </files>
+    </update>
+    <update>
+        <version>1.1</version>
+        <description>- Изменения в модуле автообновлений для релиза версии 1.1.</description>
+        <createFolders>
+            <folder>rss</folder>
+            <folder>torrents</folder>
+        </createFolders>
+        <files>
+            <file>class/Database.class.php</file>
+            <file>class/Deluge.class.php</file>
+            <file>class/Errors.class.php</file>
+            <file>class/Notification.class.php</file>
+            <file>class/System.class.php</file>
+            <file>class/Transmission.class.php</file>
+            <file>class/TransmissionRPC.class.php</file>
+            <file>img/icon9-2.png</file>
+            <file>img/icon10.png</file>
+            <file>include/add.php</file>
+            <file>include/check.php</file>
+            <file>include/credentials.php</file>
+            <file>include/execution.php</file>
+            <file>include/form.php</file>
+            <file>include/help.php</file>
+            <file>include/news.php</file>
+            <file>include/settings.php</file>
+            <file>include/show_table.php</file>
+            <file>include/show_warnings.php</file>
+            <file>include/show_watching.php</file>
+            <file>include/update.php</file>
+            <file>js/user-func.js</file>
+            <file>trackers/anidub.com.engine.php</file>
+            <file>trackers/animelayer.ru.engine.php</file>
+            <file>trackers/baibako.tv.engine.php</file>
+            <file>trackers/casstudio.tv.engine.php</file>
+            <file>trackers/kinozal.tv.engine.php</file>
+            <file>trackers/newstudio.tv.engine.php</file>
+            <file>trackers/nnm-club.me.engine.php</file>
+            <file>trackers/nnm-club.me.search.php</file>
+            <file>trackers/novafilm.tv.engine.php</file>
+            <file>trackers/pornolab.net.engine.php</file>
+            <file>trackers/pornolab.net.search.php</file>
+            <file>trackers/rustorka.com.engine.php</file>
+            <file>trackers/rutor.org.engine.php</file>
+            <file>trackers/rutracker.org.engine.php</file>
+            <file>trackers/rutracker.org.search.php</file>
+            <file>trackers/tfile.me.engine.php</file>
+            <file>trackers/tfile.me.search.php</file>
+            <file>trackers/tracker.0day.kiev.ua.engine.php</file>
+            <file>action.php</file>
+            <file>changelog.txt</file>
+            <file>engine.php</file>
+        </files>
+        <mysql>
+            <query>CREATE TABLE `news` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `text` text,
+  `new` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;</query>
+            <query>ALTER TABLE `torrent` ADD auto_update tinyint(1) unsigned NOT NULL DEFAULT '0';</query>
+            <query>ALTER TABLE `credentials` ADD passkey varchar(255) DEFAULT NULL;</query>
+            <query>ALTER TABLE `torrent` MODIFY `torrent_id` varchar(150);</query>
+            <query>INSERT INTO `settings` (`id`, `key`, `val`)
+VALUES
+	(4,'sendWarning','0'),
+	(19,'serverAddress',''),
+	(20,'deleteDistribution','0'),
+	(24,'sendUpdate','0'),
+	(25,'sendUpdateEmail',''),
+	(26,'sendUpdatePushover',''),
+	(27,'sendWarningEmail',''),
+	(28,'sendWarningPushover',''),
+	(29,'debug','0'),
+	(30,'rss','1');</query>
+        </mysql>
+        <pgsql>
+            <query>CREATE TABLE `news` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  `text` TEXT,
+  `new` INTEGER NOT NULL DEFAULT '1'
+);</query>
+            <query>ALTER TABLE torrent ADD COLUMN auto_update INTEGER NOT NULL DEFAULT '0';</query>
+            <query>ALTER TABLE credentials ADD COLUMN passkey varchar(255) DEFAULT NULL;</query>
+            <query>ALTER TABLE torrent ALTER COLUMN torrent_id TYPE varchar(150);</query>
+            <query>INSERT INTO settings VALUES (4, 'sendWarning', '0');</query>
+            <query>INSERT INTO settings VALUES (19, 'serverAddress', '');</query>
+            <query>INSERT INTO settings VALUES (20, 'deleteDistribution', '0');</query>
+            <query>INSERT INTO settings VALUES (24, 'sendUpdate', '0');</query>
+            <query>INSERT INTO settings VALUES (25, 'sendUpdateEmail', '');</query>
+            <query>INSERT INTO settings VALUES (26, 'sendUpdatePushover', '');</query>
+            <query>INSERT INTO settings VALUES (27, 'sendWarningEmail', '');</query>
+            <query>INSERT INTO settings VALUES (28, 'sendWarningPushover', '');</query>
+            <query>INSERT INTO settings VALUES (29, 'debug', '0');</query>
+            <query>INSERT INTO settings VALUES (30, 'rss', '1');   </query>
+        </pgsql>
+        <sqlite>
+            <query>CREATE SEQUENCE "auto_id_news" START 1;
+
+CREATE TABLE "news" (
+  "id" INTEGER  PRIMARY KEY NOT NULL DEFAULT nextval('auto_id_news'),
+  "text" TEXT NOT NULL,
+  "new" INTEGER NOT NULL DEFAULT '1'
+);</query>
+            <query>ALTER TABLE "torrent" ADD auto_update INTEGER NOT NULL DEFAULT '0';</query>
+            <query>ALTER TABLE "credentials" ADD passkey varchar(255) DEFAULT NULL;</query>
+            <query>ALTER TABLE "torrent" MODIFY (torrent_id varchar(150));</query>
+            <query>INSERT INTO "settings" VALUES (4, 'sendWarning', '0');</query>
+            <query>INSERT INTO "settings" VALUES (19, 'serverAddress', '');</query>
+            <query>INSERT INTO "settings" VALUES (20, 'deleteDistribution', '0');</query>
+            <query>INSERT INTO "settings" VALUES (24, 'sendUpdate', '0');</query>
+            <query>INSERT INTO "settings" VALUES (25, 'sendUpdateEmail', '');</query>
+            <query>INSERT INTO "settings" VALUES (26, 'sendUpdatePushover', '');</query>
+            <query>INSERT INTO "settings" VALUES (27, 'sendWarningEmail', '');</query>
+            <query>INSERT INTO "settings" VALUES (28, 'sendWarningPushover', '');</query>
+            <query>INSERT INTO "settings" VALUES (29, 'debug', '0');</query>
+            <query>INSERT INTO "settings" VALUES (30, 'rss', '1');</query>
+        </sqlite>
+        <queryes>
+            <query>DELETE FROM `settings` WHERE `id` = '1';</query>
+            <query>DELETE FROM `settings` WHERE `id` = '2';</query>
+            <query>DELETE FROM `settings` WHERE `id` = '4';</query>
+            <query>DELETE FROM `settings` WHERE `id` = '15';</query>
+            <query>DELETE FROM `credentials` WHERE `id` = '3';</query>
+            <query>DELETE FROM `torrent` WHERE `tracker` = 'lostfilm.tv';</query>
+            <query>DELETE FROM `warning` WHERE `where` = 'lostfilm.tv';</query>
+        </queryes>
+    </update>
+    <update>
+        <version>1.0.6</version>
+        <description>- Изменения в модуле автообновлений для релиза версии 1.1.</description>
+        <files>
+            <file>class/System.class.php</file>
+            <file>include/update.php</file>
+        </files>
+    </update>
+    <update>
+        <version>1.0.5</version>
+        <description>- Изменения в модуле автообновлений для релиза версии 1.1.</description>
+        <files>
+            <file>class/System.class.php</file>
+            <file>include/update.php</file>
+        </files>
+    </update>
+    <update>
+        <version>1.0.4</version>
+        <description>- Исправлены мелкие ошибки в апдейтере.</description>
+        <files>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+            <file>include/update.php</file>
+            <file>trackers/lostfilm.tv.engine.php</file>
+        </files>
+    </update>
+    <update>
+        <version>1.0.3</version>
+        <description>- Восстановлена работа rutor.org</description>
+        <files>
+            <file>changelog.txt</file>
+            <file>class/Database.class.php</file>
+            <file>class/System.class.php</file>
+            <file>include/show_table.php</file>
+            <file>include/update.php</file>
+            <file>trackers/rutor.org.engine.php</file>
+        </files>
+    </update>
+    <update>
+        <version>1.0.2</version>
+        <description>- Авторизация на lostfiml.tv восстановлена
+        - Множество мелких исправлений
+        - Багфикс сохранения torrent-файлов при недоступности torrent-клиента
+        </description>
+        <files>
+            <file>changelog.txt</file>
+            <file>action.php</file>
+            <file>class/Deluge.class.php</file>
+            <file>class/Errors.class.php</file>
+            <file>class/System.class.php</file>
+            <file>class/Transmission.class.php</file>
+            <file>include/show_watching.php</file>
+            <file>include/update.php</file>
+            <file>js/user-func.js</file>
+            <file>trackers/anidub.com.engine.php</file>
+            <file>trackers/animelayer.ru.engine.php</file>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>trackers/newstudio.tv.engine.php</file>
+        </files>
+    </update>    
+    <update>
+        <version>1.0.1</version>
+        <description>Обновление до 1.0.1</description>
+        <files>
+            <file>changelog.txt</file>
+            <file>class/System.class.php</file>
+            <file>img/pornolab.net.ico</file>
+            <file>js/user-func.js</file>
+            <file>trackers/baibako.tv.engine.php</file>
+            <file>trackers/novafilm.tv.engine.php</file>
+        </files>
+    </update>
+    <update>
+        <version>0.9.8</version>
+        <description>Обновление до 0.9.8</description>
+        <files>
+            <file>changelog.txt</file>
+        </files>
+        <queryes>
+            <query>ALTER TABLE `torrent` CHANGE `torrent_id` `torrent_id` VARCHAR(100)</query>
+        </queryes>
+    </update>    
+</body>
