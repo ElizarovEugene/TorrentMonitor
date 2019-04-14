@@ -102,6 +102,7 @@ foreach ($settings as $row)
                 <select id="torrentClient" name="torrentClient">
                     <option value="Deluge" <?php if ($torrentClient == 'Deluge') echo 'selected';?>>Deluge</option>
                     <option value="Transmission" <?php if ($torrentClient == 'Transmission') echo 'selected';?>>Transmission</option>
+                    <option value="qBittorrent" <?php if ($torrentClient == 'qBittorrent') echo 'selected';?>>qBittorrent</option>
                 </select>
             </label>
         </p>
