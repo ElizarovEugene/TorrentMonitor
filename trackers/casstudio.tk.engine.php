@@ -12,9 +12,9 @@ class casstudio
         	array(
         		'type'           => 'POST',
         		'returntransfer' => 1,
-        		'url'            => 'https://casstudio.tv/',
+        		'url'            => 'https://casstudio.tk/',
         		'cookie'         => $sess_cookie,
-        		'sendHeader'     => array('Host' => 'casstudio.tv', 'Content-length' => strlen($sess_cookie)),
+        		'sendHeader'     => array('Host' => 'casstudio.tk', 'Content-length' => strlen($sess_cookie)),
         	)
         );
 
@@ -94,7 +94,7 @@ class casstudio
             		'type'           => 'POST',
             		'header'         => 1,
             		'returntransfer' => 1,
-            		'url'            => 'https://casstudio.tv/ucp.php?mode=login',
+            		'url'            => 'https://casstudio.tk/ucp.php?mode=login',
             		'postfields'     => 'login=Вход&username='.$login.'&password='.$password.'&x=0&y=0',
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
@@ -178,9 +178,9 @@ class casstudio
             		'type'           => 'POST',
             		'header'         => 0,
             		'returntransfer' => 1,
-            		'url'            => 'https://casstudio.tv/viewtopic.php?t='.$torrent_id,
+            		'url'            => 'https://casstudio.tk/viewtopic.php?t='.$torrent_id,
             		'cookie'         => casstudio::$sess_cookie,
-            		'sendHeader'     => array('Host' => 'casstudio.tv', 'Content-length' => strlen(casstudio::$sess_cookie)),
+            		'sendHeader'     => array('Host' => 'casstudio.tk', 'Content-length' => strlen(casstudio::$sess_cookie)),
             	)
             );
 
@@ -210,10 +210,10 @@ class casstudio
                                     	array(
                                     		'type'           => 'POST',
                                     		'returntransfer' => 1,
-                                    		'url'            => 'https://casstudio.tv/download/file.php?id='.$link[1],
+                                    		'url'            => 'https://casstudio.tk/download/file.php?id='.$link[1],
                                     		'cookie'         => casstudio::$sess_cookie,
-                                    		'sendHeader'     => array('Host' => 'casstudio.tv', 'Content-length' => strlen(casstudio::$sess_cookie)),
-                                    		'referer'        => 'https://casstudio.tv/viewtopic.php?t='.$link[1],
+                                    		'sendHeader'     => array('Host' => 'casstudio.tk', 'Content-length' => strlen(casstudio::$sess_cookie)),
+                                    		'referer'        => 'https://casstudio.tk/viewtopic.php?t='.$link[1],
                                         	)
                                     );
                                     

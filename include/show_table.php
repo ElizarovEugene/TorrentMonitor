@@ -108,7 +108,7 @@ else
 	    		<a href='http://baibako.tv/details.php?id=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>	    	
 	    	<?php        		
     		}
-    		elseif ($tracker == 'casstudio.tv' || $tracker == 'booktracker.org')
+    		elseif ($tracker == 'casstudio.tk' || $tracker == 'booktracker.org')
     		{
 	    	?>        		
 	    		<a href='http://<?php echo $tracker ?>/viewtopic.php?t=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>

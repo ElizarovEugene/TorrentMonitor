@@ -66,7 +66,7 @@ if (isset($_POST['action']))
                     preg_match('/\/(\w*)\/?/', $path, $array);
                     $threme = $array[1];
                 }
-                elseif ($tracker == 'casstudio.tv')
+                elseif ($tracker == 'casstudio.tk')
     			{
     				$query = explode('t=', $url['query']);
     				$threme = $query[1];
@@ -246,7 +246,7 @@ if (isset($_POST['action']))
                     preg_match('/\/(.*)\/?/', $path, $array);
                     $threme = $array[1];
                 }
-                elseif ($tracker == 'casstudio.tv')
+                elseif ($tracker == 'casstudio.tk')
     			{
     				$query = explode('=', $url['query']);
     				$threme = $query[1];

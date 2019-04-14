@@ -40,7 +40,7 @@ VALUES
 	(6,'tfile.cc',' ',' ',NULL,NULL,'forum',0),
 	(7,'kinozal.me','','','',NULL,'forum',1),
 	(8,'anidub.com','','','',NULL,'forum',1),
-	(9,'casstudio.tv','','','',NULL,'forum',1),
+	(9,'casstudio.tk','','','',NULL,'forum',1),
 	(10,'baibako.tv','','','',NULL,'RSS',1),
 	(11,'newstudio.tv','','','',NULL,'RSS',1),
 	(12,'animelayer.ru','','','',NULL,'forum',1),

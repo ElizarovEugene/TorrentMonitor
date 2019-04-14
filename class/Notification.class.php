@@ -41,7 +41,7 @@ class Notification
     			$msg .= "http://rutor.info/torrent/{$name}/";
     		elseif ($tracker == 'anidub.com')
                 $msg .= "http://tr.anidub.com{$name}";
-            elseif ($tracker == 'casstudio.tv' || $tracker == 'booktracker.org')
+            elseif ($tracker == 'casstudio.tk' || $tracker == 'booktracker.org')
     		    $msg .= "http://{$tracker}/viewtopic.php?t={$name}";
         }
 

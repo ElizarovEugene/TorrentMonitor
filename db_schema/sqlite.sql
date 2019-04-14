@@ -30,7 +30,7 @@ INSERT INTO "credentials" VALUES (6, 'tfile.cc', ' ', ' ', '', '','forum',0);
 INSERT INTO "credentials" VALUES (7, 'kinozal.me', '', '', '', '','forum',1);
 INSERT INTO "credentials" VALUES (8, 'anidub.com', '', '', '', '','forum',1);
 INSERT INTO "credentials" VALUES (9, 'baibako.tv', '', '', '', '','RSS',1);
-INSERT INTO "credentials" VALUES (10,'casstudio.tv', '', '','', '','forum',1);
+INSERT INTO "credentials" VALUES (10,'casstudio.tk', '', '','', '','forum',1);
 INSERT INTO "credentials" VALUES (11,'newstudio.tv', '', '','', '','RSS',1);
 INSERT INTO "credentials" VALUES (12,'animelayer.ru', '', '','', '','forum',1);
 INSERT INTO "credentials" VALUES (13,'tracker.0day.kiev.ua','','','', '','forum',1);

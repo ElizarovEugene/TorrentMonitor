@@ -31,7 +31,7 @@ if ($tracker == 'rutracker.org' || $tracker == 'nnmclub.to' || $tracker == 'tfil
     $tracker = 'http://'.$tracker.'/forum/viewtopic.php?t=';
 elseif ($tracker == 'booktracker.org')
     $tracker = 'http://'.$tracker.'/viewtopic.php?t=';    
-elseif ($tracker == 'casstudio.tv' || $tracker == 'kinozal.me' || $tracker == 'tracker.0day.kiev.ua' || $tracker == 'tv.mekc.info')
+elseif ($tracker == 'casstudio.tk' || $tracker == 'kinozal.me' || $tracker == 'tracker.0day.kiev.ua' || $tracker == 'tv.mekc.info')
     $tracker = 'http://'.$tracker.'/details.php?id=';
 elseif ($tracker == 'rutor.org')
     $tracker = 'http://rutor.org/torrent/';

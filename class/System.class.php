@@ -250,7 +250,7 @@ class Sys
                 $name = substr($array[1], 0, -13);
             elseif ($tracker == 'booktracker.org')
                 $name = substr($array[1], 0, -31);
-            elseif ($tracker == 'casstudio.tv')
+            elseif ($tracker == 'casstudio.tk')
                 $name = substr($array[1], 48);
             elseif ($tracker == 'kinozal.me')
                 $name = substr($array[1], 0, -22);
@@ -294,7 +294,7 @@ class Sys
         $tracker = preg_replace('/www\./', '', $tracker);
 
         if (preg_match('/.*tor\.org|rutor\.info/', $tracker))
-            $tracker = 'rutor.org';
+            $tracker = 'cool-tor.org';
      
         if ($tracker == 'rustorka.com'  || $tracker == 'booktracker.org' || $tracker == 'tracker.0day.kiev.ua')
         {
@@ -362,7 +362,7 @@ class Sys
             );            
         }
 
-        if ($tracker != 'animelayer.ru' && $tracker != 'booktracker.org' && $tracker != 'casstudio.tv' && $tracker != 'torrents.net.ua' && $tracker != 'riperam.org' && $tracker != 'rustorka.com' && $tracker != 'rutor.org' && $tracker != 'tr.anidub.com')
+        if ($tracker != 'animelayer.ru' && $tracker != 'booktracker.org' && $tracker != 'casstudio.tk' && $tracker != 'torrents.net.ua' && $tracker != 'riperam.org' && $tracker != 'rustorka.com' && $tracker != 'rutor.org' && $tracker != 'tr.anidub.com')
             $forumPage = iconv('windows-1251', 'utf-8//IGNORE', $forumPage);
 
         if ($tracker == 'tr.anidub.com')
