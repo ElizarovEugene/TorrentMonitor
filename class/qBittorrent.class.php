@@ -43,7 +43,7 @@ class qBittorrent
                 'hashes'=>$hash,
                 'deleteFiles'=>'false'
             );
-            curl_setopt($MainCurl, CURLOPT_URL,"$url/api/v2/torrents/delete");
+            curl_setopt($MainCurl, CURLOPT_URL,"$torrentAddress/api/v2/torrents/delete");
             curl_setopt($MainCurl, CURLOPT_POSTFIELDS, http_build_query($data));
 
             if ($tracker == 'lostfilm.tv' || $tracker == 'lostfilm-mirror' ||  $tracker == 'baibako.tv' || $tracker == 'newstudio.tv')
