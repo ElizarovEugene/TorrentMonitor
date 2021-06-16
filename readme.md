@@ -1,7 +1,7 @@
 # TorrentMonitor
 Приложение мониторит изменения на популярных торрент-трекерах рунета и автоматизирует закачку обновлений (сериалы, раздачи которые ведутся *путем добавления новых серий/новых версий*, перезалитые торрент-файлы и т.д.)
 
-###Список возможностей приложения:
+### Список возможностей приложения:
 
 * Слежение за темами
  * anidub.com
@@ -41,7 +41,7 @@
 * RSS-лента
 * Выполенение собственных скриптов после обновления раздачи
 
-###Скриншоты:
+### Скриншоты:
  ![Screenshot0](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-53-42.jpg "Screenshot0")
  ![Screenshot1](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-54-16.jpg "Screenshot1")
  ![Screenshot2](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-54-38.jpg "Screenshot2")
@@ -50,19 +50,19 @@
  ![Screenshot5](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-55-41.jpg "Screenshot5")
  ![Screenshot6](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-56-36.jpg "Screenshot6")
 
-###Требования для установки:
+### Требования для установки:
 
 * Веб-сервер (Apache, nginx, lighttpd)
 * PHP (5.2 или выше) с поддержкой cURL и PDO
 * MySQL, PostgreSQL, SQLite
 
-###Установка и настройка
+### Установка и настройка
 http://korphome.ru/TorrentMonitor/viewtopic.php?f=3&t=138
 
-###Страница проекта:
+### Страница проекта:
 
 http://blog.korphome.ru/torrentmonitor/
 
-###Форум:
+### Форум:
 
 http://korphome.ru/TorrentMonitor/
