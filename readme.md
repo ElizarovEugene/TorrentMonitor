@@ -56,13 +56,5 @@
 * PHP (5.2 или выше) с поддержкой cURL и PDO
 * MySQL, PostgreSQL, SQLite
 
-### Установка и настройка
-http://korphome.ru/TorrentMonitor/viewtopic.php?f=3&t=138
-
 ### Страница проекта:
-
-http://blog.korphome.ru/torrentmonitor/
-
-### Форум:
-
-http://korphome.ru/TorrentMonitor/
+http://tormon.ru
