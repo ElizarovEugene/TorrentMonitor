@@ -76,16 +76,14 @@ else
                 echo $tracker ?>/forum/viewtopic.php?t=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
     		<?php
     		}
-    		elseif ($tracker == 'kinozal.me'  || $tracker == 'tracker.0day.kiev.ua' || $tracker == 'tv.mekc.info')
+    		elseif ($tracker == 'kinozal.me'  || $tracker == 'kinozal.tv'  || $tracker == 'tracker.0day.kiev.ua' || $tracker == 'tv.mekc.info')
     		{
             ?>
         	    <a href='http://<?php echo $tracker ?>/details.php?id=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
         	<?php	
     		}
-    		elseif ($tracker == 'animelayer.ru' || $tracker == 'rutor.org')
+    		elseif ($tracker == 'animelayer.ru' || $tracker == 'rutor.info')
     		{
-        		if ($tracker == 'rutor.org')
-        		    $tracker = 'rutor.info';
     		?>
     			<a href='http://<?php echo $tracker ?>/torrent/<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
     		<?php

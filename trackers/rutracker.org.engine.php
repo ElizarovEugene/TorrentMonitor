@@ -18,8 +18,8 @@ class rutracker
         		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
         	)
         );
-
-		if (preg_match('/Вы зашли как:/', $result))
+        
+		if (preg_match('/profile\.php\?mode=viewprofile/', $result))
 			return TRUE;
 		else
 			return FALSE;
@@ -162,104 +162,96 @@ class rutracker
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
+            $page = str_replace("\t", '', $page);
 
 			if ( ! empty($page))
 			{
-    			//проверяем не закрыта ли тема
-    			if (preg_match('/alt=\"Тема закрыта\"/', $page, $array))
-    			{
-        			//ставим галочку что тема закрыта
-                    Database::setClosedThreme($id, 1);
-    			}
-    			else
-    			{
-    				//ищем на странице дату регистрации торрента
-    				if (preg_match('/<td style=\"width: 70%; padding: 5px;\">\n\t{2}<ul class=\"inlined middot-separated\">\n\t{3}<li>(.*)<\/li>/', $page, $array))
-    				{
-    					//проверяем удалось ли получить дату со страницы
-    					if (isset($array[1]))
-    					{
-    						//если дата не равна ничему
-    						if ( ! empty($array[1]))
-    						{
-    							//сбрасываем варнинг
-    							Database::clearWarnings($tracker);
-    							//приводим дату к общему виду
-    							$date = rutracker::dateStringToNum($array[1]);
-    							$date_str = rutracker::dateNumToString($array[1]);
-    							//если даты не совпадают, перекачиваем торрент
-    							if ($date != $timestamp)
-    							{
-    								//сохраняем торрент в файл
-                                    $torrent = Sys::getUrlContent(
-                                    	array(
-                                    		'type'           => 'POST',
-                                    		'returntransfer' => 1,
-                                    		'url'            => 'https://rutracker.org/forum/dl.php?t='.$torrent_id,
-                                    		'cookie'         => rutracker::$sess_cookie.'; bb_dl='.$torrent_id,
-                                    		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen(rutracker::$sess_cookie.'; bb_dl='.$torrent_id)),
-                                    		'referer'        => 'https://rutracker.org/forum/viewtopic.php?t='.$torrent_id,
-                                    	)
-                                    );
-                                    
-                                    if (Sys::checkTorrentFile($torrent))
-                                    {
-        								if ($auto_update)
-        								{
-        								    $name = Sys::parseHeader($tracker, $page);
-        								    //обновляем заголовок торрента в базе
-                                            Database::setNewName($id, $name);
-        								}
-        
-        								$message = $name.' обновлён.';
-        								$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
-        								
-        								//обновляем время регистрации торрента в базе
-        								Database::setNewDate($id, $date);
-        								Database::setErrorToThreme($id, 0);
-        								Database::setClosedThreme($id, 0);
-                                    }
-                                    else
-                                        Errors::setWarnings($tracker, 'torrent_file_fail', $id);
-    							}
-    							Database::setErrorToThreme($id, 0);
-    						}
-    						else
-    						{
-    							//устанавливаем варнинг
-    							if (rutracker::$warning == NULL)
-    							{
-    								rutracker::$warning = TRUE;
-    								Errors::setWarnings($tracker, 'cant_find_date', $id);
-    							}
-    							//останавливаем процесс выполнения, т.к. не может работать без кук
-    							rutracker::$exucution = FALSE;
-    						}
-    					}
-    					else
-    					{
-    						//устанавливаем варнинг
-    						if (rutracker::$warning == NULL)
-    						{
-    							rutracker::$warning = TRUE;
-    							Errors::setWarnings($tracker, 'cant_find_date', $id);
-    						}
-    						//останавливаем процесс выполнения, т.к. не может работать без кук
-    						rutracker::$exucution = FALSE;
-    					}
-    				}
-    				else
-    				{
-    					//устанавливаем варнинг
-    					if (rutracker::$warning == NULL)
-    					{
-    						rutracker::$warning = TRUE;
-    						Errors::setWarnings($tracker, 'cant_find_date', $id);
-    					}
-    					//останавливаем процесс выполнения, т.к. не может работать без кук
-    					rutracker::$exucution = FALSE;
-    				}
-                }
+				//ищем на странице дату регистрации торрента
+				if (preg_match('/<td style=\"width: 70%; padding: 5px;\">\n<ul class=\"inlined middot-separated\">\n<li>(.*)<\/li>/', $page, $array))
+				{
+					//проверяем удалось ли получить дату со страницы
+					if (isset($array[1]))
+					{
+						//если дата не равна ничему
+						if ( ! empty($array[1]))
+						{
+							//сбрасываем варнинг
+							Database::clearWarnings($tracker);
+							//приводим дату к общему виду
+							$date = rutracker::dateStringToNum($array[1]);
+							$date_str = rutracker::dateNumToString($array[1]);
+							//если даты не совпадают, перекачиваем торрент
+							if ($date != $timestamp)
+							{
+								//сохраняем торрент в файл
+                                $torrent = Sys::getUrlContent(
+                                	array(
+                                		'type'           => 'POST',
+                                		'returntransfer' => 1,
+                                		'url'            => 'https://rutracker.org/forum/dl.php?t='.$torrent_id,
+                                		'cookie'         => rutracker::$sess_cookie.'; bb_dl='.$torrent_id,
+                                		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen(rutracker::$sess_cookie.'; bb_dl='.$torrent_id)),
+                                		'referer'        => 'https://rutracker.org/forum/viewtopic.php?t='.$torrent_id,
+                                	)
+                                );
+                                
+                                if (Sys::checkTorrentFile($torrent))
+                                {
+    								if ($auto_update)
+    								{
+    								    $name = Sys::parseHeader($tracker, $page);
+    								    //обновляем заголовок торрента в базе
+                                        Database::setNewName($id, $name);
+    								}
+    
+    								$message = $name.' обновлён.';
+    								$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
+    								
+    								//обновляем время регистрации торрента в базе
+    								Database::setNewDate($id, $date);
+    								Database::setErrorToThreme($id, 0);
+    								Database::setClosedThreme($id, 0);
+                                }
+                                else
+                                    Errors::setWarnings($tracker, 'torrent_file_fail', $id);
+							}
+							Database::setErrorToThreme($id, 0);
+						}
+						else
+						{
+							//устанавливаем варнинг
+							if (rutracker::$warning == NULL)
+							{
+								rutracker::$warning = TRUE;
+								Errors::setWarnings($tracker, 'cant_find_date', $id);
+							}
+							//останавливаем процесс выполнения, т.к. не может работать без кук
+							rutracker::$exucution = FALSE;
+						}
+					}
+					else
+					{
+						//устанавливаем варнинг
+						if (rutracker::$warning == NULL)
+						{
+							rutracker::$warning = TRUE;
+							Errors::setWarnings($tracker, 'cant_find_date', $id);
+						}
+						//останавливаем процесс выполнения, т.к. не может работать без кук
+						rutracker::$exucution = FALSE;
+					}
+				}
+				else
+				{
+					//устанавливаем варнинг
+					if (rutracker::$warning == NULL)
+					{
+						rutracker::$warning = TRUE;
+						Errors::setWarnings($tracker, 'cant_find_date', $id);
+					}
+					//останавливаем процесс выполнения, т.к. не может работать без кук
+					rutracker::$exucution = FALSE;
+				}
 			}
 			else
 			{

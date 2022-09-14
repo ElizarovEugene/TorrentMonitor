@@ -3,10 +3,12 @@ class Config
 {
     static $confArray;
     
-    public static function extended()
+    public static function extended($config = NULL)
     {
         Config::write('ext_proxy', '');
-        $config = dirname(__FILE__).'/../'.'config.xml';
+        if ( ! isset($config) || empty($config))
+            $config = dirname(__FILE__).'/../'.'config.xml';
+
         if (file_exists($config))
         {
             $xml = simplexml_load_file($config);

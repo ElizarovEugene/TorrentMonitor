@@ -120,7 +120,9 @@ class Sys
             curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:51.0) Gecko/20100101 Firefox/51.0');
             if (isset($param['follow']))
                 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-            
+
+            curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 0);
+
             if (isset($param['encoding']))
                 curl_setopt($ch, CURLOPT_ENCODING, '');
             
@@ -203,7 +205,6 @@ class Sys
                 elseif ($proxyType == 'HTTP')
                     curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
             }
-            #curl_setopt($ch, CURLOPT_PROXYUSERPWD, $loginpassw);
             
             if (Database::getSetting('debug'))
                 curl_setopt($ch, CURLOPT_VERBOSE, TRUE);
@@ -252,7 +253,7 @@ class Sys
                 $name = substr($array[1], 0, -31);
             elseif ($tracker == 'casstudio.tk')
                 $name = substr($array[1], 48);
-            elseif ($tracker == 'kinozal.me')
+            elseif ($tracker == 'kinozal.me' || $tracker == 'kinozal.tv')
                 $name = substr($array[1], 0, -22);
             elseif ($tracker == 'nnmclub.to')
                 $name = substr($array[1], 0, -12);
@@ -271,15 +272,12 @@ class Sys
                 preg_match('/(.*) \&bull\; Riper\.AM/', $array[1], $array2);
                 if ( ! empty($array2[1]))
                     $name = $array2[1];
+
             }
+            elseif ($tracker == 'rutor.info')
+                $name = substr($array[1], 14);
             elseif ($tracker == 'rustorka.com')
                 $name = substr($array[1], 0, -111);
-            elseif (preg_match('/.*tor\.org|rutor\.info/', $array[1]))
-            {
-                preg_match('/.*tor.info :: (.*)/', $array[1], $array2);
-                if ( ! empty($array2[1]))
-                    $name = $array2[1];
-            }
             else
                 $name = $array[1];
         }
@@ -293,9 +291,6 @@ class Sys
         $tracker = $Purl['host'];
         $tracker = preg_replace('/www\./', '', $tracker);
 
-        if (preg_match('/.*tor\.org|rutor\.info/', $tracker))
-            $tracker = 'cool-tor.org';
-     
         if ($tracker == 'rustorka.com'  || $tracker == 'booktracker.org' || $tracker == 'tracker.0day.kiev.ua')
         {
             $dir = str_replace('class', '', dirname(__FILE__));
@@ -359,10 +354,10 @@ class Sys
                     'returntransfer' => 1,
                     'url'            => $url,
                 )
-            );            
+            );
         }
 
-        if ($tracker != 'animelayer.ru' && $tracker != 'booktracker.org' && $tracker != 'casstudio.tk' && $tracker != 'torrents.net.ua' && $tracker != 'riperam.org' && $tracker != 'rustorka.com' && $tracker != 'rutor.org' && $tracker != 'tr.anidub.com')
+        if ($tracker != 'animelayer.ru' && $tracker != 'booktracker.org' && $tracker != 'casstudio.tk' && $tracker != 'torrents.net.ua' && $tracker != 'riperam.org' && $tracker != 'rustorka.com' && $tracker != 'rutor.info' && $tracker != 'tr.anidub.com')
             $forumPage = iconv('windows-1251', 'utf-8//IGNORE', $forumPage);
 
         if ($tracker == 'tr.anidub.com')
@@ -420,28 +415,31 @@ class Sys
         $path = str_replace('class/', '', $dir).'torrents/'.$file;
         if (file_exists($path))
             unlink($path);
-        file_put_contents($path, $torrent);
-
-        $useTorrent = Database::getSetting('useTorrent');
-        if ($useTorrent)
-        {
-            $status = Sys::addToClient($id, $name, $path, $hash, $tracker, $date_str);
-            if ($status['status'])
-                $message = $message.' И добавлен в torrent-клиент.';
+        if (file_put_contents($path, $torrent))
+        {        
+            $useTorrent = Database::getSetting('useTorrent');
+            if ($useTorrent)
+            {
+                $status = Sys::addToClient($id, $name, $path, $hash, $tracker, $date_str);
+                if ($status['status'])
+                    $message = $message.' И добавлен в torrent-клиент.';
+                else
+                    $message = $message.' Но не добавлен в torrent-клиент и сохранён.';
+                //выполняем кастомный скрипт
+                if ($status['status'])
+                    Sys::runScript($id, $tracker, $name, $status['hash'], $message, $date_str);        
+            }
             else
-                $message = $message.' Но не добавлен в torrent-клиент и сохранён.';
-            //выполняем кастомный скрипт
-            if ($status['status'])
-                Sys::runScript($id, $tracker, $name, $status['hash'], $message, $date_str);        
+                $message = $message.' И сохранён.';
+    
+            if ($tracker == 'anidub.com')
+            {
+                $torrent = Database::getTorrent($id);
+                $t_id = $torrent[0]['torrent_id'];
+            }
         }
         else
-            $message = $message.' И сохранён.';
-
-        if ($tracker == 'anidub.com')
-        {
-            $torrent = Database::getTorrent($id);
-            $t_id = $torrent[0]['torrent_id'];
-        }
+            $message = $message.' Но не удалось сохранить torrent-файл.';
             
         //отправляем уведомлении об обновлении
         Notification::sendNotification('notification', $date_str, $tracker, $message, $name, $t_id);

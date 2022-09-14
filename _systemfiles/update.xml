@@ -2,6 +2,220 @@
 <body>
     <title>TorrentMonitor Update Schema</title>
     <update>
+        <version>1.8.9.5</version>
+        <description>- rutor.org заменён на rutor.info</description>
+        <files>
+            <file>class/System.class.php</file>
+            <file>include/show_table.php</file>
+            <file>include/form.php</file>
+            <file>img/kinozal.tv.ico</file>
+            <file>img/rutor.info.ico</file>
+            <file>img/tracker.0day.kiev.ua.ico</file>
+            <file>img/tv.mekc.info.ico</file>
+            <file>trackers/rutor.info.engine.php</file>
+            <file>action.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.8.9.4</version>
+        <description>- Улучшена обработка cookie для anidub.com и lostfilm.tv
+- lostfilm-mirror перешёл на https
+- Мелкие исправления</description>
+        <files>
+            <file>class/System.class.php</file>
+            <file>include/show_table.php</file>
+            <file>trackers/anidub.com.engine.php</file>
+            <file>trackers/lostfilm-mirror.engine.php</file>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>action.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.8.9.3</version>
+        <description>- Восстановление работоспособности anidub.com
+- Восстановление работоспособности lostfilm.tv
+- Восстановление работоспособности rutor.org</description>
+        <files>
+            <file>class/System.class.php</file>
+            <file>include/form.php</file>
+            <file>include/show_table.php</file>
+            <file>trackers/anidub.com.engine.php</file>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>trackers/rutor.org.engine.php</file>
+            <file>action.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.8.9.2</version>
+        <description>- Исправлен баг с ошибкой "Warning: Undefined variable $count in /home/****/public_html/engine.php on line 32"</description>
+        <files>
+            <file>engine.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>
+    
+    <update>
+        <version>1.8.9.1</version>
+        <description>- Удалены поддержка трекеров tracker.0day.kiev.ua и tv.mekc.info
+            - Фикс парсинга заголовков nnmclub
+            - Обработка функции count(), которая приводила к выпаданию "Argument #1 ($value) must be of type Countabl"</description>
+        <files>
+            <file>class/System.class.php</file>
+            <file>engine.php</file>
+            <file>include/show_watching.php</file>
+            <file>include/show_warnings.php</file>
+            <file>changelog.txt</file>
+        </files>
+        <queryes>
+            <query>DELETE FROM credentials WHERE tracker = 'tracker.0day.kiev.ua'</query>
+            <query>DELETE FROM credentials WHERE tracker = 'tv.mekc.info'</query>
+        </queryes>
+
+    </update>
+
+    <update>
+        <version>1.8.9</version>
+        <description>- Восстановление работоспособности rutracker.org</description>
+        <files>
+            <file>class/Config.class.php</file>
+            <file>trackers/rutracker.org.engine.php</file>
+            <file>trackers/rutracker.org.search.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.8.8</version>
+        <description>- Восстановление работоспособности lostfilm.tv
+- Фиксы для rutracker.org: устранена ошибка "Не удалось найти время обновления торрента.", так же исправлена проверка авторизации на трекере
+- Восстановление работоспособности kinozal.tv и kinozal.me</description>
+        <files>
+            <file>class/System.class.php</file>
+            <file>trackers/rutracker.org.engine.php</file>
+            <file>trackers/rutracker.org.search.php</file>
+            <file>trackers/kinozal.tv.engine.php</file>
+            <file>trackers/kinozal.me.engine.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>
+
+    <update>        
+        <version>1.8.7</version>
+        <description>- Восстановление работоспособности lostfilm.tv через lostfilmtv.uno.
+- Фикс для qBittorrent, исправлен баг с удаление торрента от Roman Smirnov.</description>
+        <files>
+            <file>class/qBittorrent.class.php</file>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.8.6</version>
+        <description>- Восстановление работоспособности lostfilm.tv</description>
+        <files>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.8.5</version>
+        <description>- Восстановление работоспособности lostfilm.tv</description>
+        <files>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>trackers/baibako.tv_forum.engine.php</file>
+            <file>trackers/baibako.tv.engine.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.8.4</version>
+        <description>- Восстановление работоспособности lostfilm.tv</description>
+        <files>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.8.3</version>
+        <description>- Восстановление работоспособности lostfilm.tv</description>
+        <files>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>class/System.class.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.8.2</version>
+        <description>- Зеркало lostfilm.tv переехало к Sergey Korzenev на http://rss.bzda.ru</description>
+        <files>
+            <file>trackers/lostfilm-mirror.engine.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>
+
+    <update>
+        <version>1.8.1</version>
+        <description>- Восстановление работоспособности слежения за релизерами на http://rutracker.org</description>
+        <files>
+            <file>trackers/rutracker.org.search.php</file>
+            <file>engine.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>     
+
+    <update>
+        <version>1.8.0</version>
+        <description>- Восстановление работоспособности lostfilm.tv</description>
+        <files>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>changelog.txt</file>
+        </files>
+        <queryes>
+            <query>UPDATE credentials SET tracker = 'casstudio.tk' WHERE id = 9;</query>
+        </queryes>
+    </update>     
+    
+    <update>
+        <version>1.7.9</version>
+        <description>- casstudio.tv переехал на https://casstudio.tk
+- добавлена поддержка qBittorrent</description>
+        <files>
+            <file>class/qBittorrent.class.php</file>
+            <file>class/Notification.class.php</file>
+            <file>class/System.class.php</file>
+            <file>include/settings.php</file>
+            <file>include/form.php</file>
+            <file>include/show_table.php</file>
+            <file>include/show_warnings.php</file>
+            <file>trackers/casstudio.tk.engine.php</file>
+            <file>action.php</file>
+            <file>changelog.txt</file>
+        </files>
+        <queryes>
+            <query>UPDATE credentials SET tracker = 'casstudio.tk' WHERE id = 9;</query>
+        </queryes>
+    </update>     
+
+    <update>
+        <version>1.7.8</version>
+        <description>- Восстановление работоспособности lostfilm.tv</description>
+        <files>
+            <file>trackers/lostfilm.tv.engine.php</file>
+            <file>changelog.txt</file>
+        </files>
+    </update>     
+    <update>
         <version>1.7.7</version>
         <description>- Исправление мелких багов</description>
         <files>

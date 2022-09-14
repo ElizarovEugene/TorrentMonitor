@@ -31,10 +31,10 @@ if ($tracker == 'rutracker.org' || $tracker == 'nnmclub.to' || $tracker == 'tfil
     $tracker = 'http://'.$tracker.'/forum/viewtopic.php?t=';
 elseif ($tracker == 'booktracker.org')
     $tracker = 'http://'.$tracker.'/viewtopic.php?t=';    
-elseif ($tracker == 'casstudio.tk' || $tracker == 'kinozal.me' || $tracker == 'tracker.0day.kiev.ua' || $tracker == 'tv.mekc.info')
+elseif ($tracker == 'casstudio.tk' || $tracker == 'kinozal.tv' || $tracker == 'kinozal.me' || $tracker == 'tracker.0day.kiev.ua' || $tracker == 'tv.mekc.info')
     $tracker = 'http://'.$tracker.'/details.php?id=';
-elseif ($tracker == 'rutor.org')
-    $tracker = 'http://rutor.org/torrent/';
+elseif ($tracker == 'rutor.info')
+    $tracker = 'http://rutor.info/torrent/';
 elseif ($tracker == 'anidub.com')
     $tracker = 'http://tr.anidub.com';
 elseif ($tracker == 'riperam.org')

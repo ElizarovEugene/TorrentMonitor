@@ -29,7 +29,10 @@ $time_start_full = microtime(true);
 if (Sys::checkCurl())
 {
 	$torrentsList = Database::getTorrentsList('name');
-	$count = count($torrentsList);
+    if ($torrentsList != NULL)
+    {
+        $count = count($torrentsList);
+    }
 	echo getTimestamp();
 	echo 'Опрос новых раздач на трекерах:'.$NL;
     $time_start_overall = microtime(true);
@@ -106,47 +109,50 @@ if (Sys::checkCurl())
         echo 'Общее время опроса трекеров: '.$time.$NL;
     }
 			
-	$usersList = Database::getUserToWatch();
-	$count = count($usersList);
 	echo getTimestamp();
     echo 'Опрос новых раздач пользователей на трекерах:'.$NL;
 	$time_start_overall = microtime(true);
-	for ($i=0; $i<$count; $i++)
+	$usersList = Database::getUserToWatch();
+	if ( ! empty($usersList))
 	{
-		$tracker = $usersList[$i]['tracker'];
-		if (Database::checkTrackersCredentialsExist($tracker))
-		{
-			$serchFile = $dir.'trackers/'.$tracker.'.search.php';
-			if (file_exists($serchFile))
-			{
-				Database::clearWarnings('system');
-
-				$functionEngine = include_once $serchFile;
-				$class = explode('.', $tracker);
-				$class = $class[0];
-				$class = str_replace('-', '', $class);
-				$functionClass = $class.'Search';
-				echo getTimestamp();
-                echo 'Пользователь '.$usersList[$i]['name'].' на трекере '.$tracker.$NL;
-                $time_start = microtime(true);
-				call_user_func($functionClass .'::mainSearch', $usersList[$i]);
-				$time_end = microtime(true);
-				$time = $time_end - $time_start;
-				if ($debug)
-				{
+    	$count = count($usersList);
+    	for ($i=0; $i<$count; $i++)
+    	{
+    		$tracker = $usersList[$i]['tracker'];
+    		if (Database::checkTrackersCredentialsExist($tracker))
+    		{
+    			$serchFile = $dir.'trackers/'.$tracker.'.search.php';
+    			if (file_exists($serchFile))
+    			{
+    				Database::clearWarnings('system');
+    
+    				$functionEngine = include_once $serchFile;
+    				$class = explode('.', $tracker);
+    				$class = $class[0];
+    				$class = str_replace('-', '', $class);
+    				$functionClass = $class.'Search';
     				echo getTimestamp();
-				    echo 'Время выполнения: '.$time.$NL;
-				}
-
-				$functionClass = NULL;
-				$functionEngine = NULL;
-			}
-			else
-				Errors::setWarnings('system', 'missing_files');
-		}
-		else
-			Errors::setWarnings('system', 'credential_miss');
-	}
+                    echo 'Пользователь '.$usersList[$i]['name'].' на трекере '.$tracker.$NL;
+                    $time_start = microtime(true);
+    				call_user_func($functionClass .'::mainSearch', $usersList[$i]);
+    				$time_end = microtime(true);
+    				$time = $time_end - $time_start;
+    				if ($debug)
+    				{
+        				echo getTimestamp();
+    				    echo 'Время выполнения: '.$time.$NL;
+    				}
+    
+    				$functionClass = NULL;
+    				$functionEngine = NULL;
+    			}
+    			else
+    				Errors::setWarnings('system', 'missing_files');
+    		}
+    		else
+    			Errors::setWarnings('system', 'credential_miss');
+    	}
+    }
     $time_end_overall = microtime(true);
     $time = $time_end_overall - $time_start_overall;
     if ($debug)
@@ -162,8 +168,11 @@ if (Sys::checkCurl())
 	echo 'Добавляем темы из Temp.'.$NL;
 	$time_start = microtime(true);
 	$tempList = Database::getAllFromTemp();
-	if (count($tempList) > 0)
-	    Sys::AddFromTemp($tempList);
+	if ( ! empty($tempList))
+	{
+    	if (count($tempList) > 0)
+    	    Sys::AddFromTemp($tempList);
+    }
 	$time_end = microtime(true);
 	$time = $time_end - $time_start;
 	if ($debug)

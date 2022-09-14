@@ -70,7 +70,7 @@ class lostfilmmirror
 	        	array(
 	        		'type'           => 'GET',
 	        		'returntransfer' => 1,
-	        		'url'            => 'http://korphome.ru/lostfilm.tv/rss.xml',
+	        		'url'            => 'https://rss.bzda.ru/rss.xml',
 	        	)
 	        );
 

@@ -1,10 +1,10 @@
 <?php
 $dir = dirname(__FILE__).'/';
 include_once $dir.'config.php';
-include_once $dir.'class/System.class.php';
 include_once $dir.'class/Database.class.php';
 include_once $dir.'class/Errors.class.php';
 include_once $dir.'class/Notification.class.php';
+include_once $dir.'class/System.class.php';
 
 if (isset($_POST['action']))
 {
@@ -52,12 +52,7 @@ if (isset($_POST['action']))
     				$tracker = 'anidub.com';
                 elseif ($tracker == 'baibako.tv')
     				$tracker = 'baibako.tv_forum';
-    				
-                if (preg_match('/.*tor\.org|rutor\.info/', $tracker))
-                {
-                    $tracker = 'rutor.org';
-                    $_POST['url'] = 'http://rutor.info'.$url['path'];
-    			}
+
     			if ($tracker == 'anidub.com' || $tracker == 'riperam.org')
     			    $threme = $url['path'];
                 elseif ($tracker == 'animelayer.ru')
@@ -71,7 +66,7 @@ if (isset($_POST['action']))
     				$query = explode('t=', $url['query']);
     				$threme = $query[1];
     			}
-    			elseif ($tracker != 'rutor.org')
+    			elseif ($tracker != 'rutor.info')
     			{
     				$query = explode('=', $url['query']);
     				$threme = $query[1];
@@ -166,6 +161,7 @@ if (isset($_POST['action']))
 	//Добавляем сериал для мониторинга
 	if ($_POST['action'] == 'serial_add')
 	{
+    	
 		$tracker = $_POST['tracker'];
 		if (is_array(Database::getCredentials($tracker)))
 		{
@@ -206,7 +202,8 @@ if (isset($_POST['action']))
 		{
 			$return['error'] = TRUE;
             $return['msg'] = 'Вы не можете следить за этим сериалом на трекере - <b>'.$tracker.'</b>, пока не введёте свои учётные данные!';
-		}
+		}	
+		
 		echo json_encode($return);
 	}
 	
@@ -233,8 +230,6 @@ if (isset($_POST['action']))
     			$tracker = preg_replace('/www\./', '', $tracker);
     			if ($tracker == 'tr.anidub.com')
     				$tracker = 'anidub.com';
-                if ($tracker == 'cool-tor.org')
-				    $tracker = 'rutor.org';
 				elseif ($tracker == 'baibako.tv')
     				$tracker = 'baibako.tv_forum';
     				
@@ -251,7 +246,7 @@ if (isset($_POST['action']))
     				$query = explode('=', $url['query']);
     				$threme = $query[1];
     			}
-    			elseif ($tracker != 'rutor.org')
+    			elseif ($tracker != 'rutor.info')
     			{
     				$query = explode('=', $url['query']);
     				$threme = $query[1];

@@ -12,9 +12,9 @@ class kinozal
         	array(
         		'type'           => 'GET',
         		'returntransfer' => 1,
-        		'url'            => 'http://kinozal.me',
+        		'url'            => 'http://kinozal.tv',
         		'cookie'         => $sess_cookie,
-        		'sendHeader'     => array('Host' => 'kinozal.me', 'Content-length' => strlen($sess_cookie)),
+        		'sendHeader'     => array('Host' => 'kinozal.tv', 'Content-length' => strlen($sess_cookie)),
         		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
         	)
         );
@@ -114,7 +114,7 @@ class kinozal
             		'type'           => 'POST',
             		'header'         => 1,
             		'returntransfer' => 1,
-            		'url'            => 'http://kinozal.me/takelogin.php',
+            		'url'            => 'http://kinozal.tv/takelogin.php',
             		'postfields'     => 'username='.$login.'&password='.$password.'&returnto=',
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
@@ -205,10 +205,10 @@ class kinozal
                     	array(
                     		'type'           => 'GET',
                     		'returntransfer' => 1,
-                    		'url'            => 'http://kinozal.me/download.php?id='.$torrent_id,
+                    		'url'            => 'http://kinozal.tv/download.php?id='.$torrent_id,
                     		'cookie'         => kinozal::$sess_cookie,
-                    		'sendHeader'     => array('Host' => 'kinozal.me', 'Content-length' => strlen(kinozal::$sess_cookie)),
-                    		'referer'        => 'http://kinozal.me/details.php?id='.$torrent_id,
+                    		'sendHeader'     => array('Host' => 'kinozal.tv', 'Content-length' => strlen(kinozal::$sess_cookie)),
+                    		'referer'        => 'http://kinozal.tv/details.php?id='.$torrent_id,
                     	)
                     );
 					if (preg_match('/<a href=\'\/pay_mode\.php\#tcounter\' class=sbab>/', $torrent))
@@ -292,9 +292,9 @@ class kinozal
             		'type'           => 'GET',
             		'header'         => 0,
             		'returntransfer' => 1,
-            		'url'            => 'http://kinozal.me/details.php?id='.$torrent_id,
+            		'url'            => 'http://kinozal.tv/details.php?id='.$torrent_id,
             		'cookie'         => kinozal::$sess_cookie,
-            		'sendHeader'     => array('Host' => 'kinozal.me', 'Content-length' => strlen(kinozal::$sess_cookie)),
+            		'sendHeader'     => array('Host' => 'kinozal.tv', 'Content-length' => strlen(kinozal::$sess_cookie)),
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );			

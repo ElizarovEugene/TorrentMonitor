@@ -31,15 +31,18 @@ class rutrackerSearch extends rutracker
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
 	        );
+            $page = str_replace("\t", '', $page);
 
 	        if ( ! empty($page))
 	        {
 	        	//сбрасываем варнинг
 				Database::clearWarnings($tracker);
 
-	    		preg_match_all('/<a class=\"gen f\" href=\"tracker\.php\?f=\d{1,9}\">(.*)<\/a>/', $page, $section);
-	    		preg_match_all('/<a data-topic_id=\"\d{3,9}\" class=\"med tLink hl-tags bold\" href=\"viewtopic\.php\?t=(\d{3,9})\">(.*)<\/a>/', $page, $threme);
-	    		preg_match_all('/<td class=\"row4 small nowrap\" style=\".*\">\n\t{3}<u>.*<\/u>\n\t{6}<p>(.*)<\/p>?(\n\t{5}|\n\t{2}<p>.*<\/p>\t)<\/td>/', $page, $dates);
+	    		preg_match_all('/<a class=\"gen f ts-text\" href=\"tracker\.php\?f=\d{1,9}\">(.*)<\/a>/', $page, $section);
+	    		preg_match_all('/<a data-topic_id=\"\d{3,9}\" class=\"med tLink ts-text hl-tags bold\" href=\"viewtopic\.php\?t=(\d{3,9})\">(.*)<\/a>/', $page, $threme);
+	    		preg_match_all('/<td class=\"row4 small nowrap\" style=\".*\" data-ts_text=\".*\">\n<p>(.*)<\/p>\n(<p>(.*)<\/p>)?<\/td>/', $page, $dates);
+	    		
+	    		var_dump($dates[1]);
 	    		
                 if (count($section[1]) == count($threme[1]) && count($threme[1]) == count($dates[1]))
                 {
@@ -54,6 +57,8 @@ class rutrackerSearch extends rutracker
 	    			    Database::addThremeToBuffer($id, $section[1][$i], $threme[1][$i], $threme[2][$i], $date, $tracker);
 	    			}
                 }
+                else
+                    echo 'Not match count';
 	    	}
 	    	else
 				Errors::setWarnings($tracker, 'cant_get_forum_page');

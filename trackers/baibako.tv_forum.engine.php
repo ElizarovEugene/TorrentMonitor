@@ -12,7 +12,7 @@ class baibako_f
 			array(
 				'type'           => 'POST',
 				'returntransfer' => 1,
-				'url'            => 'http://baibako.tv/',
+				'url'            => 'https://baibako.tv/',
 				'cookie'         => $sess_cookie,
 				'sendHeader'     => array('Host' => 'baibako.tv', 'Content-length' => strlen($sess_cookie)),
 				'convert'        => array('windows-1251', 'utf-8//IGNORE'),
@@ -73,7 +73,7 @@ class baibako_f
             		'type'           => 'POST',
             		'header'         => 1,
             		'returntransfer' => 1,
-            		'url'            => 'http://baibako.tv/takelogin.php',
+            		'url'            => 'https://baibako.tv/takelogin.php',
             		'postfields'     => 'username='.$login.'&password='.$password.'&commit=%CF%F3%F1%F2%E8%F2%E5+%EC%E5%ED%FF',
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
@@ -169,7 +169,7 @@ class baibako_f
             		'type'           => 'POST',
             		'header'         => 0,
             		'returntransfer' => 1,
-            		'url'            => 'http://baibako.tv/details.php?id='.$torrent_id,
+            		'url'            => 'https://baibako.tv/details.php?id='.$torrent_id,
             		'cookie'         => baibako_f::$sess_cookie,
             		'sendHeader'     => array('Host' => 'baibako.tv', 'Content-length' => strlen(baibako_f::$sess_cookie)),
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
@@ -200,10 +200,10 @@ class baibako_f
                                 	array(
                                 		'type'           => 'POST',
                                 		'returntransfer' => 1,
-                                		'url'            => 'http://baibako.tv/download.php?id='.$torrent_id,
+                                		'url'            => 'https://baibako.tv/download.php?id='.$torrent_id,
                                 		'cookie'         => baibako_f::$sess_cookie,
                                 		'sendHeader'     => array('Host' => 'baibako.tv', 'Content-length' => strlen(baibako_f::$sess_cookie)),
-                                		'referer'        => 'http://baibako.tv/download.php?id='.$torrent_id,
+                                		'referer'        => 'https://baibako.tv/download.php?id='.$torrent_id,
                                 	)
                                 );
                                 

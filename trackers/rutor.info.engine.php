@@ -47,14 +47,14 @@ class rutor
             		'header'         => 0,
             		'follow'         => 1,
             		'returntransfer' => 1,
-            		'url'            => 'http://cool-tor.org/torrent/'.$torrent_id.'/'
+            		'url'            => 'http://rutor.info/torrent/'.$torrent_id.'/'
             	)
             );
 
 			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
-				if (preg_match('/<tr><td class=\"header\">Добавлен<\/td><td>(.+)  \((.+) назад\)<\/td><\/tr>/', $page, $array))
+				if (preg_match('/<td class=\"header\">Добавлен<\/td><td>(.+) \((.+) назад\)<\/td>/', $page, $array))
 				{
 					//проверяем удалось ли получить дату со страницы
 					if (isset($array[1]))
@@ -76,7 +76,7 @@ class rutor
                                 		'type'           => 'GET',
                                 		'follow'         => 1,
                                 		'returntransfer' => 0,
-                                		'url'            => 'http://cool-tor.org/download/'.$torrent_id.'/',
+                                		'url'            => 'http://d.rutor.info/download/'.$torrent_id.'/',
                                 	)
                                 );
 
@@ -98,6 +98,7 @@ class rutor
                                 else
                                     Errors::setWarnings($tracker, 'torrent_file_fail', $id);
 							}
+							Database::setErrorToThreme($id, 0);
 						}
 						else
 						{

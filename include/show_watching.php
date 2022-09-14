@@ -111,9 +111,11 @@ else
 <script src="js/user-func.js"></script>
 <?php
 $str = '';
-for ($i=0; $i<count($users); $i++)
+if ( $count != NULL)
 {
-    $str .= "'".$users[$i]['id']."', ";
+    for ($i = 0; $i < count($users); $i++) {
+        $str .= "'" . $users[$i]['id'] . "', ";
+    }
 }
 $str = substr($str, 0, -2);
 ?>

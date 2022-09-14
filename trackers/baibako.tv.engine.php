@@ -16,7 +16,7 @@ class baibako
 			array(
 				'type'           => 'POST',
 				'returntransfer' => 1,
-				'url'            => 'http://baibako.tv/',
+				'url'            => 'https://baibako.tv/',
 				'cookie'         => $sess_cookie,
 				'sendHeader'     => array('Host' => 'baibako.tv', 'Content-length' => strlen($sess_cookie)),
 				'convert'        => array('windows-1251', 'utf-8//IGNORE'),
@@ -102,7 +102,7 @@ class baibako
             		'type'           => 'POST',
             		'header'         => 1,
             		'returntransfer' => 1,
-            		'url'            => 'http://baibako.tv/takelogin.php',
+            		'url'            => 'https://baibako.tv/takelogin.php',
             		'postfields'     => 'username='.$login.'&password='.$password.'&commit=%CF%F3%F1%F2%E8%F2%E5+%EC%E5%ED%FF',
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
@@ -207,7 +207,7 @@ class baibako
 			        	array(
 			        		'type'           => 'POST',
 			        		'returntransfer' => 1,
-			        		'url'            => 'http://baibako.tv/rss2.php?feed=dl&passkey='.$credentials['passkey'],
+			        		'url'            => 'https://baibako.tv/rss2.php?feed=dl&passkey='.$credentials['passkey'],
 			        		'cookie'         => baibako::$sess_cookie,
                             'sendHeader'     => array('Host' => 'baibako.tv', 'Content-length' => strlen(baibako::$sess_cookie)),
                             'convert'        => array('windows-1251', 'utf-8//IGNORE'),

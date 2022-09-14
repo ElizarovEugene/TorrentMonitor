@@ -16,7 +16,7 @@ class lostfilm
 			array(
 				'type'           => 'POST',
 				'returntransfer' => 1,
-				'url'            => 'http://www.lostfilm.tv/',
+				'url'            => 'https://lostfilm.tv',
 				'cookie'         => $sess_cookie,
 				'sendHeader'     => array('Host' => 'lostfilm.tv', 'Content-length' => strlen($sess_cookie)),
 			)
@@ -72,9 +72,9 @@ class lostfilm
     		if (isset($matches[0]))
                 $episode = $matches[0];
 
-    		preg_match('/<img src=\"\/\/static\.lostfilm\.tv\/Images\/(.*)\/Posters\/image\.jpg\" alt=\"\" \/>/', $item->description, $matches);
-    		if (isset($matches[1]))
-    			$id = $matches[1];
+    		preg_match('/<img src=\"\/\/static\.lostfilm\.(tv|win|top|site)\/Images\/(.*)\/Posters\/image\.jpg\" alt=\"\" \/>/', $item->description, $matches);
+    		if (isset($matches[2]))
+    			$id = $matches[2];
     		
     			
             $date = lostfilm::dateStringToNum($item->pubDate);
@@ -106,11 +106,11 @@ class lostfilm
             		'type'           => 'POST',
             		'header'         => 1,
             		'returntransfer' => 1,
-            		'url'            => 'http://www.lostfilm.tv/ajaxik.php',
+            		'url'            => 'https://lostfilm.tv/ajaxik.php',
             		'postfields'     => 'act=users&type=login&mail='.$login.'&pass='.$password.'&rem=1',
             	)
             );
-            
+
 			if ( ! empty($page))
 			{
 				if (preg_match_all('/\"need_captcha\":true/', $page, $array))
@@ -136,7 +136,7 @@ class lostfilm
 					lostfilm::$exucution = FALSE;        			
                 }
 				//проверяем подходят ли учётные данные
-				elseif (preg_match_all('/Set-Cookie: lf_session=(.*);/U', $page, $array))
+				elseif (preg_match_all('/Set-Cookie: lf_session=(.*);/Ui', $page, $array))
 				{
     				$num = count ($array[1]);
     				lostfilm::$sess_cookie = 'lf_session='.$array[1][$num-1];
@@ -213,12 +213,13 @@ class lostfilm
 			        	array(
 			        		'type'           => 'GET',
 			        		'returntransfer' => 1,
-			        		'url'            => 'http://www.lostfilm.tv/rss.xml',
+			        		'url'            => 'https://lostfilm.tv/rss.xml',
 			        	)
 			        );
 
 					if ( ! empty(lostfilm::$page))
 					{
+    					lostfilm::$page = preg_replace('/\&/', '&amp;', lostfilm::$page);
 						//читаем xml
 						lostfilm::$xml_page = @simplexml_load_string(lostfilm::$page);
 						//если XML пришёл с ошибками - останавливаем выполнение, иначе - ставим флажок, что получаем страницу
@@ -294,12 +295,12 @@ class lostfilm
 								array(
 									'type'           => 'GET',
 									'returntransfer' => 1,
-									'url'            => 'http://www.lostfilm.tv/v_search.php?c='.$serial['ID'].'&s='.$season.'&e='.$episode.'&'.lostfilm::$sess_cookie,
+									'url'            => 'https://lostfilm.tv/v_search.php?c='.$serial['ID'].'&s='.$season.'&e='.$episode.'&'.lostfilm::$sess_cookie,
 									'sendHeader'     => array('Host' => 'lostfilm.tv'),
 								)
 							);
-
-                            if (preg_match('/location\.replace\(\"(.*)\"\);/', $page, $matches))
+							
+							if (preg_match('/location\.replace\(\"(.*)\"\);/', $page, $matches))
 							{
                                 //получаем страницу с ссылками на torrent-файлы
                                 $page = Sys::getUrlContent(
@@ -330,13 +331,13 @@ class lostfilm
                                     $amp = 'MP4';
                                 }
 
-                                if (preg_match_all('/<div class=\"inner-box--label\">\n'.$str.'\t\t\t<\/div>\n\s*<div class=\"inner-box--link main\"><a href=\"(http:\/\/tracktor\.in\/td\.php\?s=.*)\">[\s\S]*'.$quality.'<\/a><\/div>/U', $page, $matches))
+                                if (preg_match_all('/<div class=\"inner-box--label\">\n'.$str.'(\t\t\t|\s{12})<\/div>\n\s*<div class=\"inner-box--link main\"><a href=\"(https:\/\/(n.)?tracktor\.(in|site)\/td\.php\?s=.*)\">[\s\S]*'.$quality.'<\/a><\/div>/U', $page, $matches))
                                 {
         							$torrent = Sys::getUrlContent(
     						        	array(
     						        		'type'           => 'GET',
     						        		'returntransfer' => 1,
-    						        		'url'            => $matches[1][0],
+    						        		'url'            => $matches[2][0],
     						        		'sendHeader'     => array('Host' => 'tracktor.in'),
     						        	)
                                     );
@@ -353,6 +354,9 @@ class lostfilm
         								Database::setNewDate($id, $serial['date']);
         								//обновляем сведения о последнем эпизоде
         								Database::setNewEpisode($id, $serial['episode']);
+        								//очищаем ошибки
+        								Database::setErrorToThreme($id, 0);
+        								Database::setClosedThreme($id, 0);
                                     }
                                     else
                                     {
