@@ -1,3 +1,11 @@
+25.09.2022 - 1.8.9.6:
+- lostfilm.tv заменён на lostfilmtv5.site
+9.09.2022 - 1.8.9.5:
+- rutor.org заменён на rutor.info
+7.09.2022 - 1.8.9.4:
+- Улучшена обработка cookie для anidub.com и lostfilm.tv
+- lostfilm-mirror перешёл на https
+- Мелкие исправления
 2.09.2022 - 1.8.9.3:
 - Восстановление работоспособности anidub.com
 - Восстановление работоспособности lostfilm.tv
