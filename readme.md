@@ -6,17 +6,19 @@
 - Слежение за темами
   - anidub.com
   - animelayer.ru
+  - baibako.tv 
+  - booktracker.org
   - casstudio.tv
   - kinozal.tv
   - nnm-club.ru
   - pornolab.net
+  - riperam.org
   - rustorka.com
   - rutracker.org
   - rutor.org
   - tfile.me
-  - tracker.0day.kiev.ua
-  - tv.mekc.info
 - Слежение за релизерами
+  - booktracker.org
   - nnm-club.ru
   - pornolab.net
   - rutracker.org
@@ -24,13 +26,13 @@
 - Поиск новых серий (SD/HD 720/HD 1080 версии на выбор)
   - baibako.tv 
   - hamsterstudio.org
-  - lostfilm.tv
+  - lostfilm.tv (+ собственное заркало)
   - newstudio.tv
-  - novafilm.tv
 - Работа через proxy (SOCKS5/HTTP)
 - Управление торрент-клиентами (добавление/удаление раздач и файлов)
   - Transmission (через XML-RPC)
   - Deluge (через deluge-console)
+  - qBittorrent
 - Сервисы уведомлений:
   - E-mail
   - Prowl
