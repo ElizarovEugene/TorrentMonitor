@@ -66,7 +66,7 @@ if (isset($_POST['action']))
     				$query = explode('t=', $url['query']);
     				$threme = $query[1];
     			}
-    			elseif ($tracker != 'rutor.info')
+    			elseif ($tracker != 'rutor.is')
     			{
     				$query = explode('=', $url['query']);
     				$threme = $query[1];
@@ -76,7 +76,7 @@ if (isset($_POST['action']))
     				preg_match('/\d{4,8}/', $url['path'], $array);
     				$threme = $array[0];
     			}
-    
+
     			if (is_array(Database::getCredentials($tracker)))
     			{
     				$engineFile = $dir.'/trackers/'.$tracker.'.engine.php';
@@ -246,7 +246,7 @@ if (isset($_POST['action']))
     				$query = explode('=', $url['query']);
     				$threme = $query[1];
     			}
-    			elseif ($tracker != 'rutor.info')
+    			elseif ($tracker != 'rutor.is')
     			{
     				$query = explode('=', $url['query']);
     				$threme = $query[1];
