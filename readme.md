@@ -4,40 +4,40 @@
 ### Список возможностей приложения:
 
 - Слежение за темами
- - anidub.com
- - animelayer.ru
- - casstudio.tv
- - kinozal.tv
- - nnm-club.ru
- - pornolab.net
- - rustorka.com
- - rutracker.org
- - rutor.org
- - tfile.me
- - tracker.0day.kiev.ua
- - tv.mekc.info
+  - anidub.com
+  - animelayer.ru
+  - casstudio.tv
+  - kinozal.tv
+  - nnm-club.ru
+  - pornolab.net
+  - rustorka.com
+  - rutracker.org
+  - rutor.org
+  - tfile.me
+  - tracker.0day.kiev.ua
+  - tv.mekc.info
 - Слежение за релизерами
- - nnm-club.ru
- - pornolab.net
- - rutracker.org
- - tfile.me
+  - nnm-club.ru
+  - pornolab.net
+  - rutracker.org
+  - tfile.me
 - Поиск новых серий (SD/HD 720/HD 1080 версии на выбор)
- - baibako.tv 
- - hamsterstudio.org
- - lostfilm.tv
- - newstudio.tv
- - novafilm.tv
+  - baibako.tv 
+  - hamsterstudio.org
+  - lostfilm.tv
+  - newstudio.tv
+  - novafilm.tv
 - Работа через proxy (SOCKS5/HTTP)
 - Управление торрент-клиентами (добавление/удаление раздач и файлов)
- - Transmission (через XML-RPC)
- - Deluge (через deluge-console)
+  - Transmission (через XML-RPC)
+  - Deluge (через deluge-console)
 - Сервисы уведомлений:
- - E-mail
- - Prowl
- - Pushbullet
- - Pushover
- - Pushall
- - Telegram 
+  - E-mail
+  - Prowl
+  - Pushbullet
+  - Pushover
+  - Pushall
+  - Telegram 
 - RSS-лента
 - Выполенение собственных скриптов после обновления раздачи
 
