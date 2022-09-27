@@ -82,7 +82,7 @@ else
         	    <a href='http://<?php echo $tracker ?>/details.php?id=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
         	<?php	
     		}
-    		elseif ($tracker == 'animelayer.ru' || $tracker == 'rutor.info')
+    		elseif ($tracker == 'animelayer.ru' || $tracker == 'rutor.is')
     		{
     		?>
     			<a href='http://<?php echo $tracker ?>/torrent/<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>

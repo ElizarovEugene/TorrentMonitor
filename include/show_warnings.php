@@ -128,68 +128,68 @@ if ( $count != NULL)
                 <?php
                 }
             }
-        }
-		else
-		{
-			for ($x=0; $x<count($errors); $x++)
-			{
-				if (($x % 2)==0)
-					$class = "second";
-				else
-					$class = "first";
-				
-				$date = $errors[$x]['day']." ".Sys::dateNumToString($errors[$x]['month'])." ".$errors[$x]['year']." ".$errors[$x]['time'];
-				?>
-			<tr class="<?php echo $class ?>">
-				<td align="center"><?php echo $date ?></td>
-				<td><?php echo $errors[$x]['where'] ?></td>
-				<td><?php echo Errors::getWarning($errors[$x]['reason'])?>
-				<?php
-				if ($errors[$x]['id'] != NULL)
-				{
-    				$torrent = Database::getTorrent($errors[$x]['id']);
-    				$tracker = $torrent[0]['tracker'];
-    				$name = $torrent[0]['name'];
-                    $torrent_id = $torrent[0]['torrent_id'];
-    				echo '<br />Раздача: ';
-            		if ($tracker == 'rutracker.org' || $tracker == 'nnmclub.to' || $tracker == 'tfile.cc' || $tracker == 'torrents.net.ua' || $tracker == 'pornolab.net' || $tracker == 'rustorka.com')
-            		{
-            		?>
-        				<a href='http://<?php echo $tracker ?>/forum/viewtopic.php?t=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
-            		<?php
-            		}
-            		elseif ($tracker == 'kinozal.tv'  || $tracker == 'tracker.0day.kiev.ua' || $tracker == 'tv.mekc.info')
-            		{
-                    ?>
-                	    <a href='http://<?php echo $tracker ?>/details.php?id=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
-                	<?php	
-            		}
-            		elseif ($tracker == 'animelayer.ru' || $tracker == 'rutor.org')
-            		{
-                		if ($tracker == 'rutor.org')
-                		    $tracker = 'rutor.info';
-            		?>
-            			<a href='http://<?php echo $tracker ?>/torrent/<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
-            		<?php
-            		}
-            		elseif ($tracker == 'anidub.com')
-            		{
-        	    	?>        		
-        	    		<a href='http://tr.anidub.com/<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>	    	
-        	    	<?php        		
-            		}
-            		elseif ($tracker == 'casstudio.tk' || $tracker == 'booktracker.org')
-            		{
-        	    	?>        		
-        	    		<a href='http://<?php echo $tracker ?>/viewtopic.php?t=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
+    		else
+    		{
+    			for ($x=0; $x<count($errors); $x++)
+    			{
+    				if (($x % 2)==0)
+    					$class = "second";
+    				else
+    					$class = "first";
+    				
+    				$date = $errors[$x]['day']." ".Sys::dateNumToString($errors[$x]['month'])." ".$errors[$x]['year']." ".$errors[$x]['time'];
+    				?>
+    			<tr class="<?php echo $class ?>">
+    				<td align="center"><?php echo $date ?></td>
+    				<td><?php echo $errors[$x]['where'] ?></td>
+    				<td><?php echo Errors::getWarning($errors[$x]['reason'])?>
     				<?php
-                    }
-				}?>				    
-				</td>
-			</tr>
-		 	<?php
-			}
-		}
+    				if ($errors[$x]['id'] != NULL)
+    				{
+        				$torrent = Database::getTorrent($errors[$x]['id']);
+        				$tracker = $torrent[0]['tracker'];
+        				$name = $torrent[0]['name'];
+                        $torrent_id = $torrent[0]['torrent_id'];
+        				echo '<br />Раздача: ';
+                		if ($tracker == 'rutracker.org' || $tracker == 'nnmclub.to' || $tracker == 'tfile.cc' || $tracker == 'torrents.net.ua' || $tracker == 'pornolab.net' || $tracker == 'rustorka.com')
+                		{
+                		?>
+            				<a href='http://<?php echo $tracker ?>/forum/viewtopic.php?t=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
+                		<?php
+                		}
+                		elseif ($tracker == 'kinozal.tv'  || $tracker == 'tracker.0day.kiev.ua' || $tracker == 'tv.mekc.info')
+                		{
+                        ?>
+                    	    <a href='http://<?php echo $tracker ?>/details.php?id=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
+                    	<?php	
+                		}
+                		elseif ($tracker == 'animelayer.ru' || $tracker == 'rutor.org')
+                		{
+                    		if ($tracker == 'rutor.org')
+                    		    $tracker = 'rutor.info';
+                		?>
+                			<a href='http://<?php echo $tracker ?>/torrent/<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
+                		<?php
+                		}
+                		elseif ($tracker == 'anidub.com')
+                		{
+            	    	?>        		
+            	    		<a href='http://tr.anidub.com/<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>	    	
+            	    	<?php        		
+                		}
+                		elseif ($tracker == 'casstudio.tk' || $tracker == 'booktracker.org')
+                		{
+            	    	?>        		
+            	    		<a href='http://<?php echo $tracker ?>/viewtopic.php?t=<?php echo $torrent_id ?>' target='_blank'><?php echo $name ?></a>
+        				<?php
+                        }
+    				}?>				    
+    				</td>
+    			</tr>
+    		 	<?php
+    			}
+    		}
+        }
 	}
 }
 ?>

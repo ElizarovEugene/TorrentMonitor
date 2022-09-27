@@ -274,10 +274,8 @@ class Sys
                     $name = $array2[1];
 
             }
-            elseif ($tracker == 'rutor.info')
+            elseif ($tracker == 'rutor.is')
                 $name = substr($array[1], 14);
-            elseif ($tracker == 'rustorka.com')
-                $name = substr($array[1], 0, -111);
             else
                 $name = $array[1];
         }
@@ -357,7 +355,7 @@ class Sys
             );
         }
 
-        if ($tracker != 'animelayer.ru' && $tracker != 'booktracker.org' && $tracker != 'casstudio.tk' && $tracker != 'torrents.net.ua' && $tracker != 'riperam.org' && $tracker != 'rustorka.com' && $tracker != 'rutor.info' && $tracker != 'tr.anidub.com')
+        if ($tracker != 'animelayer.ru' && $tracker != 'booktracker.org' && $tracker != 'casstudio.tk' && $tracker != 'torrents.net.ua' && $tracker != 'riperam.org' && $tracker != 'rustorka.com' && $tracker != 'rutor.is' && $tracker != 'tr.anidub.com')
             $forumPage = iconv('windows-1251', 'utf-8//IGNORE', $forumPage);
 
         if ($tracker == 'tr.anidub.com')

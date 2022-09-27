@@ -162,7 +162,6 @@ class rutracker
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
-            $page = str_replace("\t", '', $page);
 
 			if ( ! empty($page))
 			{

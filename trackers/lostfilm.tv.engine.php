@@ -14,11 +14,11 @@ class lostfilm
 	{
 		$result = Sys::getUrlContent(
 			array(
-				'type'           => 'POST',
+				'type'           => 'GET',
 				'returntransfer' => 1,
-				'url'            => 'https://lostfilmtv5.site',
+				'url'            => 'https://www.lostfilmtv5.site',
 				'cookie'         => $sess_cookie,
-				'sendHeader'     => array('Host' => 'lostfilmtv5.site', 'Content-length' => strlen($sess_cookie)),
+				'sendHeader'     => array('Host' => 'www.lostfilmtv5.site', 'Content-length' => strlen($sess_cookie)),
 			)
 		);
 
@@ -106,7 +106,7 @@ class lostfilm
             		'type'           => 'POST',
             		'header'         => 1,
             		'returntransfer' => 1,
-            		'url'            => 'https://lostfilmtv5.site/ajaxik.php',
+            		'url'            => 'https://www.lostfilmtv5.site/ajaxik.php',
             		'postfields'     => 'act=users&type=login&mail='.$login.'&pass='.$password.'&rem=1',
             	)
             );
@@ -213,7 +213,7 @@ class lostfilm
 			        	array(
 			        		'type'           => 'GET',
 			        		'returntransfer' => 1,
-			        		'url'            => 'https://lostfilmtv5.site/rss.xml',
+			        		'url'            => 'https://www.lostfilmtv5.site/rss.xml',
 			        	)
 			        );
 
@@ -295,8 +295,8 @@ class lostfilm
 								array(
 									'type'           => 'GET',
 									'returntransfer' => 1,
-									'url'            => 'https://lostfilmtv5.site/v_search.php?c='.$serial['ID'].'&s='.$season.'&e='.$episode.'&'.lostfilm::$sess_cookie,
-									'sendHeader'     => array('Host' => 'lostfilmtv5.site'),
+									'url'            => 'https://www.lostfilmtv5.site/v_search.php?c='.$serial['ID'].'&s='.$season.'&e='.$episode.'&'.lostfilm::$sess_cookie,
+									'sendHeader'     => array('Host' => 'www.lostfilmtv5.site'),
 								)
 							);
 							

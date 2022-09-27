@@ -47,7 +47,7 @@ class rutor
             		'header'         => 0,
             		'follow'         => 1,
             		'returntransfer' => 1,
-            		'url'            => 'http://rutor.info/torrent/'.$torrent_id.'/'
+            		'url'            => 'http://rutor.is/torrent/'.$torrent_id.'/'
             	)
             );
 
