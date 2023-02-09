@@ -48,6 +48,14 @@ http://tormon.ru
 - RSS-лента
 - Выполенение собственных скриптов после обновления раздачи
 
+### Требования для установки:
+* Веб-сервер (Apache, nginx, lighttpd)
+* PHP (5.2 или выше) с поддержкой cURL и PDO
+* MySQL, PostgreSQL, SQLite
+
+### Docker hub:
+https://hub.docker.com/r/alfonder/torrentmonitor
+
 ### Скриншоты:
  ![Screenshot0](https://habrastorage.org/webt/yy/xq/2g/yyxq2gn8o5-b68zr-m_acdv78w8.png "Screenshot0")
  ![Screenshot1](https://habrastorage.org/webt/do/fl/cd/doflcdnaxhg4elpis4jyg30tzik.png "Screenshot1")
@@ -56,13 +64,5 @@ http://tormon.ru
  ![Screenshot4](https://habrastorage.org/webt/qs/i7/y5/qsi7y53vb8qnl0y0ifcrxbcvv78.png "Screenshot4")
  ![Screenshot5](https://habrastorage.org/webt/nz/n9/zd/nzn9zdlnhje6blm7dsbk7nnzxnk.png "Screenshot5")
  ![Screenshot6](https://habrastorage.org/webt/ta/wl/pz/tawlpzlptcv1frusl8lv_tyyc-u.png "Screenshot6")
-
-### Требования для установки:
-* Веб-сервер (Apache, nginx, lighttpd)
-* PHP (5.2 или выше) с поддержкой cURL и PDO
-* MySQL, PostgreSQL, SQLite
-
-### Docker hub:
-https://hub.docker.com/r/alfonder/torrentmonitor
 
 
