@@ -1,22 +1,27 @@
 # TorrentMonitor
 Приложение мониторит изменения на популярных торрент-трекерах рунета и автоматизирует закачку обновлений (сериалы, раздачи которые ведутся *путем добавления новых серий/новых версий*, перезалитые торрент-файлы и т.д.)
 
-### Список возможностей приложения:
+### Страница проекта:
+http://tormon.ru
 
+### Список возможностей приложения:
 - Слежение за темами
   - anidub.com
   - animelayer.ru
-  - baibako.tv 
+  - baibako.tv
   - booktracker.org
   - casstudio.tv
-  - kinozal.tv
-  - nnm-club.ru
+  - hamsterstudio.org
+  - kinozal.me
+  - lostfilm.tv
+  - newstudio.tv
+  - nnmclub.to
   - pornolab.net
   - riperam.org
   - rustorka.com
+  - rutor.info
   - rutracker.org
-  - rutor.org
-  - tfile.me
+  - tfile.cc
 - Слежение за релизерами
   - booktracker.org
   - nnm-club.ru
@@ -44,19 +49,20 @@
 - Выполенение собственных скриптов после обновления раздачи
 
 ### Скриншоты:
- ![Screenshot0](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-53-42.jpg "Screenshot0")
- ![Screenshot1](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-54-16.jpg "Screenshot1")
- ![Screenshot2](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-54-38.jpg "Screenshot2")
- ![Screenshot3](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-54-52.jpg "Screenshot3")
- ![Screenshot4](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-55-28.jpg "Screenshot4")
- ![Screenshot5](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-55-41.jpg "Screenshot5")
- ![Screenshot6](http://blog.korphome.ru/wp-content/uploads/2011/02/Мониторинг-torrent-трекеров-2014-01-27-14-56-36.jpg "Screenshot6")
+ ![Screenshot0](https://habrastorage.org/webt/yy/xq/2g/yyxq2gn8o5-b68zr-m_acdv78w8.png "Screenshot0")
+ ![Screenshot1](https://habrastorage.org/webt/do/fl/cd/doflcdnaxhg4elpis4jyg30tzik.png "Screenshot1")
+ ![Screenshot2](https://habrastorage.org/webt/ad/m5/tk/adm5tktyrelde8fur565aprrpia.png "Screenshot2")
+ ![Screenshot3](https://habrastorage.org/webt/5v/9n/ww/5v9nww4n2ahujooewnichz3emoa.png "Screenshot3")
+ ![Screenshot4](https://habrastorage.org/webt/qs/i7/y5/qsi7y53vb8qnl0y0ifcrxbcvv78.png "Screenshot4")
+ ![Screenshot5](https://habrastorage.org/webt/nz/n9/zd/nzn9zdlnhje6blm7dsbk7nnzxnk.png "Screenshot5")
+ ![Screenshot6](https://habrastorage.org/webt/ta/wl/pz/tawlpzlptcv1frusl8lv_tyyc-u.png "Screenshot6")
 
 ### Требования для установки:
-
 * Веб-сервер (Apache, nginx, lighttpd)
 * PHP (5.2 или выше) с поддержкой cURL и PDO
 * MySQL, PostgreSQL, SQLite
 
-### Страница проекта:
-http://tormon.ru
+### Docker hub:
+https://hub.docker.com/r/alfonder/torrentmonitor
+
+
