@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<body>
+<!--
+    <mirror_address>
+        <lostfilm.tv>www.ya.ru</lostfilm.tv>
+    </mirror_address>
+    <proxy>
+        <lostfilm.tv>
+            <use>yes</use>
+            <type>socks5</type>
+            <address>192.168.1.220:8118</address>
+            <mirror_address>google.ru</mirror_address>
+        </lostfilm.tv>
+    </proxy>
+-->
+</body>
+                                    
