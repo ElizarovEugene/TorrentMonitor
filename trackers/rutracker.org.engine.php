@@ -166,7 +166,7 @@ class rutracker
 			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
-				if (preg_match('/<td style=\"width: 70%; padding: 5px;\">\n<ul class=\"inlined middot-separated\">\n<li>(.*)<\/li>/', $page, $array))
+				if (preg_match('/<td style=\"width: 70%; padding: 5px;\">\n\t{2}<ul class=\"inlined middot-separated\">\n\t{3}<li>(.*)<\/li>/', $page, $array))
 				{
 					//проверяем удалось ли получить дату со страницы
 					if (isset($array[1]))
