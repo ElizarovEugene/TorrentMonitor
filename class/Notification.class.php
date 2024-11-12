@@ -134,9 +134,26 @@ class Notification
 
         $pieces = explode(';', $telegram);
         $url = "https://api.telegram.org/bot" . $pieces[0] . "/sendMessage";
+        
+        // Modified to support message_thread_id
         for ($i = 1; array_key_exists($i, $pieces); $i++)
         {
-            $postfields = array('chat_id' => $pieces[$i], 'text' => $msg, 'disable_web_page_preview' => 1, 'parse_mode' => 'HTML');
+            // Check if the piece contains thread ID (format: "chat_id:thread_id")
+            $chatDetails = explode(':', $pieces[$i]);
+            $chatId = $chatDetails[0];
+            
+            $postfields = array(
+                'chat_id' => $chatId,
+                'text' => $msg,
+                'disable_web_page_preview' => 1,
+                'parse_mode' => 'HTML'
+            );
+            
+            // Add message_thread_id if provided
+            if (isset($chatDetails[1])) {
+                $postfields['message_thread_id'] = $chatDetails[1];
+            }
+            
             $forumPage = Sys::getUrlContent(
                 array(
                     'type'           => 'POST',
