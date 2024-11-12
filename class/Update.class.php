@@ -79,7 +79,7 @@ class Update {
                         array(
                             'type' => 'GET',
                             'returntransfer' => 1,
-                            'url' => 'http://tormon.ru/tm-latest.zip',
+                            'url' => 'https://github.com/ElizarovEugene/TorrentMonitor/archive/refs/heads/master.zip',
                         )
                     );
     
