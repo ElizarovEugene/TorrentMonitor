@@ -14,13 +14,13 @@ class qBittorrent
         if ( ! empty($individualPath))
             $pathToDownload = $individualPath;
 
-        $data = array('username'=>$torrentLogin,'password'=>$torrentPassword);
+        $data = array('username' => $torrentLogin, 'password' => $torrentPassword);
 
         //Авторизация
         $MainCurl = curl_init();
         curl_setopt_array($MainCurl, array(
-            CURLOPT_URL => "$torrentAddress/api/v2/auth/login",
-            CURLOPT_USERAGENT => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:51.0) Gecko/20100101 Firefox/51.0',
+            CURLOPT_URL => $torrentAddress."/api/v2/auth/login",
+            CURLOPT_USERAGENT => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:51.0) Gecko/20100101 Firefox/51.0",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
             CURLOPT_VERBOSE => true,
@@ -30,21 +30,18 @@ class qBittorrent
     
         $response=curl_exec($MainCurl);
     
-        preg_match_all("/SID=(.*?);/",$response,$match);
+        preg_match_all("/SID=(.*?);/", $response, $match);
         $cookie = "SID=".$match[1][0];
-        curl_setopt($MainCurl,CURLOPT_COOKIE,$cookie);
-        curl_setopt($MainCurl,CURLOPT_HEADER,false);
+        curl_setopt($MainCurl, CURLOPT_COOKIE, $cookie);
+        curl_setopt($MainCurl, CURLOPT_HEADER, false);
 
-        preg_match_all("/.*\/(.*)/",$file,$match);
-        $filename = $match[1][0];
-            
         if ( ! empty($hash))
         {
             $data = array(
-                'hashes'=>$hash,
-                'deleteFiles'=>'false'
+                'hashes' => $hash,
+                'deleteFiles' => 'false'
             );
-            curl_setopt($MainCurl, CURLOPT_URL,"$torrentAddress/api/v2/torrents/delete");
+            curl_setopt($MainCurl, CURLOPT_URL, $torrentAddress."/api/v2/torrents/delete");
             curl_setopt($MainCurl, CURLOPT_POSTFIELDS, http_build_query($data));
 
             if ($tracker == 'lostfilm.tv' || $tracker == 'lostfilm-mirror' ||  $tracker == 'baibako.tv' || $tracker == 'newstudio.tv')
@@ -63,104 +60,43 @@ class qBittorrent
         }
         
         //Формируется тело запроса
-        $data = array();
-        $data[] = implode("\r\n", array(
-            "Content-Disposition: form-data; name=\"torrents\"; filename=\"$filename\";",
-            "Content-Type: application/x-bittorrent",
-            "",
-            file_get_contents($file)
-        ));
-        $data[] = implode("\r\n", array(
-            "Content-Disposition: form-data; name=\"autoTMM\"",
-            "",
-            "false"
-        ));
-        $data[] = implode("\r\n", array(
-            "Content-Disposition: form-data; name=\"savepath\"",
-            "",
-            "$pathToDownload"
-        ));
-        $data[] = implode("\r\n", array(
-            "Content-Disposition: form-data; name=\"rename\"",
-            "",
-            ""
-        ));
-        $data[] = implode("\r\n", array(
-            "Content-Disposition: form-data; name=\"category\"",
-            "",
-            ""
-        ));
-        $data[] = implode("\r\n", array(
-            "Content-Disposition: form-data; name=\"paused\"",
-            "",
-            "false"
-        ));
-        $data[] = implode("\r\n", array(
-            "Content-Disposition: form-data; name=\"root_folder\"",
-            "",
-            "true"
-        ));
-        $data[] = implode("\r\n", array(
-            "Content-Disposition: form-data; name=\"sequentialDownload\"",
-            "",
-            "true"
-        ));
-        $data[] = implode("\r\n", array(
-            "Content-Disposition: form-data; name=\"dlLimit\"",
-            "",
-            ""
-        ));
-        $data[] = implode("\r\n", array(
-            "Content-Disposition: form-data; name=\"upLimit\"",
-            "",
-            ""
-        ));
-
-        //генерируется разрыв
-        do {
-            $boundary = "---------------------" . md5(mt_rand() . microtime());
-        } while (preg_grep("/{$boundary}/", $data));
-
-        //добавляется разрыв к каждому параметру
-        array_walk($data, function (&$part) use ($boundary) {
-            $part = "--{$boundary}\r\n{$part}";
-        });
-
-        //добавляется последний разрыв
-        $data[] = "--{$boundary}--";
-        $data[] = "";
-
+        $data = array(
+            'urls' => $file,
+            'autoTMM' => true,
+            'savepath' => $pathToDownload,
+            'root_folder' => true,
+        );
+        
         //формируется заголовок запроса
-        $request_headers = array();
-        $request_headers[] = "Cookie: $cookie";
-        $request_headers[] = "Content-Type: multipart/form-data; boundary={$boundary}";
-
+        $request_headers = array(
+            "Cookie: ".$cookie
+        );
+        
         $ch = curl_init();
         curl_setopt_array($ch, array(
             CURLOPT_URL => $torrentAddress."/api/v2/torrents/add",
-            CURLOPT_USERAGENT => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:51.0) Gecko/20100101 Firefox/51.0',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
             CURLOPT_VERBOSE => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_HTTPHEADER => $request_headers,
             CURLOPT_COOKIE => $cookie,
-            CURLOPT_POSTFIELDS => implode("\r\n", $data),
+            CURLOPT_POSTFIELDS => $data
         ));
         $response = curl_exec($ch);
         curl_close($ch);
 
         if (preg_match('/Ok/', $response)) {
-            sleep(3); //по тому, что qBittorrent медленно переваривает торренты
+            sleep(3);
             
             //получение хэша торрента
             $data = array(
-                'filter'=>'all',
-                'limit'=>'1',
-                'sort'=>'added_on',
-                'reverse'=>'true'
+                'filter' => 'all',
+                'limit' => '1',
+                'sort' => 'added_on',
+                'reverse' => 'true'
             );
-            curl_setopt($MainCurl, CURLOPT_URL,"$torrentAddress/api/v2/torrents/info");
+            curl_setopt($MainCurl, CURLOPT_URL, $torrentAddress."/api/v2/torrents/info");
             curl_setopt($MainCurl, CURLOPT_POSTFIELDS, http_build_query($data));
             $response = curl_exec($MainCurl);
             $rdata = json_decode($response)[0];
@@ -179,7 +115,7 @@ class qBittorrent
         }
 
         //выход
-        curl_setopt($MainCurl,CURLOPT_URL,"$torrentAddress/logout");
+        curl_setopt($MainCurl, CURLOPT_URL, $torrentAddress."/api/v2/auth/logout");
         curl_exec($MainCurl);
         curl_close($MainCurl);
 
