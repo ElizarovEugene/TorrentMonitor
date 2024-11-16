@@ -79,7 +79,8 @@ class Update {
                         array(
                             'type' => 'GET',
                             'returntransfer' => 1,
-                            'url' => 'https://tormon.ru/tm-latest.zip',
+                            'follow' => 1,
+                            'url' => 'https://github.com/ElizarovEugene/TorrentMonitor/archive/refs/heads/master.zip',
                         )
                     );
     
@@ -146,48 +147,60 @@ class Update {
                                 Update::delTree($ROOTPATH . 'tmp');
                             }
                             else
+                            {
                                 echo 'Не могу разархивировать master.zip'."\r\n".'<br />';
+                                Update::$systemFail = TRUE;
+                            }
                         }
                         else
+                        {
                             echo 'Не могу сохранить master.zip'."\r\n".'<br />';
+                            Update::$systemFail = TRUE;
+                        }
                     }
                     else
+                    {
                         echo 'Не удалось скачать master.zip'."\r\n".'<br />';
+                        Update::$systemFail = TRUE;
+                    }
                 }
                 else
                     Update::$notNeeded = TRUE;
     
-                #Обновление базы данных
-                if (Update::$versionDatabase < Update::$updVersion)
+                if (!Update::$systemFail)
                 {
-                    if (isset($queryes->query) && ! empty($queryes->query))
+                    #Обновление базы данных
+                    if (Update::$versionDatabase < Update::$updVersion)
                     {
-                        foreach($queryes->query as $query)
+                        if (isset($queryes->query) && ! empty($queryes->query))
                         {
-                            Update::quary($query);
+                            foreach($queryes->query as $query)
+                            {
+                                Update::quary($query);
+                            }
+                        }
+                        else
+                            Update::$versionDatabase = Update::$updVersion;
+                                    
+                        if (isset($queryes_common->query) && ! empty($queryes_common->query) )
+                        {
+                            foreach($queryes_common->query as $query)
+                            {
+                                Update::quary($query);
+                            }
+                        }
+                        else
+                            Update::$versionDatabase = Update::$updVersion;
+        
+                        if (!Update::$databaseFail)
+                        {
+                            Update::$versionDatabase = Update::$updVersion;
+                            Update::$isUpdated = TRUE;
                         }
                     }
                     else
-                        Update::$versionDatabase = Update::$updVersion;
-                                
-                    if (isset($queryes_common->query) && ! empty($queryes_common->query) )
-                    {
-                        foreach($queryes_common->query as $query)
-                        {
-                            Update::quary($query);
-                        }
-                    }
-                    else
-                        Update::$versionDatabase = Update::$updVersion;
-    
-                    if (!Update::$databaseFail)
-                    {
-                        Update::$versionDatabase = Update::$updVersion;
-                        Update::$isUpdated = TRUE;
-                    }
+                        Update::$notNeeded = TRUE;
                 }
-                else
-                    Update::$notNeeded = TRUE;
             }
 
             $version = NULL;
@@ -207,12 +220,6 @@ class Update {
                 else
                     echo 'Перейти на <a href="' . $serverAddress . '">главную страницу</a>.<br />';
             }
-            /*
-            elseif (Update::$notNeeded)
-            {
-                echo 'Текущая версия системы является актуальной.' . "\r\n" . '<br />';
-            }
-            */
             else
             {
                 Errors::setWarnings('system', 'update_fail');
