@@ -27,7 +27,7 @@ class Notification
         else
             $msg = $message;
             
-		if ($name != '' || $name != 0)
+		if ($name != 0)
 		{
     		if ($tracker !== 'baibako.tv' && $tracker !== 'hamsterstudio.org' && $tracker !== 'lostfilm.tv' && $tracker !== 'lostfilm-mirror' && $tracker !== 'newstudio.tv')
     		{
