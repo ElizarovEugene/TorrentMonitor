@@ -50,6 +50,16 @@ if (file_exists($config))
 
         <div class="form-separator mb-2"></div>
 
+        <label class="row">
+            <div class="col --2:lg mb-1">User-Agent:</div>
+            <div class="col --5:lg mb-2">
+                <input type="text" name="userAgent" x-model="options.userAgent" required>
+                <div class="form-help">Например: Mozilla/5.0 (X11; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0 </div>
+            </div>
+        </label>
+
+        <div class="form-separator mb-2"></div>
+
         <label class="row mt-1">
             <div class="col --2:lg mb-1">Оформление:</div>
             <div class="col --5:lg mb-2">
