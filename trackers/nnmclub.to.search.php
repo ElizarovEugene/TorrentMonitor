@@ -26,7 +26,8 @@ class nnmclubSearch extends nnmclub
             		'type'           => 'POST',
             		'header'         => 1,
             		'returntransfer' => 1,
-            		'url'            => 'https://nnmclub.to/forum/tracker.php',
+            		'url'            => 'https://'.nnmclub::$domain.'/forum/tracker.php',
+                        'sendHeader'     => array('Host' => nnmclub::$domain, 'Content-length' => strlen('prev_sd=0&prev_a=0&prev_my=0&prev_n=0&prev_shc=0&prev_shf=1&prev_sha=1&prev_shs=0&prev_shr=0&prev_sht=0&f%5B%5D=-1&o=1&s=2&tm=-1&shf=1&sha=1&ta=-1&sns=-1&sds=-1&nm=&pn='.$user.'&submit=%CF%EE%E8%F1%EA')),
             		'postfields'     => 'prev_sd=0&prev_a=0&prev_my=0&prev_n=0&prev_shc=0&prev_shf=1&prev_sha=1&prev_shs=0&prev_shr=0&prev_sht=0&f%5B%5D=-1&o=1&s=2&tm=-1&shf=1&sha=1&ta=-1&sns=-1&sds=-1&nm=&pn='.$user.'&submit=%CF%EE%E8%F1%EA',
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
@@ -65,9 +66,9 @@ class nnmclubSearch extends nnmclub
     		            		'type'           => 'POST',
     		            		'header'         => 0,
     		            		'returntransfer' => 1,
-    		            		'url'            => 'https://nnmclub.to/forum/viewtopic.php?t='.$toDownload[$i]['threme_id'],
+    		            		'url'            => 'https://'.nnmclub::$domain.'/forum/viewtopic.php?t='.$toDownload[$i]['threme_id'],
     		            		'cookie'         => nnmclub::$sess_cookie,
-    		            		'sendHeader'     => array('Host' => 'nnmclub.to', 'Content-length' => strlen(nnmclub::$sess_cookie)),
+    		            		'sendHeader'     => array('Host' => nnmclub::$domain, 'Content-length' => strlen(nnmclub::$sess_cookie)),
     		            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
     		            	)
     		            );
@@ -86,10 +87,10 @@ class nnmclubSearch extends nnmclub
                                 		'type'           => 'GET',
                                 		'follow'         => 1,
                                 		'returntransfer' => 1,
-                                		'url'            => 'https://nnmclub.to/forum/download.php?id='.$download_id,
+                                		'url'            => 'https://'.nnmclub::$domain.'/forum/download.php?id='.$download_id,
                                 		'cookie'         => nnmclub::$sess_cookie,
                                 		'sendHeader'     => array('Host' => 'nnmclub.to', 'Content-length' => strlen(nnmclub::$sess_cookie)),
-                                		'referer'        => 'http://nnmclub.to/forum/viewtopic.php?t='.$torrent_id,
+                                		'referer'        => 'http://'.nnmclub::$domain.'/forum/viewtopic.php?t='.$torrent_id,
                                 	)
                                 );
                                 
