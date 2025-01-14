@@ -113,7 +113,7 @@ INSERT INTO settings VALUES (35, 'sendWarningService', '');
 INSERT INTO settings VALUES (37, 'proxyType', '');
 INSERT INTO settings VALUES (38, 'autoUpdate', '0');
 INSERT INTO settings VALUES (39, 'sentUpdateNotification', '0');
-
+INSERT INTO settings VALUES (40, 'userAgent', 'Mozilla/5.0 (X11; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0');
 
 CREATE TABLE "temp" (
   "id" INTEGER PRIMARY KEY NOT NULL,

@@ -121,7 +121,7 @@ class Sys
             if ($param['type'] == 'GET')
                 curl_setopt($ch, CURLOPT_HTTPGET, 1);
 
-            curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:51.0) Gecko/20100101 Firefox/51.0');
+            curl_setopt($ch, CURLOPT_USERAGENT, Database::getSetting('userAgent'));
             if (isset($param['follow']))
                 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
 

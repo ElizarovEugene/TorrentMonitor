@@ -73,6 +73,7 @@ class rutracker
             		'header'         => 1,
             		'returntransfer' => 1,
             		'url'            => 'https://rutracker.org/forum/login.php',
+                        'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen($login.'&login_password='.$password.'&login=%C2%F5%EE%E4')),
             		'postfields'     => 'login_username='.$login.'&login_password='.$password.'&login=%C2%F5%EE%E4',
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)

@@ -5,7 +5,7 @@ class nnmclub
 	protected static $exucution;
 	protected static $warning;
 	
-	protected static $domain = 'https://nnmclub.to/';
+	protected static $domain = 'nnmclub.to';
 
 	//проверяем cookie
 	public static function checkCookie($sess_cookie)
@@ -15,9 +15,9 @@ class nnmclub
         		'type'           => 'POST',
         		'returntransfer' => 1,
         		'encoding'       => 1,
-        		'url'            => nnmclub::$domain.'forum/index.php',
+        		'url'            => 'https://'.nnmclub::$domain.'/forum/index.php',
         		'cookie'         => $sess_cookie,
-        		'sendHeader'     => array('Host' => 'nnmclub.to', 'Content-length' => strlen($sess_cookie)),
+        		'sendHeader'     => array('Host' => nnmclub::$domain, 'Content-length' => strlen($sess_cookie)),
         		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
         	)
         );
@@ -72,7 +72,8 @@ class nnmclub
             		'header'         => 1,
             		'returntransfer' => 1,
             		'encoding'       => 1,
-            		'url'            => nnmclub::$domain.'forum/login.php',
+            		'url'            => 'https://'.nnmclub::$domain.'/forum/login.php',
+                        'sendHeader'     => array('Host' => nnmclub::$domain, 'Content-length' => strlen($login.'&password='.$password.'&login=%C2%F5%EE%E4')),
             		'postfields'     => 'username='.$login.'&password='.$password.'&login=%C2%F5%EE%E4',
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
@@ -152,9 +153,9 @@ class nnmclub
             		'header'         => 0,
             		'returntransfer' => 1,
             		'encoding'       => 1,
-            		'url'            => nnmclub::$domain.'forum/viewtopic.php?t='.$torrent_id,
+            		'url'            => 'https://'.nnmclub::$domain.'forum/viewtopic.php?t='.$torrent_id,
             		'cookie'         => nnmclub::$sess_cookie,
-            		'sendHeader'     => array('Host' => 'nnmclub.to', 'Content-length' => strlen(nnmclub::$sess_cookie)),
+            		'sendHeader'     => array('Host' => nnmclub::$domain, 'Content-length' => strlen(nnmclub::$sess_cookie)),
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
@@ -186,10 +187,10 @@ class nnmclub
 	                                		'type'           => 'GET',
 	                                		'follow'         => 1,
 	                                		'returntransfer' => 1,
-	                                		'url'            => nnmclub::$domain.'forum/download.php?id='.$download_id,
+	                                		'url'            => 'https://'.nnmclub::$domain.'/forum/download.php?id='.$download_id,
 	                                		'cookie'         => nnmclub::$sess_cookie,
-	                                		'sendHeader'     => array('Host' => 'nnmclub.to', 'Content-length' => strlen(nnmclub::$sess_cookie)),
-	                                		'referer'        => nnmclub::$domain.'forum/viewtopic.php?t='.$torrent_id,
+	                                		'sendHeader'     => array('Host' => nnmclub::$domain, 'Content-length' => strlen(nnmclub::$sess_cookie)),
+	                                		'referer'        => 'https://'.nnmclub::$domain.'/forum/viewtopic.php?t='.$torrent_id,
 	                                	)
 	                                );
 
