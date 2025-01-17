@@ -52,7 +52,7 @@ VALUES
 	(20,'baibako.tv_forum','','','',NULL,'forum',1),
 	(21,'riperam.org','','','',NULL,'forum',1),
     (22,'kinozal.tv','','','',NULL,'forum',1),
-    (23,'kinozal.guru','','','',NULL,'forum',1),
+    (23,'kinozal.guru','','','',NULL,'forum',1);
 
 UNLOCK TABLES;
 
