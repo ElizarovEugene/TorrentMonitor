@@ -130,7 +130,7 @@ CREATE SEQUENCE auto_id_torrent;
 CREATE TABLE "torrent" (
   "id" INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('auto_id_torrent'),
   "tracker" varchar(30) NOT NULL,
-  "name" varchar(250) NOT NULL DEFAULT '',
+  "name" varchar(500) NOT NULL DEFAULT '',
   "hd" INTEGER NOT NULL DEFAULT '0',
   "path" varchar(200) NOT NULL,
   "torrent_id" varchar(150) NOT NULL DEFAULT '',
