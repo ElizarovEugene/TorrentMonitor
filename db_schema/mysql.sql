@@ -5,7 +5,7 @@ CREATE TABLE `buffer` (
   `user_id` int(11) unsigned NOT NULL,
   `section` varchar(60) NOT NULL DEFAULT '',
   `threme_id` int(11) unsigned NOT NULL,
-  `threme` varchar(250) NOT NULL DEFAULT '',
+  `threme` varchar(500) NOT NULL DEFAULT '',
   `timestamp` date NOT NULL DEFAULT '2000-01-01',
   `accept` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `downloaded` tinyint(1) unsigned NOT NULL DEFAULT '0',
