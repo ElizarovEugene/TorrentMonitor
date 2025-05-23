@@ -40,7 +40,7 @@ class Update {
                 array(
                     'type'           => 'GET',
                     'returntransfer' => 1,
-                    'url'            => 'http://xml.tormon.ru/update.xml',
+                    'url'            => 'https://xml.tormon.ru/update.xml',
                 )
             );
     

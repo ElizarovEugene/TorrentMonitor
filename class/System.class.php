@@ -88,7 +88,7 @@ class Sys
             array(
                 'type'           => 'GET',
                 'returntransfer' => 1,
-                'url'            => 'http://xml.tormon.ru/version.xml',
+                'url'            => 'https://xml.tormon.ru/version.xml',
             )
         );
 
@@ -536,7 +536,7 @@ class Sys
             array(
                 'type'           => 'GET',
                 'returntransfer' => 1,
-                'url'            => 'http://xml.tormon.ru/news.xml',
+                'url'            => 'https://xml.tormon.ru/news.xml',
             )
         );
 

@@ -11,15 +11,24 @@ class lostfilmmirror
 	//функция преобразования даты в строку
 	private static function dateNumToString($data)
 	{
-		$data = substr($data, 0, -3);
+		$data = substr($data, 0, -6);
 		$data = preg_split('/\s/', $data);
-		$time = $data[1];
-		$data = $data[0];
-		$data = preg_split('/\-/', $data);
+		$time = $data[4];
 
-		$month = Sys::dateNumToString($data[1]);
-		$date = $data[2].' '.$month.' '.$data[0].' '.$time;
+		$date = $data[1].' '.$data[2].' '.$data[3].' '.$time;
+		return $date;
+	}
+	
+	//функция преобразования даты в строку
+	private static function dateStringToNum($data)
+	{
+		$data = substr($data, 0, -6);
+		$data = preg_split('/\s/', $data);
+		$time = $data[4];
 		
+		$month = Sys::dateStringToNum($data[2]);
+	
+		$date = $data[3].'-'.$month.'-'.$data[1].' '.$time;
 		return $date;
 	}
 	
@@ -172,7 +181,7 @@ class lostfilmmirror
 								$status = Sys::saveTorrent($tracker, $file, $torrent, $id, $hash, $message, $date_str, $name);
 
 								//обновляем время регистрации торрента в базе
-								Database::setNewDate($id, $serial['date']);
+								Database::setNewDate($id, lostfilmmirror::dateStringToNum($serial['date']));
 								//обновляем сведения о последнем эпизоде
 								Database::setNewEpisode($id, $serial['episode']);
                             }

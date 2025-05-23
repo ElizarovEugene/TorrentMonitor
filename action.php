@@ -407,7 +407,6 @@ if (isset($_POST['action']))
     if ($_POST['action'] == 'update_basic')
 	{
         Database::updateSettings('serverAddress', Sys::checkPath($_POST['serverAddress']));
-        Database::updateSettings('userAgent', $_POST['userAgent']);
         Database::updateSettings('send', Sys::strBoolToInt($_POST['send']));
         Database::updateSettings('auth', Sys::strBoolToInt($_POST['auth']));
         Database::updateSettings('rss', Sys::strBoolToInt($_POST['rss']));
