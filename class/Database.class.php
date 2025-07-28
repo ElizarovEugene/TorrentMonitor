@@ -17,7 +17,12 @@ class Database
                 $dsn = "mysql:host=".Config::read('db.host').";dbname=".Config::read('db.basename');
                 $username = Config::read('db.user');
                 $password = Config::read('db.password');
-                $options = array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES ".Config::read('db.charset'));
+                $options = array();
+                // Handle charset setting for MySQL
+                $charset = Config::read('db.charset');
+                if (!empty($charset)) {
+                    $options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES " . $charset;
+                }
                 break;
 			case 'sqlite':
 				$dsn = "sqlite:".Config::read('db.basename');
@@ -62,6 +67,9 @@ class Database
 
     public static function newStatement($request)
     {
+        if (empty($request)) {
+            throw new InvalidArgumentException('SQL request cannot be empty');
+        }
         if (self::getDbType() == 'pgsql')
             $request = str_replace('`','"',$request);
 	    return self::getInstance()->dbh->prepare($request);
