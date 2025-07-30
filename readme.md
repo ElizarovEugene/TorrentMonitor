@@ -56,6 +56,7 @@ http://tormon.ru
 ### Technical Details
 * Minimum PHP Version: 7.4.0
 * Alpine Linux Support: 3.15+ (includes PHP 7.4.33)
+* Полная совместимость с PHP 7.4+ и PHP 8+
 
 ### Docker hub:
 https://hub.docker.com/r/alfonder/torrentmonitor
