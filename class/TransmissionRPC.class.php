@@ -30,7 +30,7 @@
  * A friendly little version check...
  */
 if ( version_compare( PHP_VERSION, TransmissionRPC::MIN_PHPVER, '<' ) )
-  die( "The TransmissionRPC class requires PHP version {TransmissionRPC::TRANSMISSIONRPC_MIN_PHPVER} or above." . PHP_EOL );
+  die( "The TransmissionRPC class requires PHP version " . TransmissionRPC::MIN_PHPVER . " or above." . PHP_EOL );
 
 /**
  * Transmission bittorrent client/daemon RPC communication class
@@ -51,9 +51,9 @@ class TransmissionRPC
 
   /**
    * Minimum PHP version required
-   * 5.2.10 implemented the required http stream ignore_errors option
+   * TorrentMonitor requires PHP 7.4+ for modern compatibility
    */
-  const MIN_PHPVER = '5.2.10';
+  const MIN_PHPVER = '7.4.0';
 
   /**
    * The URL to the bittorent client you want to communicate with

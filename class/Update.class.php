@@ -50,7 +50,7 @@ class Update {
             $ROOTPATH = str_replace('class', '', dirname(__FILE__));
             $dbType = Config::read('db.type');
             
-            $count = count($xml_page->update) - 1;
+            $count = is_countable($xml_page->update) ? count($xml_page->update) - 1 : 0;
             
             $version = json_decode(file_get_contents($ROOTPATH.'version.txt'));
             Update::$versionSystem = $version->system;

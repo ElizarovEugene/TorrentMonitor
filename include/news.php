@@ -13,7 +13,7 @@ if ( ! Sys::checkAuth())
 
 <?php
 $news = Database::getNews();
-if ($news != NULL)
+if ($news != NULL && is_array($news) && count($news) > 0)
 {
     for ($i=0; $i<count($news); $i++)
     {

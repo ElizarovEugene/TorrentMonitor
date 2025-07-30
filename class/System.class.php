@@ -13,7 +13,7 @@ class Sys
                 'url'            => 'https://www.google.ru/',
             )
         );
-        if (preg_match('/<title>.*<\/title>/', $page))
+        if (!empty($page) && preg_match('/<title>.*<\/title>/', $page))
             return TRUE;
         else
             return FALSE;
@@ -542,7 +542,7 @@ class Sys
 
         //читаем xml
         $page = @simplexml_load_string($page);
-        if ( ! empty($page))
+        if (!empty($page) && isset($page->news->id) && is_countable($page->news->id))
         {
             for ($i=0; $i<count($page->news->id); $i++)
             {
