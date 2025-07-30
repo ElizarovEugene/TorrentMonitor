@@ -53,6 +53,10 @@ http://tormon.ru
 * PHP (5.2 или выше) с поддержкой cURL и PDO
 * MySQL, PostgreSQL, SQLite
 
+### Technical Details
+* Minimum PHP Version: 7.4.0
+* Alpine Linux Support: 3.15+ (includes PHP 7.4.33)
+
 ### Docker hub:
 https://hub.docker.com/r/alfonder/torrentmonitor
 
