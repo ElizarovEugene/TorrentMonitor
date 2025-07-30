@@ -73,7 +73,7 @@ class nnmclub
             		'returntransfer' => 1,
             		'encoding'       => 1,
             		'url'            => 'https://'.nnmclub::$domain.'/forum/login.php',
-                        'sendHeader'     => array('Host' => nnmclub::$domain, 'Content-length' => strlen($login.'&password='.$password.'&login=%C2%F5%EE%E4')),
+                    'sendHeader'     => array('Host' => nnmclub::$domain, 'Content-length' => strlen($login.'&password='.$password.'&login=%C2%F5%EE%E4')),
             		'postfields'     => 'username='.$login.'&password='.$password.'&login=%C2%F5%EE%E4',
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
@@ -153,7 +153,7 @@ class nnmclub
             		'header'         => 0,
             		'returntransfer' => 1,
             		'encoding'       => 1,
-            		'url'            => 'https://'.nnmclub::$domain.'forum/viewtopic.php?t='.$torrent_id,
+            		'url'            => 'https://'.nnmclub::$domain.'/forum/viewtopic.php?t='.$torrent_id,
             		'cookie'         => nnmclub::$sess_cookie,
             		'sendHeader'     => array('Host' => nnmclub::$domain, 'Content-length' => strlen(nnmclub::$sess_cookie)),
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
