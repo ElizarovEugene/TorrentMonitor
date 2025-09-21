@@ -1025,7 +1025,14 @@ class Database
 
     public static function saveToTemp($id, $name, $path, $tracker, $date)
     {
-        $stmt = self::newStatement("INSERT OR IGNORE INTO `temp` (`id`, `name`, `path`, `tracker`, `date`) VALUES (:id, :name, :path, :tracker, :date)");
+        if (Database::getDbType() == 'pgsql') {
+            $sql = "INSERT INTO `temp` (`id`, `name`, `path`, `tracker`, `date`) VALUES (:id, :name, :path, :tracker, :date) ON CONFLICT (`id`) DO UPDATE SET `name`=EXCLUDED.`name`, `path`=EXCLUDED.`path`, `tracker`=EXCLUDED.`tracker`, `date`=EXCLUDED.`date`";
+        } elseif (Database::getDbType() == 'mysql') {
+            $sql = "INSERT INTO `temp` (`id`, `name`, `path`, `tracker`, `date`) VALUES (:id, :name, :path, :tracker, :date) ON DUPLICATE KEY UPDATE `name`=VALUES(`name`), `path`=VALUES(`path`), `tracker`=VALUES(`tracker`), `date`=VALUES(`date`)";
+        } elseif (Database::getDbType() == 'sqlite') {
+            $sql = "INSERT OR REPLACE INTO `temp` (`id`, `name`, `path`, `tracker`, `date`) VALUES (:id, :name, :path, :tracker, :date)";
+        }
+        $stmt = self::newStatement($sql);
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':path', $path);
