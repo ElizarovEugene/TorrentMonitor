@@ -1025,7 +1025,7 @@ class Database
 
     public static function saveToTemp($id, $name, $path, $tracker, $date)
     {
-        $stmt = self::newStatement("INSERT INTO `temp` (`id`, `name`, `path`, `tracker`, `date`) VALUES (:id, :name, :path, :tracker, :date)");
+        $stmt = self::newStatement("INSERT OR IGNORE INTO `temp` (`id`, `name`, `path`, `tracker`, `date`) VALUES (:id, :name, :path, :tracker, :date)");
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':path', $path);
@@ -1109,7 +1109,7 @@ class Database
 
     public static function insertNews($id, $text)
     {
-        $stmt = self::newStatement("INSERT INTO `news` (`id`, `text`) VALUES (:id, :text)");
+        $stmt = self::newStatement("INSERT OR REPLACE INTO `news` (`id`, `text`) VALUES (:id, :text)");
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':text', $text);
         if ($stmt->execute())
