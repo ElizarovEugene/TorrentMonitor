@@ -1116,7 +1116,14 @@ class Database
 
     public static function insertNews($id, $text)
     {
-        $stmt = self::newStatement("INSERT OR REPLACE INTO `news` (`id`, `text`) VALUES (:id, :text)");
+        if (Database::getDbType() == 'pgsql') {
+            $sql = "INSERT INTO `news` (`id`, `text`) VALUES (:id, :text) ON CONFLICT (`id`) DO UPDATE SET `text`=EXCLUDED.`text`";
+        } elseif (Database::getDbType() == 'mysql') {
+            $sql = "INSERT INTO `news` (`id`, `text`) VALUES (:id, :text) ON DUPLICATE KEY UPDATE `text`=VALUES(`text`)";
+        } elseif (Database::getDbType() == 'sqlite') {
+            $sql = "INSERT OR REPLACE INTO `news` (`id`, `text`) VALUES (:id, :text)";
+        }
+        $stmt = self::newStatement($sql);
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':text', $text);
         if ($stmt->execute())
