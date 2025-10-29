@@ -1025,7 +1025,14 @@ class Database
 
     public static function saveToTemp($id, $name, $path, $tracker, $date)
     {
-        $stmt = self::newStatement("INSERT INTO `temp` (`id`, `name`, `path`, `tracker`, `date`) VALUES (:id, :name, :path, :tracker, :date)");
+        if (Database::getDbType() == 'pgsql') {
+            $sql = "INSERT INTO `temp` (`id`, `name`, `path`, `tracker`, `date`) VALUES (:id, :name, :path, :tracker, :date) ON CONFLICT (`id`) DO UPDATE SET `name`=EXCLUDED.`name`, `path`=EXCLUDED.`path`, `tracker`=EXCLUDED.`tracker`, `date`=EXCLUDED.`date`";
+        } elseif (Database::getDbType() == 'mysql') {
+            $sql = "INSERT INTO `temp` (`id`, `name`, `path`, `tracker`, `date`) VALUES (:id, :name, :path, :tracker, :date) ON DUPLICATE KEY UPDATE `name`=VALUES(`name`), `path`=VALUES(`path`), `tracker`=VALUES(`tracker`), `date`=VALUES(`date`)";
+        } elseif (Database::getDbType() == 'sqlite') {
+            $sql = "INSERT OR REPLACE INTO `temp` (`id`, `name`, `path`, `tracker`, `date`) VALUES (:id, :name, :path, :tracker, :date)";
+        }
+        $stmt = self::newStatement($sql);
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':path', $path);
@@ -1109,7 +1116,14 @@ class Database
 
     public static function insertNews($id, $text)
     {
-        $stmt = self::newStatement("INSERT INTO `news` (`id`, `text`) VALUES (:id, :text)");
+        if (Database::getDbType() == 'pgsql') {
+            $sql = "INSERT INTO `news` (`id`, `text`) VALUES (:id, :text) ON CONFLICT (`id`) DO UPDATE SET `text`=EXCLUDED.`text`";
+        } elseif (Database::getDbType() == 'mysql') {
+            $sql = "INSERT INTO `news` (`id`, `text`) VALUES (:id, :text) ON DUPLICATE KEY UPDATE `text`=VALUES(`text`)";
+        } elseif (Database::getDbType() == 'sqlite') {
+            $sql = "INSERT OR REPLACE INTO `news` (`id`, `text`) VALUES (:id, :text)";
+        }
+        $stmt = self::newStatement($sql);
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':text', $text);
         if ($stmt->execute())
