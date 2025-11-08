@@ -291,8 +291,7 @@ class lostfilm
 						{
     						if (substr($season, 0, 1) == 0)
     						    $season = substr($season, 1);
-								
-							echo 'https://www.lostfilm.today/v_search.php?a='.$serial['ID'].'00'.$season.'0'.$episode;
+							
 							//получаем страницу с ссылкой
 							$page = Sys::getUrlContent(
 								array(
@@ -378,3 +377,4 @@ class lostfilm
 	}
 }
 ?>
+
