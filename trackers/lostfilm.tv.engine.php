@@ -16,9 +16,9 @@ class lostfilm
 			array(
 				'type'           => 'GET',
 				'returntransfer' => 1,
-				'url'            => 'https://www.lostfilm.download',
+				'url'            => 'https://www.lostfilm.today',
 				'cookie'         => $sess_cookie,
-				'sendHeader'     => array('Host' => 'www.lostfilm.download', 'Content-length' => strlen($sess_cookie)),
+				'sendHeader'     => array('Host' => 'www.lostfilm.today', 'Content-length' => strlen($sess_cookie)),
 			)
 		);
 
@@ -106,7 +106,7 @@ class lostfilm
             		'type'           => 'POST',
             		'header'         => 1,
             		'returntransfer' => 1,
-            		'url'            => 'https://www.lostfilm.download/ajaxik.php',
+            		'url'            => 'https://www.lostfilm.today/ajaxik.php',
             		'postfields'     => 'act=users&type=login&mail='.$login.'&pass='.$password.'&rem=1',
             	)
             );
@@ -213,7 +213,7 @@ class lostfilm
 			        	array(
 			        		'type'           => 'GET',
 			        		'returntransfer' => 1,
-			        		'url'            => 'https://www.lostfilm.download/rss.xml',
+			        		'url'            => 'https://www.lostfilm.today/rss.xml',
 			        	)
 			        );
 
@@ -268,6 +268,7 @@ class lostfilm
 				foreach ($nodes as $item)
 				{
 					$serial = lostfilm::analysis($name, $item);
+						
 					if ( ! empty($serial))
 					{
 						$episode = substr($serial['episode'], 4, 2);
@@ -290,80 +291,85 @@ class lostfilm
 						{
     						if (substr($season, 0, 1) == 0)
     						    $season = substr($season, 1);
-							//получаем страницу с ссылкой на страницу с
+								
+							echo 'https://www.lostfilm.today/v_search.php?a='.$serial['ID'].'00'.$season.'0'.$episode;
+							//получаем страницу с ссылкой
 							$page = Sys::getUrlContent(
 								array(
 									'type'           => 'GET',
 									'returntransfer' => 1,
-									'url'            => 'https://www.lostfilm.download/v_search.php?c='.$serial['ID'].'&s='.$season.'&e='.$episode.'&'.lostfilm::$sess_cookie,
-									'sendHeader'     => array('Host' => 'www.lostfilm.download'),
+									'url'            => 'https://www.lostfilm.today/v_search.php?a='.$serial['ID'].'00'.$season.'0'.$episode,
+									'sendHeader'     => array('Host' => 'www.lostfilm.today'),
+									'cookie'         => lostfilm::$sess_cookie,
+									'sendHeader'     => array('Host' => 'www.lostfilm.today', 'Content-length' => strlen(lostfilm::$sess_cookie)),
 								)
 							);
 							
-							if (preg_match('/location\.replace\(\"(.*)\"\);/', $page, $matches))
-							{
-                                //получаем страницу с ссылками на torrent-файлы
-                                $page = Sys::getUrlContent(
-                                    array(
-                                        'type'           => 'GET',
-                                        'returntransfer' => 1,
-                                        'url'            => $matches[1],
-                                        'sendHeader'     => array('Host' => 'retre.org'),
-                                    )
+							preg_match('<a href=\"(.*)\">', $page, $matches);
+							if (isset($matches[1]))
+								$link = 'https://www.lostfilm.today'.$matches[1];
+								
+							//получаем страницу с ссылкой
+							$page = Sys::getUrlContent(
+								array(
+									'type'           => 'GET',
+									'returntransfer' => 1,
+									'url'            => $link,
+									'sendHeader'     => array('Host' => 'www.lostfilm.today'),
+								)
+							);
+							
+                            if ($hd == 0)
+                            {
+                                $str = 'SD';
+                                $quality = '(WEBRip|WEB-DLRip|HDTVRip)';
+                                $amp = 'SD';
+                            }
+                            if ($hd == 1)
+                            {
+                                $str = '1080';
+                                $quality = '1080p? (WEBRip|WEB-DLRip|HDTVRip)';
+                                $amp = 'HD';
+                            }
+                            if ($hd == 2)
+                            {
+                                $str = 'MP4';
+                                $quality = '720p? (WEB-DLRip|WEBRip|WEB-DL|HDTVRip)';
+                                $amp = 'MP4';
+                            }
+
+                            if (preg_match_all('/<div class=\"inner-box--label\">\n'.$str.'(\t\t\t|\s{12})<\/div>\n\s*<div class=\"inner-box--link main\"><a href=\"(https:\/\/(n.)?tracktor\.(in|site)\/td\.php\?s=.*)\">[\s\S]*'.$quality.'<\/a><\/div>/U', $page, $matches))
+                            {
+    							$torrent = Sys::getUrlContent(
+						        	array(
+						        		'type'           => 'GET',
+						        		'returntransfer' => 1,
+						        		'url'            => $matches[2][0],
+						        		'sendHeader'     => array('Host' => 'tracktor.in'),
+						        	)
                                 );
 
-                                if ($hd == 0)
-                                {
-                                    $str = 'SD';
-                                    $quality = '(WEBRip|WEB-DLRip|HDTVRip)';
-                                    $amp = 'SD';
-                                }
-                                if ($hd == 1)
-                                {
-                                    $str = '1080';
-                                    $quality = '1080p? (WEBRip|WEB-DLRip|HDTVRip)';
-                                    $amp = 'HD';
-                                }
-                                if ($hd == 2)
-                                {
-                                    $str = 'MP4';
-                                    $quality = '720p? (WEB-DLRip|WEBRip|WEB-DL|HDTVRip)';
-                                    $amp = 'MP4';
-                                }
+                                if (Sys::checkTorrentFile($torrent))
+                                {	
+    								$file = str_replace(' ', '.', $name).'.S'.$season.'E'.$episode.'.'.$amp;
+    								$episode = (substr($episode, 0, 1) == 0) ? substr($episode, 1, 1) : $episode;
+    								$season = (substr($season, 0, 1) == 0) ? substr($season, 1, 1) : $season;
+    								$message = $name.' '.$amp.' обновлён до '.$episode.' серии, '.$season.' сезона.';
+    								$status = Sys::saveTorrent($tracker, $file, $torrent, $id, $hash, $message, lostfilm::dateNumToString($serial['date']), $name);
 
-                                if (preg_match_all('/<div class=\"inner-box--label\">\n'.$str.'(\t\t\t|\s{12})<\/div>\n\s*<div class=\"inner-box--link main\"><a href=\"(https:\/\/(n.)?tracktor\.(in|site)\/td\.php\?s=.*)\">[\s\S]*'.$quality.'<\/a><\/div>/U', $page, $matches))
-                                {
-        							$torrent = Sys::getUrlContent(
-    						        	array(
-    						        		'type'           => 'GET',
-    						        		'returntransfer' => 1,
-    						        		'url'            => $matches[2][0],
-    						        		'sendHeader'     => array('Host' => 'tracktor.in'),
-    						        	)
-                                    );
-
-                                    if (Sys::checkTorrentFile($torrent))
-                                    {	
-        								$file = str_replace(' ', '.', $name).'.S'.$season.'E'.$episode.'.'.$amp;
-        								$episode = (substr($episode, 0, 1) == 0) ? substr($episode, 1, 1) : $episode;
-        								$season = (substr($season, 0, 1) == 0) ? substr($season, 1, 1) : $season;
-        								$message = $name.' '.$amp.' обновлён до '.$episode.' серии, '.$season.' сезона.';
-        								$status = Sys::saveTorrent($tracker, $file, $torrent, $id, $hash, $message, lostfilm::dateNumToString($serial['date']), $name);
-    
-        								//обновляем время регистрации торрента в базе
-        								Database::setNewDate($id, $serial['date']);
-        								//обновляем сведения о последнем эпизоде
-        								Database::setNewEpisode($id, $serial['episode']);
-        								//очищаем ошибки
-        								Database::setErrorToThreme($id, 0);
-        								Database::setClosedThreme($id, 0);
-                                    }
-                                    else
-                                    {
-                                        Errors::setWarnings($tracker, 'torrent_file_fail', $id);
-                                    }
+    								//обновляем время регистрации торрента в базе
+    								Database::setNewDate($id, $serial['date']);
+    								//обновляем сведения о последнем эпизоде
+    								Database::setNewEpisode($id, $serial['episode']);
+    								//очищаем ошибки
+    								Database::setErrorToThreme($id, 0);
+    								Database::setClosedThreme($id, 0);
                                 }
-							}
+                                else
+                                {
+                                    Errors::setWarnings($tracker, 'torrent_file_fail', $id);
+                                }
+                            }
 						}
 					}
 				}
