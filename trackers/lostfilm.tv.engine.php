@@ -71,10 +71,10 @@ class lostfilm
     		preg_match('/S\d{2}E\d{2}/', $item->title, $matches);
     		if (isset($matches[0]))
                 $episode = $matches[0];
-
-    		preg_match('/<img src=\"\/\/static\.lostfilm\.(tv|win|top|site)\/Images\/(.*)\/Posters\/image\.jpg\" alt=\"\" \/>/', $item->description, $matches);
-    		if (isset($matches[2]))
-    			$id = $matches[2];
+			
+    		preg_match('/\/Static\/Images\/(.*)\/Posters\/image.jpg/', $item->description->img["src"]->__toString(), $matches);
+    		if (isset($matches[1]))
+    			$id = $matches[1];
     		
     			
             $date = lostfilm::dateStringToNum($item->pubDate);
@@ -220,8 +220,10 @@ class lostfilm
 					if ( ! empty(lostfilm::$page))
 					{
     					lostfilm::$page = preg_replace('/\&/', '&amp;', lostfilm::$page);
+						lostfilm::$page = preg_replace('/\<\!\[CDATA\[/', '', lostfilm::$page);
+						lostfilm::$page = preg_replace('/\]\]/', '', lostfilm::$page);
 						//читаем xml
-						lostfilm::$xml_page = @simplexml_load_string(lostfilm::$page);
+						lostfilm::$xml_page = simplexml_load_string(lostfilm::$page);
 						//если XML пришёл с ошибками - останавливаем выполнение, иначе - ставим флажок, что получаем страницу
 						if ( ! lostfilm::$xml_page)
 						{
@@ -377,4 +379,3 @@ class lostfilm
 	}
 }
 ?>
-
