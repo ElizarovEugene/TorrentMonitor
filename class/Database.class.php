@@ -4,7 +4,8 @@ include_once $dir."config.php";
 
 class Database
 {
-    public $dbh;
+    private $dbh;
+    private $dbType;
     private static $instance;
 
     private function __construct()
@@ -35,6 +36,8 @@ class Database
             case 'pgsql':
                 $dsn = "pgsql:host=".Config::read('db.host').";port=".Config::read('db.port').";dbname=".Config::read('db.basename').";user=".Config::read('db.user').";password=".Config::read('db.password');
                 break;
+            default:
+                throw new Exception('Unsupported database type: ' . $this->dbType);
         }
 
         try {
@@ -90,7 +93,6 @@ class Database
             $error = $stmt->errorInfo();
             return 'Ошибка при выполнении запроса: '.$request.'<br>'.$error[2];
         }
-        $stmt = NULL;
     }
 
     public static function getSetting($param)
@@ -104,7 +106,6 @@ class Database
                 return $row['val'];
             }
         }
-        $stmt = NULL;
     }
 
     public static function getAllSetting()
@@ -119,8 +120,6 @@ class Database
             if ( ! empty($resultArray))
                 return $resultArray;
         }
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function getPaths()
@@ -140,7 +139,6 @@ class Database
             if ( ! empty($resultArray))
                 return $resultArray;
         }
-        $stmt = NULL;
     }
 
     public static function getTorrentDownloadPath($id)
@@ -154,7 +152,6 @@ class Database
                 return $row['path'];
             }
         }
-        $stmt = NULL;
     }
 
     public static function updateSettings($setting, $val)
@@ -166,7 +163,6 @@ class Database
             return TRUE;
         else
             return $stmt->errorInfo();
-        $stmt = NULL;
     }
 
     public static function updateAddress($type, $service, $address)
@@ -179,7 +175,6 @@ class Database
             return TRUE;
         else
             return $stmt->errorInfo();
-        $stmt = NULL;
     }
 
     public static function setUpdateNotification($param)
@@ -190,7 +185,6 @@ class Database
             return TRUE;
         else
             return $stmt->errorInfo();
-        $stmt = NULL;
     }
 
     public static function getUpdateNotification()
@@ -206,8 +200,6 @@ class Database
                     return FALSE;
             }
         }
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function getCredentials($tracker)
@@ -230,8 +222,6 @@ class Database
             if ( ! empty($resultArray))
                 return $resultArray;
         }
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function getAllCredentials()
@@ -253,8 +243,6 @@ class Database
             if ( ! empty($resultArray))
                 return $resultArray;
         }
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function countCredentials($password)
@@ -271,7 +259,6 @@ class Database
                     return FALSE;
             }
         }
-        $stmt = NULL;
     }
 
     public static function updateCredentials($password)
@@ -282,7 +269,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function setCredentials($id, $login, $password, $passkey)
@@ -296,7 +282,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function checkTrackersCredentialsExist($tracker)
@@ -313,7 +298,6 @@ class Database
                     return FALSE;
             }
         }
-        $stmt = NULL;
     }
 
     public static function getTrackersList()
@@ -330,8 +314,6 @@ class Database
             if ( ! empty($resultArray))
                 return $resultArray;
         }
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function getTorrentsList($order, $dir = 'ASC')
@@ -411,8 +393,6 @@ class Database
             $error = $stmt->errorInfo();
             return 'Ошибка в функции: '.__CLASS__.'::'.__FUNCTION__.': '.$error[2];
         }
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function getTorrent($id)
@@ -438,8 +418,6 @@ class Database
             if ( ! empty($resultArray))
                 return $resultArray;
         }
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function getUserToWatch()
@@ -458,8 +436,6 @@ class Database
             if ( ! empty($resultArray))
                 return $resultArray;
         }
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function checkUserExist($tracker, $name)
@@ -477,7 +453,6 @@ class Database
                     return FALSE;
             }
         }
-        $stmt = NULL;
     }
 
     public static function setUser($tracker, $name)
@@ -489,7 +464,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function deletUser($id)
@@ -504,11 +478,9 @@ class Database
                 return TRUE;
             else
                 return FALSE;
-            return TRUE;
         }
         else
             return FALSE;
-        $stmt = NULL;
     }
 
 
@@ -535,13 +507,11 @@ class Database
                         return TRUE;
                     else
                         return FALSE;
-                    $stmt = NULL;
                 }
             }
         }
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function getThremesFromBuffer($user_id)
@@ -564,8 +534,6 @@ class Database
             if ( ! empty($resultArray))
                 return $resultArray;
         }
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function transferFromBuffer($id)
@@ -593,7 +561,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function thremesClear($user_id)
@@ -604,7 +571,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function selectAllFromBuffer()
@@ -621,8 +587,6 @@ class Database
             if ( ! empty($resultArray))
                 return $resultArray;
         }
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function updateThremesToDownload($id)
@@ -633,7 +597,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function takeToDownload($tracker)
@@ -653,8 +616,6 @@ class Database
             if ( ! empty($resultArray))
                 return $resultArray;
         }
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function setDownloaded($id)
@@ -665,7 +626,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function checkSerialExist($tracker, $name, $hd)
@@ -684,7 +644,6 @@ class Database
                     return FALSE;
             }
         }
-        $stmt = NULL;
     }
 
     public static function checkThremExist($tracker, $id)
@@ -702,7 +661,6 @@ class Database
                     return FALSE;
             }
         }
-        $stmt = NULL;
     }
 
     public static function setSerial($tracker, $name, $path, $hd=FALSE)
@@ -716,7 +674,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function setThreme($tracker, $name, $path, $threme, $update_header)
@@ -731,7 +688,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function setNewDate($id, $date)
@@ -743,7 +699,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function setNewName($id, $name)
@@ -755,7 +710,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function setNewEpisode($id, $ep)
@@ -767,7 +721,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function updateSerial($id, $name, $path, $hd, $reset, $script, $pause)
@@ -786,7 +739,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function updateThreme($id, $name, $path, $threme, $update, $reset, $script, $pause)
@@ -810,7 +762,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
 
     }
 
@@ -823,7 +774,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function deletItem($id)
@@ -834,7 +784,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function getWarningsCount()
@@ -852,8 +801,6 @@ class Database
             if ( ! empty($resultArray))
                 return $resultArray;
         }
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function getWarningsCountSimple()
@@ -868,8 +815,6 @@ class Database
             if ( ! empty($resultArray))
                 return $resultArray;
         }
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function getNewsCount()
@@ -884,8 +829,6 @@ class Database
             if ( ! empty($resultArray))
                 return $resultArray;
         }
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function getWarningsList($tracker)
@@ -942,8 +885,6 @@ class Database
             if ( ! empty($resultArray))
                 return $resultArray;
         }
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function setWarnings($date, $tracker, $message, $id)
@@ -957,7 +898,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function setErrorToThreme($id, $value)
@@ -969,7 +909,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function setClosedThreme($id, $closed)
@@ -981,7 +920,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
 
@@ -993,7 +931,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function getCookie($tracker)
@@ -1008,7 +945,6 @@ class Database
             }
             return NULL;
         }
-        $stmt = NULL;
     }
 
     public static function setCookie($tracker, $cookie)
@@ -1020,7 +956,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function saveToTemp($id, $name, $path, $tracker, $date)
@@ -1042,7 +977,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function getAllFromTemp()
@@ -1063,7 +997,6 @@ class Database
             if ( ! empty($resultArray))
                 return $resultArray;
         }
-        $stmt = NULL;
     }
 
     public static function deleteFromTemp($id)
@@ -1074,7 +1007,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     public static function getNews()
@@ -1093,8 +1025,6 @@ class Database
             if ( ! empty($resultArray))
                 return $resultArray;
         }
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function checkNewsExist($id)
@@ -1111,7 +1041,6 @@ class Database
                     return FALSE;
             }
         }
-        $stmt = NULL;
     }
 
     public static function insertNews($id, $text)
@@ -1130,7 +1059,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     //Помечаем новость как прочитанную
@@ -1142,7 +1070,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 
     //
@@ -1159,8 +1086,6 @@ class Database
             if ( ! empty($resultArray))
                 return $resultArray;
         }
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function getServiceList($type)
@@ -1182,8 +1107,6 @@ class Database
         }
         else
             return $stmt->errorInfo();
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function getService($type)
@@ -1202,8 +1125,6 @@ class Database
         }
         else
             return $stmt->errorInfo();
-        $stmt = NULL;
-        $resultArray = NULL;
     }
 
     public static function getProxy()
@@ -1223,8 +1144,6 @@ class Database
         }
         else
             return $stmt->errorInfo();
-        $stmt = NULL;
-        $resultArray = NULL;
     }
     
     public static function clearTemp()
@@ -1234,7 +1153,6 @@ class Database
             return TRUE;
         else
             return FALSE;
-        $stmt = NULL;
     }
 }
 ?>

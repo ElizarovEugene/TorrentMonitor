@@ -1,7 +1,7 @@
 <?php
 class Config
 {
-    static $confArray;
+    private static $confArray;
     
     public static function extended($config = NULL)
     {
