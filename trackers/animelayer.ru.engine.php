@@ -13,7 +13,7 @@ class animelayer
 			array(
 				'type'           => 'POST',
 				'returntransfer' => 1,
-				'url'            => 'http://animelayer.ru',
+				'url'            => 'https://animelayer.ru',
 				'cookie'         => $sess_cookie,
 				'sendHeader'     => array('Host' => 'animelayer.ru', 'Content-length' => strlen($sess_cookie)),
 				'convert'        => array('windows-1251', 'utf-8//IGNORE'),
@@ -92,12 +92,12 @@ class animelayer
 					'type'           => 'POST',
 					'header'         => 1,
 					'returntransfer' => 1,
-					'url'            => 'http://animelayer.ru/auth/login/',
+					'url'            => 'https://animelayer.ru/auth/login/',
 					'postfields'     => 'login='.$login.'&password='.$password,
 					'convert'        => array('windows-1251', 'utf-8//IGNORE'),
 				)
 			);
-			
+
 			if ( ! empty($page))
 			{
 				// Проверяем подходят ли учётные данные
@@ -178,7 +178,7 @@ class animelayer
 					'type'           => 'POST',
 					'header'         => 0,
 					'returntransfer' => 1,
-					'url'            => 'http://animelayer.ru/torrent/'.$torrent_id.'/',
+					'url'            => 'https://animelayer.ru/torrent/'.$torrent_id.'/',
 					'cookie'         => animelayer::$sess_cookie,
 					'sendHeader'     => array('Host' => 'animelayer.ru', 'Content-length' => strlen(animelayer::$sess_cookie)),
 				)
@@ -200,15 +200,16 @@ class animelayer
             				// Если даты не совпадают, перекачиваем торрент
             				if ($date != $timestamp)
             				{
+								var_dump($torrent);
             					// Сохраняем торрент в файл
                                 $torrent = Sys::getUrlContent(
                                 	array(
                                 		'type'           => 'POST',
                                 		'returntransfer' => 1,
-                                		'url'            => 'http://animelayer.ru/torrent/'.$torrent_id.'/download/',
+                                		'url'            => 'https://animelayer.ru/torrent/'.$torrent_id.'/download/',
                                 		'cookie'         => animelayer::$sess_cookie,
                                 		'sendHeader'     => array('Host' => 'animelayer.ru', 'Content-length' => strlen(animelayer::$sess_cookie)),
-                                		'referer'        => 'http://animelayer.ru/torrent/'.$torrent_id,
+                                		'referer'        => 'https://animelayer.ru/torrent/'.$torrent_id,
                                 	)
                                 );
                                 
