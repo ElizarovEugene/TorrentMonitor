@@ -1,1 +1,1 @@
-{"system":"2.2.3","database":"2.2.3"}
+{"system":"2.2.4","database":"2.2.4"}
