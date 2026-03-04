@@ -205,7 +205,7 @@ class Sys
             {
                 curl_setopt($ch, CURLOPT_PROXY, $proxyAddress);
                 if ($proxyType == 'SOCKS5')
-                    curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
+                    curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5_HOSTNAME);
                 elseif ($proxyType == 'HTTP')
                     curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
             }
