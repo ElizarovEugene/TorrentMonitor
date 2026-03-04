@@ -47,7 +47,7 @@ class rutor
             		'header'         => 0,
             		'follow'         => 1,
             		'returntransfer' => 1,
-            		'url'            => 'http://rutor.is/torrent/'.$torrent_id.'/'
+            		'url'            => 'https://rutor.is/torrent/'.$torrent_id.'/'
             	)
             );
 
@@ -76,7 +76,7 @@ class rutor
                                 		'type'           => 'GET',
                                 		'follow'         => 1,
                                 		'returntransfer' => 0,
-                                		'url'            => 'http://d.rutor.info/download/'.$torrent_id.'/',
+                                		'url'            => 'https://d.rutor.info/download/'.$torrent_id,
                                 	)
                                 );
 
