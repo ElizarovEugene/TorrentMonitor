@@ -30,8 +30,8 @@ class qBittorrent
     
         $response=curl_exec($MainCurl);
     
-        preg_match_all("/SID=(.*?);/", $response, $match);
-        $cookie = "SID=".$match[1][0];
+        preg_match_all("/(QBT_)?SID(_\d+)?=(.*);/", $response, $match);
+        $cookie = $match[0][0];
         curl_setopt($MainCurl, CURLOPT_COOKIE, $cookie);
         curl_setopt($MainCurl, CURLOPT_HEADER, false);
 
