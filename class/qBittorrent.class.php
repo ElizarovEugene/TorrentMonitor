@@ -83,10 +83,12 @@ class qBittorrent
             CURLOPT_COOKIE => $cookie,
             CURLOPT_POSTFIELDS => $data
         ));
-        $response = curl_exec($ch);
+        curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
         curl_close($ch);
 
-        if (preg_match('/Ok/', $response)) {
+        //ожидаем код 200 при успешном добавлении нового и код 202, если торрент уже существует
+        if ($httpCode >= 200 && $httpCode <= 204) {
             sleep(3);
             
             //получение хэша торрента
