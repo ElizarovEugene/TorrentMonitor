@@ -103,7 +103,7 @@ DROP TABLE IF EXISTS `settings`;
 CREATE TABLE `settings` (
   `id` int(3) NOT NULL AUTO_INCREMENT,
   `key` varchar(32) NOT NULL,
-  `val` varchar(100) NOT NULL,
+  `val` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
