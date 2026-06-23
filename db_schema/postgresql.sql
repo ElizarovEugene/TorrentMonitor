@@ -84,7 +84,7 @@ CREATE SEQUENCE "auto_id_settings" START 17;
 CREATE TABLE "settings" (
   "id" INTEGER  PRIMARY KEY NOT NULL DEFAULT nextval('auto_id_settings'),
   "key" varchar(32) NOT NULL,
-  "val" varchar(100) NOT NULL
+  "val" varchar(255) NOT NULL
 );
 
 INSERT INTO settings VALUES (3, 'send', '0');
