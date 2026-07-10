@@ -1,0 +1,46 @@
+name: Publish wiki
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "wiki/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-wiki
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Clone wiki
+        run: git clone "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git" .wiki
+
+      - name: Sync wiki content
+        run: rsync -av --delete --exclude=.git wiki/ .wiki/
+
+      - name: Commit and push
+        working-directory: .wiki
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git log -1 --format=%s | grep -q '^Sync wiki from'; then
+            echo "::warning::Wiki has commits made outside this sync (e.g. edited on GitHub); they are being overwritten. Last wiki commit: $(git log -1 --format='%h %s')"
+          fi
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Wiki is already up to date"
+            exit 0
+          fi
+          VERSION=$(jq -r '.system // "unknown"' ../version.txt 2>/dev/null || echo unknown)
+          git commit -m "Sync wiki from master@${GITHUB_SHA::7} (v${VERSION})"
+          git push --force
