@@ -14,7 +14,7 @@ CREATE TABLE "buffer" (
 );
 
 
-CREATE SEQUENCE "auto_id_credentials" START 16;
+CREATE SEQUENCE "auto_id_credentials" START 24;
 
 CREATE TABLE "credentials" (
   "id" INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('auto_id_credentials'),
@@ -57,7 +57,7 @@ CREATE TABLE "news" (
 );
 
 
-CREATE SEQUENCE "auto_id_notifications" START 1;
+CREATE SEQUENCE "auto_id_notifications" START 13;
 
 CREATE TABLE "notifications" (
   "id" INTEGER  PRIMARY KEY NOT NULL DEFAULT nextval('auto_id_notifications'),
@@ -79,12 +79,12 @@ INSERT INTO notifications VALUES (10, 'Pushall', '', 'warning');
 INSERT INTO notifications VALUES (11, 'Telegram', '', 'notification');
 INSERT INTO notifications VALUES (12, 'Telegram', '', 'warning');
 
-CREATE SEQUENCE "auto_id_settings" START 17;
+CREATE SEQUENCE "auto_id_settings" START 42;
 
 CREATE TABLE "settings" (
   "id" INTEGER  PRIMARY KEY NOT NULL DEFAULT nextval('auto_id_settings'),
   "key" varchar(32) NOT NULL,
-  "val" varchar(100) NOT NULL
+  "val" varchar(255) NOT NULL
 );
 
 INSERT INTO settings VALUES (3, 'send', '0');
@@ -114,6 +114,9 @@ INSERT INTO settings VALUES (37, 'proxyType', '');
 INSERT INTO settings VALUES (38, 'autoUpdate', '0');
 INSERT INTO settings VALUES (39, 'sentUpdateNotification', '0');
 INSERT INTO settings VALUES (40, 'userAgent', 'Mozilla/5.0 (X11; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0');
+INSERT INTO settings VALUES (41, 'flaresolverrUrl', '');
+INSERT INTO settings VALUES (42, 'ApiKey', '');
+INSERT INTO settings VALUES (43, 'qbitCategory', '');
 
 CREATE TABLE "temp" (
   "id" INTEGER PRIMARY KEY NOT NULL,
@@ -141,7 +144,8 @@ CREATE TABLE "torrent" (
   "script" varchar(100) NOT NULL DEFAULT '0',
   "pause" INTEGER NOT NULL DEFAULT '0',
   "error" INTEGER NOT NULL DEFAULT '0',
-  "closed" INTEGER NOT NULL DEFAULT '0'
+  "closed" INTEGER NOT NULL DEFAULT '0',
+  "category" VARCHAR(100) NOT NULL DEFAULT ''
 );
 
 

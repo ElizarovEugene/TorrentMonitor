@@ -103,7 +103,7 @@ DROP TABLE IF EXISTS `settings`;
 CREATE TABLE `settings` (
   `id` int(3) NOT NULL AUTO_INCREMENT,
   `key` varchar(32) NOT NULL,
-  `val` varchar(100) NOT NULL,
+  `val` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -138,7 +138,10 @@ VALUES
 	(37,'proxyType',''),
 	(38,'autoUpdate','0'),
 	(39,'sentUpdateNotification','0'),
-	(40,'userAgent','Mozilla/5.0 (X11; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0');
+	(40,'userAgent','Mozilla/5.0 (X11; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0'),
+	(41,'flaresolverrUrl',''),
+	(42,'ApiKey',''),
+	(43,'qbitCategory','');
 
 UNLOCK TABLES;
 
@@ -171,7 +174,8 @@ CREATE TABLE `torrent` (
   `script` varchar(100) DEFAULT NULL,
   `pause` int(1) unsigned NOT NULL DEFAULT '0',
   `error` int(1) unsigned NOT NULL DEFAULT '0',
-  `closed` int(1) unsigned NOT NULL DEFAULT '0',  
+  `closed` int(1) unsigned NOT NULL DEFAULT '0',
+  `category` varchar(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
