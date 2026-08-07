@@ -309,7 +309,7 @@ class lostfilm
 								array(
 									'type'           => 'GET',
 									'returntransfer' => 1,
-									'url'            => 'https://www.lostfilm.download/v_search.php?a='.$serial['ID'].'00'.$season.'0'.$episode,
+									'url'            => 'https://www.lostfilm.download/v_search.php?a='.$serial['ID'].str_pad($season, 3, '0', STR_PAD_LEFT).str_pad($episode, 3, '0', STR_PAD_LEFT),
 									'cookie'         => lostfilm::$sess_cookie,
 									'sendHeader'     => array('Host' => 'www.lostfilm.download', 'Content-length' => strlen(lostfilm::$sess_cookie)),
 								)
@@ -318,7 +318,7 @@ class lostfilm
 							preg_match('<a href=\"(.*)\">', $searchPage, $matches);
 							if (isset($matches[1]))
 								$link = 'https://www.lostfilm.download'.$matches[1];
-
+							
 							//получаем страницу с ссылкой
 							$linkPage = Sys::getUrlContent(
 								array(
@@ -328,7 +328,7 @@ class lostfilm
 									'sendHeader'     => array('Host' => 'www.lostfilm.download'),
 								)
 							);
-
+							
                             if ($hd == 0)
                             {
                                 $str = 'SD';
@@ -348,14 +348,16 @@ class lostfilm
                                 $amp = 'MP4';
                             }
 
-                            if (preg_match_all('/<div class=\"inner-box--label\">\n'.$str.'(\t\t\t|\s{12})<\/div>\n\s*<div class=\"inner-box--link main\"><a href=\"(https:\/\/(n.)?tracktor\.(in|site)\/td\.php\?s=.*)\">[\s\S]*'.$quality.'<\/a><\/div>/U', $linkPage, $matches))
+                            if (preg_match_all('/<div class=\"inner-box--label\">\s*'.$str.'\s*<\/div>\s*<div class=\"inner-box--link main\"><a href=\"(https:\/\/(n\.)?tracktor\.(in|site)\/td\.php\?s=[^\"]*)\">[\s\S]*'.$quality.'<\/a><\/div>/U', $linkPage, $matches))
                             {
+								$torrentHost = $matches[2][0].'tracktor.'.$matches[3][0];
+
     							$torrent = Sys::getUrlContent(
 						        	array(
 						        		'type'           => 'GET',
 						        		'returntransfer' => 1,
-						        		'url'            => $matches[2][0],
-						        		'sendHeader'     => array('Host' => 'tracktor.in'),
+						        		'url'            => $matches[1][0],
+						        		'sendHeader'     => array('Host' => $torrentHost),
 						        	)
                                 );
 
@@ -385,6 +387,10 @@ class lostfilm
                                     Errors::setWarnings($tracker, 'torrent_file_fail', $id);
                                 }
                             }
+							else
+							{
+								Errors::setWarnings($tracker, 'quality_not_found', $id);
+							}
 						}
 					}
 				}
