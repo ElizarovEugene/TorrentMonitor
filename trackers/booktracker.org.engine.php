@@ -47,7 +47,7 @@ class booktracker
 		$data = str_replace('-', ' ', booktracker::dateStringToNum($data));
 		$arr = preg_split("/\s/", $data);
 		$date = $arr[0] . ' ' . Sys::dateNumToString($arr[1]) . ' ' . $arr[2] . ' ' . $arr[3];
-		
+
 		return $date;
 	}
 
@@ -126,7 +126,8 @@ class booktracker
 		}
 	}
 
-	public static function main($params)
+	//формируем параметры "проверочного" запроса для curl_multi (резолв куки последовательный, как и раньше)
+	public static function getRequestParams($params)
 	{
     	extract($params);
 		$cookie = Database::getCookie($tracker);
@@ -139,45 +140,63 @@ class booktracker
 		else
     		booktracker::getCookie($tracker);
 
-		if (booktracker::$exucution)
+		if ( ! booktracker::$exucution)
 		{
-			//получаем страницу для парсинга
-            $page = Sys::getUrlContent(
-            	array(
-            		'type'           => 'POST',
-            		'header'         => 0,
-            		'returntransfer' => 1,
-            		'encoding'       => 1,
-            		'url'            => 'https://booktracker.org/viewtopic.php?t='.$torrent_id,
-            		'cookie'         => booktracker::$sess_cookie,
-            		'sendHeader'     => array('Host' => 'booktracker.org', 'Content-length' => strlen(booktracker::$sess_cookie)),
-            	)
-            );
+			booktracker::$warning = NULL;
+			return array('url' => NULL);
+		}
 
-			if ( ! empty($page))
+		$url = 'https://booktracker.org/viewtopic.php?t='.$torrent_id;
+
+		$options = array(
+			CURLOPT_POST   => 1,
+			CURLOPT_COOKIE => booktracker::$sess_cookie,
+		);
+
+		if (Sys::checkCurlVersion() == 'old')
+		{
+			$header = array();
+			foreach (array('Host' => 'booktracker.org', 'Content-length' => strlen(booktracker::$sess_cookie)) as $k => $v)
+				$header[] = $k.': '.$v."\r\n";
+			$options[CURLOPT_HTTPHEADER] = $header;
+		}
+
+		return array(
+			'url'     => $url,
+			'options' => $options + Sys::getProxyOptions($url),
+		);
+	}
+
+	//разбираем полученную страницу, возвращаем изменения для batchUpdateTorrents или null
+	public static function parse($params, $page)
+	{
+    	extract($params);
+		$return = NULL;
+
+		if ( ! empty($page))
+		{
+			//ищем на странице дату регистрации торрента
+			if (preg_match('/Зарегистрирован\s&nbsp;\s*\[\s<span title=".*["]>(.+)<\/span>/U', $page, $array))
 			{
-				//ищем на странице дату регистрации торрента
-				if (preg_match('/Зарегистрирован\s&nbsp;\s*\[\s<span title=".*["]>(.+)<\/span>/U', $page, $array))
+				//проверяем удалось ли получить дату со страницы
+				if (isset($array[1]))
 				{
-					//проверяем удалось ли получить дату со страницы
-					if (isset($array[1]))
+					//если дата не равна ничему
+					if ( ! empty($array[1]))
 					{
-						//если дата не равна ничему
-						if ( ! empty($array[1]))
+						//находим имя торрента для скачивания
+						if (preg_match('/href=\"download.php\?id=(\d+)\"/', $page, $link))
 						{
-							//находим имя торрента для скачивания
-							if (preg_match('/href=\"download.php\?id=(\d+)\"/', $page, $link))
+							//приводим дату к общему виду
+							$date = booktracker::dateStringToNum($array[1]);
+							$date_str = booktracker::dateNumToString($array[1]);
+							//если даты не совпадают, перекачиваем торрент
+							if ($date != $timestamp)
 							{
-								//приводим дату к общему виду
-								$date = booktracker::dateStringToNum($array[1]);
-								$date_str = booktracker::dateNumToString($array[1]);
-								//если даты не совпадают, перекачиваем торрент
-								if ($date != $timestamp)
-								{
-									//сохраняем торрент в файл
-									$download_id = $link[1];
+								//сохраняем торрент в файл
+								$download_id = $link[1];
 
-									$torrent = Sys::getUrlContent(
+								$torrent = Sys::getUrlContent(
 	                                	array(
 	                                		'type'           => 'GET',
 	                                		'returntransfer' => 1,
@@ -189,38 +208,32 @@ class booktracker
 	                                );
 	                                if (Sys::checkTorrentFile($torrent))
                                     {
+									if ($auto_update)
+    								{
+        								$name = Sys::parseHeader($tracker, $page);
+    								}
+
+									$message = $name.' обновлён.';
+									$saved = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
+
+									if ($saved)
+									{
     									if ($auto_update)
-        								{
-            								$name = Sys::parseHeader($tracker, $page);
-        								    //обновляем заголовок торрента в базе
-                                            Database::setNewName($id, $name);
-        								}
-
-    									$message = $name.' обновлён.';
-    									$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
-
-        								//обновляем время регистрации торрента в базе
-    									Database::setNewDate($id, $date);
-        								//сбрасываем варнинг
-        								Database::clearWarnings($tracker);
-        								Database::setErrorToThreme($id, 0);
+    										//обновляем заголовок торрента в базе
+        									$return[$id]['name'] = $name;
+    									//обновляем время регистрации торрента в базе
+										$return[$id]['timestamp'] = $date;
+    									//сбрасываем варнинг
+    									Database::clearWarnings($tracker);
+    									$return[$id]['error'] = 0;
+									}
+									else
+										Errors::setWarnings($tracker, 'save_file_fail', $id);
                                     }
                                     else
                                         Errors::setWarnings($tracker, 'torrent_file_fail', $id);
-								}
-								Database::setErrorToThreme($id, 0);
 							}
-							else
-							{
-								//устанавливаем варнинг
-								if (booktracker::$warning == NULL)
-                    			{
-                    				booktracker::$warning = TRUE;
-                    				Errors::setWarnings($tracker, 'cant_find_dowload_link', $id);
-                    			}
-                    			//останавливаем процесс выполнения, т.к. не может работать без кук
-								booktracker::$exucution = FALSE;
-							}
+							$return[$id]['error'] = 0;
 						}
 						else
 						{
@@ -228,7 +241,7 @@ class booktracker
 							if (booktracker::$warning == NULL)
                 			{
                 				booktracker::$warning = TRUE;
-                				Errors::setWarnings($tracker, 'cant_find_date', $id);
+                				Errors::setWarnings($tracker, 'cant_find_dowload_link', $id);
                 			}
                 			//останавливаем процесс выполнения, т.к. не может работать без кук
 							booktracker::$exucution = FALSE;
@@ -264,13 +277,26 @@ class booktracker
 				if (booktracker::$warning == NULL)
     			{
     				booktracker::$warning = TRUE;
-    				Errors::setWarnings($tracker, 'cant_get_forum_page', $id);
+    				Errors::setWarnings($tracker, 'cant_find_date', $id);
     			}
     			//останавливаем процесс выполнения, т.к. не может работать без кук
 				booktracker::$exucution = FALSE;
 			}
 		}
+		else
+		{
+			//устанавливаем варнинг
+			if (booktracker::$warning == NULL)
+			{
+				booktracker::$warning = TRUE;
+				Errors::setWarnings($tracker, 'cant_get_forum_page', $id);
+			}
+			//останавливаем процесс выполнения, т.к. не может работать без кук
+			booktracker::$exucution = FALSE;
+		}
+
 		booktracker::$warning = NULL;
+		return $return;
 	}
 }
 ?>

@@ -45,8 +45,8 @@ if ($trackers != NULL) {
             x-transition:leave-end="tm-item--leaving-end"
             >
             <div class="fz-md text-center mb-1 d-flex">
-                Ошибки:&nbsp;<strong><?= $tracker['where'] ?></strong>
-                <button @click.prevent="clear('<?= $tracker['where'] ?>', <?= $tracker['count'] ?>)" class="btn btn--danger btn--round ml-auto" title="Очистить ошибки"><svg><use href="assets/img/sprite.svg#trash" /></svg></button>
+                Ошибки:&nbsp;<strong><?= htmlspecialchars($tracker['where'], ENT_QUOTES) ?></strong>
+                <button @click.prevent="clear('<?= htmlspecialchars($tracker['where'], ENT_QUOTES) ?>', <?= $tracker['count'] ?>)" class="btn btn--danger btn--round ml-auto" title="Очистить ошибки"><svg><use href="assets/img/sprite.svg#trash" /></svg></button>
             </div>
 
             <?php foreach ($tracker['errors'] as $root => $errors) { ?>
@@ -65,7 +65,7 @@ if ($trackers != NULL) {
                         ?>
                         <div class="row tm-item">
                             <div class="col --auto">
-                                <div class="tracker-icon" style="background-image: url(img/<?= $error['where'] ?>.ico)" title="<?= $error['where'] ?>"></div>
+                                <div class="tracker-icon" style="background-image: url(img/<?= htmlspecialchars($error['where'], ENT_QUOTES) ?>.ico)" title="<?= htmlspecialchars($error['where'], ENT_QUOTES) ?>"></div>
                             </div>
                             <div class="col">
                                 <?= Errors::getWarning($error['reason']) ?>

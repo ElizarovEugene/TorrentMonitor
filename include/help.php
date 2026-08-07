@@ -20,7 +20,7 @@ $opts = stream_context_create(array(
         'timeout' => 1
         )
     ));
-$xmlstr = @file_get_contents('http://xml.tormon.ru/help.xml', false, $opts);
+$xmlstr = @file_get_contents('https://xml.tormon.ru/help.xml', false, $opts);
 $xml = @simplexml_load_string($xmlstr);
 if (false !== $xml)
 {

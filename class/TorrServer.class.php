@@ -12,6 +12,8 @@ class TorrServer
         {
         	extract($row);
         }
+        if (!preg_match('~^https?://~i', $torrentAddress))
+            $torrentAddress = 'http://'.$torrentAddress;
 
     	try
     	{
@@ -32,7 +34,7 @@ class TorrServer
                     curl_setopt_array($ch, array(
                         CURLOPT_POST => 1,
                         CURLOPT_FOLLOWLOCATION => 1,
-                        CURLOPT_URL => 'http://'.$torrentAddress.'/torrents/',
+                        CURLOPT_URL => $torrentAddress.'/torrents/',
                         CURLOPT_USERAGENT => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:51.0) Gecko/20100101 Firefox/51.0',
                         CURLOPT_RETURNTRANSFER => true,
                         CURLOPT_POST => true,
@@ -52,7 +54,7 @@ class TorrServer
                 $name = '';
 
             #добавляем торрент в torrent-клиент
-            $url = 'http://'.$torrentAddress.'/stream/fname?link='.$file.'&save&title='.$name.'&stat';
+            $url = $torrentAddress.'/stream/fname?link='.$file.'&save&title='.$name.'&stat';
             $ch = curl_init();
             curl_setopt_array($ch, array(
                 CURLOPT_FOLLOWLOCATION => 1,
@@ -89,6 +91,38 @@ class TorrServer
         }
         
         return $return;
+    }
+
+    #удаляем раздачу из torrent-клиента (без добавления новой)
+    public static function remove($hash)
+    {
+        $settings = Database::getAllSetting();
+        foreach ($settings as $row)
+        {
+            extract($row);
+        }
+        if (!preg_match('~^https?://~i', $torrentAddress))
+            $torrentAddress = 'http://'.$torrentAddress;
+
+        $data = json_encode(array('action' => 'rem', 'hash' => $hash));
+        $ch = curl_init();
+        curl_setopt_array($ch, array(
+            CURLOPT_POST => true,
+            CURLOPT_FOLLOWLOCATION => 1,
+            CURLOPT_URL => $torrentAddress.'/torrents/',
+            CURLOPT_USERAGENT => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:51.0) Gecko/20100101 Firefox/51.0',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_USERPWD => $torrentLogin.':'.$torrentPassword,
+            CURLOPT_HTTPHEADER => array('Content-Type: application/json'),
+            CURLOPT_POSTFIELDS => $data,
+        ));
+        $response = curl_exec($ch);
+        if ($debug)
+            var_dump($response);
+        curl_close($ch);
+
+        Database::clearWarnings('TorrServer');
+        return array('status' => TRUE);
     }
 }
 ?>

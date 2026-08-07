@@ -4,8 +4,8 @@ class lostfilm
 	protected static $sess_cookie;
 	protected static $exucution;
 	protected static $warning;
-	
-	protected static $page;	
+
+	protected static $page;
 	protected static $log_page;
 	protected static $xml_page;
 
@@ -16,16 +16,16 @@ class lostfilm
 			array(
 				'type'           => 'GET',
 				'returntransfer' => 1,
-				'url'            => 'https://www.lostfilm.today',
+				'url'            => 'https://www.lostfilm.download',
 				'cookie'         => $sess_cookie,
-				'sendHeader'     => array('Host' => 'www.lostfilm.today', 'Content-length' => strlen($sess_cookie)),
+				'sendHeader'     => array('Host' => 'www.lostfilm.download', 'Content-length' => strlen($sess_cookie)),
 			)
 		);
 
 		if (preg_match('/<a href=\"\/my\" title=\"Перейти в личный кабинет\">/', $result))
 			return TRUE;
 		else
-			return FALSE;		  
+			return FALSE;
 	}
 
 	public static function checkRule($data)
@@ -41,12 +41,12 @@ class lostfilm
 	{
 		$data = substr($data, 5);
 		$data = substr($data, 0, -6);
-		
+
 		$monthes = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 		$month = substr($data, 3, 3);
 		$data = preg_replace('/(\d\d)-(\d\d)-(\d\d)/', '$3-$2-$1', str_replace($month, str_pad(array_search($month, $monthes)+1, 2, 0, STR_PAD_LEFT), $data));
-		
-		$data = preg_split('/\s/', $data);		
+
+		$data = preg_split('/\s/', $data);
 		$date = $data[2].'-'.$data[1].'-'.$data[0].' '.$data[3];
 		return $date;
 	}
@@ -57,26 +57,26 @@ class lostfilm
 		$data = substr($data, 0, -3);
 		$data = str_replace('-', ' ', $data);
 		$arr = preg_split('/\s/', $data);
-		
+
 		$month = Sys::dateNumToString($arr[1]);
 		$date = $arr[2].' '.$month.' '.$arr[0].' '.$arr[3];
 		return $date;
 	}
-	
+
 	//функция анализа xml ленты
 	private static function analysis($name, $item)
 	{
-		if (preg_match('/'.$name.'/i', $item->title))
+		if (preg_match('/'.preg_quote($name, '/').'/i', $item->title))
 		{
     		preg_match('/S\d{2}E\d{2}/', $item->title, $matches);
     		if (isset($matches[0]))
                 $episode = $matches[0];
-			
+
     		preg_match('/\/Static\/Images\/(.*)\/Posters\/image.jpg/', $item->description->img["src"]->__toString(), $matches);
     		if (isset($matches[1]))
     			$id = $matches[1];
-    		
-    			
+
+
             $date = lostfilm::dateStringToNum($item->pubDate);
             $dateTimeUser = new DateTimeZone(date_default_timezone_get());
             $dateTimeUser = new DateTime('now', $dateTimeUser);
@@ -85,14 +85,15 @@ class lostfilm
             $dateTimeUTC = new DateTime($date, $dateTimeZoneUTC);
             $dateTimeUTC->add(new DateInterval('PT'.$offset.'H'));
             $date = $dateTimeUTC->format('Y-m-d H:i:s');
-            
+
+
     		return array('ID'=>$id, 'episode'=>$episode, 'date'=>$date);
 		}
-	}	
+	}
 
 	//функция получения кук
 	public static function getCookie($tracker)
-	{	
+	{
 		//проверяем заполнены ли учётные данные
 		if (Database::checkTrackersCredentialsExist($tracker))
 		{
@@ -100,13 +101,13 @@ class lostfilm
 			$credentials = Database::getCredentials($tracker);
 			$login = iconv('utf-8', 'windows-1251', $credentials['login']);
 			$password = $credentials['password'];
-			
+
 			$page = Sys::getUrlContent(
             	array(
             		'type'           => 'POST',
             		'header'         => 1,
             		'returntransfer' => 1,
-            		'url'            => 'https://www.lostfilm.today/ajaxik.php',
+            		'url'            => 'https://www.lostfilm.download/ajaxik.php',
             		'postfields'     => 'act=users&type=login&mail='.$login.'&pass='.$password.'&rem=1',
             	)
             );
@@ -122,7 +123,7 @@ class lostfilm
         				Errors::setWarnings($tracker, 'captcha');
         			}
 					//останавливаем выполнение цепочки
-					lostfilm::$exucution = FALSE;        			
+					lostfilm::$exucution = FALSE;
                 }
 				elseif (preg_match_all('/\"error\"/', $page, $array))
     			{
@@ -133,7 +134,7 @@ class lostfilm
         				Errors::setWarnings($tracker, 'credential_wrong');
         			}
 					//останавливаем выполнение цепочки
-					lostfilm::$exucution = FALSE;        			
+					lostfilm::$exucution = FALSE;
                 }
 				//проверяем подходят ли учётные данные
 				elseif (preg_match_all('/Set-Cookie: lf_session=(.*);/Ui', $page, $array))
@@ -178,82 +179,91 @@ class lostfilm
 				Errors::setWarnings($tracker, 'credential_miss');
 			}
 			//останавливаем выполнение цепочки
-			lostfilm::$exucution = FALSE;						
-		}	
+			lostfilm::$exucution = FALSE;
+		}
 	}
-	
-	//основная функция
-	public static function main($params)
-	{
-    	extract($params);
-		//проверяем небыло ли до этого уже ошибок
-		if (empty(lostfilm::$exucution) || (lostfilm::$exucution))
-		{
-			//проверяем получена ли уже кука
-			if (empty(lostfilm::$sess_cookie))
-			{
-        		$cookie = Database::getCookie($tracker);
-        		if (lostfilm::checkCookie($cookie))
-        		{
-        			lostfilm::$sess_cookie = $cookie;
-        			//запускам процесс выполнения
-        			lostfilm::$exucution = TRUE;
-        		}			
-        		else
-            		lostfilm::getCookie($tracker);
-			}
-			
-			//проверяем получена ли уже RSS лента
-			if ( ! lostfilm::$log_page)
-			{
-				if (lostfilm::$exucution)
-				{
-					//получаем страницу
-			        lostfilm::$page = Sys::getUrlContent(
-			        	array(
-			        		'type'           => 'GET',
-			        		'returntransfer' => 1,
-			        		'url'            => 'https://www.lostfilm.today/rss.xml',
-			        	)
-			        );
 
-					if ( ! empty(lostfilm::$page))
-					{
-    					lostfilm::$page = preg_replace('/\&/', '&amp;', lostfilm::$page);
-						lostfilm::$page = preg_replace('/\<\!\[CDATA\[/', '', lostfilm::$page);
-						lostfilm::$page = preg_replace('/\]\]/', '', lostfilm::$page);
-						//читаем xml
-						lostfilm::$xml_page = simplexml_load_string(lostfilm::$page);
-						//если XML пришёл с ошибками - останавливаем выполнение, иначе - ставим флажок, что получаем страницу
-						if ( ! lostfilm::$xml_page)
-						{
-							//устанавливаем варнинг
-        					if (lostfilm::$warning == NULL)
-                			{
-                				lostfilm::$warning = TRUE;
-                				Errors::setWarnings($tracker, 'rss_parse_false');
-                			}
-							//останавливаем выполнение цепочки
-							lostfilm::$exucution = FALSE;
-						}
-						else
-							lostfilm::$log_page = TRUE;
-					}
-					else
-					{
-						//устанавливаем варнинг
-    					if (lostfilm::$warning == NULL)
-            			{
-            				lostfilm::$warning = TRUE;
-            				Errors::setWarnings($tracker, 'cant_find_rss');
-            			}
-						//останавливаем выполнение цепочки
-						lostfilm::$exucution = FALSE;
-					}
+	//формируем параметры "проверочного" запроса для curl_multi
+	//резолв куки выполняется один раз для всех строк lostfilm.tv в рамках текущего прогона;
+	//rss.xml одинаков для каждой строки, поэтому CurlMultiFetcher схлопнёт его в один реальный запрос
+	public static function getRequestParams($params)
+	{
+		extract($params);
+
+		//проверяем получена ли уже кука
+		if (empty(lostfilm::$sess_cookie))
+		{
+    		$cookie = Database::getCookie($tracker);
+    		if (lostfilm::checkCookie($cookie))
+    		{
+    			lostfilm::$sess_cookie = $cookie;
+    			//запускам процесс выполнения
+    			lostfilm::$exucution = TRUE;
+    		}
+    		else
+        		lostfilm::getCookie($tracker);
+		}
+
+		if ( ! lostfilm::$exucution)
+			return array('url' => NULL);
+
+		$url = 'https://www.lostfilm.download/rss.xml';
+
+		return array(
+			'url'     => $url,
+			'options' => array(CURLOPT_HTTPGET => 1) + Sys::getProxyOptions($url),
+		);
+	}
+
+	//разбираем RSS-ленту (общую для всех строк lostfilm.tv) и анализируем эпизоды для текущей строки
+	public static function parse($params, $page)
+	{
+		extract($params);
+		$return = NULL;
+
+		//проверяем получена ли уже RSS лента (один раз для всех строк этого трекера)
+		if (lostfilm::$xml_page === NULL)
+		{
+			if ( ! empty($page))
+			{
+				$page = preg_replace('/\&/', '&amp;', $page);
+				$page = preg_replace('/\<\!\[CDATA\[/', '', $page);
+				$page = preg_replace('/\]\]/', '', $page);
+				//читаем xml
+				$xml = simplexml_load_string($page);
+				//если XML пришёл с ошибками - останавливаем выполнение, иначе - сохраняем для остальных строк
+				if ( ! $xml)
+				{
+					//устанавливаем варнинг
+					if (lostfilm::$warning == NULL)
+        			{
+        				lostfilm::$warning = TRUE;
+        				Errors::setWarnings($tracker, 'rss_parse_false');
+        			}
+					//останавливаем выполнение цепочки
+					lostfilm::$exucution = FALSE;
+					lostfilm::$xml_page = FALSE;
+				}
+				else
+				{
+					lostfilm::$log_page = TRUE;
+					lostfilm::$xml_page = $xml;
 				}
 			}
+			else
+			{
+				//устанавливаем варнинг
+				if (lostfilm::$warning == NULL)
+    			{
+    				lostfilm::$warning = TRUE;
+    				Errors::setWarnings($tracker, 'cant_find_rss');
+    			}
+				//останавливаем выполнение цепочки
+				lostfilm::$exucution = FALSE;
+				lostfilm::$xml_page = FALSE;
+			}
 		}
-	
+
 		//если выполнение цепочки не остановлено
 		if (lostfilm::$exucution)
 		{
@@ -266,11 +276,11 @@ class lostfilm
 				{
 				    array_unshift($nodes, $item);
 				}
-				
+
 				foreach ($nodes as $item)
 				{
 					$serial = lostfilm::analysis($name, $item);
-						
+
 					if ( ! empty($serial))
 					{
 						$episode = substr($serial['episode'], 4, 2);
@@ -293,33 +303,32 @@ class lostfilm
 						{
     						if (substr($season, 0, 1) == 0)
     						    $season = substr($season, 1);
-							
+
 							//получаем страницу с ссылкой
-							$page = Sys::getUrlContent(
+							$searchPage = Sys::getUrlContent(
 								array(
 									'type'           => 'GET',
 									'returntransfer' => 1,
-									'url'            => 'https://www.lostfilm.today/v_search.php?a='.$serial['ID'].'00'.$season.'0'.$episode,
-									'sendHeader'     => array('Host' => 'www.lostfilm.today'),
+									'url'            => 'https://www.lostfilm.download/v_search.php?a='.$serial['ID'].'00'.$season.'0'.$episode,
 									'cookie'         => lostfilm::$sess_cookie,
-									'sendHeader'     => array('Host' => 'www.lostfilm.today', 'Content-length' => strlen(lostfilm::$sess_cookie)),
+									'sendHeader'     => array('Host' => 'www.lostfilm.download', 'Content-length' => strlen(lostfilm::$sess_cookie)),
 								)
 							);
-							
-							preg_match('<a href=\"(.*)\">', $page, $matches);
+
+							preg_match('<a href=\"(.*)\">', $searchPage, $matches);
 							if (isset($matches[1]))
-								$link = 'https://www.lostfilm.today'.$matches[1];
-								
+								$link = 'https://www.lostfilm.download'.$matches[1];
+
 							//получаем страницу с ссылкой
-							$page = Sys::getUrlContent(
+							$linkPage = Sys::getUrlContent(
 								array(
 									'type'           => 'GET',
 									'returntransfer' => 1,
 									'url'            => $link,
-									'sendHeader'     => array('Host' => 'www.lostfilm.today'),
+									'sendHeader'     => array('Host' => 'www.lostfilm.download'),
 								)
 							);
-							
+
                             if ($hd == 0)
                             {
                                 $str = 'SD';
@@ -339,7 +348,7 @@ class lostfilm
                                 $amp = 'MP4';
                             }
 
-                            if (preg_match_all('/<div class=\"inner-box--label\">\n'.$str.'(\t\t\t|\s{12})<\/div>\n\s*<div class=\"inner-box--link main\"><a href=\"(https:\/\/(n.)?tracktor\.(in|site)\/td\.php\?s=.*)\">[\s\S]*'.$quality.'<\/a><\/div>/U', $page, $matches))
+                            if (preg_match_all('/<div class=\"inner-box--label\">\n'.$str.'(\t\t\t|\s{12})<\/div>\n\s*<div class=\"inner-box--link main\"><a href=\"(https:\/\/(n.)?tracktor\.(in|site)\/td\.php\?s=.*)\">[\s\S]*'.$quality.'<\/a><\/div>/U', $linkPage, $matches))
                             {
     							$torrent = Sys::getUrlContent(
 						        	array(
@@ -351,20 +360,25 @@ class lostfilm
                                 );
 
                                 if (Sys::checkTorrentFile($torrent))
-                                {	
-    								$file = str_replace(' ', '.', $name).'.S'.$season.'E'.$episode.'.'.$amp;
-    								$episode = (substr($episode, 0, 1) == 0) ? substr($episode, 1, 1) : $episode;
-    								$season = (substr($season, 0, 1) == 0) ? substr($season, 1, 1) : $season;
-    								$message = $name.' '.$amp.' обновлён до '.$episode.' серии, '.$season.' сезона.';
-    								$status = Sys::saveTorrent($tracker, $file, $torrent, $id, $hash, $message, lostfilm::dateNumToString($serial['date']), $name);
+                                {
+									$file = str_replace(' ', '.', $name).'.S'.$season.'E'.$episode.'.'.$amp;
+									$episode = (substr($episode, 0, 1) == 0) ? substr($episode, 1, 1) : $episode;
+									$season = (substr($season, 0, 1) == 0) ? substr($season, 1, 1) : $season;
+									$message = $name.' '.$amp.' обновлён до '.$episode.' серии, '.$season.' сезона.';
+									$saved = Sys::saveTorrent($tracker, $file, $torrent, $id, $hash, $message, lostfilm::dateNumToString($serial['date']), $name);
 
-    								//обновляем время регистрации торрента в базе
-    								Database::setNewDate($id, $serial['date']);
-    								//обновляем сведения о последнем эпизоде
-    								Database::setNewEpisode($id, $serial['episode']);
-    								//очищаем ошибки
-    								Database::setErrorToThreme($id, 0);
-    								Database::setClosedThreme($id, 0);
+									if ($saved)
+									{
+									    //обновляем время регистрации торрента в базе
+									    $return[$id]['timestamp'] = $serial['date'];
+									    //обновляем сведения о последнем эпизоде
+									    $return[$id]['ep'] = $serial['episode'];
+									    //очищаем ошибки
+									    $return[$id]['error'] = 0;
+									    $return[$id]['closed'] = 0;
+									}
+									else
+									    Errors::setWarnings($tracker, 'save_file_fail', $id);
                                 }
                                 else
                                 {
@@ -376,6 +390,8 @@ class lostfilm
 				}
 			}
 		}
+
+		return $return;
 	}
 }
 ?>

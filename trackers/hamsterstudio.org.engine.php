@@ -4,8 +4,8 @@ class hamsterstudio
     protected static $sess_cookie;
 	protected static $exucution;
 	protected static $warning;
-	
-	protected static $page;	
+
+	protected static $page;
 	protected static $log_page;
 	protected static $xml_page;
 
@@ -26,9 +26,9 @@ class hamsterstudio
 		if (preg_match('/<a href=\"logout\.php\">Выход<\/a>/U', $result))
 			return TRUE;
 		else
-			return FALSE;		  
+			return FALSE;
 	}
-	
+
 	//функция проверки введёного URL`а
 	public static function checkRule($data)
 	{
@@ -37,7 +37,7 @@ class hamsterstudio
 		else
 			return FALSE;
 	}
-	
+
 	//функция преобразования даты в строку
 	private static function dateNumToString($data)
 	{
@@ -49,7 +49,7 @@ class hamsterstudio
 
 		$month = Sys::dateNumToString($data[1]);
 		$date = $data[2].' '.$month.' '.$data[0].' '.$time;
-		
+
 		return $date;
 	}
 
@@ -65,7 +65,7 @@ class hamsterstudio
 			return array('episode'=>$episode, 'date'=>$date, 'link'=>(string)$item->link);
 		}
 	}
-	
+
 	//функция анализа xml ленты
 	private static function analysis($name, $hd, $item)
 	{
@@ -99,7 +99,7 @@ class hamsterstudio
 			$credentials = Database::getCredentials($tracker);
 			$login = iconv('utf-8', 'windows-1251', $credentials['login']);
 			$password = $credentials['password'];
-			
+
 			$page = Sys::getUrlContent(
             	array(
             		'type'           => 'POST',
@@ -171,84 +171,92 @@ class hamsterstudio
 				Errors::setWarnings($tracker, 'credential_miss');
 			}
 			//останавливаем выполнение цепочки
-			hamsterstudio::$exucution = FALSE;						
-		}	
+			hamsterstudio::$exucution = FALSE;
+		}
 	}
 
-	//основная функция
-	public static function main($params)
+	//формируем параметры "проверочного" запроса для curl_multi (резолв куки последовательный, как и раньше)
+	public static function getRequestParams($params)
 	{
     	extract($params);
-		//проверяем небыло ли до этого уже ошибок
-		if (empty(hamsterstudio::$exucution) || (hamsterstudio::$exucution))
+		$cookie = Database::getCookie($tracker);
+		if (hamsterstudio::checkCookie($cookie))
 		{
-			//проверяем получена ли уже кука
-			if (empty(hamsterstudio::$sess_cookie))
-			{
-        		$cookie = Database::getCookie($tracker);
-        		if (hamsterstudio::checkCookie($cookie))
-        		{
-        			hamsterstudio::$sess_cookie = $cookie;
-        			//запускам процесс выполнения
-        			hamsterstudio::$exucution = TRUE;
-        		}			
-        		else
-                    hamsterstudio::getCookie($tracker);
-			}
+			hamsterstudio::$sess_cookie = $cookie;
+			//запускам процесс выполнения
+			hamsterstudio::$exucution = TRUE;
+		}
+		else
+            hamsterstudio::getCookie($tracker);
 
-			//проверяем получена ли уже RSS лента
-			if ( ! hamsterstudio::$log_page)
-			{
-				if (hamsterstudio::$exucution)
-				{
-					//получаем страницу
-			        $page = Sys::getUrlContent(
-			        	array(
-			        		'type'           => 'GET',
-			        		'returntransfer' => 1,
-			        		'url'            => 'http://hamsterstudio.org/rss.php?feed=dl',
-			        		'cookie'         => hamsterstudio::$sess_cookie,
-                            'sendHeader'     => array('Host' => 'hamsterstudio.org', 'Content-length' => strlen(hamsterstudio::$sess_cookie)),
-                            'convert'        => array('windows-1251', 'utf-8//IGNORE'),
-			        	)
-			        );
+		if ( ! hamsterstudio::$exucution)
+		{
+			hamsterstudio::$warning = NULL;
+			return array('url' => NULL);
+		}
 
-                    $page = str_replace('<?xml version="1.0" encoding="windows-1251" ?>','<?xml version="1.0" encoding="utf-8"?>', $page);
-					if ( ! empty($page))
-					{
-					    $xml_page = str_replace(array("&amp;", "&"), array("&", "&amp;"), $page);
-						//читаем xml
-						hamsterstudio::$xml_page = @simplexml_load_string($xml_page);
-						//если XML пришёл с ошибками - останавливаем выполнение, иначе - ставим флажок, что получаем страницу
-						if ( ! hamsterstudio::$xml_page)
-						{
-							//устанавливаем варнинг
-        					if (hamsterstudio::$warning == NULL)
-                			{
-                				hamsterstudio::$warning = TRUE;
-                				Errors::setWarnings($tracker, 'rss_parse_false');
-                			}
-							//останавливаем выполнение цепочки
-							hamsterstudio::$exucution = FALSE;
-						}
-						else
-							hamsterstudio::$log_page = TRUE;
-					}
-					else
-					{
-						//устанавливаем варнинг
-    					if (hamsterstudio::$warning == NULL)
-            			{
-            				hamsterstudio::$warning = TRUE;
-            				Errors::setWarnings($tracker, 'cant_find_rss');
-            			}
-						//останавливаем выполнение цепочки
-						hamsterstudio::$exucution = FALSE;
-					}
-				}
+		$url = 'http://hamsterstudio.org/rss.php?feed=dl';
+
+		$options = array(
+			CURLOPT_HTTPGET => 1,
+			CURLOPT_COOKIE  => hamsterstudio::$sess_cookie,
+		);
+
+		if (Sys::checkCurlVersion() == 'old')
+		{
+			$header = array();
+			foreach (array('Host' => 'hamsterstudio.org', 'Content-length' => strlen(hamsterstudio::$sess_cookie)) as $k => $v)
+				$header[] = $k.': '.$v."\r\n";
+			$options[CURLOPT_HTTPHEADER] = $header;
+		}
+
+		return array(
+			'url'     => $url,
+			'options' => $options + Sys::getProxyOptions($url),
+		);
+	}
+
+	//разбираем полученную страницу, возвращаем изменения для batchUpdateTorrents или null
+	public static function parse($params, $page)
+	{
+    	extract($params);
+		$return = NULL;
+
+		$page = iconv('windows-1251', 'utf-8//IGNORE', $page);
+
+        $page = str_replace('<?xml version="1.0" encoding="windows-1251" ?>','<?xml version="1.0" encoding="utf-8"?>', $page);
+		if ( ! empty($page))
+		{
+		    $xml_page = str_replace(array("&amp;", "&"), array("&", "&amp;"), $page);
+			//читаем xml
+			hamsterstudio::$xml_page = @simplexml_load_string($xml_page);
+			//если XML пришёл с ошибками - останавливаем выполнение, иначе - ставим флажок, что получаем страницу
+			if ( ! hamsterstudio::$xml_page)
+			{
+				//устанавливаем варнинг
+				if (hamsterstudio::$warning == NULL)
+    			{
+    				hamsterstudio::$warning = TRUE;
+    				Errors::setWarnings($tracker, 'rss_parse_false');
+    			}
+				//останавливаем выполнение цепочки
+				hamsterstudio::$exucution = FALSE;
 			}
-        }
-        
+			else
+				hamsterstudio::$log_page = TRUE;
+		}
+		else
+		{
+			//устанавливаем варнинг
+			if (hamsterstudio::$warning == NULL)
+			{
+				hamsterstudio::$warning = TRUE;
+				Errors::setWarnings($tracker, 'cant_find_rss');
+			}
+			//останавливаем выполнение цепочки
+			hamsterstudio::$exucution = FALSE;
+		}
+
 		//если выполнение цепочки не остановлено
 		if (hamsterstudio::$exucution)
 		{
@@ -261,7 +269,7 @@ class hamsterstudio
 				{
 				    array_unshift($nodes, $item);
 				}
-				
+
 				foreach ($nodes as $item)
 				{
 					$serial = hamsterstudio::analysis($name, $hd, $item);
@@ -298,27 +306,37 @@ class hamsterstudio
 									'sendHeader'     => array('Host' => 'hamsterstudio.org', 'Content-length' => strlen(hamsterstudio::$sess_cookie)),
 								)
 							);
-							
+
                             if (Sys::checkTorrentFile($torrent))
-                            {							
+                            {
 								$file = str_replace(' ', '.', $name).'.S'.$season.'E'.$episode.'.'.$amp;
 								$episode = (substr($episode, 0, 1) == 0) ? substr($episode, 1, 1) : $episode;
 								$season = (substr($season, 0, 1) == 0) ? substr($season, 1, 1) : $season;
 								$message = $name.' '.$amp.' обновлён до '.$episode.' серии, '.$season.' сезона.';
-								$status = Sys::saveTorrent($tracker, $file, $torrent, $id, $hash, $message, $date_str, $name);
+								$saved = Sys::saveTorrent($tracker, $file, $torrent, $id, $hash, $message, $date_str, $name);
 
-								//обновляем время регистрации торрента в базе
-								Database::setNewDate($id, $serial['date']);
-								//обновляем сведения о последнем эпизоде
-								Database::setNewEpisode($id, $serial['episode']);
+								if ($saved)
+								{
+								    //обновляем время регистрации торрента в базе
+								    if ( ! isset($return[$id]))
+								        $return[$id] = array();
+								    $return[$id]['timestamp'] = $serial['date'];
+								    //обновляем сведения о последнем эпизоде
+								    $return[$id]['ep'] = $serial['episode'];
+								}
+								else
+								    Errors::setWarnings($tracker, 'save_file_fail', $id);
                             }
                             else
-                                Errors::setWarnings($tracker, 'torrent_file_fail', $id);													
+                                Errors::setWarnings($tracker, 'torrent_file_fail', $id);
 						}
 					}
 				}
             }
         }
+
+		hamsterstudio::$warning = NULL;
+		return $return;
 	}
 }
 ?>

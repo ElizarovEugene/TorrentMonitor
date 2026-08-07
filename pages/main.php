@@ -39,6 +39,12 @@ if (! empty($lastStart)) {
 ?>
 
 
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.store('tmApp', { torrentClient: <?= json_encode(Database::getSetting('torrentClient')) ?> });
+});
+</script>
+
 <div x-cloak x-data="tm(<?= $errors_count ?>, <?= $news_count ?>)">
 
 <div class="container-fluid">

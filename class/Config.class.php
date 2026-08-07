@@ -28,7 +28,7 @@ class Config
     
     public static function read($name)
     {
-        return self::$confArray[$name];
+        return self::$confArray[$name] ?? NULL;
     }
 
     public static function write($name, $value)

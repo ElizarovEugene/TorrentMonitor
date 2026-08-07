@@ -35,6 +35,7 @@ if (file_exists($config))
         <button :class="currentTab == 'proxy' && '--current'" @click="setTab('proxy')">Прокси</button>
         <button :class="currentTab == 'torrent' && '--current'" @click="setTab('torrent')">Торрент-клиент</button>
         <button :class="currentTab == 'extended' && '--current'" @click="setTab('extended')">Расширенные</button>
+        <button :class="currentTab == 'api' && '--current'" @click="setTab('api')">API</button>
     </nav>
 
     <div class="form-error mb-2" x-show="error.length > 0" x-text="error" x-transition.opacity></div>
@@ -43,8 +44,8 @@ if (file_exists($config))
         <label class="row">
             <div class="col --2:lg mb-1">Адрес TM:</div>
             <div class="col --5:lg mb-2">
-                <input type="text" name="serverAddress" x-model="options.serverAddress" required>
-                <div class="form-help">Например: http://torrent.test.ru/</div>
+                <input type="url" name="serverAddress" x-model="options.serverAddress" pattern="https?://.+" required>
+                <div class="form-help">Полный адрес с протоколом, например: http://torrent.test.ru/</div>
             </div>
         </label>
 
@@ -54,7 +55,7 @@ if (file_exists($config))
             <div class="col --2:lg mb-1">User-Agent:</div>
             <div class="col --5:lg mb-2">
                 <input type="text" name="userAgent" x-model="options.userAgent" required>
-                <div class="form-help">Например: Mozilla/5.0 (X11; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0 </div>
+                <div class="form-help">Например: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36</div>
             </div>
         </label>
 
@@ -275,8 +276,8 @@ if (file_exists($config))
                 <label class="row mt-1">
                     <div class="col --2:lg mb-1">Торрент-клиент:</div>
                     <div class="col --5:lg mb-2">
-                        <select x-model="options.torrentClient">
-                            <template x-for='client in ["Deluge","Transmission","qBittorrent","TorrServer","SynologyDS"]'>
+                        <select x-model="options.torrentClient" @change="$store.tmApp.torrentClient = options.torrentClient">
+                            <template x-for='client in ["Deluge","qBittorrent","SynologyDS","TorrServer","Transmission"]'>
                                 <option x-text="client" :selected="options.torrentClient == client"></option>
                             </template>
                         </select>
@@ -284,14 +285,14 @@ if (file_exists($config))
                 </label>
 
                 <label class="row">
-                    <div class="col --2:lg mb-1">IP, порт торрент-клиента:</div>
+                    <div class="col --2:lg mb-1">Адрес торрент-клиента:</div>
                     <div class="col --5:lg mb-2">
-                        <input type="text" name="torrentAddress" x-model="options.torrentAddress" :required="options.useTorrent > 0" placeholder="127.0.0.1:58846">
-                        <div class="form-help">Например: 127.0.0.1:58846</div>
+                        <input type="url" name="torrentAddress" x-model="options.torrentAddress" :required="options.useTorrent > 0" pattern="https?://.+">
+                        <div class="form-help">Полный адрес с протоколом, например: http://127.0.0.1:9091</div>
                     </div>
                 </label>
 
-                <label class="row">
+                <label class="row" x-show="options.torrentClient != 'Deluge'">
                     <div class="col --2:lg mb-1">Логин:</div>
                     <div class="col --5:lg mb-2">
                         <input type="text" name="torrentLogin" x-model="options.torrentLogin" placeholder="KorP">
@@ -312,6 +313,14 @@ if (file_exists($config))
                     <div class="col --5:lg mb-2">
                         <input type="text" name="pathToDownload" x-model="options.pathToDownload" :required="options.useTorrent > 0">
                         <div class="form-help">Например: /var/lib/transmission/downloads или C:/downloads</div>
+                    </div>
+                </label>
+
+                <label class="row" x-show="options.torrentClient == 'qBittorrent'">
+                    <div class="col --2:lg mb-1">Категория по умолчанию:</div>
+                    <div class="col --5:lg mb-2">
+                        <input type="text" name="qbitCategory" x-model="options.qbitCategory">
+                        <div class="form-help">Применяется если для раздачи не задана индивидуальная категория</div>
                     </div>
                 </label>
 
@@ -350,6 +359,24 @@ if (file_exists($config))
 
     <form x-show="currentTab == 'extended'" @submit.prevent="update('extended', $el)" action="action.php">
 
+        <label class="row">
+            <div class="col --2:lg mb-1">Таймаут HTTP-запросов:</div>
+            <div class="col --5:lg mb-2">
+                <input type="number" name="httpTimeout" x-model="options.httpTimeout" min="1" required>
+                <div class="form-help">В секундах. Используется при опросе трекеров и работе с торрент-клиентом.</div>
+            </div>
+        </label>
+
+        <label class="row">
+            <div class="col --2:lg mb-1">FlareSolverr / Byparr URL:</div>
+            <div class="col --5:lg mb-2">
+                <input type="url" name="flaresolverrUrl" x-model="options.flaresolverrUrl" placeholder="http://byparr:8191">
+                <div class="form-help">Адрес Byparr/FlareSolverr для обхода Cloudflare. Оставьте пустым, если не используется.</div>
+            </div>
+        </label>
+
+        <div class="form-separator mb-2"></div>
+
         <div class="row">
             <div class="col --8:lg mb-2">
                 <textarea name="settings" x-model="options.settings" cols="30" rows="20"></textarea>
@@ -362,6 +389,49 @@ if (file_exists($config))
         </div>
 
     </form>
+
+
+    <div x-show="currentTab == 'api'" x-data="{ apiKey: '<?= addslashes((string)Database::getSetting('ApiKey')) ?>' }">
+
+        <div class="row mb-2">
+            <div class="col --2:lg mb-1">API-ключ:</div>
+            <div class="col --5:lg mb-2">
+                <template x-if="apiKey">
+                    <input type="text" :value="apiKey" readonly @click="$el.select()">
+                </template>
+                <template x-if="!apiKey">
+                    <div class="form-help --error">Ключ не сгенерирован. Нажмите кнопку ниже.</div>
+                </template>
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col --2:lg"></div>
+            <div class="col">
+                <button type="button" class="btn btn--secondary" @click="let d = $data; $.post('action.php', {action:'api_token_regenerate'}, function(r){ r.error ? notyf.error(r.msg) : (d.apiKey = r.token, notyf.success(r.msg)) }, 'json')">
+                    <span x-text="apiKey ? 'Сгенерировать новый ключ' : 'Сгенерировать ключ'"></span>
+                </button>
+                <div x-show="apiKey" class="form-help mt-1">Генерация нового ключа инвалидирует старый.</div>
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col --2:lg mb-1"></div>
+            <div class="col --10:lg mb-2">
+                <div class="form-help">
+                    Авторизация: заголовок <code>Authorization: Bearer API_KEY</code><br><br>
+                    <b>GET /api/torrents</b> — список тем. Параметр: <code>?tracker=</code> (опционально).<br>
+                    <b>GET /api/torrents/{id}</b> — все поля одной темы по ID.<br>
+                    <b>POST /api/torrents</b> — добавить. Форумный трекер: <code>url</code>. RSS-трекер: <code>tracker</code> + <code>name</code> [+ <code>hd</code>: 0=SD, 1=720p, 2=1080p].<br>
+                    <b>DELETE /api/torrents/{id}</b> — удалить тему по ID.<br>
+                    <b>POST /api/run</b> — запустить движок вручную (асинхронно, возвращает 202).<br>
+                    <b>GET /api/errors</b> — список ошибок. Параметр: <code>?tracker=</code> (опционально).<br>
+                    <b>GET /api/errors/{id}</b> — ошибки конкретной темы по ID.<br>
+                    <b>POST /api/sonarr</b> — эндпоинт для добавления раздач из Sonarr. Поддерживает <code>?token=</code> и <code>?category=</code> в URL.
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 </div>

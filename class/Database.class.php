@@ -1,6 +1,7 @@
 <?php
 $dir = dirname(__FILE__)."/../";
 include_once $dir."config.php";
+include_once $dir."class/Crypto.class.php";
 
 class Database
 {
@@ -48,8 +49,7 @@ class Database
             elseif ($this->dbType == 'mysql')
                $this->dbh = new PDO($dsn, $username, $password, $options);
         } catch (PDOException $e) {
-            print 'Error!: '.$e->getMessage().'<br/>';
-            die();
+            throw new RuntimeException('DB connection failed: '.$e->getMessage(), 0, $e);
         }
     }
 
@@ -95,6 +95,27 @@ class Database
         }
     }
 
+    //Перешифровывает значение(я) колонки, если они ещё хранятся в виде, унаследованном
+    //от версии без шифрования (нет префикса Crypto::PREFIX). Используется как переходный
+    //механизм при переносе старой базы: расшифровка читает старое значение как есть,
+    //а эта функция на лету переводит его в новый зашифрованный формат при первом обращении.
+    private static function reencryptIfLegacy($table, $idColumn, $idValue, array $columns)
+    {
+        $set = array();
+        $params = array(':idval' => $idValue);
+        foreach ($columns as $column => $rawValue)
+        {
+            if ($rawValue === '' || $rawValue === NULL || Crypto::isEncrypted($rawValue))
+                continue;
+            $set[] = "`$column` = :$column";
+            $params[":$column"] = Crypto::encrypt($rawValue);
+        }
+        if (empty($set))
+            return;
+        $stmt = self::newStatement("UPDATE `$table` SET ".implode(', ', $set)." WHERE `$idColumn` = :idval");
+        $stmt->execute($params);
+    }
+
     public static function getSetting($param)
     {
         $stmt = self::newStatement("SELECT `val` FROM `settings` WHERE `key` = :param");
@@ -103,6 +124,11 @@ class Database
         {
             foreach ($stmt as $row)
             {
+                if ($param == 'torrentPassword')
+                {
+                    self::reencryptIfLegacy('settings', 'key', $param, array('val' => $row['val']));
+                    return Crypto::decrypt($row['val']);
+                }
                 return $row['val'];
             }
         }
@@ -115,7 +141,13 @@ class Database
         {
             foreach ($stmt as $row)
             {
-                $resultArray[] = array("{$row['key']}" => "{$row['val']}");
+                $val = $row['val'];
+                if ($row['key'] == 'torrentPassword')
+                {
+                    self::reencryptIfLegacy('settings', 'key', $row['key'], array('val' => $val));
+                    $val = Crypto::decrypt($val);
+                }
+                $resultArray[] = array("{$row['key']}" => "{$val}");
             }
             if ( ! empty($resultArray))
                 return $resultArray;
@@ -154,8 +186,27 @@ class Database
         }
     }
 
+    public static function getTorrentCategory($id)
+    {
+        $stmt = self::newStatement("SELECT `category` FROM `torrent` WHERE `id` = :id");
+        $stmt->bindParam(':id', $id);
+        if ($stmt->execute())
+            foreach ($stmt as $row)
+                return (string)$row['category'];
+        return '';
+    }
+
+    public static function getDistinctCategories()
+    {
+        $stmt = self::newStatement("SELECT DISTINCT `category` FROM `torrent` WHERE `category` != '' ORDER BY `category`");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_COLUMN, 0) ?: array();
+    }
+
     public static function updateSettings($setting, $val)
     {
+        if ($setting == 'torrentPassword')
+            $val = Crypto::encrypt($val);
         $stmt = self::newStatement("UPDATE `settings` SET `val` = :val WHERE `key` = :setting");
         $stmt->bindParam(':setting', $setting);
         $stmt->bindParam(':val', $val);
@@ -212,9 +263,10 @@ class Database
             {
                 if ($row['log'] != "" && $row['pass'] != "")
                 {
+                    self::reencryptIfLegacy('credentials', 'tracker', $tracker, array('pass' => $row['pass'], 'passkey' => $row['passkey']));
                     $resultArray['login'] = $row['log'];
-                    $resultArray['password'] = $row['pass'];
-                    $resultArray['passkey'] = $row['passkey'];
+                    $resultArray['password'] = Crypto::decrypt($row['pass']);
+                    $resultArray['passkey'] = Crypto::decrypt($row['passkey']);
                 }
                 else
                     return FALSE;
@@ -232,11 +284,12 @@ class Database
             $i = 0;
             foreach ($stmt as $row)
             {
+                self::reencryptIfLegacy('credentials', 'tracker', $row['tracker'], array('pass' => $row['pass'], 'passkey' => $row['passkey']));
                 $resultArray[$i]['id'] = $row['id'];
                 $resultArray[$i]['tracker'] = $row['tracker'];
                 $resultArray[$i]['login'] = $row['log'];
-                $resultArray[$i]['password'] = $row['pass'];
-                $resultArray[$i]['passkey'] = $row['passkey'];
+                $resultArray[$i]['password'] = Crypto::decrypt($row['pass']);
+                $resultArray[$i]['passkey'] = Crypto::decrypt($row['passkey']);
                 $resultArray[$i]['necessarily'] = $row['necessarily'];
                 $i++;
             }
@@ -273,6 +326,8 @@ class Database
 
     public static function setCredentials($id, $login, $password, $passkey)
     {
+        $password = Crypto::encrypt($password);
+        $passkey = Crypto::encrypt($passkey);
         $stmt = self::newStatement("UPDATE `credentials` SET `log` = :login, `pass` = :password, `passkey` = :passkey WHERE `id` = :id");
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':login', $login);
@@ -397,7 +452,7 @@ class Database
 
     public static function getTorrent($id)
     {
-        $stmt = self::newStatement("SELECT `id`, `tracker`, `name`, `hd`, `path`, `torrent_id`, `auto_update`, `script`, `pause`, `closed` FROM `torrent` WHERE `id` = :id");
+        $stmt = self::newStatement("SELECT `id`, `tracker`, `name`, `hd`, `path`, `torrent_id`, `auto_update`, `script`, `pause`, `closed`, `hash`, `category` FROM `torrent` WHERE `id` = :id");
         $stmt->bindParam(':id', $id);
         if ($stmt->execute())
         {
@@ -414,10 +469,43 @@ class Database
                 $resultArray[$i]['script'] = $row['script'];
                 $resultArray[$i]['pause'] = $row['pause'];
                 $resultArray[$i]['closed'] = $row['closed'];
+                $resultArray[$i]['hash'] = $row['hash'];
+                $resultArray[$i]['category'] = $row['category'];
+                $i++;
             }
             if ( ! empty($resultArray))
                 return $resultArray;
         }
+    }
+
+    public static function getTorrentFull($id)
+    {
+        $stmt = self::newStatement("SELECT `id`, `tracker`, `name`, `hd`, `path`, `torrent_id`, `ep`, `timestamp`, `auto_update`, `script`, `pause`, `closed`, `hash`, `error`, `category` FROM `torrent` WHERE `id` = :id");
+        $stmt->bindParam(':id', $id);
+        if ($stmt->execute())
+        {
+            foreach ($stmt as $row)
+            {
+                return [
+                    'id'          => (int)$row['id'],
+                    'tracker'     => $row['tracker'],
+                    'name'        => $row['name'],
+                    'hd'          => (int)$row['hd'],
+                    'path'        => $row['path'],
+                    'torrent_id'  => $row['torrent_id'],
+                    'ep'          => $row['ep'],
+                    'timestamp'   => $row['timestamp'],
+                    'auto_update' => (int)$row['auto_update'],
+                    'script'      => $row['script'],
+                    'pause'       => (int)$row['pause'],
+                    'closed'      => (int)$row['closed'],
+                    'hash'        => $row['hash'],
+                    'error'       => (int)$row['error'],
+                    'category'    => $row['category'],
+                ];
+            }
+        }
+        return null;
     }
 
     public static function getUserToWatch()
@@ -497,9 +585,14 @@ class Database
                 {
                     $stmt = self::newStatement("INSERT INTO buffer (user_id, section, threme_id, threme, timestamp, tracker) VALUES (:user_id, :section, :threme_id, :threme, :timestamp, :tracker)");
                     $stmt->bindParam(':user_id', $user_id);
+                    //section/threme приходят регэкспом из сырого HTML страницы трекера и могут
+                    //содержать HTML-сущности (&#039; и т.п.) — раскодируем их здесь, до
+                    //htmlspecialchars() на выводе, иначе получим двойное кодирование
+                    $section = html_entity_decode($section, ENT_QUOTES, 'UTF-8');
                     $stmt->bindParam(':section', $section);
                     $stmt->bindParam(':threme_id', $threme_id);
                     $threme = preg_replace('/<wbr>/', '', $threme);
+                    $threme = html_entity_decode($threme, ENT_QUOTES, 'UTF-8');
                     $stmt->bindParam(':threme', $threme);
                     $stmt->bindParam(':timestamp', $timestamp);
                     $stmt->bindParam(':tracker', $tracker);
@@ -524,9 +617,11 @@ class Database
             foreach ($stmt as $row)
             {
                 $resultArray[$i]['id'] = $row['id'];
-                $resultArray[$i]['section'] = $row['section'];
+                //html_entity_decode на случай записей, сохранённых до фикса парсинга
+                //заголовков (старые строки могли остаться с необработанной сущностью)
+                $resultArray[$i]['section'] = html_entity_decode($row['section'], ENT_QUOTES, 'UTF-8');
                 $resultArray[$i]['threme_id'] = $row['threme_id'];
-                $resultArray[$i]['threme'] = $row['threme'];
+                $resultArray[$i]['threme'] = html_entity_decode($row['threme'], ENT_QUOTES, 'UTF-8');
                 $resultArray[$i]['timestamp'] = $row['timestamp'];
                 $resultArray[$i]['tracker'] = $row['tracker'];
                 $i++;
@@ -663,27 +758,29 @@ class Database
         }
     }
 
-    public static function setSerial($tracker, $name, $path, $hd=FALSE)
+    public static function setSerial($tracker, $name, $path, $hd=FALSE, $category = '')
     {
-        $stmt = self::newStatement("INSERT INTO `torrent` (`tracker`, `name`, `path`, `hd`) VALUES (:tracker, :name, :path, :hd)");
+        $stmt = self::newStatement("INSERT INTO `torrent` (`tracker`, `name`, `path`, `hd`, `category`) VALUES (:tracker, :name, :path, :hd, :category)");
         $stmt->bindParam(':tracker', $tracker);
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':path', $path);
         $stmt->bindParam(':hd', $hd);
+        $stmt->bindParam(':category', $category);
         if ($stmt->execute())
             return TRUE;
         else
             return FALSE;
     }
 
-    public static function setThreme($tracker, $name, $path, $threme, $update_header)
+    public static function setThreme($tracker, $name, $path, $threme, $update_header, $category = '')
     {
-        $stmt = self::newStatement("INSERT INTO `torrent` (`tracker`, `name`, `path`, `torrent_id`, `auto_update`) VALUES (:tracker, :name, :path, :threme, :update_header)");
+        $stmt = self::newStatement("INSERT INTO `torrent` (`tracker`, `name`, `path`, `torrent_id`, `auto_update`, `category`) VALUES (:tracker, :name, :path, :threme, :update_header, :category)");
         $stmt->bindParam(':tracker', $tracker);
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':path', $path);
         $stmt->bindParam(':threme', $threme);
         $stmt->bindParam(':update_header', $update_header);
+        $stmt->bindParam(':category', $category);
         if ($stmt->execute())
             return TRUE;
         else
@@ -741,9 +838,9 @@ class Database
             return FALSE;
     }
 
-    public static function updateThreme($id, $name, $path, $threme, $update, $reset, $script, $pause)
+    public static function updateThreme($id, $name, $path, $threme, $update, $reset, $script, $pause, $category = '')
     {
-        $stmt = self::newStatement("UPDATE `torrent` SET `name` = :name, `path` = :path, `torrent_id` = :torrent_id, `auto_update`= :auto_update, `script` = :script, `pause` = :pause WHERE `id` = :id");
+        $stmt = self::newStatement("UPDATE `torrent` SET `name` = :name, `path` = :path, `torrent_id` = :torrent_id, `auto_update`= :auto_update, `script` = :script, `pause` = :pause, `category` = :category WHERE `id` = :id");
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':path', $path);
         $stmt->bindParam(':script', $script);
@@ -751,6 +848,7 @@ class Database
 	    $stmt->bindParam(':auto_update', $update);
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':pause', $pause);
+        $stmt->bindParam(':category', $category);
         $stmt->execute();
 
         if ($reset)
@@ -887,6 +985,61 @@ class Database
         }
     }
 
+    public static function getAllWarningsList()
+    {
+        if (Database::getDbType() == 'pgsql')
+        {
+            $stmt = Database::getInstance()->dbh->prepare("SELECT \"time\", \"reason\", \"where\", \"t_id\" FROM warning ORDER BY time DESC");
+        }
+        else
+        {
+            $stmt = Database::getInstance()->dbh->prepare("SELECT `time`, `reason`, `where`, `t_id` FROM `warning` ORDER BY `time` DESC");
+        }
+        if ($stmt->execute())
+        {
+            $i = 0;
+            foreach ($stmt as $row)
+            {
+                $resultArray[$i]['time']    = $row['time'];
+                $resultArray[$i]['reason']  = $row['reason'];
+                $resultArray[$i]['tracker'] = $row['where'];
+                $resultArray[$i]['id']      = $row['t_id'];
+                $i++;
+            }
+            if ( ! empty($resultArray))
+                return $resultArray;
+        }
+        return [];
+    }
+
+    public static function getWarningsByTorrentId($torrentId)
+    {
+        if (Database::getDbType() == 'pgsql')
+        {
+            $stmt = Database::getInstance()->dbh->prepare("SELECT \"time\", \"reason\", \"where\", \"t_id\" FROM warning WHERE \"t_id\" = :id ORDER BY time DESC");
+        }
+        else
+        {
+            $stmt = Database::getInstance()->dbh->prepare("SELECT `time`, `reason`, `where`, `t_id` FROM `warning` WHERE `t_id` = :id ORDER BY `time` DESC");
+        }
+        $stmt->bindParam(':id', $torrentId);
+        if ($stmt->execute())
+        {
+            $i = 0;
+            foreach ($stmt as $row)
+            {
+                $resultArray[$i]['time']    = $row['time'];
+                $resultArray[$i]['reason']  = $row['reason'];
+                $resultArray[$i]['tracker'] = $row['where'];
+                $resultArray[$i]['id']      = $row['t_id'];
+                $i++;
+            }
+            if ( ! empty($resultArray))
+                return $resultArray;
+        }
+        return [];
+    }
+
     public static function setWarnings($date, $tracker, $message, $id)
     {
         $stmt = self::newStatement("INSERT INTO `warning` (`time`, `where`, `reason`, `t_id`) VALUES (:date, :tracker, :message, :id)");
@@ -922,6 +1075,48 @@ class Database
             return FALSE;
     }
 
+    //пакетное обновление строк `torrent` одной транзакцией
+    //$updates = [ $id => ['timestamp'=>..., 'name'=>..., 'ep'=>..., 'error'=>0, 'closed'=>0], ... ]
+    //присутствуют только реально изменившиеся колонки для данной строки
+    public static function batchUpdateTorrents(array $updates)
+    {
+        if (empty($updates))
+            return;
+
+        $allowedColumns = array('timestamp', 'name', 'ep', 'error', 'closed');
+        $dbh = self::getInstance()->dbh;
+
+        $dbh->beginTransaction();
+        try
+        {
+            foreach ($updates as $id => $fields)
+            {
+                $set = array();
+                $params = array(':id' => $id);
+                foreach ($fields as $column => $value)
+                {
+                    if ( ! in_array($column, $allowedColumns, true))
+                        continue;
+
+                    $set[] = "`$column` = :$column";
+                    $params[":$column"] = $value;
+                }
+
+                if (empty($set))
+                    continue;
+
+                $stmt = self::newStatement("UPDATE `torrent` SET ".implode(', ', $set)." WHERE `id` = :id");
+                if ( ! $stmt->execute($params))
+                    throw new PDOException('batchUpdateTorrents: failed to update torrent id '.$id);
+            }
+            $dbh->commit();
+        }
+        catch (PDOException $e)
+        {
+            $dbh->rollBack();
+        }
+    }
+
 
     public static function clearWarnings($tracker)
     {
@@ -941,7 +1136,8 @@ class Database
         {
             foreach ($stmt as $row)
             {
-                return $row['cookie'];
+                self::reencryptIfLegacy('credentials', 'tracker', $tracker, array('cookie' => $row['cookie']));
+                return Crypto::decrypt($row['cookie']);
             }
             return NULL;
         }
@@ -950,6 +1146,7 @@ class Database
     public static function setCookie($tracker, $cookie)
     {
         $stmt = self::newStatement("UPDATE `credentials` SET `cookie` = :cookie WHERE `tracker` = :tracker");
+        $cookie = Crypto::encrypt($cookie);
         $stmt->bindParam(':cookie', $cookie);
         $stmt->bindParam(':tracker', $tracker);
         if ($stmt->execute())
@@ -1129,6 +1326,10 @@ class Database
 
     public static function getProxy()
     {
+        static $cache = null;
+        if ($cache !== null)
+            return $cache;
+
         $stmt = self::newStatement("SELECT `key`, `val` FROM `settings` WHERE `key` LIKE 'proxy%' ORDER BY `id`");
         if ($stmt->execute())
         {
@@ -1140,7 +1341,7 @@ class Database
                 $i++;
             }
             if ( ! empty($resultArray))
-                return $resultArray;
+                return $cache = $resultArray;
         }
         else
             return $stmt->errorInfo();

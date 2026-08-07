@@ -16,7 +16,9 @@ class Transmission
 
     	try
     	{
-            $rpc = new TransmissionRPC('http://'.$torrentAddress.'/transmission/rpc', $torrentLogin, $torrentPassword);
+            if (!preg_match('~^https?://~i', $torrentAddress))
+                $torrentAddress = 'http://'.$torrentAddress;
+            $rpc = new TransmissionRPC($torrentAddress.'/transmission/rpc', $torrentLogin, $torrentPassword);
             if ($debug)
         	    $rpc->debug=true;
         	$result = $rpc->sstats();
@@ -104,6 +106,49 @@ class Transmission
             }
         }
     	return $return;
+    }
+
+    #удаляем раздачу из torrent-клиента (без добавления новой)
+    public static function remove($hash)
+    {
+        $settings = Database::getAllSetting();
+        foreach ($settings as $row)
+        {
+            extract($row);
+        }
+
+        try
+        {
+            if (!preg_match('~^https?://~i', $torrentAddress))
+                $torrentAddress = 'http://'.$torrentAddress;
+            $rpc = new TransmissionRPC($torrentAddress.'/transmission/rpc', $torrentLogin, $torrentPassword);
+            if ($debug)
+                $rpc->debug = true;
+            $delOpt = ! empty($deleteOldFiles) ? 'true' : 'false';
+            $rpc->remove($hash, $delOpt);
+
+            Database::clearWarnings('Transmission');
+            $return['status'] = TRUE;
+        }
+        catch (Exception $e)
+        {
+            if (preg_match('/Invalid username\/password\./', $e->getMessage()))
+            {
+                $return['status'] = FALSE;
+                $return['msg'] = 'log_passwd';
+            }
+            elseif (preg_match('/Unable to connect to/U', $e->getMessage()))
+            {
+                $return['status'] = FALSE;
+                $return['msg'] = 'connect_fail';
+            }
+            else
+            {
+                $return['status'] = FALSE;
+                $return['msg'] = 'unknown';
+            }
+        }
+        return $return;
     }
 }
 ?>

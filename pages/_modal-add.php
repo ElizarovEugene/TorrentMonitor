@@ -1,3 +1,7 @@
+<?php
+$_tmTorrentClient = Database::getSetting('torrentClient');
+$_tmCategories    = Database::getDistinctCategories();
+?>
 <div class="modal__backdrop"
     x-data="add"
     x-show="modalAdd"
@@ -35,6 +39,18 @@
                     <div class="col --12 mb-2">
                         <input type="text" name="path" x-model="theme.path">
                         <div class="form-help">Например: /var/lib/transmission/downloads или C:/downloads/</div>
+                    </div>
+                </label>
+                <label class="row" x-show="$store.tmApp.torrentClient === 'qBittorrent'">
+                    <div class="col --12 mb-1">Категория qBittorrent:</div>
+                    <div class="col --12 mb-2">
+                        <input type="text" name="category" x-model="theme.category" list="qbit-category-list">
+                        <datalist id="qbit-category-list">
+                            <?php foreach ($_tmCategories as $cat): ?>
+                            <option value="<?= htmlspecialchars($cat, ENT_QUOTES) ?>">
+                            <?php endforeach; ?>
+                        </datalist>
+                        <div class="form-help">Не обязательно</div>
                     </div>
                 </label>
                 <label class="row" @click="theme.update_header = !theme.update_header">
@@ -109,9 +125,16 @@
 
                 <label class="row">
                     <div class="col --12 mb-1">Директория для скачивания:</div>
-                    <div class="col --12">
+                    <div class="col --12 mb-2">
                         <input type="text" name="path" x-model="series.path">
                         <div class="form-help">Например: /var/lib/transmission/downloads или C:/downloads</div>
+                    </div>
+                </label>
+                <label class="row" x-show="$store.tmApp.torrentClient === 'qBittorrent'">
+                    <div class="col --12 mb-1">Категория qBittorrent:</div>
+                    <div class="col --12">
+                        <input type="text" name="category" x-model="series.category" list="qbit-category-list">
+                        <div class="form-help">Не обязательно</div>
                     </div>
                 </label>
             </div>

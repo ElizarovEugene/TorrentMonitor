@@ -29,6 +29,14 @@ class Errors
         Errors::write('update_fail', 'Невозможно обновить систему.');
     	Errors::write('update_news', 'Невозможно проверить новости.');
 
+        Errors::write('api_invalid_token',   'API: получен запрос с неверным токеном.');
+        Errors::write('api_bad_event_type',  'API: получен неподдерживаемый тип события.');
+        Errors::write('api_no_download_id',  'API: событие Grab не содержит downloadId.');
+        Errors::write('api_qbit_fail',       'API: не удалось получить данные из qBittorrent.');
+        Errors::write('api_bad_url',         'API: поле comment торрента не содержит корректного URL.');
+        Errors::write('api_no_credentials',  'API: нет учётных данных для трекера в TM.');
+        Errors::write('api_already_tracked', 'API: тема уже отслеживается в TM.');
+
     	Errors::write('404', 'Не удалось добавить в torrent-клиент, неверная ссылка на torrent-файл.');
     	Errors::write('log_passwd', 'Не удалось подключиться к torrent-клиенту, неправильный логин или пароль.');
     	Errors::write('connect_fail', 'Не удалось подключиться к torrent-клиенту. Клиент  недоступен по указанному адресу.');
@@ -70,7 +78,7 @@ class Errors
         $debug = Database::getSetting('debug');
     	Database::setWarnings($date, $tracker, $warning, $id);
     	if ($debug)
-    	    echo '<br>'."\r\n".$warning.'<br>'."\r\n";
+    	    echo '<br>'."\r\n".$tracker.': '.$warning.'<br>'."\r\n";
 		if ($id != NULL)
 			Database::setErrorToThreme($id, 1);
     	$countErrors = Database::getWarningsCount($tracker);

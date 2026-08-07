@@ -18,7 +18,7 @@ class rutracker
         		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
         	)
         );
-        
+
 		if (preg_match('/profile\.php\?mode=viewprofile/', $result))
 			return TRUE;
 		else
@@ -135,10 +135,10 @@ class rutracker
 		}
 	}
 
-	//основная функция
-	public static function main($params)
+	//формируем параметры "проверочного" запроса для curl_multi (резолв куки последовательный, как и раньше)
+	public static function getRequestParams($params)
 	{
-    	extract($params);
+		extract($params);
 		$cookie = Database::getCookie($tracker);
 		if (rutracker::checkCookie($cookie))
 		{
@@ -149,86 +149,97 @@ class rutracker
 		else
     		rutracker::getCookie($tracker);
 
-		if (rutracker::$exucution)
+		if ( ! rutracker::$exucution)
 		{
-			//получаем страницу для парсинга
-            $page = Sys::getUrlContent(
-            	array(
-            		'type'           => 'POST',
-            		'header'         => 0,
-            		'returntransfer' => 1,
-            		'url'            => 'https://rutracker.org/forum/viewtopic.php?t='.$torrent_id,
-            		'cookie'         => rutracker::$sess_cookie,
-            		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen(rutracker::$sess_cookie)),
-            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
-            	)
-            );
+			rutracker::$warning = NULL;
+			return array('url' => NULL);
+		}
 
-			if ( ! empty($page))
+		$url = 'https://rutracker.org/forum/viewtopic.php?t='.$torrent_id;
+
+		$options = array(
+			CURLOPT_POST   => 1,
+			CURLOPT_COOKIE => rutracker::$sess_cookie,
+		);
+
+		if (Sys::checkCurlVersion() == 'old')
+		{
+			$header = array();
+			foreach (array('Host' => 'rutracker.org', 'Content-length' => strlen(rutracker::$sess_cookie)) as $k => $v)
+				$header[] = $k.': '.$v."\r\n";
+			$options[CURLOPT_HTTPHEADER] = $header;
+		}
+
+		return array(
+			'url'     => $url,
+			'options' => $options + Sys::getProxyOptions($url),
+		);
+	}
+
+	//разбираем полученную страницу, возвращаем изменения для batchUpdateTorrents или null
+	public static function parse($params, $page)
+	{
+		extract($params);
+		$return = NULL;
+
+		$page = iconv('windows-1251', 'utf-8//IGNORE', $page);
+
+		if ( ! empty($page))
+		{
+			//ищем на странице дату регистрации торрента
+			if (preg_match('/<td style=\"width: 70%; padding: 5px;\">\n\t{2}<ul class=\"inlined middot-separated\">\n\t{3}<li>(.*)<\/li>/', $page, $array))
 			{
-				//ищем на странице дату регистрации торрента
-				if (preg_match('/<td style=\"width: 70%; padding: 5px;\">\n\t{2}<ul class=\"inlined middot-separated\">\n\t{3}<li>(.*)<\/li>/', $page, $array))
+				//проверяем удалось ли получить дату со страницы
+				if (isset($array[1]))
 				{
-					//проверяем удалось ли получить дату со страницы
-					if (isset($array[1]))
+					//если дата не равна ничему
+					if ( ! empty($array[1]))
 					{
-						//если дата не равна ничему
-						if ( ! empty($array[1]))
+						//сбрасываем варнинг
+						Database::clearWarnings($tracker);
+						//приводим дату к общему виду
+						$date = rutracker::dateStringToNum($array[1]);
+						$date_str = rutracker::dateNumToString($array[1]);
+						$return = array($id => array('error' => 0));
+						//если даты не совпадают, перекачиваем торрент
+						if ($date != $timestamp)
 						{
-							//сбрасываем варнинг
-							Database::clearWarnings($tracker);
-							//приводим дату к общему виду
-							$date = rutracker::dateStringToNum($array[1]);
-							$date_str = rutracker::dateNumToString($array[1]);
-							//если даты не совпадают, перекачиваем торрент
-							if ($date != $timestamp)
-							{
-								//сохраняем торрент в файл
-                                $torrent = Sys::getUrlContent(
-                                	array(
-                                		'type'           => 'POST',
-                                		'returntransfer' => 1,
-                                		'url'            => 'https://rutracker.org/forum/dl.php?t='.$torrent_id,
-                                		'cookie'         => rutracker::$sess_cookie.'; bb_dl='.$torrent_id,
-                                		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen(rutracker::$sess_cookie.'; bb_dl='.$torrent_id)),
-                                		'referer'        => 'https://rutracker.org/forum/viewtopic.php?t='.$torrent_id,
-                                	)
-                                );
-                                
-                                if (Sys::checkTorrentFile($torrent))
-                                {
-    								if ($auto_update)
-    								{
-    								    $name = Sys::parseHeader($tracker, $page);
-    								    //обновляем заголовок торрента в базе
-                                        Database::setNewName($id, $name);
-    								}
-    
-    								$message = $name.' обновлён.';
-    								$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
-    								
-    								//обновляем время регистрации торрента в базе
-    								Database::setNewDate($id, $date);
-									//сбрасываем варнинг
-									Database::clearWarnings($tracker);
-    								Database::setErrorToThreme($id, 0);
-    								Database::setClosedThreme($id, 0);
-                                }
-                                else
-                                    Errors::setWarnings($tracker, 'torrent_file_fail', $id);
-							}
-							Database::setErrorToThreme($id, 0);
-						}
-						else
-						{
-							//устанавливаем варнинг
-							if (rutracker::$warning == NULL)
-							{
-								rutracker::$warning = TRUE;
-								Errors::setWarnings($tracker, 'cant_find_date', $id);
-							}
-							//останавливаем процесс выполнения, т.к. не может работать без кук
-							rutracker::$exucution = FALSE;
+							//сохраняем торрент в файл
+                            $torrent = Sys::getUrlContent(
+                            	array(
+                            		'type'           => 'POST',
+                            		'returntransfer' => 1,
+                            		'url'            => 'https://rutracker.org/forum/dl.php?t='.$torrent_id,
+                            		'cookie'         => rutracker::$sess_cookie.'; bb_dl='.$torrent_id,
+                            		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen(rutracker::$sess_cookie.'; bb_dl='.$torrent_id)),
+                            		'referer'        => 'https://rutracker.org/forum/viewtopic.php?t='.$torrent_id,
+                            	)
+                            );
+
+                            if (Sys::checkTorrentFile($torrent))
+                            {
+								if ($auto_update)
+								    $name = Sys::parseHeader($tracker, $page);
+
+								$message = $name.' обновлён.';
+								$saved = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
+
+								if ($saved)
+								{
+								    if ($auto_update)
+								        //обновляем заголовок торрента в базе
+								        $return[$id]['name'] = $name;
+								    //обновляем время регистрации торрента в базе
+								    $return[$id]['timestamp'] = $date;
+								    //сбрасываем варнинг
+								    Database::clearWarnings($tracker);
+								    $return[$id]['closed'] = 0;
+								}
+								else
+								    Errors::setWarnings($tracker, 'save_file_fail', $id);
+                            }
+                            else
+                                Errors::setWarnings($tracker, 'torrent_file_fail', $id);
 						}
 					}
 					else
@@ -261,13 +272,26 @@ class rutracker
 				if (rutracker::$warning == NULL)
 				{
 					rutracker::$warning = TRUE;
-					Errors::setWarnings($tracker, 'cant_get_forum_page', $id);
+					Errors::setWarnings($tracker, 'cant_find_date', $id);
 				}
 				//останавливаем процесс выполнения, т.к. не может работать без кук
 				rutracker::$exucution = FALSE;
 			}
 		}
+		else
+		{
+			//устанавливаем варнинг
+			if (rutracker::$warning == NULL)
+			{
+				rutracker::$warning = TRUE;
+				Errors::setWarnings($tracker, 'cant_get_forum_page', $id);
+			}
+			//останавливаем процесс выполнения, т.к. не может работать без кук
+			rutracker::$exucution = FALSE;
+		}
+
 		rutracker::$warning = NULL;
+		return $return;
 	}
 }
 ?>

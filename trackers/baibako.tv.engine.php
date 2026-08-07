@@ -4,8 +4,8 @@ class baibako
     protected static $sess_cookie;
 	protected static $exucution;
 	protected static $warning;
-	
-	protected static $page;	
+
+	protected static $page;
 	protected static $log_page;
 	protected static $xml_page;
 
@@ -26,16 +26,16 @@ class baibako
 		if (preg_match('/<a href=\"logout\.php\">Выход<\/a>/U', $result))
 			return TRUE;
 		else
-			return FALSE;		  
+			return FALSE;
 	}
-	
+
 	//функция преобразования даты
 	private static function dateNumToString($data)
 	{
 		$data = substr($data, 0, -3);
 		$data = str_replace('-', ' ', $data);
 		$arr = preg_split('/\s/', $data);
-		
+
 		$month = Sys::dateNumToString($arr[1]);
 		$date = $arr[2].' '.$month.' '.$arr[0].' '.$arr[3];
 		return $date;
@@ -58,11 +58,11 @@ class baibako
 			$new = explode('e', $str);
 			$new_ep = explode('-', $new[1]);
 			$episode = $new_ep[1];
-			
+
 			return array('episode'=>$episode, 'date'=>$item->pubDate, 'link'=>(string)$item->link);
 		}
 	}
-	
+
 	//функция анализа xml ленты
 	private static function analysis($name, $hd, $item)
 	{
@@ -96,7 +96,7 @@ class baibako
 			$credentials = Database::getCredentials($tracker);
 			$login = iconv('utf-8', 'windows-1251', $credentials['login']);
 			$password = $credentials['password'];
-			
+
 			$page = Sys::getUrlContent(
             	array(
             		'type'           => 'POST',
@@ -171,86 +171,94 @@ class baibako
 				Errors::setWarnings($tracker, 'credential_miss');
 			}
 			//останавливаем выполнение цепочки
-			baibako::$exucution = FALSE;						
-		}	
+			baibako::$exucution = FALSE;
+		}
 	}
-	
-	//основная функция
-	public static function main($params)
+
+	//формируем параметры "проверочного" запроса для curl_multi (резолв куки последовательный, как и раньше)
+	public static function getRequestParams($params)
 	{
         extract($params);
-		//проверяем небыло ли до этого уже ошибок
-		if (empty(baibako::$exucution) || (baibako::$exucution))
+		$cookie = Database::getCookie($tracker);
+		if (baibako::checkCookie($cookie))
 		{
-			//проверяем получена ли уже кука
-			if (empty(baibako::$sess_cookie))
-			{
-        		$cookie = Database::getCookie($tracker);
-        		if (baibako::checkCookie($cookie))
-        		{
-        			baibako::$sess_cookie = $cookie;
-        			//запускам процесс выполнения
-        			baibako::$exucution = TRUE;
-        		}			
-        		else
-                    baibako::getCookie($tracker);
-			}
+			baibako::$sess_cookie = $cookie;
+			//запускам процесс выполнения
+			baibako::$exucution = TRUE;
+		}
+		else
+            baibako::getCookie($tracker);
 
-			//проверяем получена ли уже RSS лента
-			if ( ! baibako::$log_page)
-			{
-				if (baibako::$exucution)
-				{
-    				$credentials = Database::getCredentials('baibako.tv');
-					//получаем страницу
-			        $page_xml = Sys::getUrlContent(
-			        	array(
-			        		'type'           => 'POST',
-			        		'returntransfer' => 1,
-			        		'url'            => 'http://baibako.tv/rss2.php?feed=dl&passkey='.$credentials['passkey'],
-			        		'cookie'         => baibako::$sess_cookie,
-                            'sendHeader'     => array('Host' => 'baibako.tv', 'Content-length' => strlen(baibako::$sess_cookie)),
-                            'convert'        => array('windows-1251', 'utf-8//IGNORE'),
-			        	)
-			        );
+		if ( ! baibako::$exucution)
+		{
+			baibako::$warning = NULL;
+			return array('url' => NULL);
+		}
 
-                    $page_xml = str_replace('<?xml version="1.0" encoding="windows-1251" ?>','<?xml version="1.0" encoding="utf-8"?>', $page_xml);
-                    
-					if ( ! empty($page_xml))
-					{
-					    $xml_page = str_replace(array("&amp;", "&"), array("&", "&amp;"), $page_xml);
-						//читаем xml
-						baibako::$xml_page = @simplexml_load_string($xml_page);
-						//если XML пришёл с ошибками - останавливаем выполнение, иначе - ставим флажок, что получаем страницу
-						if ( ! baibako::$xml_page)
-						{
-							//устанавливаем варнинг
-        					if (baibako::$warning == NULL)
-                			{
-                				baibako::$warning = TRUE;
-                				Errors::setWarnings($tracker, 'rss_parse_false');
-                			}
-							//останавливаем выполнение цепочки
-							baibako::$exucution = FALSE;
-						}
-						else
-							baibako::$log_page = TRUE;
-                    }
-					else
-					{
-						//устанавливаем варнинг
-    					if (baibako::$warning == NULL)
-            			{
-            				baibako::$warning = TRUE;
-            				Errors::setWarnings($tracker, 'cant_find_rss');
-            			}
-						//останавливаем выполнение цепочки
-						baibako::$exucution = FALSE;
-					}
-				}
+		$credentials = Database::getCredentials('baibako.tv');
+		$url = 'http://baibako.tv/rss2.php?feed=dl&passkey='.$credentials['passkey'];
+
+		$options = array(
+			CURLOPT_POST   => 1,
+			CURLOPT_COOKIE => baibako::$sess_cookie,
+		);
+
+		if (Sys::checkCurlVersion() == 'old')
+		{
+			$header = array();
+			foreach (array('Host' => 'baibako.tv', 'Content-length' => strlen(baibako::$sess_cookie)) as $k => $v)
+				$header[] = $k.': '.$v."\r\n";
+			$options[CURLOPT_HTTPHEADER] = $header;
+		}
+
+		return array(
+			'url'     => $url,
+			'options' => $options + Sys::getProxyOptions($url),
+		);
+	}
+
+	//разбираем полученную страницу, возвращаем изменения для batchUpdateTorrents или null
+	public static function parse($params, $page_xml)
+	{
+        extract($params);
+		$return = NULL;
+
+		$page_xml = iconv('windows-1251', 'utf-8//IGNORE', $page_xml);
+
+        $page_xml = str_replace('<?xml version="1.0" encoding="windows-1251" ?>','<?xml version="1.0" encoding="utf-8"?>', $page_xml);
+
+		if ( ! empty($page_xml))
+		{
+		    $xml_page = str_replace(array("&amp;", "&"), array("&", "&amp;"), $page_xml);
+			//читаем xml
+			baibako::$xml_page = @simplexml_load_string($xml_page);
+			//если XML пришёл с ошибками - останавливаем выполнение, иначе - ставим флажок, что получаем страницу
+			if ( ! baibako::$xml_page)
+			{
+				//устанавливаем варнинг
+				if (baibako::$warning == NULL)
+    			{
+    				baibako::$warning = TRUE;
+    				Errors::setWarnings($tracker, 'rss_parse_false');
+    			}
+				//останавливаем выполнение цепочки
+				baibako::$exucution = FALSE;
 			}
+			else
+				baibako::$log_page = TRUE;
         }
-        
+		else
+		{
+			//устанавливаем варнинг
+			if (baibako::$warning == NULL)
+			{
+				baibako::$warning = TRUE;
+				Errors::setWarnings($tracker, 'cant_find_rss');
+			}
+			//останавливаем выполнение цепочки
+			baibako::$exucution = FALSE;
+		}
+
 		//если выполнение цепочки не остановлено
 		if (baibako::$exucution)
 		{
@@ -263,7 +271,7 @@ class baibako
 				{
 				    array_unshift($nodes, $item);
 				}
-				
+
 				foreach ($nodes as $item)
 				{
 					$serial = baibako::analysis($name, $hd, $item);
@@ -272,7 +280,7 @@ class baibako
 						$episode = substr($serial['episode'], 4, 2);
 						$season = substr($serial['episode'], 1, 2);
 						$date_str = baibako::dateNumToString($serial['date']);
-						
+
 						if ( ! empty($ep))
 						{
 							if ($season == substr($ep, 1, 2) && $episode > substr($ep, 4, 2))
@@ -300,19 +308,26 @@ class baibako
 									'sendHeader'     => array('Host' => 'baibako.tv', 'Content-length' => strlen(baibako::$sess_cookie)),
 								)
 							);
-							
+
 							if (Sys::checkTorrentFile($torrent))
-                            {					
+                            {
     							$file = str_replace(' ', '.', $name).'.S'.$season.'E'.$episode.'.'.$amp;
     							$episode = (substr($episode, 0, 1) == 0) ? substr($episode, 1, 1) : $episode;
     							$season = (substr($season, 0, 1) == 0) ? substr($season, 1, 1) : $season;
     							$message = $name.' '.$amp.' обновлён до '.$episode.' серии, '.$season.' сезона.';
-    							$status = Sys::saveTorrent($tracker, $file, $torrent, $id, $hash, $message, $date_str, $name);
-    								
-    							//обновляем время регистрации торрента в базе
-    							Database::setNewDate($id, $serial['date']);
-    							//обновляем сведения о последнем эпизоде
-    							Database::setNewEpisode($id, $serial['episode']);
+    							$saved = Sys::saveTorrent($tracker, $file, $torrent, $id, $hash, $message, $date_str, $name);
+
+    							if ($saved)
+    							{
+    							    //обновляем время регистрации торрента в базе
+    							    if ( ! isset($return[$id]))
+    							        $return[$id] = array();
+    							    $return[$id]['timestamp'] = $serial['date'];
+    							    //обновляем сведения о последнем эпизоде
+    							    $return[$id]['ep'] = $serial['episode'];
+    							}
+    							else
+    							    Errors::setWarnings($tracker, 'save_file_fail', $id);
                             }
                             else
                                 Errors::setWarnings($tracker, 'torrent_file_fail', $id);
@@ -321,6 +336,9 @@ class baibako
 				}
             }
         }
+
+		baibako::$warning = NULL;
+		return $return;
 	}
 }
 ?>

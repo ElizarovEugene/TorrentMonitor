@@ -3,11 +3,10 @@ class lostfilmmirror
 {
 	protected static $exucution;
 	protected static $warning;
-	
-	protected static $page;	
-	protected static $log_page;
-	protected static $xml_page;
-	
+
+	//резервный адрес ленты, используется, если основной источник недоступен
+	const MIRROR_URL = 'https://lf.tormon.ru/rss.xml';
+
 	//функция преобразования даты в строку
 	private static function dateNumToString($data)
 	{
@@ -18,20 +17,20 @@ class lostfilmmirror
 		$date = $data[1].' '.$data[2].' '.$data[3].' '.$time;
 		return $date;
 	}
-	
+
 	//функция преобразования даты в строку
 	private static function dateStringToNum($data)
 	{
 		$data = substr($data, 0, -6);
 		$data = preg_split('/\s/', $data);
 		$time = $data[4];
-		
+
 		$month = Sys::dateStringToNum($data[2]);
-	
+
 		$date = $data[3].'-'.$month.'-'.$data[1].' '.$time;
 		return $date;
 	}
-	
+
 	//функция анализа эпизода
 	private static function analysisEpisode($item)
 	{
@@ -42,7 +41,7 @@ class lostfilmmirror
 			return array('episode'=>$episode, 'date'=>(string)$item->pubDate, 'link'=>(string)$item->link);
 		}
 	}
-	
+
 	//функция анализа xml ленты
 	private static function analysis($name, $hd, $item)
 	{
@@ -66,72 +65,70 @@ class lostfilmmirror
             }
 		}
 	}
-	
-	//основная функция
-	public static function main($params)
+
+	//формируем параметры "проверочного" запроса для curl_multi
+	public static function getRequestParams($params)
 	{
-    	extract($params);
-		//проверяем получена ли уже RSS лента
-		if ( ! lostfilmmirror::$log_page)
+		extract($params);
+		lostfilmmirror::$exucution = TRUE;
+
+		$url = 'https://rss.bzda.ru/rss.xml';
+
+		return array(
+			'url'     => $url,
+			'options' => array(
+				CURLOPT_HTTPGET       => 1,
+				CURLOPT_RETURNTRANSFER => 1,
+			) + Sys::getProxyOptions($url),
+		);
+	}
+
+	//разбираем полученную страницу, возвращаем изменения для batchUpdateTorrents или null
+	public static function parse($params, $page)
+	{
+		extract($params);
+		$return = NULL;
+
+		if (empty($page))
 		{
-			//получаем страницу
-	        lostfilmmirror::$page = Sys::getUrlContent(
-	        	array(
-	        		'type'           => 'GET',
-	        		'returntransfer' => 1,
-	        		'url'            => 'https://rss.bzda.ru/rss.xml',
-	        	)
-	        );
+			//основной источник недоступен - пробуем зеркало
+			$mirrorUrl = lostfilmmirror::MIRROR_URL;
+			$page = Sys::getUrlContent(array(
+				'type'           => 'GET',
+				'returntransfer' => 1,
+				'url'            => $mirrorUrl,
+			));
+		}
 
-			if ( ! empty(lostfilmmirror::$page))
-			{
-				//читаем xml
-				lostfilmmirror::$xml_page = @simplexml_load_string(lostfilmmirror::$page);
+		if ( ! empty($page))
+		{
+			//читаем xml
+			$xml_page = @simplexml_load_string($page);
 
-				//если XML пришёл с ошибками - останавливаем выполнение, иначе - ставим флажок, что получаем страницу
-				if ( ! lostfilmmirror::$xml_page)
-				{
-					//устанавливаем варнинг
-    				if (lostfilmmirror::$warning == NULL)
-        			{
-        				lostfilmmirror::$warning = TRUE;
-        				Errors::setWarnings($tracker, 'rss_parse_false');
-        			}
-					//останавливаем выполнение цепочки
-					lostfilmmirror::$exucution = FALSE;
-				}
-				else
-				{
-					lostfilmmirror::$log_page = TRUE;
-					lostfilmmirror::$exucution = TRUE;
-				}
-			}
-			else
+			//если XML пришёл с ошибками - останавливаем выполнение, иначе - ставим флажок, что получаем страницу
+			if ( ! $xml_page)
 			{
 				//устанавливаем варнинг
 				if (lostfilmmirror::$warning == NULL)
     			{
     				lostfilmmirror::$warning = TRUE;
-    				Errors::setWarnings($tracker, 'cant_find_rss');
+    				Errors::setWarnings($tracker, 'rss_parse_false');
     			}
 				//останавливаем выполнение цепочки
-				lostfilmmirror::$exucution = FALSE;							
+				lostfilmmirror::$exucution = FALSE;
 			}
-		}
-
-		//если выполнение цепочки не остановлено
-		if (lostfilmmirror::$exucution)
-		{
-			if ( ! empty(lostfilmmirror::$xml_page))
+			else
 			{
+				lostfilmmirror::$exucution = TRUE;
+
 				//сбрасываем варнинг
 				Database::clearWarnings($tracker);
 				$nodes = array();
-				foreach (lostfilmmirror::$xml_page->channel->item AS $item)
+				foreach ($xml_page->channel->item AS $item)
 				{
 				    array_unshift($nodes, $item);
 				}
-				
+
 				foreach ($nodes as $item)
 				{
 					$serial = lostfilmmirror::analysis($name, $hd, $item);
@@ -140,7 +137,7 @@ class lostfilmmirror
 						$episode = substr($serial['episode'], 4, 2);
 						$season = substr($serial['episode'], 1, 2);
 						$date_str = lostfilmmirror::dateNumToString($serial['date']);
-					
+
 						if ( ! empty($ep))
 						{
 							if ($season == substr($ep, 1, 2) && $episode > substr($ep, 4, 2))
@@ -154,7 +151,7 @@ class lostfilmmirror
 							$download = TRUE;
 						else
 							$download = FALSE;
-						
+
 						if ($download)
 						{
 							if ($hd == 1 || $hd == 3)
@@ -171,19 +168,28 @@ class lostfilmmirror
 					        		'url'            => $serial['link'],
 					        	)
                             );
-                            
+
                             if (Sys::checkTorrentFile($torrent))
-                            {							
+                            {
 								$file = str_replace(' ', '.', $name).'.S'.$season.'E'.$episode.'.'.$amp;
 								$episode = (substr($episode, 0, 1) == 0) ? substr($episode, 1, 1) : $episode;
 								$season = (substr($season, 0, 1) == 0) ? substr($season, 1, 1) : $season;
 								$message = $name.' '.$amp.' обновлён до '.$episode.' серии, '.$season.' сезона.';
-								$status = Sys::saveTorrent($tracker, $file, $torrent, $id, $hash, $message, $date_str, $name);
+								$saved = Sys::saveTorrent($tracker, $file, $torrent, $id, $hash, $message, $date_str, $name);
 
-								//обновляем время регистрации торрента в базе
-								Database::setNewDate($id, lostfilmmirror::dateStringToNum($serial['date']));
-								//обновляем сведения о последнем эпизоде
-								Database::setNewEpisode($id, $serial['episode']);
+								if ($saved)
+								{
+									//обновляем время регистрации торрента в базе
+									if ($return === NULL)
+										$return = array();
+									if ( ! isset($return[$id]))
+										$return[$id] = array();
+									$return[$id]['timestamp'] = lostfilmmirror::dateStringToNum($serial['date']);
+									//обновляем сведения о последнем эпизоде
+									$return[$id]['ep'] = $serial['episode'];
+								}
+								else
+									Errors::setWarnings($tracker, 'save_file_fail', $id);
                             }
                             else
                                 Errors::setWarnings($tracker, 'torrent_file_fail', $id);
@@ -192,6 +198,19 @@ class lostfilmmirror
 				}
 			}
 		}
+		else
+		{
+			//устанавливаем варнинг
+			if (lostfilmmirror::$warning == NULL)
+			{
+				lostfilmmirror::$warning = TRUE;
+				Errors::setWarnings($tracker, 'cant_find_rss');
+			}
+			//останавливаем выполнение цепочки
+			lostfilmmirror::$exucution = FALSE;
+		}
+
+		return $return;
 	}
 }
 ?>

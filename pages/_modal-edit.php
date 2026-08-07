@@ -42,6 +42,13 @@
                         <div class="form-help">Например: /home/user/check.sh</div>
                     </div>
                 </label>
+                <label class="row" x-show="$store.tmApp.torrentClient === 'qBittorrent'">
+                    <div class="col --12 mb-1">Категория qBittorrent:</div>
+                    <div class="col --12 mb-2">
+                        <input type="text" name="category" x-model="editData.category" list="qbit-category-list">
+                        <div class="form-help">Не обязательно</div>
+                    </div>
+                </label>
                 <label class="row" @click="editData.auto_update = !editData.auto_update">
                     <div class="col --12 mb-2 toggler-wrap">
                         <div class="toggler" :class="editData.auto_update && '--done'"></div> Обновлять заголовок автоматически
@@ -135,6 +142,13 @@
                     <div class="col --12 mb-2">
                         <input type="text" name="script" x-model="editData.script">
                         <div class="form-help">Например: /home/user/check.sh</div>
+                    </div>
+                </label>
+                <label class="row" x-show="$store.tmApp.torrentClient === 'qBittorrent'">
+                    <div class="col --12 mb-1">Категория qBittorrent:</div>
+                    <div class="col --12 mb-2">
+                        <input type="text" name="category" x-model="editData.category" list="qbit-category-list">
+                        <div class="form-help">Не обязательно</div>
                     </div>
                 </label>
                 <label class="row" @click="editData.pause = !editData.pause">

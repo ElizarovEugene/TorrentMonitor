@@ -79,10 +79,10 @@ $torrents_list = Database::getTorrentsList($order, $orderDir);
 
         <div x-cloak x-show="showInfo" x-transition>
             <?php if ($type == 'RSS' && $ep) { ?>
-                <div class="tm-item__meta" title="Последняя скачаная серия"><svg><use href="assets/img/sprite.svg#ep" /></svg><?= $ep ?></div>
+                <div class="tm-item__meta" title="Последняя скачаная серия"><svg><use href="assets/img/sprite.svg#ep" /></svg><?= htmlspecialchars($ep, ENT_QUOTES) ?></div>
             <?php } ?>
             <?php if (! empty($path)) { ?>
-                <div class="tm-item__meta" title="Путь сохранения"><svg><use href="assets/img/sprite.svg#save-to" /></svg><?= $path ?></div>
+                <div class="tm-item__meta" title="Путь сохранения"><svg><use href="assets/img/sprite.svg#save-to" /></svg><?= htmlspecialchars($path, ENT_QUOTES) ?></div>
             <?php } ?>
             <?php if ($error) { ?>
                 <div class="tm-item__meta c-danger"><svg><use href="assets/img/sprite.svg#errors-has" /></svg>Есть ошибки</div>
@@ -128,10 +128,10 @@ $torrents_list = Database::getTorrentsList($order, $orderDir);
 
                 <div class="tm-item__popup">
                     <?php if ($type == 'RSS' && $ep) { ?>
-                        <div class="tm-item__meta" title="Последняя скачаная серия"><svg><use href="assets/img/sprite.svg#ep" /></svg><?= $ep ?></div>
+                        <div class="tm-item__meta" title="Последняя скачаная серия"><svg><use href="assets/img/sprite.svg#ep" /></svg><?= htmlspecialchars($ep, ENT_QUOTES) ?></div>
                     <?php } ?>
                     <?php if (! empty($path)) { ?>
-                        <div class="tm-item__meta" title="Путь сохранения"><svg><use href="assets/img/sprite.svg#save-to" /></svg><?= $path ?></div>
+                        <div class="tm-item__meta" title="Путь сохранения"><svg><use href="assets/img/sprite.svg#save-to" /></svg><?= htmlspecialchars($path, ENT_QUOTES) ?></div>
                     <?php } ?>
                     <?php if ($error) { ?>
                         <div class="tm-item__meta c-danger"><svg><use href="assets/img/sprite.svg#errors-has" /></svg>Есть ошибки</div>
@@ -151,17 +151,32 @@ $torrents_list = Database::getTorrentsList($order, $orderDir);
 
         <div class="confirm__wrap" title="Удалить тему">
             <button class="btn tm-item__icon tm-item__icon--delete" @click="showDelete = true"><svg><use href="assets/img/sprite.svg#trash" /></svg></button>
+        </div>
+    </div>
 
-            <div class="confirm confirm--danger"
-                x-cloak
-                x-show="showDelete"
-                @click.away="showDelete = false"
-                >
-                <div class="confirm__title">Правда удалить?</div>
-                <div class="confirm__actions">
-                    <button class="btn btn--secondary" @click="deleteItem(<?= $id ?>)">ОК</button>
-                </div>
-                <button class="btn-unset confirm__icon" @click.prevent="showDelete = false" title="Отмена"><svg><use href="assets/img/sprite.svg#close" /></svg></button>
+    <div class="modal__backdrop"
+        x-show="showDelete"
+        x-transition.opacity
+        @click="showDelete = false; removeFromClient = false"
+        style="align-items: center;"
+        >
+        <div class="modal container-sm:max p-0" x-transition.scale @click.stop>
+            <div class="modal__bar">
+                <div class="modal__title">Удалить тему?</div>
+                <button class="modal__close" @click="showDelete = false; removeFromClient = false"><svg><use href="assets/img/sprite.svg#close" /></svg></button>
+            </div>
+
+            <div class="modal__body">
+                <label class="row" @click="removeFromClient = !removeFromClient">
+                    <div class="col --12 toggler-wrap">
+                        <div class="toggler" :class="removeFromClient && '--done'"></div> Удалить из торрент-клиента
+                    </div>
+                </label>
+            </div>
+
+            <div class="modal__buttons">
+                <button @click="showDelete = false; removeFromClient = false" type="button" class="btn btn--secondary">Отмена</button>
+                <button @click="deleteItem(<?= $id ?>)" type="button" class="btn btn--primary">Удалить</button>
             </div>
         </div>
     </div>

@@ -22,14 +22,14 @@ if (is_array($themes) && count($themes) > 0) {
         >
 
         <div class="col --auto">
-            <div class="tracker-icon" style="background-image: url(img/<?= $item['tracker'] ?>.ico)" title="<?= $item['tracker'] ?>"></div>
+            <div class="tracker-icon" style="background-image: url(img/<?= htmlspecialchars($item['tracker'], ENT_QUOTES) ?>.ico)" title="<?= htmlspecialchars($item['tracker'], ENT_QUOTES) ?>"></div>
         </div>
         <div class="col">
             <div class="tm-item__section">
-                <?= $item['section'] ?>
+                <?= htmlspecialchars($item['section'], ENT_QUOTES) ?>
             </div>
             <div class="tm-item__title">
-                <a href="<?= 'http://'.$item['tracker'].'/forum/viewtopic.php?t='.$item['threme_id'] ?>" target="_blank"><?= $item['threme']?></a>
+                <a href="<?= 'http://'.htmlspecialchars($item['tracker'], ENT_QUOTES).'/forum/viewtopic.php?t='.htmlspecialchars($item['threme_id'], ENT_QUOTES) ?>" target="_blank"><?= htmlspecialchars($item['threme'], ENT_QUOTES) ?></a>
             </div>
         </div>
 

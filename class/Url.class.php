@@ -6,6 +6,10 @@ class Url
 
     public static function create($tracker, $name, $torrent_id = false, $hd = 0)
     {
+        //на случай, если в БД уже сохранено название с необработанной HTML-сущностью
+        //(старый баг парсинга заголовка трекера) — безопасный no-op для чистых строк
+        $name = html_entity_decode($name, ENT_QUOTES, 'UTF-8');
+
         $data = [
             'tracker' => $tracker,
             'name'    => $name,
@@ -15,11 +19,11 @@ class Url
         ];
 
         if ($torrent_id) {
-            $data['url'] = '<a href="' . self::href($tracker, $torrent_id) . '" target="_blank">' . $name . '</a>';
+            $data['url'] = '<a href="' . self::href($tracker, $torrent_id) . '" target="_blank">' . htmlspecialchars($name, ENT_QUOTES) . '</a>';
         }
         elseif (in_array($tracker, self::$strackerslf))
         {
-            $data['url'] = '<a href="https://www.lostfilmtv5.site/search?q=' . urlencode($name) . '" target="_blank">' . $name . '</a>';
+            $data['url'] = '<a href="https://www.lostfilmtv5.site/search?q=' . urlencode($name) . '" target="_blank">' . htmlspecialchars($name, ENT_QUOTES) . '</a>';
             if ($hd == 1) {
                 $data['quality'] = '1080';
             } elseif ($hd == 2) {
@@ -30,7 +34,7 @@ class Url
         }
         elseif (in_array($tracker, self::$strackers))
         {
-            $data['url'] = $name;
+            $data['url'] = htmlspecialchars($name, ENT_QUOTES);
             if ($hd == 1) {
                 $data['quality'] = '720';
             } elseif ($hd == 2) {

@@ -1,23 +1,8 @@
 <?php
 class Sys
 {
-    //проверяем есть ли интернет
-    public static function checkInternet()
-    {
-        $page = Sys::getUrlContent(
-            array(
-                'type'           => 'GET',
-                'header'         => 1,
-                'follow'         => 1,
-                'returntransfer' => 1,
-                'url'            => 'https://www.google.ru/',
-            )
-        );
-        if (!empty($page) && preg_match('/<title>.*<\/title>/', $page))
-            return TRUE;
-        else
-            return FALSE;
-    }
+    //URL для проверки наличия подключения к интернету
+    const INTERNET_CHECK_URL = 'https://ya.ru/';
 
     //проверяем есть ли конфигурационный файл
     public static function checkConfigExist()
@@ -44,13 +29,18 @@ class Sys
     {
         $version = '7.30';
         $curl = curl_version();
-        if ($curl['version'] <= $version)
+        if (version_compare($curl['version'], $version, '<='))
             return 'old';
         else
             return 'new';
     }
 
     //проверяем есть ли на конце пути /
+    public static function checkUrl($url)
+    {
+        return rtrim($url, '/');
+    }
+
     public static function checkPath($path)
     {
         $torrentClient = Database::getSetting('torrentClient');
@@ -68,6 +58,40 @@ class Sys
     public static function checkWriteToPath($path)
     {
         return is_writable($path);
+    }
+
+    //проверяем права доступа: 755 для директорий, 644 для файлов
+    public static function checkPermissions($root)
+    {
+        $root = rtrim($root, '/');
+        $result = array('dirs' => array(), 'files' => array());
+
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+
+        foreach ($iterator as $path => $info)
+        {
+            $relative = substr($path, strlen($root) + 1);
+            if ($relative == '.git' || strpos($relative, '.git/') === 0)
+                continue;
+
+            $perms = fileperms($path) & 0777;
+
+            if ($info->isDir())
+            {
+                if ($perms != 0755)
+                    $result['dirs'][$relative] = sprintf('%o', $perms);
+            }
+            else
+            {
+                if ($perms != 0644)
+                    $result['files'][$relative] = sprintf('%o', $perms);
+            }
+        }
+
+        return $result;
     }
 
     //версия системы
@@ -107,6 +131,61 @@ class Sys
             else
                 return FALSE;
         }
+    }
+
+    //формируем curl-опции прокси для заданного url (общие настройки + потрекерный ext_proxy)
+    public static function getProxyOptions($url)
+    {
+        $proxy = NULL;
+        $proxyAddress = NULL;
+        $proxyType = NULL;
+
+        $settingProxy = Database::getProxy();
+        if (is_array($settingProxy))
+        {
+            $proxy = $settingProxy[0]['val'];
+            $proxyAddress = $settingProxy[1]['val'];
+            $proxyType = $settingProxy[2]['val'];
+        }
+
+        $ext_proxy = Config::read('ext_proxy');
+        if ( ! empty($ext_proxy))
+        {
+            $urlParts = parse_url($url);
+            $tracker = preg_replace('/www\./', '', $urlParts['host']);
+            if (isset($ext_proxy[$tracker]))
+            {
+                if ($ext_proxy[$tracker]['use'] == 'yes')
+                {
+                    $proxy = TRUE;
+                    if (count($ext_proxy[$tracker]) == 3)
+                    {
+                        $proxyAddress = $ext_proxy[$tracker]['address'];
+                        $proxyType = $ext_proxy[$tracker]['type'];
+                    }
+                    else
+                    {
+                        $proxyAddress = $settingProxy[1]['val'];
+                        $proxyType = $settingProxy[2]['val'];
+                    }
+                    echo 'Use proxy: '.$proxyAddress;
+                }
+                else
+                    $proxy = FALSE;
+            }
+        }
+
+        $options = array();
+        if ($proxy)
+        {
+            $options[CURLOPT_PROXY] = $proxyAddress;
+            if ($proxyType == 'SOCKS5')
+                $options[CURLOPT_PROXYTYPE] = CURLPROXY_SOCKS5_HOSTNAME;
+            elseif ($proxyType == 'HTTP')
+                $options[CURLOPT_PROXYTYPE] = CURLPROXY_HTTP;
+        }
+
+        return $options;
     }
 
     //обёртка для CURL, для более удобного использования
@@ -167,54 +246,23 @@ class Sys
             if (isset($param['userpwd']))
                 curl_setopt($ch, CURLOPT_USERPWD, $param['userpwd']);
 
-            $settingProxy = Database::getProxy();
-            if (is_array($settingProxy))
-            {
-                $proxy = $settingProxy[0]['val'];
-                $proxyAddress = $settingProxy[1]['val'];
-                $proxyType = $settingProxy[2]['val'];
-            }
-
-            $ext_proxy = Config::read('ext_proxy');
-            if ( ! empty($ext_proxy))
-            {
-                $url = parse_url($param['url']);
-                $tracker = preg_replace('/www\./', '', $url['host']);
-                if (isset($ext_proxy[$tracker]))
-                {
-                    if ($ext_proxy[$tracker]['use'] == 'yes')
-                    {
-                        $proxy = TRUE;
-                        if (count($ext_proxy[$tracker]) == 3)
-                        {
-                            $proxyAddress = $ext_proxy[$tracker]['address'];
-                            $proxyType = $ext_proxy[$tracker]['type'];
-                        }
-                        else
-                        {
-                            $proxyAddress = $settingProxy[1]['val'];
-                            $proxyType = $settingProxy[2]['val'];
-                        }
-                        echo 'Use proxy: '.$proxyAddress;
-                    }
-                    else
-                        $proxy = FALSE;
-                }
-            }
-            if ($proxy)
-            {
-                curl_setopt($ch, CURLOPT_PROXY, $proxyAddress);
-                if ($proxyType == 'SOCKS5')
-                    curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5_HOSTNAME);
-                elseif ($proxyType == 'HTTP')
-                    curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
-            }
+            foreach (Sys::getProxyOptions($param['url']) as $proxyOpt => $proxyVal)
+                curl_setopt($ch, $proxyOpt, $proxyVal);
 
             if (Database::getSetting('debug'))
                 curl_setopt($ch, CURLOPT_VERBOSE, TRUE);
 
-            $result = curl_exec($ch);
+            $result   = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
             curl_close($ch);
+
+            if (($httpCode == 403 || $httpCode == 503) && !empty($result) && Sys::isCloudflarePage($result))
+            {
+                $existingCookie = isset($param['cookie']) ? $param['cookie'] : '';
+                $fsResult = Sys::getViaFlareSolverr($param['url'], $existingCookie);
+                if ($fsResult !== null)
+                    $result = $fsResult['body'];
+            }
 
             if (isset($param['convert']) && $param['convert'] != NULL)
                 $result = iconv($param['convert'][0], $param['convert'][1], $result);
@@ -223,23 +271,130 @@ class Sys
         }
     }
 
-    //Проверяем доступность трекера
-    public static function checkavAilability($tracker)
+    public static function isCloudflarePage(string $body): bool
     {
-        $page = Sys::getUrlContent(
-            array(
-                'type'           => 'GET',
-                'header'         => 1,
-                'follow'         => 1,
-                'returntransfer' => 1,
-                'url'            => $tracker,
-            )
-        );
+        return strpos($body, 'cf-browser-verification') !== false
+            || strpos($body, 'Just a moment') !== false
+            || (stripos($body, 'cloudflare') !== false
+                && (strpos($body, 'Checking your browser') !== false
+                    || strpos($body, 'DDoS protection') !== false));
+    }
 
-        if (preg_match('/HTTP\/1\.1 200 OK/', $page))
-            return true;
-        else
-            return false;
+    public static function getViaFlareSolverr(string $url, string $existingCookies = ''): ?array
+    {
+        $fsUrl = Database::getSetting('flaresolverrUrl');
+        if (empty($fsUrl))
+            return null;
+
+        $cookiesArr = array();
+        if (!empty($existingCookies))
+        {
+            foreach (explode(';', $existingCookies) as $pair)
+            {
+                $pair = trim($pair);
+                if (strpos($pair, '=') !== false)
+                {
+                    list($name, $value) = explode('=', $pair, 2);
+                    $cookiesArr[] = array('name' => trim($name), 'value' => trim($value));
+                }
+            }
+        }
+
+        $postData = json_encode(array(
+            'cmd'        => 'request.get',
+            'url'        => $url,
+            'maxTimeout' => 60000,
+            'cookies'    => $cookiesArr,
+        ));
+
+        $ch = curl_init(rtrim($fsUrl, '/').'/v1');
+        curl_setopt_array($ch, array(
+            CURLOPT_POST           => 1,
+            CURLOPT_POSTFIELDS     => $postData,
+            CURLOPT_HTTPHEADER     => array('Content-Type: application/json'),
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_TIMEOUT        => 120,
+        ));
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        if (!$response)
+            return null;
+        $data = json_decode($response, true);
+        if (!isset($data['solution']))
+            return null;
+
+        $solution  = $data['solution'];
+        $cookieStr = implode('; ', array_map(function($c) {
+            return $c['name'].'='.$c['value'];
+        }, isset($solution['cookies']) ? $solution['cookies'] : array()));
+
+        return array(
+            'body'      => isset($solution['response'])  ? $solution['response']  : '',
+            'cookies'   => $cookieStr,
+            'userAgent' => isset($solution['userAgent']) ? $solution['userAgent'] : '',
+            'status'    => isset($solution['status'])    ? $solution['status']    : 0,
+        );
+    }
+
+    //URL для проверки доступности трекера
+    public static function getTrackerCheckUrl($tracker)
+    {
+        switch ($tracker)
+        {
+            case 'baibako.tv_forum':
+                return 'http://baibako.tv/';
+            case 'lostfilm.tv':
+                return 'https://www.lostfilm.tv/';
+            case 'lostfilm-mirror':
+                return 'https://rss.bzda.ru/rss.xml';
+            case 'nnmclub.to':
+                return 'https://nnmclub.to/forum/index.php';
+            case 'rutor.org':
+                return 'http://rutor.info/';
+            case 'rutracker.org':
+                return 'http://rutracker.org/forum/index.php';
+            default:
+                return 'http://'.$tracker;
+        }
+    }
+
+    //форматируем байты в читаемый вид (КБ/МБ/ГБ/ТБ)
+    public static function formatBytes($bytes, $precision = 2)
+    {
+        if ($bytes <= 0)
+            return '0 Б';
+
+        $units = array('Б', 'КБ', 'МБ', 'ГБ', 'ТБ');
+        $pow = min((int) floor(log($bytes, 1024)), count($units) - 1);
+
+        return round($bytes / (1024 ** $pow), $precision).' '.$units[$pow];
+    }
+
+    //переводим значение php.ini (например "128M") в байты; -1/0 — без ограничения
+    public static function iniToBytes($val)
+    {
+        $val = trim((string) $val);
+        if ($val === '' || $val === '-1' || $val === '0')
+            return -1;
+
+        $last = strtolower($val[strlen($val) - 1]);
+        $num = (int) $val;
+
+        switch ($last)
+        {
+            case 'g':
+                $num *= 1024 ** 3;
+                break;
+            case 'm':
+                $num *= 1024 ** 2;
+                break;
+            case 'k':
+                $num *= 1024;
+                break;
+        }
+
+        return $num;
     }
 
     public static function parseHeader($tracker, $page)
@@ -278,6 +433,11 @@ class Sys
                 $name = substr($array[1], 14);
             else
                 $name = $array[1];
+
+            //заголовок страницы трекера может содержать HTML-сущности (&#039; и т.п.) —
+            //раскодируем их здесь, до htmlspecialchars() на выводе, иначе получим двойное
+            //кодирование и буквальный "&#039;" вместо апострофа в интерфейсе
+            $name = html_entity_decode($name, ENT_QUOTES, 'UTF-8');
         }
         return $name;
     }
@@ -301,6 +461,9 @@ class Sys
                 $class = explode('.', $tracker);
                 $class = $class[0];
                 $functionClass = str_replace('-', '', $class);
+
+                if ($tracker == 'kinozal.guru')
+                    $functionClass = 'kinozalguru';
             }
 
             $cookie = Database::getCookie($tracker);
@@ -370,7 +533,10 @@ class Sys
     {
         $script = Database::getScript($id);
         if ( ! empty($script['script']))
-            print(`{$script['script']} '{$tracker}' '{$name}' '{$hash}' '{$message}' '{$date_str}'`);
+        {
+            $cmd = implode(' ', array_map('escapeshellarg', array($script['script'], $tracker, $name, $hash, $message, $date_str)));
+            print(shell_exec($cmd));
+        }
 
     }
 
@@ -401,18 +567,44 @@ class Sys
         return $return;
     }
 
+    //удаляем раздачу из torrent-клиента (вызывается при удалении темы из ТМ).
+    //best-effort: ошибка не блокирует удаление темы из ТМ, только пишется в варнинги.
+    public static function removeFromClient($hash)
+    {
+        if (empty($hash) || empty(Database::getSetting('useTorrent')))
+            return;
+
+        $torrentClient = Database::getSetting('torrentClient');
+        if (empty($torrentClient))
+            return;
+
+        $dir = dirname(__FILE__).'/';
+        include_once $dir.$torrentClient.'.class.php';
+
+        $status = call_user_func($torrentClient.'::remove', $hash);
+        if (empty($status['status']))
+            Errors::setWarnings($torrentClient, ! empty($status['msg']) ? $status['msg'] : 'unknown');
+    }
+
     //сохраняем torrent файл
     public static function saveTorrent($tracker, $file, $torrent, $id, $hash, $message, $date_str, $name)
     {
         $t_id = $file;
         $file = str_replace("'", '', $file);
         $file = str_replace(":", '', $file);
+        $file = str_replace(array('/', '\\'), '', $file);
         $file = '['.$tracker.']_'.$file.'.torrent';
         $dir = dirname(__FILE__).'/';
         $path = str_replace('class/', '', $dir).'torrents/'.$file;
         if (file_exists($path))
             unlink($path);
-        if (file_put_contents($path, $torrent))
+
+        //сохранён ли сам torrent-файл на диск - именно это решает caller,
+        //обновлять ли timestamp темы в БД (добавление в клиент остаётся best-effort
+        //и не блокирует фиксацию найденного обновления)
+        $saved = (bool) file_put_contents($path, $torrent);
+
+        if ($saved)
         {
             $useTorrent = Database::getSetting('useTorrent');
             if ($useTorrent)
@@ -440,6 +632,8 @@ class Sys
 
         //отправляем уведомлении об обновлении
         Notification::sendNotification('notification', $date_str, $tracker, $message, $name, $t_id);
+
+        return $saved;
     }
 
     //добавляем раздачи из Temp в torrent-клиент

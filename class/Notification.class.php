@@ -23,7 +23,7 @@ class Notification
 	public static function generateMessage($date, $tracker, $message, $header_message, $name)
 	{
         if (is_string($tracker))
-            $msg = "<b>".$header_message."</b>\r\n".'<i>Дата:</i>  '.$date."\r\n".'<i>Трекер:</i>  '.$tracker."\r\n".'<i>Сообщение:</i>  '.$message."\r\n";
+            $msg = "<b>".$header_message."</b>\r\n".'<i>Дата:</i>  '.$date."\r\n".'<i>Трекер:</i>  '.$tracker."\r\n".'<i>Сообщение:</i>  '.htmlspecialchars($message, ENT_QUOTES)."\r\n";
         else
             $msg = $message;
             

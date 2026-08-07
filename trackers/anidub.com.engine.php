@@ -23,7 +23,7 @@ class anidub
         else
             return FALSE;
     }
-    
+
     //функция проверки введёного URL`а
     public static function checkRule($data)
     {
@@ -32,7 +32,7 @@ class anidub
         else
             return TRUE;
     }
-    
+
     //функция преобразования даты
     private static function dateStringToNum($data)
     {
@@ -41,7 +41,7 @@ class anidub
             $pieces = explode(', ', $data);
             if ($pieces[0] == 'Вчера')
                 $timestamp = strtotime('-1 day');
-            else         
+            else
                 $timestamp = strtotime('now');
             $date = date('Y-m-d', $timestamp);
             $time = $pieces[1].':00';
@@ -56,11 +56,11 @@ class anidub
             if (strlen($pieces2[0]) == 1)
                 $pieces2[0] = '0'.$pieces2[0];
             $dateTime = $pieces2[2].'-'.$pieces2[1].'-'.$pieces2[0].' '.$pieces[1].':00';
-            
+
             return $dateTime;
         }
     }
-    
+
     //функция получения кук
     protected static function getCookie($tracker)
     {
@@ -71,7 +71,7 @@ class anidub
             $credentials = Database::getCredentials($tracker);
             $login = iconv("utf-8", "windows-1251", $credentials['login']);
             $password = $credentials['password'];
-            
+
             //авторизовываемся на трекере
             $page = Sys::getUrlContent(
                 array(
@@ -138,9 +138,9 @@ class anidub
             anidub::$exucution = FALSE;
         }
     }
-    
-    //основная функция
-    public static function main($params)
+
+    //формируем параметры "проверочного" запроса для curl_multi (резолв куки последовательный, как и раньше)
+    public static function getRequestParams($params)
     {
         extract($params);
         $cookie = Database::getCookie($tracker);
@@ -149,99 +149,110 @@ class anidub
             anidub::$sess_cookie = $cookie;
             //запускам процесс выполнения
             anidub::$exucution = TRUE;
-        }            
+        }
         else
             anidub::getCookie($tracker);
 
-        if (anidub::$exucution)
+        if ( ! anidub::$exucution)
         {
-            //получаем страницу для парсинга
-            $page = Sys::getUrlContent(
-                array(
-                    'type'           => 'POST',
-                    'header'         => 0,
-                    'returntransfer' => 1,
-                    'url'            => 'https://tr.anidub.com'.$torrent_id,
-                    'cookie'         => anidub::$sess_cookie,
-                    'sendHeader'     => array('Host' => 'tr.anidub.com', 'Content-length' => strlen(anidub::$sess_cookie)),
-                )
-            );
+            anidub::$warning = NULL;
+            return array('url' => NULL);
+        }
 
-            if ( ! empty($page))
+        $url = 'https://tr.anidub.com'.$torrent_id;
+
+        $options = array(
+            CURLOPT_POST   => 1,
+            CURLOPT_COOKIE => anidub::$sess_cookie,
+        );
+
+        if (Sys::checkCurlVersion() == 'old')
+        {
+            $header = array();
+            foreach (array('Host' => 'tr.anidub.com', 'Content-length' => strlen(anidub::$sess_cookie)) as $k => $v)
+                $header[] = $k.': '.$v."\r\n";
+            $options[CURLOPT_HTTPHEADER] = $header;
+        }
+
+        return array(
+            'url'     => $url,
+            'options' => $options + Sys::getProxyOptions($url),
+        );
+    }
+
+    //разбираем полученную страницу, возвращаем изменения для batchUpdateTorrents или null
+    public static function parse($params, $page)
+    {
+        extract($params);
+        $return = NULL;
+
+        if ( ! empty($page))
+        {
+            //ищем на странице дату регистрации торрента
+            if (preg_match('/<li><b>Дата:<\/b> (.*)<\/li>/', $page, $array))
             {
-                //ищем на странице дату регистрации торрента
-                if (preg_match('/<li><b>Дата:<\/b> (.*)<\/li>/', $page, $array))
+                //проверяем удалось ли получить дату со страницы
+                if (isset($array[1]))
                 {
-                    //проверяем удалось ли получить дату со страницы
-                    if (isset($array[1]))
+                    //если дата не равна ничему
+                    if ( ! empty($array[1]))
                     {
-                        //если дата не равна ничему
-                        if ( ! empty($array[1]))
+                        //сбрасываем варнинг
+                        Database::clearWarnings($tracker);
+                        //приводим дату к общему виду
+                        $date = anidub::dateStringToNum($array[1]);
+                        $date_str = $array[1];
+                        //если даты не совпадают, перекачиваем торрент
+                        if ($date != $timestamp)
                         {
-                            //сбрасываем варнинг
-                            Database::clearWarnings($tracker);
-                            //приводим дату к общему виду
-                            $date = anidub::dateStringToNum($array[1]);
-                            $date_str = $array[1];
-                            //если даты не совпадают, перекачиваем торрент
-                            if ($date != $timestamp)
+                            if (preg_match('/download\.php\?id=(\d*)/', $page, $array))
                             {
-                                if (preg_match('/download\.php\?id=(\d*)/', $page, $array))
+                                if ($array[1] !== FALSE)
                                 {
-                                    if ($array[1] !== FALSE)
+                                    //сохраняем торрент в файл
+                                    $torrent = Sys::getUrlContent(
+                                        array(
+                                            'type'           => 'GET',
+                                            'returntransfer' => 1,
+                                            'url'            => 'https://tr.anidub.com/engine/download.php?id='.$array[1],
+                                            'cookie'         => anidub::$sess_cookie,
+                                            'sendHeader'     => array('Host' => 'tr.anidub.com', 'Content-length' => strlen(anidub::$sess_cookie)),
+                                            'referer'        => 'https://tr.anidub.com'.$torrent_id,
+                                        )
+                                    );
+
+                                    if (Sys::checkTorrentFile($torrent))
                                     {
-                                        //сохраняем торрент в файл
-                                        $torrent = Sys::getUrlContent(
-                                            array(
-                                                'type'           => 'GET',
-                                                'returntransfer' => 1,
-                                                'url'            => 'https://tr.anidub.com/engine/download.php?id='.$array[1],
-                                                'cookie'         => anidub::$sess_cookie,
-                                                'sendHeader'     => array('Host' => 'tr.anidub.com', 'Content-length' => strlen(anidub::$sess_cookie)),
-                                                'referer'        => 'https://tr.anidub.com'.$torrent_id,
-                                            )
-                                        );
-                                        
-                                        if (Sys::checkTorrentFile($torrent))
+                                        if ($auto_update)
+                                            $name = Sys::parseHeader($tracker, $page);
+
+                                        $message = $name.' обновлён.';
+                                        $saved = Sys::saveTorrent($tracker, $array[1], $torrent, $id, $hash, $message, $date_str, $name);
+
+                                        if ($saved)
                                         {
                                             if ($auto_update)
-                                            {
-                                                $name = Sys::parseHeader($tracker, $page);
                                                 //обновляем заголовок торрента в базе
-                                                Database::setNewName($id, $name);
-                                            }
-    
-                                            $message = $name.' обновлён.';
-                                            $status = Sys::saveTorrent($tracker, $download_id, $torrent, $id, $hash, $message, $date_str, $name);
-                                            
+                                                $return[$id]['name'] = $name;
                                             //обновляем время регистрации торрента в базе
-                                            Database::setNewDate($id, $date);
+                                            $return[$id]['timestamp'] = $date;
                                             //сбрасываем варнинг
                                             Database::clearWarnings($tracker);
-                                            Database::setErrorToThreme($id, 0);
+                                            $return[$id]['error'] = 0;
                                         }
                                         else
-                                            Errors::setWarnings($tracker, 'torrent_file_fail', $id);
+                                            Errors::setWarnings($tracker, 'save_file_fail', $id);
                                     }
+                                    else
+                                        Errors::setWarnings($tracker, 'torrent_file_fail', $id);
                                 }
-                                else
-                                {
-                                    anidub::$warning = TRUE;
-                                    Errors::setWarnings($tracker, 'cant_find_torrent_id', $id);
-                                }
-                                Database::setErrorToThreme($id, 0);
                             }
-                        }
-                        else
-                        {
-                            //устанавливаем варнинг
-                            if (anidub::$warning == NULL)
+                            else
                             {
                                 anidub::$warning = TRUE;
-                                Errors::setWarnings($tracker, 'cant_find_date', $id);
+                                Errors::setWarnings($tracker, 'cant_find_torrent_id', $id);
                             }
-                            //останавливаем процесс выполнения, т.к. не может работать без кук
-                            anidub::$exucution = FALSE;
+                            $return[$id]['error'] = 0;
                         }
                     }
                     else
@@ -267,20 +278,32 @@ class anidub
                     //останавливаем процесс выполнения, т.к. не может работать без кук
                     anidub::$exucution = FALSE;
                 }
-            }            
+            }
             else
             {
                 //устанавливаем варнинг
                 if (anidub::$warning == NULL)
                 {
                     anidub::$warning = TRUE;
-                    Errors::setWarnings($tracker, 'cant_get_forum_page', $id);
+                    Errors::setWarnings($tracker, 'cant_find_date', $id);
                 }
                 //останавливаем процесс выполнения, т.к. не может работать без кук
                 anidub::$exucution = FALSE;
             }
         }
+        else
+        {
+            //устанавливаем варнинг
+            if (anidub::$warning == NULL)
+            {
+                anidub::$warning = TRUE;
+                Errors::setWarnings($tracker, 'cant_get_forum_page', $id);
+            }
+            //останавливаем процесс выполнения, т.к. не может работать без кук
+            anidub::$exucution = FALSE;
+        }
         anidub::$warning = NULL;
+        return $return;
     }
 }
 ?>

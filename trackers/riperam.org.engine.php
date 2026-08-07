@@ -4,7 +4,7 @@ class riperam
 	protected static $sess_cookie;
 	protected static $exucution;
 	protected static $warning;
-	
+
 	protected static $domain = 'http://riperam.org/';
 
 	//проверяем cookie
@@ -42,7 +42,7 @@ class riperam
     	$date1 = explode(' ', $date[0]);
         $date2 = $date1[2].'-'.Sys::dateStringToNum($date1[1]).'-'.$date1[0];
         $date = $date2.' '.$date[1].':00';
-        
+
         return $date;
 	}
 
@@ -51,7 +51,7 @@ class riperam
 	{
     	$date1 = explode(', ', $data);
     	$date = $date1[0].' в '.$date1[1];
-    	
+
 		return $date;
 	}
 
@@ -130,7 +130,8 @@ class riperam
 		}
 	}
 
-	public static function main($params)
+	//формируем параметры "проверочного" запроса для curl_multi (резолв куки последовательный, как и раньше)
+	public static function getRequestParams($params)
 	{
     	extract($params);
 		$cookie = Database::getCookie($tracker);
@@ -143,43 +144,61 @@ class riperam
 		else
     		riperam::getCookie($tracker);
 
-		if (riperam::$exucution)
+		if ( ! riperam::$exucution)
 		{
-			//получаем страницу для парсинга
-            $page = Sys::getUrlContent(
-            	array(
-            		'type'           => 'POST',
-            		'header'         => 0,
-            		'returntransfer' => 1,
-            		'encoding'       => 1,
-            		'url'            => riperam::$domain.$torrent_id,
-            		'cookie'         => riperam::$sess_cookie,
-            		'sendHeader'     => array('Host' => 'riperam.org', 'Content-length' => strlen(riperam::$sess_cookie)),
-            	)
-            );
+			riperam::$warning = NULL;
+			return array('url' => NULL);
+		}
 
-			if ( ! empty($page))
+		$url = riperam::$domain.$torrent_id;
+
+		$options = array(
+			CURLOPT_POST   => 1,
+			CURLOPT_COOKIE => riperam::$sess_cookie,
+		);
+
+		if (Sys::checkCurlVersion() == 'old')
+		{
+			$header = array();
+			foreach (array('Host' => 'riperam.org', 'Content-length' => strlen(riperam::$sess_cookie)) as $k => $v)
+				$header[] = $k.': '.$v."\r\n";
+			$options[CURLOPT_HTTPHEADER] = $header;
+		}
+
+		return array(
+			'url'     => $url,
+			'options' => $options + Sys::getProxyOptions($url),
+		);
+	}
+
+	//разбираем полученную страницу, возвращаем изменения для batchUpdateTorrents или null
+	public static function parse($params, $page)
+	{
+    	extract($params);
+		$return = NULL;
+
+		if ( ! empty($page))
+		{
+			//ищем на странице дату регистрации торрента
+			if (preg_match('/\[ (\d{2} \D{6} \d{4}\, \d{2}\:\d{2}) \]/', $page, $array))
 			{
-				//ищем на странице дату регистрации торрента
-				if (preg_match('/\[ (\d{2} \D{6} \d{4}\, \d{2}\:\d{2}) \]/', $page, $array))
+				//проверяем удалось ли получить дату со страницы
+				if (isset($array[1]))
 				{
-					//проверяем удалось ли получить дату со страницы
-					if (isset($array[1]))
+					//если дата не равна ничему
+					if ( ! empty($array[1]))
 					{
-						//если дата не равна ничему
-						if ( ! empty($array[1]))
+						//находим имя торрента для скачивания
+						if (preg_match('/download\/file\.php\?id=(\d{6,8})/', $page, $link))
 						{
-							//находим имя торрента для скачивания
-							if (preg_match('/download\/file\.php\?id=(\d{6,8})/', $page, $link))
+							//приводим дату к общему виду
+							$date = riperam::dateStringToNum($array[1]);
+							$date_str = riperam::dateNumToString($array[1]);
+							//если даты не совпадают, перекачиваем торрент
+							if ($date != $timestamp)
 							{
-								//приводим дату к общему виду
-								$date = riperam::dateStringToNum($array[1]);
-								$date_str = riperam::dateNumToString($array[1]);
-								//если даты не совпадают, перекачиваем торрент
-								if ($date != $timestamp)
-								{
-									//сохраняем торрент в файл
-									$download_id = $link[1];
+								//сохраняем торрент в файл
+								$download_id = $link[1];
                                     $torrent = Sys::getUrlContent(
 	                                	array(
 	                                		'type'           => 'GET',
@@ -194,38 +213,30 @@ class riperam
 
 	                                if (Sys::checkTorrentFile($torrent))
                                     {
-    									if ($auto_update)
-        								{
-        								    $name = Sys::parseHeader($tracker, $page);
-        								    //обновляем заголовок торрента в базе
-                                            Database::setNewName($id, $name);
-        								}
+									if ($auto_update)
+    								    $name = Sys::parseHeader($tracker, $page);
 
-    									$message = $name.' обновлён.';
-    									$status = Sys::saveTorrent($tracker, $download_id, $torrent, $id, $hash, $message, $date_str, $name);
+									$message = $name.' обновлён.';
+									$saved = Sys::saveTorrent($tracker, $download_id, $torrent, $id, $hash, $message, $date_str, $name);
 
-        								//обновляем время регистрации торрента в базе
-    									Database::setNewDate($id, $date);
-        								//сбрасываем варнинг
-        								Database::clearWarnings($tracker);
-        								Database::setErrorToThreme($id, 0);
+									if ($saved)
+									{
+									    if ($auto_update)
+    									        //обновляем заголовок торрента в базе
+    									        $return[$id]['name'] = $name;
+									    //обновляем время регистрации торрента в базе
+									    $return[$id]['timestamp'] = $date;
+    									    //сбрасываем варнинг
+    									    Database::clearWarnings($tracker);
+    									    $return[$id]['error'] = 0;
+									}
+									else
+									    Errors::setWarnings($tracker, 'save_file_fail', $id);
                                     }
                                     else
                                         Errors::setWarnings($tracker, 'torrent_file_fail', $id);
-								}
-								Database::setErrorToThreme($id, 0);
 							}
-							else
-							{
-								//устанавливаем варнинг
-								if (riperam::$warning == NULL)
-                    			{
-                    				riperam::$warning = TRUE;
-                    				Errors::setWarnings($tracker, 'cant_find_dowload_link', $id);
-                    			}
-                    			//останавливаем процесс выполнения, т.к. не может работать без кук
-								riperam::$exucution = FALSE;
-							}
+							$return[$id]['error'] = 0;
 						}
 						else
 						{
@@ -233,7 +244,7 @@ class riperam
 							if (riperam::$warning == NULL)
                 			{
                 				riperam::$warning = TRUE;
-                				Errors::setWarnings($tracker, 'cant_find_date', $id);
+                				Errors::setWarnings($tracker, 'cant_find_dowload_link', $id);
                 			}
                 			//останавливаем процесс выполнения, т.к. не может работать без кук
 							riperam::$exucution = FALSE;
@@ -269,12 +280,26 @@ class riperam
 				if (riperam::$warning == NULL)
     			{
     				riperam::$warning = TRUE;
-    				Errors::setWarnings($tracker, 'cant_get_forum_page', $id);
+    				Errors::setWarnings($tracker, 'cant_find_date', $id);
     			}
     			//останавливаем процесс выполнения, т.к. не может работать без кук
 				riperam::$exucution = FALSE;
 			}
 		}
+		else
+		{
+			//устанавливаем варнинг
+			if (riperam::$warning == NULL)
+			{
+				riperam::$warning = TRUE;
+				Errors::setWarnings($tracker, 'cant_get_forum_page', $id);
+			}
+			//останавливаем процесс выполнения, т.к. не может работать без кук
+			riperam::$exucution = FALSE;
+		}
+
 		riperam::$warning = NULL;
+		return $return;
 	}
 }
+?>

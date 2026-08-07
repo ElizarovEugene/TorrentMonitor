@@ -5,23 +5,53 @@ include_once $dir.'class/Database.class.php';
 include_once $dir.'class/Errors.class.php';
 include_once $dir.'class/Notification.class.php';
 include_once $dir.'class/System.class.php';
+include_once $dir.'class/Update.class.php';
 include_once $dir."class/Url.class.php";
+
+function csrf_verify()
+{
+    if (
+        empty($_POST['csrf_token']) ||
+        empty($_SESSION['csrf_token']) ||
+        ! hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+    ) {
+        http_response_code(403);
+        echo json_encode(['error' => true, 'msg' => 'CSRF token mismatch']);
+        exit;
+    }
+}
 
 if (isset($_POST['action']))
 {
+    if (session_status() !== PHP_SESSION_ACTIVE)
+        session_start();
+
+    csrf_verify();
+
 	//Проверяем пароль
 	if ($_POST['action'] == 'enter')
 	{
-		$password = md5($_POST['password']);
-		$count = Database::countCredentials($password);
+		$stored = Database::getSetting('password');
+		$input  = $_POST['password'];
+		$ok = false;
 
-		if ($count == 1)
+		if (password_verify($input, $stored))
 		{
-			session_start();
-			$_SESSION['TM'] = $password;
+		    $ok = true;
+		}
+		elseif (hash_equals($stored, md5($input)))
+		{
+		    $ok = true;
+		    $stored = password_hash($input, PASSWORD_BCRYPT);
+		    Database::updateCredentials($stored);
+		}
+
+		if ($ok)
+		{
+			$_SESSION['TM'] = $stored;
 			$return['error'] = FALSE;
 			if ($_POST['remember'] == 'true')
-			    setcookie('TM', $password, time()+3600*24*31, '/');
+			    setcookie('TM', $stored, time()+3600*24*31, '/');
 		}
 		else
 		{
@@ -97,6 +127,15 @@ if (isset($_POST['action']))
 						if ($tracker == 'baibako.tv_forum')
     					    $functionClass = 'baibako_f';
 
+					    if ($tracker == 'kinozal.guru')
+					        $functionClass = 'kinozalguru';
+
+					    if ($tracker == 'kinozal.me')
+					        $functionClass = 'kinozalme';
+
+					    if ($tracker == 'kinozal.tv')
+					        $functionClass = 'kinozaltv';
+
                         if ( ! empty($threme))
                         {
         					if (call_user_func(array($functionClass, 'checkRule'), $threme))
@@ -108,7 +147,7 @@ if (isset($_POST['action']))
         							else
         								$name = Sys::getHeader($_POST['url']);
 
-        							$query = Database::setThreme($tracker, $name, $_POST['path'], $threme, Sys::strBoolToInt($_POST['update_header']));
+        							$query = Database::setThreme($tracker, $name, $_POST['path'], $threme, Sys::strBoolToInt($_POST['update_header']), $_POST['category'] ?? '');
         							if ($query === TRUE)
                                     {
             							$return['error'] = FALSE;
@@ -117,7 +156,7 @@ if (isset($_POST['action']))
                                     else
                                     {
                                         $return['error'] = TRUE;
-                                        $return['msg'] = 'Произошла ошибка при сохранении в БД.'.var_dump($query);
+                                        $return['msg'] = 'Произошла ошибка при сохранении в БД.'.print_r($query, true);
                                     }
         						}
         						else
@@ -175,7 +214,7 @@ if (isset($_POST['action']))
 				$class = str_replace('-', '', $class);
 				if (Database::checkSerialExist($tracker, $_POST['name'], $_POST['hd']))
 				{
-					$query = Database::setSerial($tracker, $_POST['name'], $_POST['path'], $_POST['hd']);
+					$query = Database::setSerial($tracker, $_POST['name'], $_POST['path'], $_POST['hd'], $_POST['category'] ?? '');
 					if ($query === TRUE)
 					{
 					    $return['error'] = FALSE;
@@ -184,7 +223,7 @@ if (isset($_POST['action']))
                     else
                     {
                         $return['error'] = TRUE;
-                        $return['msg'] = 'Произошла ошибка при сохранении в БД.'.var_dump($query);
+                        $return['msg'] = 'Произошла ошибка при сохранении в БД.'.print_r($query, true);
                     }
 				}
 				else
@@ -277,11 +316,20 @@ if (isset($_POST['action']))
 						if ($tracker == 'baibako.tv_forum')
     					    $functionClass = 'baibako_f';
 
+					    if ($tracker == 'kinozal.guru')
+					        $functionClass = 'kinozalguru';
+
+					    if ($tracker == 'kinozal.me')
+					        $functionClass = 'kinozalme';
+
+					    if ($tracker == 'kinozal.tv')
+					        $functionClass = 'kinozaltv';
+
                         if ( ! empty($threme))
                         {
         					if (call_user_func(array($functionClass, 'checkRule'), $threme))
                 			{
-                				Database::updateThreme($_POST['id'], $_POST['name'], $_POST['path'], $threme, Sys::strBoolToInt($_POST['update']), Sys::strBoolToInt($_POST['reset']), $_POST['script'], Sys::strBoolToInt($_POST['pause']));
+                				Database::updateThreme($_POST['id'], $_POST['name'], $_POST['path'], $threme, Sys::strBoolToInt($_POST['update']), Sys::strBoolToInt($_POST['reset']), $_POST['script'], Sys::strBoolToInt($_POST['pause']), $_POST['category'] ?? '');
                 				$return['error'] = FALSE;
                                 $return['msg'] = 'Тема обновлена.';
                             }
@@ -291,8 +339,28 @@ if (isset($_POST['action']))
                                 $return['msg'] = 'Не верный ID темы.';
                             }
                         }
-                    }
+                        else
+                        {
+                            $return['error'] = TRUE;
+                            $return['msg'] = 'Не верная ссылка.';
+                        }
+    				}
+    				else
+    				{
+        				$return['error'] = TRUE;
+                        $return['msg'] = 'Отсутствует модуль для трекера - <b>'.$tracker.'</b>.';
+    				}
                 }
+                else
+                {
+                    $return['error'] = TRUE;
+                    $return['msg'] = 'Невозможно обновить тему: не введены учётные данные для трекера - <b>'.$tracker.'</b>.';
+                }
+            }
+            else
+            {
+                $return['error'] = TRUE;
+                $return['msg'] = 'Не верная ссылка.';
             }
         }
         echo json_encode($return);
@@ -386,6 +454,12 @@ if (isset($_POST['action']))
 	//Удаляем мониторинг
 	if ($_POST['action'] == 'del')
 	{
+		if ( ! empty($_POST['removeFromClient']))
+		{
+			$torrent = Database::getTorrent($_POST['id']);
+			if (is_array($torrent) && ! empty($torrent[0]['hash']))
+				Sys::removeFromClient($torrent[0]['hash']);
+		}
 		Database::deletItem($_POST['id']);
     	$return['error'] = FALSE;
         $return['msg'] = 'Удалено.';
@@ -407,6 +481,7 @@ if (isset($_POST['action']))
     if ($_POST['action'] == 'update_basic')
 	{
         Database::updateSettings('serverAddress', Sys::checkPath($_POST['serverAddress']));
+        Database::updateSettings('userAgent', $_POST['userAgent']);
         Database::updateSettings('send', Sys::strBoolToInt($_POST['send']));
         Database::updateSettings('auth', Sys::strBoolToInt($_POST['auth']));
         Database::updateSettings('rss', Sys::strBoolToInt($_POST['rss']));
@@ -421,6 +496,9 @@ if (isset($_POST['action']))
 	//Обновляем расширенные настройки
 	if ($_POST['action'] == 'update_extended')
 	{
+		Database::updateSettings('httpTimeout', (int) $_POST['httpTimeout']);
+		Database::updateSettings('flaresolverrUrl', trim($_POST['flaresolverrUrl']));
+
 		$config = Config::read('ext_filename');
 		if (file_put_contents($config, $_POST['settings']))
 		{
@@ -471,7 +549,7 @@ if (isset($_POST['action']))
 	//Меняем пароль
 	if ($_POST['action'] == 'update_auth')
 	{
-		$pass = md5($_POST['pass']);
+		$pass = password_hash($_POST['pass'], PASSWORD_BCRYPT);
 		$q = Database::updateCredentials($pass);
 		if ($q)
 		{
@@ -503,12 +581,13 @@ if (isset($_POST['action']))
     {
         Database::updateSettings('useTorrent', Sys::strBoolToInt($_POST['useTorrent']));
         Database::updateSettings('torrentClient', $_POST['torrentClient']);
-        Database::updateSettings('torrentAddress', $_POST['torrentAddress']);
+        Database::updateSettings('torrentAddress', Sys::checkUrl($_POST['torrentAddress']));
         Database::updateSettings('torrentLogin', $_POST['torrentLogin']);
         Database::updateSettings('torrentPassword', $_POST['torrentPassword']);
         Database::updateSettings('pathToDownload', Sys::checkPath($_POST['pathToDownload']));
         Database::updateSettings('deleteDistribution', Sys::strBoolToInt($_POST['deleteDistribution']));
         Database::updateSettings('deleteOldFiles', Sys::strBoolToInt($_POST['deleteOldFiles']));
+        Database::updateSettings('qbitCategory', $_POST['qbitCategory'] ?? '');
 
         $return['error'] = FALSE;
         $return['msg'] = 'Настройки торрент-клиента сохранены.';
@@ -542,9 +621,20 @@ if (isset($_POST['action']))
 	//Выполняем обновление системы
 	if ($_POST['action'] == 'system_update')
 	{
-		Update::runUpdate();
+		Update::main();
 		return TRUE;
 	}
+
+    //Генерируем новый токен для API
+    if ($_POST['action'] == 'api_token_regenerate')
+    {
+        $token = bin2hex(random_bytes(32));
+        Database::updateSettings('ApiKey', $token);
+        $return['error'] = FALSE;
+        $return['msg'] = 'Ключ сгенерирован.';
+        $return['token'] = $token;
+        echo json_encode($return);
+    }
 
 	//Очистка ошибок потрекерно
 	if ($_POST['action'] == 'clear_warnings')
@@ -563,10 +653,12 @@ if (isset($_POST['action']))
 
 if (isset($_GET['action']))
 {
+    if ( ! Sys::checkAuth())
+        exit();
+
 	//Сортировка вывода торрентов
 	if ($_GET['action'] == 'order')
 	{
-		session_start();
         $by  = !empty($_GET['by']) ? $_GET['by'] : 'name';
         $dir = !empty($_GET['dir']) ? $_GET['dir'] : 'asc';
 
@@ -574,7 +666,7 @@ if (isset($_GET['action']))
             $by = 'name';
         }
 		if (!in_array($dir, ['asc', 'desc'])) {
-            $by = 'asc';
+            $dir = 'asc';
         }
 		setcookie('order', $by, time()+3600*24*365);
 		setcookie('orderDir', $dir, time()+3600*24*365);

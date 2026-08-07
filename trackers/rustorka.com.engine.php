@@ -133,12 +133,12 @@ class rustorka
 			//останавливаем процесс выполнения, т.к. не может работать без кук
 			rustorka::$exucution = FALSE;
 		}
-		
+
 		return rustorka::$sess_cookie;
 	}
 
-	//основная функция
-	public static function main($params)
+	//формируем параметры "проверочного" запроса для curl_multi (резолв куки последовательный, как и раньше)
+	public static function getRequestParams($params)
 	{
     	extract($params);
 		$cookie = Database::getCookie($tracker);
@@ -151,92 +151,105 @@ class rustorka
 		else
     		rustorka::getCookie($tracker);
 
-		if (rustorka::$exucution)
+		if ( ! rustorka::$exucution)
 		{
-			//получаем страницу для парсинга
-            $page = Sys::getUrlContent(
-            	array(
-            		'type'           => 'POST',
-            		'header'         => 0,
-            		'returntransfer' => 1,
-            		'url'            => 'http://rustorka.com/forum/viewtopic.php?t='.$torrent_id,
-            		'cookie'         => rustorka::$sess_cookie,
-            		'sendHeader'     => array('Host' => 'rustorka.com', 'Content-length' => strlen(rustorka::$sess_cookie)),
-					'referer'        => 'http://rustorka.com/forum/index.php',
-            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
-            	)
-            );
+			rustorka::$warning = NULL;
+			return array('url' => NULL);
+		}
 
-			if ( ! empty($page))
+		$url = 'http://rustorka.com/forum/viewtopic.php?t='.$torrent_id;
+
+		$options = array(
+			CURLOPT_POST   => 1,
+			CURLOPT_COOKIE => rustorka::$sess_cookie,
+		);
+
+		if (Sys::checkCurlVersion() == 'old')
+		{
+			$header = array();
+			foreach (array('Host' => 'rustorka.com', 'Content-length' => strlen(rustorka::$sess_cookie)) as $k => $v)
+				$header[] = $k.': '.$v."\r\n";
+			$options[CURLOPT_HTTPHEADER] = $header;
+		}
+
+		return array(
+			'url'     => $url,
+			'options' => $options + Sys::getProxyOptions($url),
+		);
+	}
+
+	//разбираем полученную страницу, возвращаем изменения для batchUpdateTorrents или null
+	public static function parse($params, $page)
+	{
+    	extract($params);
+		$return = NULL;
+
+		$page = iconv('windows-1251', 'utf-8//IGNORE', $page);
+
+		if ( ! empty($page))
+		{
+			//ищем на странице дату регистрации торрента
+			if (preg_match('/<td>Зарегистрирован:<\/td>\r\n{1,2}\s{4}<td>(.*)<\/td>/', $page, $array))
 			{
-				//ищем на странице дату регистрации торрента
-				if (preg_match('/<td>Зарегистрирован:<\/td>\r\n{1,2}\s{4}<td>(.*)<\/td>/', $page, $array))
+				//проверяем удалось ли получить дату со страницы
+				if (isset($array[1]))
 				{
-					//проверяем удалось ли получить дату со страницы
-					if (isset($array[1]))
+					//если дата не равна ничему
+					if ( ! empty($array[1]))
 					{
-						//если дата не равна ничему
-						if ( ! empty($array[1]))
+						//сбрасываем варнинг
+						Database::clearWarnings($tracker);
+						//приводим дату к общему виду
+						$date = rustorka::dateStringToNum($array[1]);
+						$date_str = rustorka::dateNumToString($array[1]);
+						//если даты не совпадают, перекачиваем торрент
+						if ($date != $timestamp)
 						{
-							//сбрасываем варнинг
-							Database::clearWarnings($tracker);
-							//приводим дату к общему виду
-							$date = rustorka::dateStringToNum($array[1]);
-							$date_str = rustorka::dateNumToString($array[1]);
-							//если даты не совпадают, перекачиваем торрент
-							if ($date != $timestamp)
-							{
-							    //ищем ссылку на скачивание torrent-файла
-                                if (preg_match('/<a href=\"download\.php\?id=(.*)\" class=\"(genmed|seedmed)\">/', $page, $array))
+						    //ищем ссылку на скачивание torrent-файла
+                            if (preg_match('/<a href=\"download\.php\?id=(.*)\" class=\"(genmed|seedmed)\">/', $page, $array))
+                            {
+                                $link = 'http://rustorka.com/forum/download.php?id='.$array[1];
+								//сохраняем торрент в файл
+                                $torrent = Sys::getUrlContent(
+                                	array(
+                                		'type'           => 'POST',
+                                		'returntransfer' => 1,
+                                		'url'            => $link,
+                                		'cookie'         => rustorka::$sess_cookie,
+                                		'sendHeader'     => array('Host' => 'rustorka.com', 'Content-length' => strlen(rustorka::$sess_cookie)),
+                                		'referer'        => 'http://rustorka.com/forum/viewtopic.php?t='.$torrent_id,
+                                	)
+                                );
+
+                                if (Sys::checkTorrentFile($torrent))
                                 {
-                                    $link = 'http://rustorka.com/forum/download.php?id='.$array[1];
-    								//сохраняем торрент в файл
-                                    $torrent = Sys::getUrlContent(
-                                    	array(
-                                    		'type'           => 'POST',
-                                    		'returntransfer' => 1,
-                                    		'url'            => $link,
-                                    		'cookie'         => rustorka::$sess_cookie,
-                                    		'sendHeader'     => array('Host' => 'rustorka.com', 'Content-length' => strlen(rustorka::$sess_cookie)),
-                                    		'referer'        => 'http://rustorka.com/forum/viewtopic.php?t='.$torrent_id,
-                                    	)
-                                    );
-                                    
-                                    if (Sys::checkTorrentFile($torrent))
-                                    {
-        								if ($auto_update)
-        								{
-        								    $name = Sys::parseHeader($tracker, $page);
-        								    //обновляем заголовок торрента в базе
-                                            Database::setNewName($id, $name);
-        								}
-    
-        								$message = $name.' обновлён.';
-        								$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
-    								
-        								//обновляем время регистрации торрента в базе
-        								Database::setNewDate($id, $date);
-										//сбрасываем варнинг
-										Database::clearWarnings($tracker);
-										Database::setErrorToThreme($id, 0);
-                                    }
-                                    else
-                                        Errors::setWarnings($tracker, 'torrent_file_fail', $id);
+    								if ($auto_update)
+    								{
+    								    $name = Sys::parseHeader($tracker, $page);
+    								}
+
+    								$message = $name.' обновлён.';
+    								$saved = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
+
+    								if ($saved)
+    								{
+    								    if ($auto_update)
+    								        //обновляем заголовок торрента в базе
+        								$return[$id]['name'] = $name;
+    								    //обновляем время регистрации торрента в базе
+									$return[$id]['timestamp'] = $date;
+									//сбрасываем варнинг
+									Database::clearWarnings($tracker);
+									$return[$id]['error'] = 0;
+    								}
+    								else
+    								    Errors::setWarnings($tracker, 'save_file_fail', $id);
                                 }
-							}
-							Database::setErrorToThreme($id, 0);
+                                else
+                                    Errors::setWarnings($tracker, 'torrent_file_fail', $id);
+                            }
 						}
-						else
-						{
-							//устанавливаем варнинг
-							if (rustorka::$warning == NULL)
-							{
-								rustorka::$warning = TRUE;
-								Errors::setWarnings($tracker, 'cant_find_date', $id);
-							}
-							//останавливаем процесс выполнения, т.к. не может работать без кук
-							rustorka::$exucution = FALSE;
-						}
+						$return[$id]['error'] = 0;
 					}
 					else
 					{
@@ -268,13 +281,25 @@ class rustorka
 				if (rustorka::$warning == NULL)
 				{
 					rustorka::$warning = TRUE;
-					Errors::setWarnings($tracker, 'cant_get_forum_page', $id);
+					Errors::setWarnings($tracker, 'cant_find_date', $id);
 				}
 				//останавливаем процесс выполнения, т.к. не может работать без кук
 				rustorka::$exucution = FALSE;
 			}
 		}
+		else
+		{
+			//устанавливаем варнинг
+			if (rustorka::$warning == NULL)
+			{
+				rustorka::$warning = TRUE;
+				Errors::setWarnings($tracker, 'cant_get_forum_page', $id);
+			}
+			//останавливаем процесс выполнения, т.к. не может работать без кук
+			rustorka::$exucution = FALSE;
+		}
 		rustorka::$warning = NULL;
+		return $return;
 	}
 }
 ?>

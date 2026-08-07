@@ -8,8 +8,12 @@ include_once $dir.'class/System.class.php';
 include_once $dir.'class/Database.class.php';
 include_once $dir.'class/Errors.class.php';
 include_once $dir.'class/Notification.class.php';
+include_once $dir.'class/CurlMultiFetcher.class.php';
 
 header('Content-Type: text/html; charset=utf-8');
+
+set_time_limit(0);
+ignore_user_abort(true);
 
 function getTimestamp()
 {
@@ -36,72 +40,153 @@ if (Sys::checkCurl())
     
 	echo getTimestamp();
 	echo 'Опрос новых раздач на трекерах:'.$NL;
+    Sys::lastStart();
     $time_start_overall = microtime(true);
+
+    //Проход 0: один раз получаем список учётных данных вместо запроса на каждой итерации
+    $allCredentials = Database::getAllCredentials();
+    $credentialSet = array();
+    foreach ($allCredentials as $cred)
+    {
+        if ( ! empty($cred['login']) && ! empty($cred['password']))
+            $credentialSet[$cred['tracker']] = TRUE;
+    }
+
+    $fetcher = new CurlMultiFetcher();
+    $pending = array();
+
+    //Проход 1: резолв кук/авторизации (последовательно) + формирование "проверочных" запросов
 	for ($i=0; $i<$count; $i++)
 	{
 		$tracker = $torrentsList[$i]['tracker'];
-		if (Database::checkTrackersCredentialsExist($tracker))
+		if (isset($credentialSet[$tracker]))
 		{
 			$engineFile = $dir.'trackers/'.$tracker.'.engine.php';
 			if (file_exists($engineFile))
 			{
-				Database::clearWarnings('system');
-				
-				$functionEngine = include_once $engineFile;
-				$class = explode('.', $tracker);
-				$class = $class[0];
-				$functionClass = str_replace('-', '', $class);
-				
-				if ($tracker == 'tracker.0day.kiev.ua')
-				    $functionClass = 'kiev';
-				    
-                if ($tracker == 'tv.mekc.info')
-				    $functionClass = 'mekc';
-				    
-				if ($tracker == 'baibako.tv_forum')
-				    $functionClass = 'baibako_f';
+			    try
+			    {
+				    Database::clearWarnings($tracker);
 
-                echo getTimestamp();
-				echo $torrentsList[$i]['name'].' на трекере '.$tracker.$NL;
-				if ($torrentsList[$i]['pause'])
-				{
-    				echo getTimestamp();
-    				echo 'Наблюдение за данной темой приостановлено.'.$NL;
-    				continue;
-				}
-				if ($torrentsList[$i]['type'] == 'RSS')
-				{
-				    $time_start = microtime(true);
-				    call_user_func($functionClass.'::main', $torrentsList[$i]);
-				    $time_end = microtime(true);
-				    $time = $time_end - $time_start;
-				    if ($debug)
+				    $functionEngine = include_once $engineFile;
+				    $class = explode('.', $tracker);
+				    $class = $class[0];
+				    $functionClass = str_replace('-', '', $class);
+
+				    if ($tracker == 'tracker.0day.kiev.ua')
+				        $functionClass = 'kiev';
+
+                    if ($tracker == 'tv.mekc.info')
+				        $functionClass = 'mekc';
+
+				    if ($tracker == 'baibako.tv_forum')
+				        $functionClass = 'baibako_f';
+
+				    if ($tracker == 'kinozal.guru')
+				        $functionClass = 'kinozalguru';
+
+				    if ($tracker == 'kinozal.me')
+				        $functionClass = 'kinozalme';
+
+				    if ($tracker == 'kinozal.tv')
+				        $functionClass = 'kinozaltv';
+
+                    echo getTimestamp();
+				    echo $torrentsList[$i]['name'].' на трекере '.$tracker.$NL;
+				    if ($torrentsList[$i]['pause'])
 				    {
     				    echo getTimestamp();
-				        echo 'Время выполнения: '.$time.$NL;
+    				    echo 'Наблюдение за данной темой приостановлено.'.$NL;
+    				    continue;
+				    }
+				    if ($torrentsList[$i]['type'] == 'RSS' || $torrentsList[$i]['type'] == 'forum')
+				    {
+				        $time_start = microtime(true);
+				        $requestParams = call_user_func(array($functionClass, 'getRequestParams'), $torrentsList[$i]);
+				        $time_end = microtime(true);
+				        $time = $time_end - $time_start;
+				        if ($debug)
+				        {
+    				        echo getTimestamp();
+				            echo 'Время выполнения (подготовка запроса): '.$time.$NL;
+				        }
+
+				        if ( ! empty($requestParams['url']))
+				        {
+				            $key = $tracker.'_'.$torrentsList[$i]['id'];
+				            $fetcher->add($key, $requestParams['url'], isset($requestParams['options']) ? $requestParams['options'] : array());
+				            $pending[$key] = array(
+				                'row'   => $torrentsList[$i],
+				                'class' => $functionClass,
+				            );
+				        }
 				    }
 				}
-				if ($torrentsList[$i]['type'] == 'forum')
+				catch (Throwable $e)
 				{
-				    $time_start = microtime(true);
-					call_user_func($functionClass.'::main', $torrentsList[$i]);
-					$time_end = microtime(true);
-					$time = $time_end - $time_start;
-					if ($debug)
-					{
-    					echo getTimestamp();
-				        echo 'Время выполнения: '.$time.$NL;
-				    }
+				    echo getTimestamp().'Ошибка подготовки запроса ('.$tracker.'): '.$e->getMessage().$NL;
+				    Errors::setWarnings($tracker, 'engine_error');
 				}
-				$functionClass = NULL;
-				$functionEngine = NULL;
+				finally
+				{
+				    $functionClass = NULL;
+				    $functionEngine = NULL;
+				}
 			}
 			else
-				Errors::setWarnings('system', 'missing_files');				
+				Errors::setWarnings($tracker, 'missing_files');
 		}
 		else
-			Errors::setWarnings('system', 'credential_miss');
+			Errors::setWarnings($tracker, 'credential_miss');
 	}
+
+    //Выполняем все "проверочные" запросы параллельно
+    try {
+        $responses = $fetcher->execute();
+    } catch (Throwable $e) {
+        echo getTimestamp().'Ошибка параллельного запроса: '.$e->getMessage().$NL;
+        $responses = array();
+    }
+
+    //Проход 2: разбираем ответы и собираем изменения для пакетного обновления
+    $pendingUpdates = array();
+    foreach ($pending as $key => $info)
+    {
+        $row     = $info['row'];
+        $class   = $info['class'];
+        $tracker = $row['tracker'];
+        $response = isset($responses[$key]) ? $responses[$key] : array('body' => '', 'http_code' => 0, 'error' => 'no response');
+
+        $time_start = microtime(true);
+        try {
+            $result = call_user_func(array($class, 'parse'), $row, $response['body']);
+        } catch (Throwable $e) {
+            echo getTimestamp().'Ошибка parse ('.$tracker.'): '.$e->getMessage().$NL;
+            Errors::setWarnings($tracker, 'engine_error');
+            $time_end = microtime(true);
+            continue;
+        }
+        $time_end = microtime(true);
+        $time = $time_end - $time_start;
+        if ($debug)
+        {
+            echo getTimestamp();
+            echo 'Время выполнения (разбор ответа, '.$tracker.'): '.$time.$NL;
+        }
+
+        if ( ! empty($result))
+            $pendingUpdates = $pendingUpdates + $result;
+    }
+
+    if ( ! empty($pendingUpdates))
+    {
+        try {
+            Database::batchUpdateTorrents($pendingUpdates);
+        } catch (Throwable $e) {
+            echo getTimestamp().'Ошибка сохранения обновлений в БД: '.$e->getMessage().$NL;
+        }
+    }
+
     $time_end_overall = microtime(true);
     $time = $time_end_overall - $time_start_overall;
     if ($debug)
@@ -125,33 +210,41 @@ if (Sys::checkCurl())
     			$serchFile = $dir.'trackers/'.$tracker.'.search.php';
     			if (file_exists($serchFile))
     			{
-    				Database::clearWarnings('system');
-    
-    				$functionEngine = include_once $serchFile;
-    				$class = explode('.', $tracker);
-    				$class = $class[0];
-    				$class = str_replace('-', '', $class);
-    				$functionClass = $class.'Search';
-    				echo getTimestamp();
-                    echo 'Пользователь '.$usersList[$i]['name'].' на трекере '.$tracker.$NL;
-                    $time_start = microtime(true);
-    				call_user_func($functionClass .'::mainSearch', $usersList[$i]);
-    				$time_end = microtime(true);
-    				$time = $time_end - $time_start;
-    				if ($debug)
+    				try
     				{
-        				echo getTimestamp();
-    				    echo 'Время выполнения: '.$time.$NL;
+    				    Database::clearWarnings($tracker);
+
+    				    $functionEngine = include_once $serchFile;
+    				    $class = explode('.', $tracker);
+    				    $class = $class[0];
+    				    $class = str_replace('-', '', $class);
+    				    $functionClass = $class.'Search';
+    				    echo getTimestamp();
+                        echo 'Пользователь '.$usersList[$i]['name'].' на трекере '.$tracker.$NL;
+                        $time_start = microtime(true);
+    				    call_user_func($functionClass .'::mainSearch', $usersList[$i]);
+    				    $time_end = microtime(true);
+    				    $time = $time_end - $time_start;
+    				    if ($debug)
+    				    {
+        				    echo getTimestamp();
+    				        echo 'Время выполнения: '.$time.$NL;
+    				    }
+    				}
+    				catch (Throwable $e)
+    				{
+    				    echo getTimestamp().'Ошибка mainSearch ('.$tracker.'): '.$e->getMessage().$NL;
+    				    Errors::setWarnings($tracker, 'engine_error');
     				}
     
     				$functionClass = NULL;
     				$functionEngine = NULL;
     			}
     			else
-    				Errors::setWarnings('system', 'missing_files');
+    				Errors::setWarnings($tracker, 'missing_files');
     		}
     		else
-    			Errors::setWarnings('system', 'credential_miss');
+    			Errors::setWarnings($tracker, 'credential_miss');
     	}
     }
     $time_end_overall = microtime(true);
@@ -214,9 +307,6 @@ if (Sys::checkCurl())
             }
         }
     }
-    echo getTimestamp();
-	echo 'Запись времени последнего запуска ТМ.'.$NL;
-	Sys::lastStart();
 }	
 else
 	Errors::setWarnings('system', 'curl');

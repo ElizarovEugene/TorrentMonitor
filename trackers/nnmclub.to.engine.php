@@ -4,7 +4,7 @@ class nnmclub
 	protected static $sess_cookie;
 	protected static $exucution;
 	protected static $warning;
-	
+
 	protected static $domain = 'nnmclub.to';
 
 	//проверяем cookie
@@ -131,7 +131,8 @@ class nnmclub
 		}
 	}
 
-	public static function main($params)
+	//формируем параметры "проверочного" запроса для curl_multi (резолв куки последовательный, как и раньше)
+	public static function getRequestParams($params)
 	{
     	extract($params);
 		$cookie = Database::getCookie($tracker);
@@ -144,45 +145,64 @@ class nnmclub
 		else
     		nnmclub::getCookie($tracker);
 
-		if (nnmclub::$exucution)
+		if ( ! nnmclub::$exucution)
 		{
-			//получаем страницу для парсинга
-            $page = Sys::getUrlContent(
-            	array(
-            		'type'           => 'POST',
-            		'header'         => 0,
-            		'returntransfer' => 1,
-            		'encoding'       => 1,
-            		'url'            => 'https://'.nnmclub::$domain.'/forum/viewtopic.php?t='.$torrent_id,
-            		'cookie'         => nnmclub::$sess_cookie,
-            		'sendHeader'     => array('Host' => nnmclub::$domain, 'Content-length' => strlen(nnmclub::$sess_cookie)),
-            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
-            	)
-            );
+			nnmclub::$warning = NULL;
+			return array('url' => NULL);
+		}
 
-			if ( ! empty($page))
+		$url = 'https://'.nnmclub::$domain.'/forum/viewtopic.php?t='.$torrent_id;
+
+		$options = array(
+			CURLOPT_POST   => 1,
+			CURLOPT_COOKIE => nnmclub::$sess_cookie,
+		);
+
+		if (Sys::checkCurlVersion() == 'old')
+		{
+			$header = array();
+			foreach (array('Host' => nnmclub::$domain, 'Content-length' => strlen(nnmclub::$sess_cookie)) as $k => $v)
+				$header[] = $k.': '.$v."\r\n";
+			$options[CURLOPT_HTTPHEADER] = $header;
+		}
+
+		return array(
+			'url'     => $url,
+			'options' => $options + Sys::getProxyOptions($url),
+		);
+	}
+
+	//разбираем полученную страницу, возвращаем изменения для batchUpdateTorrents или null
+	public static function parse($params, $page)
+	{
+    	extract($params);
+		$return = NULL;
+
+		$page = iconv('windows-1251', 'utf-8//IGNORE', $page);
+
+		if ( ! empty($page))
+		{
+			//ищем на странице дату регистрации торрента
+			if (preg_match('/<td class=\"genmed\">&nbsp;(\d{2}\s\D{6}\s\d{4}\s\d{2}:\d{2}:\d{2})<\/td>/', $page, $array))
 			{
-				//ищем на странице дату регистрации торрента
-				if (preg_match('/<td class=\"genmed\">&nbsp;(\d{2}\s\D{6}\s\d{4}\s\d{2}:\d{2}:\d{2})<\/td>/', $page, $array))
+				//проверяем удалось ли получить дату со страницы
+				if (isset($array[1]))
 				{
-					//проверяем удалось ли получить дату со страницы
-					if (isset($array[1]))
+					//если дата не равна ничему
+					if ( ! empty($array[1]))
 					{
-						//если дата не равна ничему
-						if ( ! empty($array[1]))
+						//находим имя торрента для скачивания
+						if (preg_match('/download\.php\?id=(\d{6,8})/', $page, $link))
 						{
-							//находим имя торрента для скачивания
-							if (preg_match('/download\.php\?id=(\d{6,8})/', $page, $link))
+							//приводим дату к общему виду
+							$date = nnmclub::dateStringToNum($array[1]);
+							$date_str = $array[1];
+							//если даты не совпадают, перекачиваем торрент
+							if ($date != $timestamp)
 							{
-								//приводим дату к общему виду
-								$date = nnmclub::dateStringToNum($array[1]);
-								$date_str = $array[1];
-								//если даты не совпадают, перекачиваем торрент
-								if ($date != $timestamp)
-								{
-									//сохраняем торрент в файл
-									$download_id = $link[1];
-                                    $torrent = Sys::getUrlContent(
+								//сохраняем торрент в файл
+								$download_id = $link[1];
+                                $torrent = Sys::getUrlContent(
 	                                	array(
 	                                		'type'           => 'GET',
 	                                		'follow'         => 1,
@@ -196,38 +216,30 @@ class nnmclub
 
 	                                if (Sys::checkTorrentFile($torrent))
                                     {
-    									if ($auto_update)
-        								{
-        								    $name = Sys::parseHeader($tracker, $page);
-        								    //обновляем заголовок торрента в базе
-                                            Database::setNewName($id, $name);
-        								}
+									if ($auto_update)
+    								    $name = Sys::parseHeader($tracker, $page);
 
-    									$message = $name.' обновлён.';
-    									$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
+									$message = $name.' обновлён.';
+									$saved = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
 
-        								//обновляем время регистрации торрента в базе
-    									Database::setNewDate($id, $date);
-        								//сбрасываем варнинг
-        								Database::clearWarnings($tracker);
-        								Database::setErrorToThreme($id, 0);
+									if ($saved)
+    								{
+    								    if ($auto_update)
+    								        //обновляем заголовок торрента в базе
+                                        $return[$id]['name'] = $name;
+    								    //обновляем время регистрации торрента в базе
+									    $return[$id]['timestamp'] = $date;
+    								    //сбрасываем варнинг
+    								    Database::clearWarnings($tracker);
+    								    $return[$id]['error'] = 0;
+    								}
+    								else
+    								    Errors::setWarnings($tracker, 'save_file_fail', $id);
                                     }
                                     else
                                         Errors::setWarnings($tracker, 'torrent_file_fail', $id);
-								}
-								Database::setErrorToThreme($id, 0);
 							}
-							else
-							{
-								//устанавливаем варнинг
-								if (nnmclub::$warning == NULL)
-                    			{
-                    				nnmclub::$warning = TRUE;
-                    				Errors::setWarnings($tracker, 'cant_find_dowload_link', $id);
-                    			}
-                    			//останавливаем процесс выполнения, т.к. не может работать без кук
-								nnmclub::$exucution = FALSE;
-							}
+							$return[$id]['error'] = 0;
 						}
 						else
 						{
@@ -235,7 +247,7 @@ class nnmclub
 							if (nnmclub::$warning == NULL)
                 			{
                 				nnmclub::$warning = TRUE;
-                				Errors::setWarnings($tracker, 'cant_find_date', $id);
+                				Errors::setWarnings($tracker, 'cant_find_dowload_link', $id);
                 			}
                 			//останавливаем процесс выполнения, т.к. не может работать без кук
 							nnmclub::$exucution = FALSE;
@@ -271,13 +283,25 @@ class nnmclub
 				if (nnmclub::$warning == NULL)
     			{
     				nnmclub::$warning = TRUE;
-    				Errors::setWarnings($tracker, 'cant_get_forum_page', $id);
+    				Errors::setWarnings($tracker, 'cant_find_date', $id);
     			}
     			//останавливаем процесс выполнения, т.к. не может работать без кук
 				nnmclub::$exucution = FALSE;
 			}
 		}
+		else
+		{
+			//устанавливаем варнинг
+			if (nnmclub::$warning == NULL)
+			{
+				nnmclub::$warning = TRUE;
+				Errors::setWarnings($tracker, 'cant_get_forum_page', $id);
+			}
+			//останавливаем процесс выполнения, т.к. не может работать без кук
+			nnmclub::$exucution = FALSE;
+		}
 		nnmclub::$warning = NULL;
+		return $return;
 	}
 }
 ?>

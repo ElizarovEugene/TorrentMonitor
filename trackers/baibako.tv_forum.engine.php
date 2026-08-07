@@ -22,9 +22,9 @@ class baibako_f
 		if (preg_match('/<a href=\"logout\.php\">Выход<\/a>/U', $result))
 			return TRUE;
 		else
-			return FALSE;		  
+			return FALSE;
 	}
-	
+
 	//функция проверки введёного URL`а
 	public static function checkRule($data)
 	{
@@ -32,8 +32,8 @@ class baibako_f
 			return FALSE;
 		else
 			return TRUE;
-	}	
-	
+	}
+
 	//функция преобразования даты
 	private static function dateStringToNum($data)
 	{
@@ -41,17 +41,17 @@ class baibako_f
     	if (strlen($data1[0]) == 1)
 			$data1[0] = '0'.$data1[0];
     	$data3 = $data1[2].'-'.Sys::dateStringToNum($data1[1]).'-'.$data1[0];
-    	$date = $data3.' '.$data1[4];		
-    	
-    	return $date;	
-	}	
-	
+    	$date = $data3.' '.$data1[4];
+
+    	return $date;
+	}
+
 	//функция преобразования даты
 	private static function dateNumToString($data)
 	{
 		$data = substr($data, 0, -3);
 		$arr = preg_split('/\s/', $data);
-		
+
 		$month = Sys::dateNumToString($arr[1]);
 		$date = $arr[0].' '.$month.' '.$arr[2].' '.$arr[4];
 		return $date;
@@ -67,7 +67,7 @@ class baibako_f
 			$credentials = Database::getCredentials($tracker);
 			$login = iconv('utf-8', 'windows-1251', $credentials['login']);
 			$password = $credentials['password'];
-			
+
 			$page = Sys::getUrlContent(
             	array(
             		'type'           => 'POST',
@@ -142,12 +142,12 @@ class baibako_f
 				Errors::setWarnings($tracker, 'credential_miss');
 			}
 			//останавливаем выполнение цепочки
-			baibako_f::$exucution = FALSE;						
-		}	
+			baibako_f::$exucution = FALSE;
+		}
 	}
-	
-	//основная функция
-	public static function main($params)
+
+	//формируем параметры "проверочного" запроса для curl_multi (резолв куки последовательный, как и раньше)
+	public static function getRequestParams($params)
 	{
         extract($params);
 		$cookie = Database::getCookie($tracker);
@@ -159,88 +159,99 @@ class baibako_f
 		}
 		else
     		baibako_f::getCookie($tracker);
-    		
-    		
-		if (baibako_f::$exucution)
-		{
-			//получаем страницу для парсинга
-            $page = Sys::getUrlContent(
-            	array(
-            		'type'           => 'POST',
-            		'header'         => 0,
-            		'returntransfer' => 1,
-            		'url'            => 'http://baibako.tv/details.php?id='.$torrent_id,
-            		'cookie'         => baibako_f::$sess_cookie,
-            		'sendHeader'     => array('Host' => 'baibako.tv', 'Content-length' => strlen(baibako_f::$sess_cookie)),
-            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
-            	)
-            );
 
-			if ( ! empty($page))
+		if ( ! baibako_f::$exucution)
+		{
+			baibako_f::$warning = NULL;
+			return array('url' => NULL);
+		}
+
+		$url = 'http://baibako.tv/details.php?id='.$torrent_id;
+
+		$options = array(
+			CURLOPT_POST   => 1,
+			CURLOPT_COOKIE => baibako_f::$sess_cookie,
+		);
+
+		if (Sys::checkCurlVersion() == 'old')
+		{
+			$header = array();
+			foreach (array('Host' => 'baibako.tv', 'Content-length' => strlen(baibako_f::$sess_cookie)) as $k => $v)
+				$header[] = $k.': '.$v."\r\n";
+			$options[CURLOPT_HTTPHEADER] = $header;
+		}
+
+		return array(
+			'url'     => $url,
+			'options' => $options + Sys::getProxyOptions($url),
+		);
+	}
+
+	//разбираем полученную страницу, возвращаем изменения для batchUpdateTorrents или null
+	public static function parse($params, $page)
+	{
+        extract($params);
+		$return = NULL;
+
+		$page = iconv('windows-1251', 'utf-8//IGNORE', $page);
+
+		if ( ! empty($page))
+		{
+			//ищем на странице дату регистрации торрента
+			if (preg_match('/<td align=\"left\" width=\"16\.6\%\"><b>(.*)<\/b><\/td>/', $page, $array))
 			{
-				//ищем на странице дату регистрации торрента
-				if (preg_match('/<td align=\"left\" width=\"16\.6\%\"><b>(.*)<\/b><\/td>/', $page, $array))
+				//проверяем удалось ли получить дату со страницы
+				if (isset($array[1]))
 				{
-					//проверяем удалось ли получить дату со страницы
-					if (isset($array[1]))
+					//если дата не равна ничему
+					if ( ! empty($array[1]))
 					{
-						//если дата не равна ничему
-						if ( ! empty($array[1]))
+						//сбрасываем варнинг
+						Database::clearWarnings($tracker);
+						//приводим дату к общему виду
+						$date = baibako_f::dateStringToNum($array[1]);
+						$date_str = baibako_f::dateNumToString($array[1]);
+						//если даты не совпадают, перекачиваем торрент
+						if ($date != $timestamp)
 						{
-							//сбрасываем варнинг
-							Database::clearWarnings($tracker);
-							//приводим дату к общему виду
-							$date = baibako_f::dateStringToNum($array[1]);
-							$date_str = baibako_f::dateNumToString($array[1]);
-							//если даты не совпадают, перекачиваем торрент
-							if ($date != $timestamp)
-							{
-								//сохраняем торрент в файл
-                                $torrent = Sys::getUrlContent(
-                                	array(
-                                		'type'           => 'POST',
-                                		'returntransfer' => 1,
-                                		'url'            => 'http://baibako.tv/download.php?id='.$torrent_id,
-                                		'cookie'         => baibako_f::$sess_cookie,
-                                		'sendHeader'     => array('Host' => 'baibako.tv', 'Content-length' => strlen(baibako_f::$sess_cookie)),
-                                		'referer'        => 'http://baibako.tv/download.php?id='.$torrent_id,
-                                	)
-                                );
-                                
-                                if (Sys::checkTorrentFile($torrent))
-                                {
-    								if ($auto_update)
-    								{
-    								    $name = Sys::parseHeader($tracker, $page);
-    								    //обновляем заголовок торрента в базе
-                                        Database::setNewName($id, $name);
-    								}
-    
-    								$message = $name.' обновлён.';
-    								$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
-    								
-    								//обновляем время регистрации торрента в базе
-    								Database::setNewDate($id, $date);
-									//сбрасываем варнинг
-									Database::clearWarnings($tracker);
-    								Database::setErrorToThreme($id, 0);
-                                }
-                                else
-                                    Errors::setWarnings($tracker, 'torrent_file_fail', $id);
-							}
-							Database::setErrorToThreme($id, 0);
+							//сохраняем торрент в файл
+                            $torrent = Sys::getUrlContent(
+                            	array(
+                            		'type'           => 'POST',
+                            		'returntransfer' => 1,
+                            		'url'            => 'http://baibako.tv/download.php?id='.$torrent_id,
+                            		'cookie'         => baibako_f::$sess_cookie,
+                            		'sendHeader'     => array('Host' => 'baibako.tv', 'Content-length' => strlen(baibako_f::$sess_cookie)),
+                            		'referer'        => 'http://baibako.tv/download.php?id='.$torrent_id,
+                            	)
+                            );
+
+                            if (Sys::checkTorrentFile($torrent))
+                            {
+								if ($auto_update)
+								    $name = Sys::parseHeader($tracker, $page);
+
+								$message = $name.' обновлён.';
+								$saved = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
+
+								if ($saved)
+								{
+								    if ($auto_update)
+								        //обновляем заголовок торрента в базе
+								        $return[$id]['name'] = $name;
+								    //обновляем время регистрации торрента в базе
+								    $return[$id]['timestamp'] = $date;
+								    //сбрасываем варнинг
+								    Database::clearWarnings($tracker);
+								    $return[$id]['error'] = 0;
+								}
+								else
+								    Errors::setWarnings($tracker, 'save_file_fail', $id);
+                            }
+                            else
+                                Errors::setWarnings($tracker, 'torrent_file_fail', $id);
 						}
-						else
-						{
-							//устанавливаем варнинг
-							if (baibako_f::$warning == NULL)
-							{
-								baibako_f::$warning = TRUE;
-								Errors::setWarnings($tracker, 'cant_find_date', $id);
-							}
-							//останавливаем процесс выполнения, т.к. не может работать без кук
-							baibako_f::$exucution = FALSE;
-						}
+						$return[$id]['error'] = 0;
 					}
 					else
 					{
@@ -253,21 +264,34 @@ class baibako_f
 						//останавливаем процесс выполнения, т.к. не может работать без кук
 						baibako_f::$exucution = FALSE;
 					}
-                }
-			}
-			else
-			{
-				//устанавливаем варнинг
-				if (baibako_f::$warning == NULL)
-				{
-					baibako_f::$warning = TRUE;
-					Errors::setWarnings($tracker, 'cant_get_forum_page', $id);
 				}
-				//останавливаем процесс выполнения, т.к. не может работать без кук
-				baibako_f::$exucution = FALSE;
-			}
+				else
+				{
+					//устанавливаем варнинг
+					if (baibako_f::$warning == NULL)
+					{
+						baibako_f::$warning = TRUE;
+						Errors::setWarnings($tracker, 'cant_find_date', $id);
+					}
+					//останавливаем процесс выполнения, т.к. не может работать без кук
+					baibako_f::$exucution = FALSE;
+				}
+            }
 		}
-		baibako_f::$warning = NULL;		
+		else
+		{
+			//устанавливаем варнинг
+			if (baibako_f::$warning == NULL)
+			{
+				baibako_f::$warning = TRUE;
+				Errors::setWarnings($tracker, 'cant_get_forum_page', $id);
+			}
+			//останавливаем процесс выполнения, т.к. не может работать без кук
+			baibako_f::$exucution = FALSE;
+		}
+
+		baibako_f::$warning = NULL;
+		return $return;
 	}
 }
 ?>

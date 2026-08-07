@@ -5,7 +5,7 @@ class animelayer
 	protected static $sess_cookie;
 	protected static $exucution;
 	protected static $warning;
-	
+
 	// Проверяем cookie
 	public static function checkCookie($sess_cookie)
 	{
@@ -25,7 +25,7 @@ class animelayer
 		else
 			return FALSE;
 	}
-	
+
 	// Функция проверки введёного URL`а
 	public static function checkRule($data)
 	{
@@ -34,7 +34,7 @@ class animelayer
 		else
 		    return FALSE;
 	}
-	
+
 	//функция преобразования даты из строки в формат БД
 	private static function dateStringToNum($data)
 	{
@@ -42,24 +42,24 @@ class animelayer
 		$pieces = explode(' ', $date);
 		if (strlen($pieces[0]) == 1)
 			$pieces[0] = '0'.$pieces[0];
-		
+
 		$monthes = array('/января/i', '/февраля/i', '/марта/i', '/апреля/i', '/мая/i', '/июня/i', '/июля/i', '/августа/i', '/сентября/i', '/октября/i', '/ноября/i', '/декабря/i');
 		$monthes_num = array('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12');
 		$month = preg_replace($monthes, $monthes_num, $pieces[1]);
 
 		preg_match('/\d{1,2}:\d{2}/', $date, $matchs);
-		$pieces2 = explode(':', $matchs[0]);      
+		$pieces2 = explode(':', $matchs[0]);
 		if (strlen($pieces2[0]) == 1)
 			$hour = '0'.$pieces2[0];
 		else
 			$hour = $pieces2[0];
-			
+
 		if (count($pieces) == 4)
-		    return date('Y').'-'.$month.'-'.$pieces[0].' '.$hour.':'.$pieces2[1].':00'; 
+		    return date('Y').'-'.$month.'-'.$pieces[0].' '.$hour.':'.$pieces2[1].':00';
 		else if (count($pieces) == 5)
 		    return $pieces[2].'-'.$month.'-'.$pieces[0].' '.$hour.':'.$pieces2[1].':00';
 	}
-	
+
 	//функция преобразования даты в строку
 	private static function dateNumToString($data)
 	{
@@ -71,10 +71,10 @@ class animelayer
 
 		$month = Sys::dateNumToString($data[1]);
 		$date = $data[2].' '.$month.' '.$data[0].' в '.$time;
-		
+
 		return $date;
     }
-	
+
 	// Функция получения кук
 	protected static function getCookie($tracker)
 	{
@@ -85,7 +85,7 @@ class animelayer
 			$credentials = Database::getCredentials($tracker);
 			$login = iconv('utf-8', 'windows-1251', $credentials['login']);
 			$password = $credentials['password'];
-			
+
 			// Авторизовываемся на трекере
 			$page = Sys::getUrlContent(
 				array(
@@ -150,14 +150,14 @@ class animelayer
 				animelayer::$warning = TRUE;
 				Errors::setWarnings($tracker, 'credential_miss');
 			}
-			
+
 			// Останавливаем процесс выполнения, т.к. не может работать без кук
 			animelayer::$exucution = FALSE;
 		}
 	}
 
-	// Основная функция
-	public static function main($params)
+	//формируем параметры "проверочного" запроса для curl_multi (резолв куки последовательный, как и раньше)
+	public static function getRequestParams($params)
 	{
     	extract($params);
 		$cookie = Database::getCookie($tracker);
@@ -166,127 +166,151 @@ class animelayer
 			animelayer::$sess_cookie = $cookie;
 			// Запускам процесс выполнения
 			animelayer::$exucution = TRUE;
-		}			
+		}
 		else
 			animelayer::getCookie($tracker);
-		
-		if (animelayer::$exucution)
+
+		if ( ! animelayer::$exucution)
 		{
-			// Получаем страницу для парсинга
-			$page = Sys::getUrlContent(
-				array(
-					'type'           => 'POST',
-					'header'         => 0,
-					'returntransfer' => 1,
-					'url'            => 'https://animelayer.ru/torrent/'.$torrent_id.'/',
-					'cookie'         => animelayer::$sess_cookie,
-					'sendHeader'     => array('Host' => 'animelayer.ru', 'Content-length' => strlen(animelayer::$sess_cookie)),
-				)
-			);
-			if ( ! empty($page))
-			{
-				// Ищем на странице дату регистрации торрента
-				if (preg_match('/<span class=\"(date-updated|date-created)\">(.*)<\/span>/U', $page, $array))
-                {
-            		// Проверяем удалось ли получить дату со страницы
-            		if (isset($array[2]))
-            		{
-            			if ( ! empty($array[2]))
-            			{
-            				// Сбрасываем варнинг
-            				Database::clearWarnings($tracker);
-            				$date = animelayer::dateStringToNum($array[2]);
-            				$date_str = animelayer::dateNumToString($date);
-            				// Если даты не совпадают, перекачиваем торрент
-            				if ($date != $timestamp)
-            				{
-								var_dump($torrent);
-            					// Сохраняем торрент в файл
-                                $torrent = Sys::getUrlContent(
-                                	array(
-                                		'type'           => 'POST',
-                                		'returntransfer' => 1,
-                                		'url'            => 'https://animelayer.ru/torrent/'.$torrent_id.'/download/',
-                                		'cookie'         => animelayer::$sess_cookie,
-                                		'sendHeader'     => array('Host' => 'animelayer.ru', 'Content-length' => strlen(animelayer::$sess_cookie)),
-                                		'referer'        => 'https://animelayer.ru/torrent/'.$torrent_id,
-                                	)
-                                );
-                                
-                                if (Sys::checkTorrentFile($torrent))
-                                {
-                                    if ($auto_update)
-    								{
-        								$name = Sys::parseHeader($tracker, $page);
-    								    //обновляем заголовок торрента в базе
-                                        Database::setNewName($id, $name);
-                                        //сбрасываем варнинг
-        								Database::clearWarnings($tracker);
-        								Database::setErrorToThreme($id, 0);
-    								}
-        								
-                                    $message = $name.' обновлён.';
-                					$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
- 								
-                					// Обновляем время регистрации торрента в базе
-                					Database::setNewDate($id, $date);
+			animelayer::$warning = NULL;
+			return array('url' => NULL);
+		}
+
+		$url = 'https://animelayer.ru/torrent/'.$torrent_id.'/';
+
+		$options = array(
+			CURLOPT_POST   => 1,
+			CURLOPT_COOKIE => animelayer::$sess_cookie,
+		);
+
+		if (Sys::checkCurlVersion() == 'old')
+		{
+			$header = array();
+			foreach (array('Host' => 'animelayer.ru', 'Content-length' => strlen(animelayer::$sess_cookie)) as $k => $v)
+				$header[] = $k.': '.$v."\r\n";
+			$options[CURLOPT_HTTPHEADER] = $header;
+		}
+
+		return array(
+			'url'     => $url,
+			'options' => $options + Sys::getProxyOptions($url),
+		);
+	}
+
+	//разбираем полученную страницу, возвращаем изменения для batchUpdateTorrents или null
+	public static function parse($params, $page)
+	{
+    	extract($params);
+		$return = NULL;
+
+		if ( ! empty($page))
+		{
+			// Ищем на странице дату регистрации торрента
+			if (preg_match('/<span class=\"(date-updated|date-created)\">(.*)<\/span>/U', $page, $array))
+            {
+        		// Проверяем удалось ли получить дату со страницы
+        		if (isset($array[2]))
+        		{
+        			if ( ! empty($array[2]))
+        			{
+        				// Сбрасываем варнинг
+        				Database::clearWarnings($tracker);
+        				$date = animelayer::dateStringToNum($array[2]);
+        				$date_str = animelayer::dateNumToString($date);
+        				// Если даты не совпадают, перекачиваем торрент
+        				if ($date != $timestamp)
+        				{
+        					// Сохраняем торрент в файл
+                            $torrent = Sys::getUrlContent(
+                            	array(
+                            		'type'           => 'POST',
+                            		'returntransfer' => 1,
+                            		'url'            => 'https://animelayer.ru/torrent/'.$torrent_id.'/download/',
+                            		'cookie'         => animelayer::$sess_cookie,
+                            		'sendHeader'     => array('Host' => 'animelayer.ru', 'Content-length' => strlen(animelayer::$sess_cookie)),
+                            		'referer'        => 'https://animelayer.ru/torrent/'.$torrent_id,
+                            	)
+                            );
+
+                            if (Sys::checkTorrentFile($torrent))
+                            {
+                                if ($auto_update)
+								{
+    								$name = Sys::parseHeader($tracker, $page);
+								    //обновляем заголовок торрента в базе
+                                    $return[$id]['name'] = $name;
+                                    //сбрасываем варнинг
+    								Database::clearWarnings($tracker);
+    								$return[$id]['error'] = 0;
+								}
+
+                                $message = $name.' обновлён.';
+            					$saved = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
+
+            					if ($saved)
+            					{
+            						// Обновляем время регистрации торрента в базе
+            						$return[$id]['timestamp'] = $date;
 									//сбрасываем варнинг
 									Database::clearWarnings($tracker);
-									Database::setErrorToThreme($id, 0);
-                				}
-                				else
-                                    Errors::setWarnings($tracker, 'torrent_file_fail', $id);
+									$return[$id]['error'] = 0;
+            					}
+            					else
+            						Errors::setWarnings($tracker, 'save_file_fail', $id);
             				}
-							Database::setErrorToThreme($id, 0);
-            			}
-            			else
-            			{
-            				// Устанавливаем варнинг
-            				if (animelayer::$warning == NULL)
-            				{
-            					animelayer::$warning = TRUE;
-            					Errors::setWarnings($tracker, 'cant_find_date', $id);
-            				}
-            				// Останавливаем процесс выполнения, т.к. не может работать без даты
-            				animelayer::$exucution = FALSE;
-            			}
-            		}
-            		else
-            		{
-            			// Устанавливаем варнинг
-            			if (animelayer::$warning == NULL)
-            			{
-            				animelayer::$warning = TRUE;
-            				Errors::setWarnings($tracker, 'cant_find_date', $id);
-            			}
-            			// Останавливаем процесс выполнения, т.к. не может работать без даты
-            			animelayer::$exucution = FALSE;
-            		}                    
-                }
-				else
-				{
-					// Устанавливаем варнинг
-					if (animelayer::$warning == NULL)
-					{
-						animelayer::$warning = TRUE;
-						Errors::setWarnings($tracker, 'cant_find_date', $id);
-					}
-					// Останавливаем процесс выполнения, т.к. не может работать без даты
-					animelayer::$exucution = FALSE;
-				}
-			}			
+            				else
+                                Errors::setWarnings($tracker, 'torrent_file_fail', $id);
+        				}
+						$return[$id]['error'] = 0;
+        			}
+        			else
+        			{
+        				// Устанавливаем варнинг
+        				if (animelayer::$warning == NULL)
+        				{
+        					animelayer::$warning = TRUE;
+        					Errors::setWarnings($tracker, 'cant_find_date', $id);
+        				}
+        				// Останавливаем процесс выполнения, т.к. не может работать без даты
+        				animelayer::$exucution = FALSE;
+        			}
+        		}
+        		else
+        		{
+        			// Устанавливаем варнинг
+        			if (animelayer::$warning == NULL)
+        			{
+        				animelayer::$warning = TRUE;
+        				Errors::setWarnings($tracker, 'cant_find_date', $id);
+        			}
+        			// Останавливаем процесс выполнения, т.к. не может работать без даты
+        			animelayer::$exucution = FALSE;
+        		}
+            }
 			else
 			{
 				// Устанавливаем варнинг
 				if (animelayer::$warning == NULL)
 				{
 					animelayer::$warning = TRUE;
-					Errors::setWarnings($tracker, 'cant_get_forum_page', $id);
+					Errors::setWarnings($tracker, 'cant_find_date', $id);
 				}
-				// Останавливаем процесс выполнения, т.к. не может работать без данных
+				// Останавливаем процесс выполнения, т.к. не может работать без даты
 				animelayer::$exucution = FALSE;
 			}
 		}
+		else
+		{
+			// Устанавливаем варнинг
+			if (animelayer::$warning == NULL)
+			{
+				animelayer::$warning = TRUE;
+				Errors::setWarnings($tracker, 'cant_get_forum_page', $id);
+			}
+			// Останавливаем процесс выполнения, т.к. не может работать без данных
+			animelayer::$exucution = FALSE;
+		}
 		animelayer::$warning = NULL;
+		return $return;
 	}
 }

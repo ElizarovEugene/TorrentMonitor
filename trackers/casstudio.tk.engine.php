@@ -54,26 +54,26 @@ class casstudio
 			$month = Sys::dateStringToNum(substr($pieces[1], 0, 6));
 			if (strlen($pieces[0]) == 1)
 			    $pieces[0] = '0'.$pieces[0];
-			
+
 			$year = substr($pieces[2], 0, -1);
 			$date = $year.'-'.$month.'-'.$pieces[0];
 			$time = $pieces[3].':00';
 			$dateTime = $date.' '.$time;
 
 			return $dateTime;
-	    }	    
+	    }
 	}
 
 	//функция преобразования даты
 	private static function dateNumToString($data)
     {
     	$arr = preg_split('/\s/', $data);
-    	
+
     	$dates = preg_split('/-/', $arr[0]);
     	$date = $dates[2].' '.Sys::dateNumToString($dates[1]).' '.$dates[0];
-    	
+
     	$time = substr($arr[1], 0, -3);
-    	
+
     	return $date.' в '.$time;
     }
 
@@ -112,7 +112,7 @@ class casstudio
 				}
 				//если подходят - получаем куки
 				elseif (preg_match_all('/Set-Cookie: (.*);/iU', $page, $array))
-				{var_dump($array);
+				{
 					casstudio::$sess_cookie = $array[1][3].'; '.$array[1][4].'; '.$array[1][5];
 					Database::setCookie($tracker, casstudio::$sess_cookie);
 					//запускам процесс выполнения, т.к. не может работать без кук
@@ -156,8 +156,8 @@ class casstudio
 		}
 	}
 
-	//основная функция
-	public static function main($params)
+	//формируем параметры "проверочного" запроса для curl_multi (резолв куки последовательный, как и раньше)
+	public static function getRequestParams($params)
 	{
     	extract($params);
 		$cookie = Database::getCookie($tracker);
@@ -170,99 +170,111 @@ class casstudio
 		else
     		casstudio::getCookie($tracker);
 
-		if (casstudio::$exucution)
+		if ( ! casstudio::$exucution)
 		{
-			//получаем страницу для парсинга
-            $page = Sys::getUrlContent(
-            	array(
-            		'type'           => 'POST',
-            		'header'         => 0,
-            		'returntransfer' => 1,
-            		'url'            => 'https://casstudio.tk/viewtopic.php?t='.$torrent_id,
-            		'cookie'         => casstudio::$sess_cookie,
-            		'sendHeader'     => array('Host' => 'casstudio.tk', 'Content-length' => strlen(casstudio::$sess_cookie)),
-            	)
-            );
+			casstudio::$warning = NULL;
+			return array('url' => NULL);
+		}
 
-			if ( ! empty($page))
+		$url = 'https://casstudio.tk/viewtopic.php?t='.$torrent_id;
+
+		$options = array(
+			CURLOPT_POST   => 1,
+			CURLOPT_COOKIE => casstudio::$sess_cookie,
+		);
+
+		if (Sys::checkCurlVersion() == 'old')
+		{
+			$header = array();
+			foreach (array('Host' => 'casstudio.tk', 'Content-length' => strlen(casstudio::$sess_cookie)) as $k => $v)
+				$header[] = $k.': '.$v."\r\n";
+			$options[CURLOPT_HTTPHEADER] = $header;
+		}
+
+		return array(
+			'url'     => $url,
+			'options' => $options + Sys::getProxyOptions($url),
+		);
+	}
+
+	//разбираем полученную страницу, возвращаем изменения для batchUpdateTorrents или null
+	public static function parse($params, $page)
+	{
+    	extract($params);
+		$return = NULL;
+
+		if ( ! empty($page))
+		{
+			//ищем на странице дату регистрации торрента
+			if (preg_match('/<b>Добавлен<\/b>: <span class=\"my_tt\" title=\"(.*)\">(.*)<\/span>/', $page, $array))
 			{
-				//ищем на странице дату регистрации торрента
-				if (preg_match('/<b>Добавлен<\/b>: <span class=\"my_tt\" title=\"(.*)\">(.*)<\/span>/', $page, $array))
+				//проверяем удалось ли получить дату со страницы
+				if (isset($array[2]))
 				{
-					//проверяем удалось ли получить дату со страницы
-					if (isset($array[2]))
+					//если дата не равна ничему
+					if ( ! empty($array[2]))
 					{
-						//если дата не равна ничему
-						if ( ! empty($array[2]))
+						//сбрасываем варнинг
+						Database::clearWarnings($tracker);
+						//приводим дату к общему виду
+                        $date = casstudio::dateStringToNum($array[2]);
+						$date_str = casstudio::dateNumToString($date);
+						$return = array($id => array('error' => 0));
+						//если даты не совпадают, перекачиваем торрент
+						if ($date != $timestamp)
 						{
-							//сбрасываем варнинг
-							Database::clearWarnings($tracker);
-							//приводим дату к общему виду
-                            $date = casstudio::dateStringToNum($array[2]);
-							$date_str = casstudio::dateNumToString($date);
-							//если даты не совпадают, перекачиваем торрент
-							if ($date != $timestamp)
-							{
-							    if (preg_match('/\.\/download\/file\.php\?id=(.*)\" title=\"Скачать торрент\"/', $page, $link))
-							    {
-    								//сохраняем торрент в файл
-                                    $torrent = Sys::getUrlContent(
-                                    	array(
-                                    		'type'           => 'POST',
-                                    		'returntransfer' => 1,
-                                    		'url'            => 'https://casstudio.tk/download/file.php?id='.$link[1],
-                                    		'cookie'         => casstudio::$sess_cookie,
-                                    		'sendHeader'     => array('Host' => 'casstudio.tk', 'Content-length' => strlen(casstudio::$sess_cookie)),
-                                    		'referer'        => 'https://casstudio.tk/viewtopic.php?t='.$link[1],
-                                        	)
-                                    );
-                                    
-                                    if (Sys::checkTorrentFile($torrent))
-                                    {
-        								if ($auto_update)
-        								{
-        								    $name = Sys::parseHeader($tracker, $page);
-        								    //обновляем заголовок торрента в базе
-                                            Database::setNewName($id, $name);
-        								}
-    
-        								$message = $name.' обновлён.';
-        								$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
-    								
-        								//обновляем время регистрации торрента в базе
-        								Database::setNewDate($id, $date);
-										//сбрасываем варнинг
-										Database::clearWarnings($tracker);
-										Database::setErrorToThreme($id, 0);
-                                    }
-                                    else
-                                        Errors::setWarnings($tracker, 'torrent_file_fail', $id);
+						    if (preg_match('/\.\/download\/file\.php\?id=(.*)\" title=\"Скачать торрент\"/', $page, $link))
+						    {
+								//сохраняем торрент в файл
+                                $torrent = Sys::getUrlContent(
+                                	array(
+                                		'type'           => 'POST',
+                                		'returntransfer' => 1,
+                                		'url'            => 'https://casstudio.tk/download/file.php?id='.$link[1],
+                                		'cookie'         => casstudio::$sess_cookie,
+                                		'sendHeader'     => array('Host' => 'casstudio.tk', 'Content-length' => strlen(casstudio::$sess_cookie)),
+                                		'referer'        => 'https://casstudio.tk/viewtopic.php?t='.$link[1],
+                                    	)
+                                );
+
+                                if (Sys::checkTorrentFile($torrent))
+                                {
+    								if ($auto_update)
+    								    $name = Sys::parseHeader($tracker, $page);
+
+    								$message = $name.' обновлён.';
+    								$saved = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
+
+    								if ($saved)
+    								{
+    								    if ($auto_update)
+    								        //обновляем заголовок торрента в базе
+    								        $return[$id]['name'] = $name;
+    								    //обновляем время регистрации торрента в базе
+    								    $return[$id]['timestamp'] = $date;
+    								    //сбрасываем варнинг
+    								    Database::clearWarnings($tracker);
+    								    $return[$id]['error'] = 0;
+    								}
+    								else
+    								    Errors::setWarnings($tracker, 'save_file_fail', $id);
                                 }
                                 else
-                                {
-                                    //устанавливаем варнинг
-        							if (casstudio::$warning == NULL)
-        							{
-        								casstudio::$warning = TRUE;
-        								Errors::setWarnings($tracker, 'cant_find_dowload_link', $id);
-        							}
-        							//останавливаем процесс выполнения, т.к. не может работать без кук
-        							casstudio::$exucution = FALSE;
-                                }
-							}
-							Database::setErrorToThreme($id, 0);
+                                    Errors::setWarnings($tracker, 'torrent_file_fail', $id);
+                            }
+                            else
+                            {
+                                //устанавливаем варнинг
+    							if (casstudio::$warning == NULL)
+    							{
+    								casstudio::$warning = TRUE;
+    								Errors::setWarnings($tracker, 'cant_find_dowload_link', $id);
+    							}
+    							//останавливаем процесс выполнения, т.к. не может работать без кук
+    							casstudio::$exucution = FALSE;
+                            }
 						}
-						else
-						{
-							//устанавливаем варнинг
-							if (casstudio::$warning == NULL)
-							{
-								casstudio::$warning = TRUE;
-								Errors::setWarnings($tracker, 'cant_find_date', $id);
-							}
-							//останавливаем процесс выполнения, т.к. не может работать без кук
-							casstudio::$exucution = FALSE;
-						}
+						$return[$id]['error'] = 0;
 					}
 					else
 					{
@@ -294,13 +306,26 @@ class casstudio
 				if (casstudio::$warning == NULL)
 				{
 					casstudio::$warning = TRUE;
-					Errors::setWarnings($tracker, 'cant_get_forum_page');
+					Errors::setWarnings($tracker, 'cant_find_date', $id);
 				}
 				//останавливаем процесс выполнения, т.к. не может работать без кук
 				casstudio::$exucution = FALSE;
 			}
 		}
+		else
+		{
+			//устанавливаем варнинг
+			if (casstudio::$warning == NULL)
+			{
+				casstudio::$warning = TRUE;
+				Errors::setWarnings($tracker, 'cant_get_forum_page');
+			}
+			//останавливаем процесс выполнения, т.к. не может работать без кук
+			casstudio::$exucution = FALSE;
+		}
+
 		casstudio::$warning = NULL;
+		return $return;
 	}
 }
 ?>

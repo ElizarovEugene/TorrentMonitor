@@ -2,16 +2,24 @@
 $dir = dirname(__FILE__).'/../';
 include_once $dir.'class/Database.class.php';
 
-$rss = Database::getSetting('rss');
+try
+{
+    $rss = Database::getSetting('rss');
+    $dbOk = true;
+}
+catch (Throwable $e)
+{
+    $rss = false;
+    $dbOk = false;
+}
 
 if ($rss)
 {
-    header('Content-type: text/xml');
-    
+    header('Content-type: text/xml; charset=utf-8');
+
     //количество записей в ленте. При необходимости, можно вынести в параметры
     $maxCount = 20;
-    
-    #$url = 'http://'.$_SERVER["HTTP_HOST"].str_replace('/rss/index.php', '', $_SERVER["SCRIPT_NAME"]);
+
     $url = Database::getSetting('serverAddress');
     
     $xml=new DomDocument('1.0','utf-8'); // создаем XML документ
@@ -77,7 +85,7 @@ if ($rss)
         
         // формируем элемент 'title'
         $title = $item->appendChild($xml->createElement('title'));
-        $title->appendChild($xml->createTextNode(sprintf("%0d. ", $count++).$fileName));
+        $title->appendChild($xml->createTextNode(($count++).'. '.$fileName));
         
         // формируем элемент 'pubDate'
         $pubDate = $item->appendChild($xml->createElement('pubDate'));
@@ -94,6 +102,8 @@ if ($rss)
     // выводим содержимое XML документа
     print $xml->saveXML();
 }
+elseif ( ! $dbOk)
+    echo '<h1>RSS unavailable</h1>';
 else
     echo '<h1>RSS disabled</h1>';
 ?>

@@ -4,8 +4,8 @@ class newstudio
 	protected static $sess_cookie;
 	protected static $exucution;
 	protected static $warning;
-	
-	protected static $page;	
+
+	protected static $page;
 	protected static $log_page;
 	protected static $xml_page;
 
@@ -26,7 +26,7 @@ class newstudio
 		if (preg_match('/login\.php\?logout=1/', $result))
 			return TRUE;
 		else
-			return FALSE;		  
+			return FALSE;
 	}
 
 	public static function checkRule($data)
@@ -42,28 +42,28 @@ class newstudio
 	{
 		$data = substr($data, 5);
 		$data = substr($data, 0, -6);
-		
+
 		$monthes = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 		$month = substr($data, 3, 3);
 		$data = preg_replace('/(\d\d)-(\d\d)-(\d\d)/', '$3-$2-$1', str_replace($month, str_pad(array_search($month, $monthes)+1, 2, 0, STR_PAD_LEFT), $data));
-		
-		$data = preg_split('/\s/', $data);		
+
+		$data = preg_split('/\s/', $data);
 		$date = $data[2].'-'.$data[1].'-'.$data[0].' '.$data[3];
 		return $date;
 	}
-	
+
 	//функция преобразования даты в строку
 	private static function dateNumToString($data)
 	{
 		$data = substr($data, 0, -3);
 		$data = str_replace('-', ' ', $data);
 		$arr = preg_split('/\s/', $data);
-		
+
 		$month = Sys::dateNumToString($arr[1]);
 		$date = $arr[2].' '.$month.' '.$arr[0].' '.$arr[3];
 		return $date;
 	}
-	
+
 	//функция поиска id torrent-файла
 	private static function findID($link)
 	{
@@ -77,7 +77,7 @@ class newstudio
 				'sendHeader'     => array('Host' => 'newstudio.tv', 'Content-length' => strlen(newstudio::$sess_cookie)),
 			)
 		);
-		
+
 		if (preg_match('/download\.php\?id=(\d{2,6})/', $result, $matches))
 			return $matches[1];
 		else
@@ -123,10 +123,10 @@ class newstudio
 			}
 		}
 	}
-	
+
 	//функция получения кук
 	public static function getCookie($tracker)
-	{	
+	{
 		//проверяем заполнены ли учётные данные
 		if (Database::checkTrackersCredentialsExist($tracker))
 		{
@@ -134,7 +134,7 @@ class newstudio
 			$credentials = Database::getCredentials($tracker);
 			$login = iconv('utf-8', 'windows-1251', $credentials['login']);
 			$password = $credentials['password'];
-			
+
 			$page = Sys::getUrlContent(
             	array(
             		'type'           => 'POST',
@@ -202,79 +202,88 @@ class newstudio
 				Errors::setWarnings($tracker, 'credential_miss');
 			}
 			//останавливаем выполнение цепочки
-			newstudio::$exucution = FALSE;						
-		}	
+			newstudio::$exucution = FALSE;
+		}
 	}
-	
-	//основная функция
-	public static function main($params)
-	{
-    	extract($params);
-		//проверяем небыло ли до этого уже ошибок
-		if (empty(newstudio::$exucution) || (newstudio::$exucution))
-		{
-			//проверяем получена ли уже кука
-			if (empty(newstudio::$sess_cookie))
-			{
-        		$cookie = Database::getCookie($tracker);
-        		if (newstudio::checkCookie($cookie))
-        		{
-        			newstudio::$sess_cookie = $cookie;
-        			//запускам процесс выполнения
-        			newstudio::$exucution = TRUE;
-        		}			
-        		else
-            		newstudio::getCookie($tracker);
-			}
-			
-			//проверяем получена ли уже RSS лента
-			if ( ! newstudio::$log_page)
-			{
-				if (newstudio::$exucution)
-				{
-					//получаем страницу
-			        newstudio::$page = Sys::getUrlContent(
-			        	array(
-			        		'type'           => 'GET',
-			        		'returntransfer' => 1,
-			        		'url'            => 'https://newstudio.tv/rss.php',
-			        	)
-			        );
 
-					if ( ! empty(newstudio::$page))
-					{
-						//читаем xml
-						newstudio::$xml_page = @simplexml_load_string(newstudio::$page);
-						//если XML пришёл с ошибками - останавливаем выполнение, иначе - ставим флажок, что получаем страницу
-						if ( ! newstudio::$xml_page)
-						{
-							//устанавливаем варнинг
-        					if (newstudio::$warning == NULL)
-                			{
-                				newstudio::$warning = TRUE;
-                				Errors::setWarnings($tracker, 'rss_parse_false');
-                			}
-							//останавливаем выполнение цепочки
-							newstudio::$exucution = FALSE;
-						}
-						else
-							newstudio::$log_page = TRUE;
-					}
-					else
-					{
-						//устанавливаем варнинг
-    					if (newstudio::$warning == NULL)
-            			{
-            				newstudio::$warning = TRUE;
-            				Errors::setWarnings($tracker, 'cant_find_rss');
-            			}
-						//останавливаем выполнение цепочки
-						newstudio::$exucution = FALSE;
-					}
+	//формируем параметры "проверочного" запроса для curl_multi
+	//резолв куки выполняется один раз для всех строк newstudio.tv в рамках текущего прогона;
+	//rss.php одинаков для каждой строки, поэтому CurlMultiFetcher схлопнёт его в один реальный запрос
+	public static function getRequestParams($params)
+	{
+		extract($params);
+
+		//проверяем получена ли уже кука
+		if (empty(newstudio::$sess_cookie))
+		{
+    		$cookie = Database::getCookie($tracker);
+    		if (newstudio::checkCookie($cookie))
+    		{
+    			newstudio::$sess_cookie = $cookie;
+    			//запускам процесс выполнения
+    			newstudio::$exucution = TRUE;
+    		}
+    		else
+        		newstudio::getCookie($tracker);
+		}
+
+		if ( ! newstudio::$exucution)
+			return array('url' => NULL);
+
+		$url = 'https://newstudio.tv/rss.php';
+
+		return array(
+			'url'     => $url,
+			'options' => array(CURLOPT_HTTPGET => 1) + Sys::getProxyOptions($url),
+		);
+	}
+
+	//разбираем RSS-ленту (общую для всех строк newstudio.tv) и анализируем эпизоды для текущей строки
+	public static function parse($params, $page)
+	{
+		extract($params);
+		$return = NULL;
+
+		//проверяем получена ли уже RSS лента (один раз для всех строк этого трекера)
+		if (newstudio::$xml_page === NULL)
+		{
+			if ( ! empty($page))
+			{
+				//читаем xml
+				$xml = @simplexml_load_string($page);
+				//если XML пришёл с ошибками - останавливаем выполнение, иначе - сохраняем для остальных строк
+				if ( ! $xml)
+				{
+					//устанавливаем варнинг
+					if (newstudio::$warning == NULL)
+        			{
+        				newstudio::$warning = TRUE;
+        				Errors::setWarnings($tracker, 'rss_parse_false');
+        			}
+					//останавливаем выполнение цепочки
+					newstudio::$exucution = FALSE;
+					newstudio::$xml_page = FALSE;
+				}
+				else
+				{
+					newstudio::$log_page = TRUE;
+					newstudio::$xml_page = $xml;
 				}
 			}
+			else
+			{
+				//устанавливаем варнинг
+				if (newstudio::$warning == NULL)
+    			{
+    				newstudio::$warning = TRUE;
+    				Errors::setWarnings($tracker, 'cant_find_rss');
+    			}
+				//останавливаем выполнение цепочки
+				newstudio::$exucution = FALSE;
+				newstudio::$xml_page = FALSE;
+			}
 		}
-	
+
 		//если выполнение цепочки не остановлено
 		if (newstudio::$exucution)
 		{
@@ -287,7 +296,7 @@ class newstudio
 				{
 				    array_unshift($nodes, $item);
 				}
-				
+
 				foreach ($nodes as $item)
 				{
 
@@ -327,19 +336,24 @@ class newstudio
 									'sendHeader'     => array('Host' => 'newstudio.tv', 'Content-length' => strlen(newstudio::$sess_cookie)),
 								)
 							);
-							
+
 							if (Sys::checkTorrentFile($torrent))
                             {
-    							$file = str_replace(' ', '.', $name).'.S'.$season.'E'.$episode.'.'.$amp;
-    							$episode = (substr($episode, 0, 1) == 0) ? substr($episode, 1, 1) : $episode;
-    							$season = (substr($season, 0, 1) == 0) ? substr($season, 1, 1) : $season;
-    							$message = $name.' '.$amp.' обновлён до '.$episode.' серии, '.$season.' сезона.';
-                                $status = Sys::saveTorrent($tracker, $file, $torrent, $id, $hash, $message, $date_str, $name);
-    								
-    							//обновляем время регистрации торрента в базе
-    							Database::setNewDate($id, newstudio::dateStringToNum($serial['date']));
-    							//обновляем сведения о последнем эпизоде
-    							Database::setNewEpisode($id, $serial['episode']);
+								$file = str_replace(' ', '.', $name).'.S'.$season.'E'.$episode.'.'.$amp;
+								$episode = (substr($episode, 0, 1) == 0) ? substr($episode, 1, 1) : $episode;
+								$season = (substr($season, 0, 1) == 0) ? substr($season, 1, 1) : $season;
+								$message = $name.' '.$amp.' обновлён до '.$episode.' серии, '.$season.' сезона.';
+                                $saved = Sys::saveTorrent($tracker, $file, $torrent, $id, $hash, $message, $date_str, $name);
+
+                                if ($saved)
+                                {
+								    //обновляем время регистрации торрента в базе
+								    $return[$id]['timestamp'] = newstudio::dateStringToNum($serial['date']);
+								    //обновляем сведения о последнем эпизоде
+								    $return[$id]['ep'] = $serial['episode'];
+                                }
+                                else
+                                    Errors::setWarnings($tracker, 'save_file_fail', $id);
                             }
                             else
                                 Errors::setWarnings($tracker, 'torrent_file_fail', $id);
@@ -348,6 +362,8 @@ class newstudio
 				}
 			}
 		}
+
+		return $return;
 	}
 }
 ?>
