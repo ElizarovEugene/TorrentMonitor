@@ -6,6 +6,7 @@ class CurlMultiFetcher
     private $aliases = array();
     private $requestMeta = array();
     private $defaultOptions = array();
+    private $concurrencyLimit;
 
     public function __construct()
     {
@@ -15,6 +16,8 @@ class CurlMultiFetcher
             CURLOPT_RETURNTRANSFER    => 1,
             CURLOPT_DNS_CACHE_TIMEOUT => 0,
         );
+        $limit = (int) Config::read('curl.concurrency');
+        $this->concurrencyLimit = ($limit > 0) ? $limit : 10;
     }
 
     //регистрируем запрос; если такой же url+options уже зарегистрирован — добавляем $id как алиас существующего запроса
@@ -44,7 +47,8 @@ class CurlMultiFetcher
         );
     }
 
-    //выполняем все зарегистрированные запросы параллельно, возвращаем $id => ['body'=>..., 'http_code'=>..., 'error'=>...]
+    //выполняем запросы параллельно с лимитом одновременных соединений (скользящее окно)
+    //возвращаем $id => ['body'=>..., 'http_code'=>..., 'error'=>...]
     public function execute()
     {
         $results = array();
@@ -52,48 +56,76 @@ class CurlMultiFetcher
         if (empty($this->handles))
             return $results;
 
-        $mh = curl_multi_init();
-        foreach ($this->handles as $ch)
+        $queue    = $this->handles;  // ключ => ch, ещё не добавленные в multi
+        $chToKey  = array();         // int(ch) => key, для обратного поиска по handle
+        $mh       = curl_multi_init();
+
+        // запускаем первую порцию до лимита
+        $initial = array_splice($queue, 0, $this->concurrencyLimit);
+        foreach ($initial as $key => $ch)
+        {
             curl_multi_add_handle($mh, $ch);
-
-        $running = NULL;
-        do
-        {
-            $status = curl_multi_exec($mh, $running);
-            if ($running)
-                curl_multi_select($mh);
+            $chToKey[(int)$ch] = $key;
         }
-        while ($running && $status == CURLM_OK);
 
-        foreach ($this->handles as $key => $ch)
+        $running = null;
+        while (!empty($chToKey))
         {
-            $body     = curl_multi_getcontent($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $error    = curl_error($ch);
-
-            if (($httpCode == 403 || $httpCode == 503) && !empty($body) && Sys::isCloudflarePage($body))
+            do
             {
-                $meta     = $this->requestMeta[$key];
-                $fsResult = Sys::getViaFlareSolverr($meta['url'], $meta['cookie']);
-                if ($fsResult !== null)
+                $status = curl_multi_exec($mh, $running);
+                if ($running)
+                    curl_multi_select($mh);
+            }
+            while ($running && $status == CURLM_OK);
+
+            // обрабатываем все завершившиеся дескрипторы
+            while (($info = curl_multi_info_read($mh)) !== false)
+            {
+                if ($info['msg'] !== CURLMSG_DONE)
+                    continue;
+
+                $ch  = $info['handle'];
+                $key = $chToKey[(int)$ch];
+                unset($chToKey[(int)$ch]);
+
+                $body     = curl_multi_getcontent($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $error    = curl_error($ch);
+
+                if (($httpCode == 403 || $httpCode == 503) && !empty($body) && Sys::isCloudflarePage($body))
                 {
-                    $body     = $fsResult['body'];
-                    $httpCode = $fsResult['status'];
-                    $error    = '';
+                    $meta     = $this->requestMeta[$key];
+                    $fsResult = Sys::getViaFlareSolverr($meta['url'], $meta['cookie']);
+                    if ($fsResult !== null)
+                    {
+                        $body     = $fsResult['body'];
+                        $httpCode = $fsResult['status'];
+                        $error    = '';
+                    }
+                }
+
+                foreach ($this->aliases[$key] as $id)
+                {
+                    $results[$id] = array(
+                        'body'      => $body,
+                        'http_code' => $httpCode,
+                        'error'     => $error,
+                    );
+                }
+
+                curl_multi_remove_handle($mh, $ch);
+                curl_close($ch);
+
+                // добавляем следующий из очереди, если есть
+                if (!empty($queue))
+                {
+                    $nextKey = key($queue);
+                    $nextCh  = array_shift($queue);
+                    curl_multi_add_handle($mh, $nextCh);
+                    $chToKey[(int)$nextCh] = $nextKey;
                 }
             }
-
-            foreach ($this->aliases[$key] as $id)
-            {
-                $results[$id] = array(
-                    'body'      => $body,
-                    'http_code' => $httpCode,
-                    'error'     => $error,
-                );
-            }
-
-            curl_multi_remove_handle($mh, $ch);
-            curl_close($ch);
         }
 
         curl_multi_close($mh);

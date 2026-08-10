@@ -104,9 +104,9 @@ class Update {
                                 {
                                     foreach ($createFolders->create as $folder)
                                     {
-                                        if (!mkdir($ROOTPATH . $folder, 0777, true))
+                                        if (!is_dir($ROOTPATH . $folder) && !mkdir($ROOTPATH . $folder, 0777, true))
                                         {
-                                            echo 'Не удалось создать директорию: ' . $file . ', обновление прервано.' . "\r\n" . '<br />';
+                                            echo 'Не удалось создать директорию: ' . $folder . ', обновление прервано.' . "\r\n" . '<br />';
                                             Update::$systemFail = TRUE;
                                         }
                                         else
