@@ -85,13 +85,21 @@ if ($dbOk)
 <?php } ?>
 
 <?php
+$dbType = Config::read('db.type') ?: 'mysql';
+$pdoExtMap = array(
+    'mysql'  => array('pdo_mysql',  'PDO MySQL'),
+    'sqlite' => array('pdo_sqlite', 'PDO SQLite'),
+    'pgsql'  => array('pdo_pgsql',  'PDO PostgreSQL'),
+);
+$pdoEntry = isset($pdoExtMap[$dbType]) ? $pdoExtMap[$dbType] : $pdoExtMap['mysql'];
+
 $requiredExtensions = array(
-    'curl'      => 'cURL',
-    'pdo_mysql' => 'PDO MySQL',
-    'mbstring'  => 'mbstring',
-    'simplexml' => 'SimpleXML',
-    'zip'       => 'Zip',
-    'json'      => 'JSON',
+    'curl'          => 'cURL',
+    $pdoEntry[0]    => $pdoEntry[1],
+    'mbstring'      => 'mbstring',
+    'simplexml'     => 'SimpleXML',
+    'zip'           => 'Zip',
+    'json'          => 'JSON',
 );
 foreach ($requiredExtensions as $ext => $label)
 {

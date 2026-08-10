@@ -24,7 +24,7 @@
             <div class="navigation-badge"><span x-text="countNews"></span></div>
         </template>
     </button>
-    <button class="btn" :class="{ 'active': pageCurrent == 'help' }" @click="showPage('help')"><svg><use href="assets/img/sprite.svg#question" /></svg>Справка</button>
+    <a class="btn" href="https://github.com/ElizarovEugene/TorrentMonitor/wiki" target="_blank" rel="noopener"><svg><use href="assets/img/sprite.svg#question" /></svg>Справка</a>
     <div class="navigation-sep"></div>
     <div class="navigation-info">Синхронизация: <br><?= $lastStartTime ?></div>
 </nav>
