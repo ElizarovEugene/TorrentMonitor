@@ -256,15 +256,20 @@ class Sys
             $httpCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
             curl_close($ch);
 
+            $viaFlareSolverr = false;
             if (($httpCode == 403 || $httpCode == 503) && !empty($result) && Sys::isCloudflarePage($result))
             {
                 $existingCookie = isset($param['cookie']) ? $param['cookie'] : '';
                 $fsResult = Sys::getViaFlareSolverr($param['url'], $existingCookie);
                 if ($fsResult !== null)
+                {
                     $result = $fsResult['body'];
+                    $viaFlareSolverr = true;
+                }
             }
 
-            if (isset($param['convert']) && $param['convert'] != NULL)
+            // FlareSolverr всегда возвращает UTF-8 (браузерный рендеринг) — convert не нужен
+            if (!$viaFlareSolverr && isset($param['convert']) && $param['convert'] != NULL)
                 $result = iconv($param['convert'][0], $param['convert'][1], $result);
 
             return $result;

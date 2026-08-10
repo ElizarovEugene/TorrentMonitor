@@ -56,7 +56,7 @@ class rutracker
 	}
 
 	//функция получения кук
-	protected static function getCookie($tracker)
+	public static function getCookie($tracker)
 	{
 		//проверяем заполнены ли учётные данные
 		if (Database::checkTrackersCredentialsExist($tracker))
@@ -66,18 +66,34 @@ class rutracker
 			$login = iconv('utf-8', 'windows-1251', $credentials['login']);
 			$password = $credentials['password'];
 
-			//авторизовываемся на трекере
-			$page = Sys::getUrlContent(
-            	array(
-            		'type'           => 'POST',
-            		'header'         => 1,
-            		'returntransfer' => 1,
-            		'url'            => 'https://rutracker.org/forum/login.php',
-                        'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen($login.'&login_password='.$password.'&login=%C2%F5%EE%E4')),
-            		'postfields'     => 'login_username='.$login.'&login_password='.$password.'&login=%C2%F5%EE%E4',
-            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
-            	)
-            );
+			// Cloudflare стоит перед login.php — получаем cf_clearance через Byparr (GET),
+			// затем повторяем POST-логин с этими куками и UA браузера Byparr
+			$cfCookie    = '';
+			$cfUserAgent = Database::getSetting('userAgent');
+			$fsResult    = Sys::getViaFlareSolverr('https://rutracker.org/forum/login.php');
+			if ($fsResult !== null)
+			{
+				$cfCookie    = $fsResult['cookies'];
+				$cfUserAgent = $fsResult['userAgent'];
+			}
+
+			$postFields = 'login_username='.$login.'&login_password='.$password.'&login=%C2%F5%EE%E4';
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_POST,              1);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER,    1);
+			curl_setopt($ch, CURLOPT_HEADER,            1);
+			curl_setopt($ch, CURLOPT_ENCODING,          '');
+			curl_setopt($ch, CURLOPT_URL,               'https://rutracker.org/forum/login.php');
+			curl_setopt($ch, CURLOPT_POSTFIELDS,        $postFields);
+			curl_setopt($ch, CURLOPT_USERAGENT,         $cfUserAgent);
+			curl_setopt($ch, CURLOPT_TIMEOUT,           Database::getSetting('httpTimeout'));
+			curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 0);
+			if (!empty($cfCookie))
+				curl_setopt($ch, CURLOPT_COOKIE, $cfCookie);
+			foreach (Sys::getProxyOptions('https://rutracker.org/forum/login.php') as $opt => $val)
+				curl_setopt($ch, $opt, $val);
+			$page = curl_exec($ch);
+			curl_close($ch);
 
 			if ( ! empty($page))
 			{
@@ -182,7 +198,27 @@ class rutracker
 		extract($params);
 		$return = NULL;
 
-		$page = iconv('windows-1251', 'utf-8//IGNORE', $page);
+		// curl_multi не поддерживает Byparr-fallback — обрабатываем CF-страницу здесь
+		if (Sys::isCloudflarePage($page))
+		{
+			$url      = 'https://rutracker.org/forum/viewtopic.php?t='.$torrent_id;
+			$fsResult = Sys::getViaFlareSolverr($url, rutracker::$sess_cookie);
+			if ($fsResult !== null)
+				$page = $fsResult['body']; // Byparr возвращает UTF-8 — iconv не нужен
+			else
+			{
+				if (rutracker::$warning == NULL)
+				{
+					rutracker::$warning = TRUE;
+					Errors::setWarnings($tracker, 'cant_get_forum_page', $id);
+				}
+				rutracker::$exucution = FALSE;
+				rutracker::$warning = NULL;
+				return NULL;
+			}
+		}
+		else
+			$page = iconv('windows-1251', 'utf-8//IGNORE', $page);
 
 		if ( ! empty($page))
 		{
