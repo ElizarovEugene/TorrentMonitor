@@ -387,17 +387,10 @@ class lostfilm
                                     Errors::setWarnings($tracker, 'torrent_file_fail', $id);
                                 }
                             }
-<<<<<<< HEAD
 							else
 							{
 								Errors::setWarnings($tracker, 'quality_not_found', $id);
 							}
-=======
-						else
-						{
-							Errors::setWarnings($tracker, 'quality_not_found', $id);
-						}
->>>>>>> upstream/master
 						}
 					}
 				}
