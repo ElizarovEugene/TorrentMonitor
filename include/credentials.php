@@ -61,6 +61,30 @@ $trackers = Database::getTrackersList();
                 </div>
             </div>
         </form>
+
+        <template x-if="tracker.tracker == 'rutracker.org'">
+            <div x-data="{bbSession:''}" class="mt-3">
+                <hr class="mb-3">
+                <label class="row">
+                    <div class="col --2:lg mb-1">bb_session:</div>
+                    <div class="col --5:lg mb-2">
+                        <input type="text" x-model="bbSession" placeholder="значение куки bb_session из браузера">
+                    </div>
+                </label>
+                <div class="row">
+                    <div class="col --2:lg mb-1"></div>
+                    <div class="col mb-2" style="font-size:.85em;opacity:.7">
+                        Войдите в rutracker.org в браузере → DevTools → Application → Cookies → скопируйте значение <b>bb_session</b>.
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col --2:lg"></div>
+                    <div class="col">
+                        <button class="btn btn--primary" @click="$.post('action.php',{action:'set_rutracker_cookie',bb_session:bbSession},function(r){r.error?notyf.error(r.msg):notyf.success(r.msg)},'json')">Сохранить cookie</button>
+                    </div>
+                </div>
+            </div>
+        </template>
     </div>
 </div>
 

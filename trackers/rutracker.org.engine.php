@@ -58,97 +58,59 @@ class rutracker
 	//функция получения кук
 	public static function getCookie($tracker)
 	{
-		//проверяем заполнены ли учётные данные
-		if (Database::checkTrackersCredentialsExist($tracker))
+		if ( ! Database::checkTrackersCredentialsExist($tracker))
 		{
-			//получаем учётные данные
-			$credentials = Database::getCredentials($tracker);
-			$login = iconv('utf-8', 'windows-1251', $credentials['login']);
-			$password = $credentials['password'];
-
-			// Cloudflare стоит перед login.php — получаем cf_clearance через Byparr (GET),
-			// затем повторяем POST-логин с этими куками и UA браузера Byparr
-			$cfCookie    = '';
-			$cfUserAgent = Database::getSetting('userAgent');
-			$fsResult    = Sys::getViaFlareSolverr('https://rutracker.org/forum/login.php');
-			if ($fsResult !== null)
-			{
-				$cfCookie    = $fsResult['cookies'];
-				$cfUserAgent = $fsResult['userAgent'];
-			}
-
-			$postFields = 'login_username='.$login.'&login_password='.$password.'&login=%C2%F5%EE%E4';
-			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_POST,              1);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER,    1);
-			curl_setopt($ch, CURLOPT_HEADER,            1);
-			curl_setopt($ch, CURLOPT_ENCODING,          '');
-			curl_setopt($ch, CURLOPT_URL,               'https://rutracker.org/forum/login.php');
-			curl_setopt($ch, CURLOPT_POSTFIELDS,        $postFields);
-			curl_setopt($ch, CURLOPT_USERAGENT,         $cfUserAgent);
-			curl_setopt($ch, CURLOPT_TIMEOUT,           Database::getSetting('httpTimeout'));
-			curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 0);
-			if (!empty($cfCookie))
-				curl_setopt($ch, CURLOPT_COOKIE, $cfCookie);
-			foreach (Sys::getProxyOptions('https://rutracker.org/forum/login.php') as $opt => $val)
-				curl_setopt($ch, $opt, $val);
-			$page = curl_exec($ch);
-			curl_close($ch);
-
-			if ( ! empty($page))
-			{
-				//проверяем подходят ли учётные данные
-				if (preg_match('/profile\.php\?mode=register/', $page, $array))
-				{
-					//устанавливаем варнинг
-					Errors::setWarnings($tracker, 'credential_wrong');
-					//останавливаем процесс выполнения, т.к. не может работать без кук
-					rutracker::$exucution = FALSE;
-				}
-				//если подходят - получаем куки
-				elseif (preg_match('/bb_session=.+;/U', $page, $array))
-				{
-					rutracker::$sess_cookie = $array[0];
-					Database::setCookie($tracker, rutracker::$sess_cookie);
-					//запускам процесс выполнения, т.к. не может работать без кук
-					rutracker::$exucution = TRUE;
-				}
-				else
-				{
-					//устанавливаем варнинг
-					if (rutracker::$warning == NULL)
-					{
-						rutracker::$warning = TRUE;
-						Errors::setWarnings($tracker, 'cant_find_cookie');
-					}
-					//останавливаем процесс выполнения, т.к. не может работать без кук
-					rutracker::$exucution = FALSE;
-				}
-			}
-			//если вообще ничего не найдено
-			else
-			{
-				//устанавливаем варнинг
-				if (rutracker::$warning == NULL)
-				{
-					rutracker::$warning = TRUE;
-					Errors::setWarnings($tracker, 'cant_get_auth_page');
-				}
-				//останавливаем процесс выполнения, т.к. не может работать без кук
-				rutracker::$exucution = FALSE;
-			}
-		}
-		else
-		{
-			//устанавливаем варнинг
 			if (rutracker::$warning == NULL)
 			{
 				rutracker::$warning = TRUE;
 				Errors::setWarnings($tracker, 'credential_miss');
 			}
-			//останавливаем процесс выполнения, т.к. не может работать без кук
 			rutracker::$exucution = FALSE;
+			return;
 		}
+
+		$credentials    = Database::getCredentials($tracker);
+		$login          = iconv('utf-8', 'windows-1251', $credentials['login']);
+		$password       = $credentials['password'];
+		$rawPostFields  = 'login_username='.$login.'&login_password='.$password.'&login=%C2%F5%EE%E4';
+		$loginUrl       = 'https://rutracker.org/forum/login.php';
+
+		// Прямой POST (работает для установок без Cloudflare)
+		$page = Sys::getUrlContent(
+			array(
+				'type'           => 'POST',
+				'header'         => 1,
+				'returntransfer' => 1,
+				'url'            => $loginUrl,
+				'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen($rawPostFields)),
+				'postfields'     => $rawPostFields,
+				'convert'        => array('windows-1251', 'utf-8//IGNORE'),
+			)
+		);
+
+		if ( ! empty($page))
+		{
+			if (preg_match('/profile\.php\?mode=register/', $page))
+			{
+				if (rutracker::$warning == NULL) { rutracker::$warning = TRUE; Errors::setWarnings($tracker, 'credential_wrong'); }
+			}
+			elseif (preg_match('/\bbb_session=([^;\r\n\s]+)/', $page, $array))
+			{
+				rutracker::$sess_cookie = 'bb_session='.$array[1].';';
+				Database::setCookie($tracker, rutracker::$sess_cookie);
+				rutracker::$exucution = TRUE;
+				return;
+			}
+			else
+			{
+				if (rutracker::$warning == NULL) { rutracker::$warning = TRUE; Errors::setWarnings($tracker, 'cant_find_cookie'); }
+			}
+		}
+		else
+		{
+			if (rutracker::$warning == NULL) { rutracker::$warning = TRUE; Errors::setWarnings($tracker, 'cant_get_auth_page'); }
+		}
+		rutracker::$exucution = FALSE;
 	}
 
 	//формируем параметры "проверочного" запроса для curl_multi (резолв куки последовательный, как и раньше)
