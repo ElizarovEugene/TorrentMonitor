@@ -32,6 +32,12 @@ class rutrackerSearch extends rutracker
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
 	        );
+            // если tracker.php упёрся в CF и getUrlContent решил его сам через Byparr —
+            // запоминаем cf_clearance/UA, чтобы переиспользовать их в запросе к dl.php ниже
+            if (!empty(Sys::$lastCfCookies))
+                rutracker::$cf_cookies = Sys::$lastCfCookies;
+            if (!empty(Sys::$lastCfUserAgent))
+                rutracker::$cf_userAgent = Sys::$lastCfUserAgent;
             $page = str_replace("\t", '', $page);
 
 	        if ( ! empty($page))
@@ -73,14 +79,20 @@ class rutrackerSearch extends rutracker
                         $id = $toDownload[$i]['id'];
                         $torrent_id = $toDownload[$i]['threme_id'];
                         $name = $toDownload[$i]['threme'];
+                        // если Byparr решал CF для tracker.php — используем его cookies (cf_clearance) и UA,
+                        // чтобы dl.php не упёрся в CF повторно из-за несовпадения фингерпринта
+                        $dlCookie = !empty(rutracker::$cf_cookies)
+                        	? rutracker::$cf_cookies.'; bb_dl='.$torrent_id
+                        	: rutracker::$sess_cookie.'; bb_dl='.$torrent_id;
                         $torrent = Sys::getUrlContent(
                         	array(
                         		'type'           => 'POST',
                         		'returntransfer' => 1,
                         		'url'            => 'https://rutracker.org/forum/dl.php?t='.$torrent_id,
-                        		'cookie'         => rutracker::$sess_cookie.'; bb_dl='.$torrent_id,
-                        		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen(rutracker::$sess_cookie)),
+                        		'cookie'         => $dlCookie,
+                        		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen($dlCookie)),
                         		'referer'        => 'https://rutracker.org/forum/dl.php?t='.$torrent_id,
+                        		'useragent'      => rutracker::$cf_userAgent,
                         	)
                         );
                         

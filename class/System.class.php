@@ -200,7 +200,9 @@ class Sys
             if ($param['type'] == 'GET')
                 curl_setopt($ch, CURLOPT_HTTPGET, 1);
 
-            curl_setopt($ch, CURLOPT_USERAGENT, Database::getSetting('userAgent'));
+            // если передан UA браузера, решившего Cloudflare-challenge — используем его,
+            // иначе cf_clearance не совпадёт с фингерпринтом и Cloudflare сбросит куку
+            curl_setopt($ch, CURLOPT_USERAGENT, !empty($param['useragent']) ? $param['useragent'] : Database::getSetting('userAgent'));
             if (isset($param['follow']))
                 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
 
@@ -260,7 +262,11 @@ class Sys
             if (($httpCode == 403 || $httpCode == 503) && !empty($result) && Sys::isCloudflarePage($result))
             {
                 $existingCookie = isset($param['cookie']) ? $param['cookie'] : '';
-                $fsResult = Sys::getViaFlareSolverr($param['url'], $existingCookie);
+                // сохраняем исходный метод запроса — dl.php отдаёт файл только на POST,
+                // "тихий" фолбэк на GET уводит Byparr на неразрешаемый интерактивный челлендж
+                $fsMethod   = isset($param['type']) && $param['type'] == 'POST' ? 'POST' : 'GET';
+                $fsPostData = isset($param['postfields']) ? $param['postfields'] : '';
+                $fsResult = Sys::getViaFlareSolverr($param['url'], $existingCookie, $fsMethod, $fsPostData);
                 if ($fsResult !== null)
                 {
                     $result = $fsResult['body'];
@@ -285,7 +291,7 @@ class Sys
                     || strpos($body, 'DDoS protection') !== false));
     }
 
-    public static function getViaFlareSolverr(string $url, string $existingCookies = ''): ?array
+    public static function getViaFlareSolverr(string $url, string $existingCookies = '', string $method = 'GET', string $postData = ''): ?array
     {
         $fsUrl = Database::getSetting('flaresolverrUrl');
         if (empty($fsUrl))
@@ -305,20 +311,24 @@ class Sys
             }
         }
 
-        $postData = json_encode(array(
-            'cmd'        => 'request.get',
+        $requestParams = array(
+            'cmd'        => $method == 'POST' ? 'request.post' : 'request.get',
             'url'        => $url,
-            'maxTimeout' => 60000,
+            'maxTimeout' => 120000,
             'cookies'    => $cookiesArr,
-        ));
+        );
+        if ($method == 'POST')
+            $requestParams['postData'] = $postData;
+
+        $requestJson = json_encode($requestParams);
 
         $ch = curl_init(rtrim($fsUrl, '/').'/v1');
         curl_setopt_array($ch, array(
             CURLOPT_POST           => 1,
-            CURLOPT_POSTFIELDS     => $postData,
+            CURLOPT_POSTFIELDS     => $requestJson,
             CURLOPT_HTTPHEADER     => array('Content-Type: application/json'),
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_TIMEOUT        => 120,
+            CURLOPT_TIMEOUT        => 180,
         ));
         $response = curl_exec($ch);
         curl_close($ch);
@@ -521,7 +531,9 @@ class Sys
         }
 
         if ($tracker != 'animelayer.ru' && $tracker != 'booktracker.org' && $tracker != 'casstudio.tk' && $tracker != 'riperam.org' && $tracker != 'rustorka.com' && $tracker != 'rutor.is' && $tracker != 'tr.anidub.com')
-            $forumPage = iconv('windows-1251', 'utf-8//IGNORE', $forumPage);
+            // страница могла прийти уже в UTF-8 (Byparr/FlareSolverr для rutracker.org
+            // при CF-bypass) — повторный iconv на валидном UTF-8 портит кириллицу
+            $forumPage = mb_check_encoding($forumPage, 'UTF-8') ? $forumPage : iconv('windows-1251', 'utf-8//IGNORE', $forumPage);
 
         if ($tracker == 'tr.anidub.com')
             $tracker = 'anidub.com';

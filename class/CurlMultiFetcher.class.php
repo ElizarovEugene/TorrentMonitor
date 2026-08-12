@@ -7,9 +7,11 @@ class CurlMultiFetcher
     private $requestMeta = array();
     private $defaultOptions = array();
     private $concurrencyLimit;
+    private $cfFallback;
 
-    public function __construct()
+    public function __construct($cfFallback = true)
     {
+        $this->cfFallback = $cfFallback;
         $this->defaultOptions = array(
             CURLOPT_USERAGENT         => Database::getSetting('userAgent'),
             CURLOPT_TIMEOUT           => Database::getSetting('httpTimeout'),
@@ -93,15 +95,27 @@ class CurlMultiFetcher
                 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 $error    = curl_error($ch);
 
-                if (($httpCode == 403 || $httpCode == 503) && !empty($body) && Sys::isCloudflarePage($body))
+                $meta = $this->requestMeta[$key];
+
+                // rutracker.org исключён: у него своя explicit-обработка CF-challenge
+                // в rutracker.org.engine.php::parse() (сохраняет cf_clearance/UA для dl.php).
+                // Если фолбэк отработает здесь, parse() получит уже решённую (или пустую)
+                // страницу и никогда не увидит CF-challenge — cf_cookies/cf_userAgent не сохранятся.
+                if ($this->cfFallback && ($httpCode == 403 || $httpCode == 503) && !empty($body) && Sys::isCloudflarePage($body) && strpos($meta['url'], 'rutracker.org') === false)
                 {
-                    $meta     = $this->requestMeta[$key];
                     $fsResult = Sys::getViaFlareSolverr($meta['url'], $meta['cookie']);
                     if ($fsResult !== null)
                     {
                         $body     = $fsResult['body'];
                         $httpCode = $fsResult['status'];
                         $error    = '';
+                    }
+                    else
+                    {
+                        // Byparr не смог обойти CF — возвращаем пустое тело,
+                        // чтобы parse() не делал повторный вызов Byparr
+                        $body  = '';
+                        $error = 'cf_bypass_failed';
                     }
                 }
 

@@ -4,6 +4,8 @@ class rutracker
 	protected static $sess_cookie;
 	protected static $exucution;
 	protected static $warning;
+	protected static $cf_cookies = ''; // cookies от FlareSolverr после решения CF-challenge
+	protected static $cf_userAgent = ''; // UA браузера, решившего challenge — должен совпадать с cf_clearance
 
 	//проверяем cookie
 	public static function checkCookie($sess_cookie)
@@ -166,7 +168,13 @@ class rutracker
 			$url      = 'https://rutracker.org/forum/viewtopic.php?t='.$torrent_id;
 			$fsResult = Sys::getViaFlareSolverr($url, rutracker::$sess_cookie);
 			if ($fsResult !== null)
-				$page = $fsResult['body']; // Byparr возвращает UTF-8 — iconv не нужен
+			{
+				$page = $fsResult['body']; // FlareSolverr возвращает UTF-8 — iconv не нужен
+				if (!empty($fsResult['cookies']))
+					rutracker::$cf_cookies = $fsResult['cookies']; // сохраняем cf_clearance для dl.php
+				if (!empty($fsResult['userAgent']))
+					rutracker::$cf_userAgent = $fsResult['userAgent']; // UA должен совпадать при переиспользовании cf_clearance
+			}
 			else
 			{
 				if (rutracker::$warning == NULL)
@@ -180,7 +188,9 @@ class rutracker
 			}
 		}
 		else
-			$page = iconv('windows-1251', 'utf-8//IGNORE', $page);
+			// FlareSolverr мог уже вернуть UTF-8 (если CurlMultiFetcher решил CF сам);
+			// windows-1251 с кириллицей не является валидным UTF-8 — безопасный способ различить
+			$page = mb_check_encoding($page, 'UTF-8') ? $page : iconv('windows-1251', 'utf-8//IGNORE', $page);
 
 		if ( ! empty($page))
 		{
@@ -203,14 +213,20 @@ class rutracker
 						if ($date != $timestamp)
 						{
 							//сохраняем торрент в файл
+							// если FlareSolverr решал CF для viewtopic.php — используем его cookies
+							// (включают cf_clearance), чтобы dl.php не упёрся в CF повторно
+							$dlCookie = !empty(rutracker::$cf_cookies)
+								? rutracker::$cf_cookies.'; bb_dl='.$torrent_id
+								: rutracker::$sess_cookie.'; bb_dl='.$torrent_id;
                             $torrent = Sys::getUrlContent(
                             	array(
                             		'type'           => 'POST',
                             		'returntransfer' => 1,
                             		'url'            => 'https://rutracker.org/forum/dl.php?t='.$torrent_id,
-                            		'cookie'         => rutracker::$sess_cookie.'; bb_dl='.$torrent_id,
-                            		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen(rutracker::$sess_cookie.'; bb_dl='.$torrent_id)),
+                            		'cookie'         => $dlCookie,
+                            		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen($dlCookie)),
                             		'referer'        => 'https://rutracker.org/forum/viewtopic.php?t='.$torrent_id,
+                            		'useragent'      => rutracker::$cf_userAgent,
                             	)
                             );
 
