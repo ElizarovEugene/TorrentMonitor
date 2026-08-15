@@ -93,7 +93,9 @@ VALUES
 	(9,'Pushall','', 'notification'),
 	(10,'Pushall','', 'warning'),
 	(11,'Telegram','', 'notification'),
-	(12,'Telegram','', 'warning');
+	(12,'Telegram','', 'warning'),
+	(13,'Gotify','', 'notification'),
+	(14,'Gotify','', 'warning');
 
 UNLOCK TABLES;
 
