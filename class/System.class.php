@@ -198,7 +198,7 @@ class Sys
 
         $scheme = 'http';
         if (isset($options[CURLOPT_PROXYTYPE]) && $options[CURLOPT_PROXYTYPE] == CURLPROXY_SOCKS5_HOSTNAME)
-            $scheme = 'socks5h';
+            $scheme = 'socks5';
 
         return $scheme.'://'.$options[CURLOPT_PROXY];
     }
