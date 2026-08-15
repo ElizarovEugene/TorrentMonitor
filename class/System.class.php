@@ -4,6 +4,12 @@ class Sys
     //URL для проверки наличия подключения к интернету
     const INTERNET_CHECK_URL = 'https://ya.ru/';
 
+    // cf_clearance/UA, которыми getUrlContent() воспользовался при последнем
+    // автоматическом CF-фолбэке на Byparr — чтобы вызывающий код мог переиспользовать
+    // их в следующем запросе (иначе кука не совпадёт с фингерпринтом и Cloudflare её сбросит)
+    public static $lastCfCookies = '';
+    public static $lastCfUserAgent = '';
+
     //проверяем есть ли конфигурационный файл
     public static function checkConfigExist()
     {
@@ -273,6 +279,9 @@ class Sys
             $httpCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
             curl_close($ch);
 
+            Sys::$lastCfCookies = '';
+            Sys::$lastCfUserAgent = '';
+
             $viaFlareSolverr = false;
             if (($httpCode == 403 || $httpCode == 503) && !empty($result) && Sys::isCloudflarePage($result))
             {
@@ -286,6 +295,8 @@ class Sys
                 {
                     $result = $fsResult['body'];
                     $viaFlareSolverr = true;
+                    Sys::$lastCfCookies = !empty($fsResult['cookies']) ? $fsResult['cookies'] : '';
+                    Sys::$lastCfUserAgent = !empty($fsResult['userAgent']) ? $fsResult['userAgent'] : '';
                 }
             }
 

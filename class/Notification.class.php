@@ -114,7 +114,7 @@ class Notification
 	public static function sendPushall($pushall, $date, $tracker, $message, $header_message, $name)
 	{
     	$msg = Notification::generateMessage($date, $tracker, $message, $header_message, $name);
-
+        
         $pieces = explode(';', $pushall);
         $postfields = array('type' => 'self', 'id' => $pieces[0], 'key' => $pieces[1], 'title' => $header_message, 'text' => $msg);
         $forumPage = Sys::getUrlContent(
