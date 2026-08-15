@@ -68,6 +68,8 @@ INSERT INTO "notifications" VALUES(9,'Pushall','','notification');
 INSERT INTO "notifications" VALUES(10,'Pushall','','warning');
 INSERT INTO "notifications" VALUES(11,'Telegram','','notification');
 INSERT INTO "notifications" VALUES(12,'Telegram','','warning');
+INSERT INTO "notifications" VALUES(13,'Gotify','','notification');
+INSERT INTO "notifications" VALUES(14,'Gotify','','warning');
 
 CREATE TABLE `settings` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
