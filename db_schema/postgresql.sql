@@ -57,7 +57,7 @@ CREATE TABLE "news" (
 );
 
 
-CREATE SEQUENCE "auto_id_notifications" START 13;
+CREATE SEQUENCE "auto_id_notifications" START 15;
 
 CREATE TABLE "notifications" (
   "id" INTEGER  PRIMARY KEY NOT NULL DEFAULT nextval('auto_id_notifications'),
@@ -78,6 +78,8 @@ INSERT INTO notifications VALUES (9, 'Pushall', '', 'notification');
 INSERT INTO notifications VALUES (10, 'Pushall', '', 'warning');
 INSERT INTO notifications VALUES (11, 'Telegram', '', 'notification');
 INSERT INTO notifications VALUES (12, 'Telegram', '', 'warning');
+INSERT INTO notifications VALUES (13, 'Gotify', '', 'notification');
+INSERT INTO notifications VALUES (14, 'Gotify', '', 'warning');
 
 CREATE SEQUENCE "auto_id_settings" START 42;
 
