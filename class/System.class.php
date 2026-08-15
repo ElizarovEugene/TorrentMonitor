@@ -188,6 +188,21 @@ class Sys
         return $options;
     }
 
+    //конвертирует curl-опции прокси (getProxyOptions) в URL-строку для FlareSolverr's
+    //JSON API ("proxy": {"url": "..."}) -- FlareSolverr не умеет CURLOPT_PROXY/CURLOPT_PROXYTYPE,
+    //только явную схему в URL
+    private static function proxyOptionsToUrl($options)
+    {
+        if (empty($options[CURLOPT_PROXY]))
+            return null;
+
+        $scheme = 'http';
+        if (isset($options[CURLOPT_PROXYTYPE]) && $options[CURLOPT_PROXYTYPE] == CURLPROXY_SOCKS5_HOSTNAME)
+            $scheme = 'socks5h';
+
+        return $scheme.'://'.$options[CURLOPT_PROXY];
+    }
+
     //обёртка для CURL, для более удобного использования
     public static function getUrlContent($param = null)
     {
@@ -319,6 +334,14 @@ class Sys
         );
         if ($method == 'POST')
             $requestParams['postData'] = $postData;
+
+        //прокидываем уже настроенный (в т.ч. потрекерный) прокси в FlareSolverr -- без
+        //этого FlareSolverr ходит на сайт напрямую со своего хоста, и для трекеров,
+        //заблокированных на уровне DPI/ISP (а не только Cloudflare-челленджем), запрос
+        //не проходит даже после решения челленджа
+        $proxyUrl = Sys::proxyOptionsToUrl(Sys::getProxyOptions($url));
+        if ($proxyUrl)
+            $requestParams['proxy'] = array('url' => $proxyUrl);
 
         $requestJson = json_encode($requestParams);
 
