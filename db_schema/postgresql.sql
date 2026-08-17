@@ -119,6 +119,7 @@ INSERT INTO settings VALUES (40, 'userAgent', 'Mozilla/5.0 (X11; Linux x86_64; r
 INSERT INTO settings VALUES (41, 'flaresolverrUrl', '');
 INSERT INTO settings VALUES (42, 'ApiKey', '');
 INSERT INTO settings VALUES (43, 'qbitCategory', '');
+INSERT INTO settings VALUES (44, 'flaresolverrUrl', '');
 
 CREATE TABLE "temp" (
   "id" INTEGER PRIMARY KEY NOT NULL,
