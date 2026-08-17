@@ -31,7 +31,8 @@ $torrentClient = $torrentAddress = $pathToDownload = null;
 if ($dbOk)
 {
     //собираем все проверки доступности (интернет + трекеры + торрент-клиент) в один параллельный пакет
-    $fetcher = new CurlMultiFetcher();
+    //CF-bypass здесь не нужен — трекер за CF считается доступным; отключаем, чтобы не вешать страницу
+    $fetcher = new CurlMultiFetcher(false);
     $fetcher->add('internet', Sys::INTERNET_CHECK_URL, Sys::getProxyOptions(Sys::INTERNET_CHECK_URL) + array(CURLOPT_FOLLOWLOCATION => 1));
 
     $credentials = Database::getAllCredentials();
@@ -349,10 +350,13 @@ foreach ($credentials as $cred)
     <?php
     $result = $checkResults[$tracker] ?? null;
     $available = $result && empty($result['error']) && $result['http_code'] >= 200 && $result['http_code'] < 400;
-    if ($available)
+    $behindCf  = !$available && $result && empty($result['error'])
+                 && ($result['http_code'] == 403 || $result['http_code'] == 503)
+                 && !empty($result['body']) && Sys::isCloudflarePage($result['body']);
+    if ($available || $behindCf)
     {
     ?>
-    <div class="check-item">Трекер <strong><?= htmlspecialchars($tracker, ENT_QUOTES) ?></strong> доступен.</div>
+    <div class="check-item">Трекер <strong><?= htmlspecialchars($tracker, ENT_QUOTES) ?></strong> доступен<?= $behindCf ? ' (за Cloudflare)' : '' ?>.</div>
     <?php } else { ?>
     <div class="check-item --error">Трекер <strong><?= htmlspecialchars($tracker, ENT_QUOTES) ?></strong> не доступен.</div>
     <?php

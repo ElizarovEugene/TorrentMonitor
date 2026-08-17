@@ -210,10 +210,21 @@ class Database
         $stmt = self::newStatement("UPDATE `settings` SET `val` = :val WHERE `key` = :setting");
         $stmt->bindParam(':setting', $setting);
         $stmt->bindParam(':val', $val);
-        if ($stmt->execute())
-            return TRUE;
-        else
+        if ( ! $stmt->execute())
             return $stmt->errorInfo();
+
+        // строки могло не быть, если настройка добавлена в схему уже после разворачивания
+        // этой установки и не попала в update.xml-миграцию (UPDATE такое молча пропускает)
+        if ($stmt->rowCount() == 0)
+        {
+            $insertStmt = self::newStatement("INSERT INTO `settings` (`key`, `val`) VALUES (:setting, :val)");
+            $insertStmt->bindParam(':setting', $setting);
+            $insertStmt->bindParam(':val', $val);
+            if ( ! $insertStmt->execute())
+                return $insertStmt->errorInfo();
+        }
+
+        return TRUE;
     }
 
     public static function updateAddress($type, $service, $address)
@@ -278,7 +289,7 @@ class Database
 
     public static function getAllCredentials()
     {
-        $stmt = self::newStatement("SELECT `id`, `tracker`, `log`, `pass`, `passkey`, `necessarily` FROM `credentials` ORDER BY `tracker`");
+        $stmt = self::newStatement("SELECT `id`, `tracker`, `log`, `pass`, `passkey`, `cookie`, `necessarily` FROM `credentials` ORDER BY `tracker`");
         if ($stmt->execute())
         {
             $i = 0;
@@ -290,6 +301,7 @@ class Database
                 $resultArray[$i]['login'] = $row['log'];
                 $resultArray[$i]['password'] = Crypto::decrypt($row['pass']);
                 $resultArray[$i]['passkey'] = Crypto::decrypt($row['passkey']);
+                $resultArray[$i]['cookie'] = Crypto::decrypt($row['cookie']);
                 $resultArray[$i]['necessarily'] = $row['necessarily'];
                 $i++;
             }

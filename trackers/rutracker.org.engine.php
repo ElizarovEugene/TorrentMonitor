@@ -96,7 +96,11 @@ class rutracker
 			{
 				if (rutracker::$warning == NULL) { rutracker::$warning = TRUE; Errors::setWarnings($tracker, 'credential_wrong'); }
 			}
-			elseif (preg_match('/\bbb_session=([^;\r\n\s]+)/', $page, $array))
+			// если CF заблокировал прямой POST и getUrlContent() сам решил его через Byparr —
+			// bb_session нужно искать в Sys::$lastCfCookies: тело ответа от Byparr не содержит
+			// заголовков Set-Cookie вообще, только структурированное поле cookies
+			elseif (preg_match('/\bbb_session=([^;\r\n\s]+)/', $page, $array)
+				|| (!empty(Sys::$lastCfCookies) && preg_match('/\bbb_session=([^;\s]+)/', Sys::$lastCfCookies, $array)))
 			{
 				rutracker::$sess_cookie = 'bb_session='.$array[1].';';
 				Database::setCookie($tracker, rutracker::$sess_cookie);

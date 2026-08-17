@@ -74,28 +74,25 @@ Docker-проекта: [TOR-and-Transmission](https://github.com/alfonder/torren
 Учтите, что через TOR трекеры отвечают заметно медленнее — при таймаутах
 увеличьте «Таймаут HTTP-запросов» в **Настройки → Расширенные**.
 
-## FlareSolverr / Byparr
+## FlareSolverr
 
 Некоторые трекеры прячутся за Cloudflare, который блокирует автоматические запросы.
-[FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) и его форк
-[Byparr](https://github.com/ThePhaseless/Byparr) решают задачу Cloudflare в реальном
+[FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) решает задачу Cloudflare в реальном
 браузере и отдают TM готовые cookies.
 
-1. Запустите FlareSolverr или Byparr — обычно это Docker-контейнер, порт 8191:
+1. Запустите FlareSolverr — обычно это Docker-контейнер, порт 8191:
 
    ```yaml
    services:
      byparr:
-       image: ghcr.io/thephaseless/byparr:latest
-       container_name: byparr
+       image: ghcr.io/flaresolverr/flaresolverr:latest
+       container_name: flaresolverr
        restart: unless-stopped
        ports:
          - "8191:8191"
    ```
 
-   Либо FlareSolverr: образ `ghcr.io/flaresolverr/flaresolverr:latest`, тот же порт.
-
-2. В TM: **Настройки → Расширенные → FlareSolverr / Byparr URL** →
+2. В TM: **Настройки → Расширенные → FlareSolverr URL** →
    `http://byparr:8191` (или `http://127.0.0.1:8191`).
 
 Если поле пустое, обход Cloudflare не используется.

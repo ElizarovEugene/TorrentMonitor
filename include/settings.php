@@ -21,7 +21,7 @@ foreach ($settings as $key => $row)
     $csettings[key($row)] = $row[key($row)];
     extract($row);
 }
-$config = Config::read('ext_filename');
+$config = Config::read('ext_filename') ?: dirname(__FILE__).'/../config.xml';
 if (file_exists($config))
     $csettings['settings'] = file_get_contents($config);
 ?>
