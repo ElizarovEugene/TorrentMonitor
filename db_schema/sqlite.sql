@@ -93,7 +93,6 @@ INSERT INTO "settings" VALUES (16, 'deleteOldFiles', '0');
 INSERT INTO "settings" VALUES (19, 'serverAddress', '');
 INSERT INTO "settings" VALUES (20, 'deleteDistribution', '0');
 INSERT INTO "settings" VALUES (24, 'sendUpdate', '0');
-INSERT INTO "settings" VALUES (25, 'sendWarning', '0');
 INSERT INTO "settings" VALUES (29, 'debug', '0');
 INSERT INTO "settings" VALUES (30, 'rss', '1');
 INSERT INTO "settings" VALUES (31, 'debugFor', '');
@@ -107,7 +106,6 @@ INSERT INTO "settings" VALUES (40, 'userAgent', 'Mozilla/5.0 (X11; Linux x86_64;
 INSERT INTO "settings" VALUES (41, 'flaresolverrUrl', '');
 INSERT INTO "settings" VALUES (42, 'ApiKey', '');
 INSERT INTO "settings" VALUES (43, 'qbitCategory', '');
-INSERT INTO "settings" VALUES (44, 'flaresolverrUrl', '');
 
 CREATE TABLE `temp` (
   `id` INTEGER NOT NULL,
