@@ -130,7 +130,6 @@ VALUES
 	(19,'serverAddress',''),
 	(20,'deleteDistribution','0'),
 	(24,'sendUpdate','0'),
-	(25,'sendWarning','0'),
 	(29,'debug','0'),
 	(30,'rss','1'),
 	(31,'debugFor',''),
@@ -143,8 +142,7 @@ VALUES
 	(40,'userAgent','Mozilla/5.0 (X11; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0'),
 	(41,'flaresolverrUrl',''),
 	(42,'ApiKey',''),
-	(43,'qbitCategory',''),
-    (44,'flaresolverrUrl','');
+	(43,'qbitCategory','');
 
 UNLOCK TABLES;
 
