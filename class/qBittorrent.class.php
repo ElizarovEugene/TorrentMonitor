@@ -1,7 +1,7 @@
 <?php
 class qBittorrent
 {
-    #добавляем новую закачку в torrent-клиент, обновляем hash в базе
+    #добавляем новую закачку в torrent-клиент, удаляем старую и обновляем hash в базе
     public static function addNew($id, $file, $hash, $tracker)
     {
         #получаем настройки из базы
@@ -12,23 +12,24 @@ class qBittorrent
         }
 
         $individualPath = Database::getTorrentDownloadPath($id);
-        if ( ! empty($individualPath))
-            $pathToDownload = $individualPath;
+        $pathToDownload = !empty($individualPath) ? $individualPath : '';
 
         $category = Database::getTorrentCategory($id);
         if (empty($category))
             $category = Database::getSetting('qbitCategory');
 
         $data = array('username' => $torrentLogin, 'password' => $torrentPassword);
+        
+        // Единый User-Agent для стабильности API
+        $userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
-        //Авторизация
+        // 1. Авторизация
         $MainCurl = curl_init();
         curl_setopt_array($MainCurl, array(
             CURLOPT_URL => $torrentAddress."/api/v2/auth/login",
-            CURLOPT_USERAGENT => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:51.0) Gecko/20100101 Firefox/51.0",
+            CURLOPT_USERAGENT => $userAgent,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
-            CURLOPT_VERBOSE => true,
             CURLOPT_HEADER => true,
             CURLOPT_POSTFIELDS => http_build_query($data)
         ));
@@ -47,103 +48,147 @@ class qBittorrent
         }
 
         $cookie = $match[0][0];
-        curl_setopt($MainCurl, CURLOPT_COOKIE, $cookie);
-        curl_setopt($MainCurl, CURLOPT_HEADER, false);
+        curl_close($MainCurl); // Закрываем сессию, чтобы избежать кэширования параметров
 
+        // 2. Удаление старой раздачи (с учетом настроек сохранения файлов)
         if ( ! empty($hash))
         {
-            $data = array(
-                'hashes' => $hash,
-                'deleteFiles' => 'false'
-            );
-            curl_setopt($MainCurl, CURLOPT_URL, $torrentAddress."/api/v2/torrents/delete");
-            curl_setopt($MainCurl, CURLOPT_POSTFIELDS, http_build_query($data));
+            $deleteFiles = 'false';
+            // Логика удаления файлов только для RSS-сериалов
+            if (($tracker == 'lostfilm.tv' || $tracker == 'lostfilm-mirror' || $tracker == 'baibako.tv' || $tracker == 'newstudio.tv') && !empty($deleteOldFiles))
+            {
+                $deleteFiles = 'true';
+            }
 
-            if ($tracker == 'lostfilm.tv' || $tracker == 'lostfilm-mirror' ||  $tracker == 'baibako.tv' || $tracker == 'newstudio.tv')
-            {
-                if ($deleteOldFiles)
-                    $data['deleteFiles'] = 'true';
-                #удяляем существующую закачку из torrent-клиента
-                if ($deleteDistribution)
-                    curl_exec($MainCurl);
+            $ch_del = curl_init();
+            curl_setopt_array($ch_del, array(
+                CURLOPT_URL => $torrentAddress."/api/v2/torrents/delete",
+                CURLOPT_USERAGENT => $userAgent,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => array(
+                    "Cookie: ".$cookie,
+                    "Referer: ".$torrentAddress."/" // Защита от CSRF
+                ),
+                CURLOPT_POSTFIELDS => http_build_query(array(
+                    'hashes'      => trim($hash),
+                    'deleteFiles' => $deleteFiles
+                ))
+            ));
+            
+            // Если включено удаление старых раздач или это серийный трекер
+            if (!empty($deleteDistribution) || $deleteFiles == 'true') {
+                curl_exec($ch_del);
             }
-            else
-            {
-                #удяляем существующую закачку из torrent-клиента
-                curl_exec($MainCurl);
-            }
+            curl_close($ch_del);
+            
+            // Задержка для предотвращения конфликта имен (race condition)
+            sleep(1);
         }
         
-        //Формируется тело запроса
-        // autoTMM=true заставляет qBit игнорировать savepath — отключаем если путь задан
+        // 3. Добавление новой раздачи (Прямая загрузка CURLFile для избежания статуса pending)
+        $tag = explode('.', $tracker)[0];
+        $filename = urldecode(basename(parse_url($file, PHP_URL_PATH)));
+        $localPath = dirname(__FILE__).'/../torrents/'.$filename;
+
         $data = array(
-            'urls'        => $file,
             'autoTMM'     => empty($pathToDownload) ? 'true' : 'false',
             'savepath'    => $pathToDownload,
             'root_folder' => 'true',
+            'tags'        => $tag
         );
+        
         if (!empty($category))
             $data['category'] = $category;
+
+        if (file_exists($localPath)) {
+            $data['torrents'] = new CURLFile($localPath, 'application/x-bittorrent', $filename);
+        } else {
+            $data['urls'] = $file;
+        }
         
-        //формируется заголовок запроса
-        $request_headers = array(
-            "Cookie: ".$cookie
-        );
-        
-        $ch = curl_init();
-        curl_setopt_array($ch, array(
+        $ch_add = curl_init();
+        curl_setopt_array($ch_add, array(
             CURLOPT_URL => $torrentAddress."/api/v2/torrents/add",
+            CURLOPT_USERAGENT => $userAgent,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
-            CURLOPT_VERBOSE => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_HTTPHEADER => $request_headers,
-            CURLOPT_COOKIE => $cookie,
+            CURLOPT_HTTPHEADER => array(
+                "Cookie: ".$cookie,
+                "Referer: ".$torrentAddress."/"
+            ),
             CURLOPT_POSTFIELDS => $data
         ));
-        curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-        curl_close($ch);
+        $add_resp = curl_exec($ch_add);
+        $add_code = curl_getinfo($ch_add, CURLINFO_RESPONSE_CODE);
+        curl_close($ch_add);
 
-        //ожидаем код 200 при успешном добавлении нового и код 202, если торрент уже существует
-        if ($httpCode >= 200 && $httpCode <= 204) {
-            sleep(3);
+        // 4. Проверка результата и получение нового хэша
+        $return = array('status' => FALSE, 'msg' => 'add_fail');
+        $hashNew = '';
+
+        if ($add_code >= 200 && $add_code <= 204) {
+            $resp_json = json_decode($add_resp, true);
             
-            //получение хэша торрента
-            $data = array(
-                'filter' => 'all',
-                'limit' => '1',
-                'sort' => 'added_on',
-                'reverse' => 'true'
-            );
-            curl_setopt($MainCurl, CURLOPT_URL, $torrentAddress."/api/v2/torrents/info");
-            curl_setopt($MainCurl, CURLOPT_POSTFIELDS, http_build_query($data));
-            $response = curl_exec($MainCurl);
-            $rdata = json_decode($response)[0];
-            $hashNew = $rdata->hash;
+            // Современный qBittorrent возвращает хэш прямо в ответе при загрузке CURLFile
+            if (is_array($resp_json) && !empty($resp_json['added_torrent_ids'][0])) {
+                $hashNew = $resp_json['added_torrent_ids'][0];
+            } else {
+                // Запасной план: ищем хэш по дате добавления
+                sleep(2);
+                $ch_info = curl_init();
+                curl_setopt_array($ch_info, array(
+                    CURLOPT_URL => $torrentAddress."/api/v2/torrents/info",
+                    CURLOPT_USERAGENT => $userAgent,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_POST => true,
+                    CURLOPT_HTTPHEADER => array(
+                        "Cookie: ".$cookie,
+                        "Referer: ".$torrentAddress."/"
+                    ),
+                    CURLOPT_POSTFIELDS => http_build_query(array(
+                        'filter' => 'all',
+                        'limit' => '1',
+                        'sort' => 'added_on',
+                        'reverse' => 'true'
+                    ))
+                ));
+                $info_resp = curl_exec($ch_info);
+                curl_close($ch_info);
 
-            #обновляем hash в базе
-            Database::updateHash($id, $hashNew);
+                $rdata = json_decode($info_resp)[0];
+                $hashNew = $rdata->hash;
+            }
 
-            //сбрасываем варнинг
-            Database::clearWarnings('qBittorrent');
-            $return['status'] = TRUE;
-            $return['hash'] = $hashNew;
-        } else {
-            $return['status'] = FALSE;
-            $return['msg'] = 'add_fail';
+            if (!empty($hashNew)) {
+                #обновляем hash в базе
+                Database::updateHash($id, $hashNew);
+                Database::clearWarnings('qBittorrent');
+                
+                $return['status'] = TRUE;
+                $return['hash'] = $hashNew;
+            }
         }
 
-        //выход
-        curl_setopt($MainCurl, CURLOPT_URL, $torrentAddress."/api/v2/auth/logout");
-        curl_exec($MainCurl);
-        curl_close($MainCurl);
+        // 5. Выход
+        $ch_out = curl_init();
+        curl_setopt_array($ch_out, array(
+            CURLOPT_URL => $torrentAddress."/api/v2/auth/logout",
+            CURLOPT_USERAGENT => $userAgent,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => array(
+                "Cookie: ".$cookie,
+                "Referer: ".$torrentAddress."/"
+            )
+        ));
+        curl_exec($ch_out);
+        curl_close($ch_out);
 
         return $return;
     }
 
     #получаем поле comment торрента по его hash (для api-интеграции)
-    #повторяет попытки, чтобы справиться с race condition: торрент может ещё не появиться в qBit
     public static function getTorrentComment($hash, $retries = 4, $delay = 3)
     {
         $settings = Database::getAllSetting();
@@ -212,7 +257,6 @@ class qBittorrent
             extract($row);
         }
 
-
         $data = array('username' => $torrentLogin, 'password' => $torrentPassword);
 
         $MainCurl = curl_init();
@@ -238,6 +282,7 @@ class qBittorrent
         $cookie = $match[0][0];
         curl_setopt($MainCurl, CURLOPT_COOKIE, $cookie);
         curl_setopt($MainCurl, CURLOPT_HEADER, false);
+        curl_setopt($MainCurl, CURLOPT_HTTPHEADER, array("Referer: ".$torrentAddress."/")); // Обход CSRF
 
         $data = array(
             'hashes' => $hash,
