@@ -12,6 +12,9 @@ class Errors
     	Errors::write('engine_error', 'Внутренняя ошибка движка при обработке трекера. Подробности — в torrent_monitor_error.log.');
 
 		Errors::write('not_available', 'Не могу получить доступ к трекеру.');
+		Errors::write('proxy_unreachable', 'Не удалось подключиться через прокси для этого трекера.');
+		Errors::write('proxy_path_unreachable', 'Соединение через прокси не установлено: недоступен прокси или трекер.');
+		Errors::write('tracker_unreachable', 'Трекер не отвечает: соединение не установлено.');
 		Errors::write('credential_wrong', 'Неправильные учётные данные.');
 		Errors::write('cant_get_forum_page', 'Не удалось получить страницу трекера.');
 		Errors::write('cant_get_auth_page', 'Не удалось получить страницу авторизацию трекера.');

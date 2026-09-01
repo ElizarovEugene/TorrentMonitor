@@ -94,6 +94,7 @@ class CurlMultiFetcher
                 $body     = curl_multi_getcontent($ch);
                 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 $error    = curl_error($ch);
+                $errno    = curl_errno($ch);
 
                 $meta = $this->requestMeta[$key];
 
@@ -125,6 +126,7 @@ class CurlMultiFetcher
                         'body'      => $body,
                         'http_code' => $httpCode,
                         'error'     => $error,
+                        'errno'     => $errno,
                     );
                 }
 

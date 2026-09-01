@@ -114,7 +114,15 @@ class rutracker
 		}
 		else
 		{
-			if (rutracker::$warning == NULL) { rutracker::$warning = TRUE; Errors::setWarnings($tracker, 'cant_get_auth_page'); }
+			if (rutracker::$warning == NULL)
+			{
+				rutracker::$warning = TRUE;
+				$connErr = Sys::classifyConnectionError($loginUrl);
+				if ($connErr !== NULL)
+					Errors::setWarnings($tracker, $connErr);
+				else
+					Errors::setWarnings($tracker, 'cant_get_auth_page');
+			}
 		}
 		rutracker::$exucution = FALSE;
 	}

@@ -149,8 +149,11 @@ if ($memoryLimitBytes > 0 && $memoryLimitBytes < 64 * 1024 * 1024) { ?>
 if ($dbOk) {
 if ($internetOk) { ?>
     <div class="check-item">Подключение к интернету установлено.</div>
-<?php } else { ?>
-    <div class="check-item --error">Отсутствует подключение к интернету.</div>
+<?php } else {
+    $internetErr   = $checkResults['internet']['error'] ?? '';
+    $internetProxy = ! empty($internetErr) ? Sys::getProxyOptions(Sys::INTERNET_CHECK_URL) : array();
+    ?>
+    <div class="check-item --error"><?php if ( ! empty($internetProxy)) { ?>Не удалось соединиться через прокси: <?= htmlspecialchars($internetErr, ENT_QUOTES) ?> — недоступен прокси либо целевой узел, интернет как таковой может работать.<?php } elseif ( ! empty($internetErr)) { ?>Отсутствует подключение к интернету: <?= htmlspecialchars($internetErr, ENT_QUOTES) ?>.<?php } else { ?>Ответ получен, но не похож на рабочую страницу — проверьте доступ к <?= htmlspecialchars(Sys::INTERNET_CHECK_URL, ENT_QUOTES) ?>.<?php } ?></div>
 <?php }
 } ?>
 
@@ -261,9 +264,9 @@ if ($rootFree === false) { ?>
         if ($available) { ?>
     <div class="check-item">Торрент-клиент по адресу <strong><?= htmlspecialchars($torrentAddress, ENT_QUOTES) ?></strong> отвечает.</div>
         <?php } elseif ($torrentClient == 'Deluge') { ?>
-    <div class="check-item --error">Торрент-клиент по адресу <strong><?= htmlspecialchars($torrentAddress, ENT_QUOTES) ?></strong> не отвечает. Для Deluge укажите адрес и порт <strong>deluge-web</strong> (по умолчанию 8112), а не порт демона (58846).</div>
+    <div class="check-item --error">Торрент-клиент по адресу <strong><?= htmlspecialchars($torrentAddress, ENT_QUOTES) ?></strong> не отвечает<?= ! empty($result['error']) ? ': '.htmlspecialchars($result['error'], ENT_QUOTES) : '' ?>. Для Deluge укажите адрес и порт <strong>deluge-web</strong> (по умолчанию 8112), а не порт демона (58846).</div>
         <?php } else { ?>
-    <div class="check-item --error">Торрент-клиент по адресу <strong><?= htmlspecialchars($torrentAddress, ENT_QUOTES) ?></strong> не отвечает.</div>
+    <div class="check-item --error">Торрент-клиент по адресу <strong><?= htmlspecialchars($torrentAddress, ENT_QUOTES) ?></strong> не отвечает<?= ! empty($result['error']) ? ': '.htmlspecialchars($result['error'], ENT_QUOTES) : '' ?>.</div>
         <?php }
     } ?>
 
@@ -358,7 +361,7 @@ foreach ($credentials as $cred)
     ?>
     <div class="check-item">Трекер <strong><?= htmlspecialchars($tracker, ENT_QUOTES) ?></strong> доступен<?= $behindCf ? ' (за Cloudflare)' : '' ?>.</div>
     <?php } else { ?>
-    <div class="check-item --error">Трекер <strong><?= htmlspecialchars($tracker, ENT_QUOTES) ?></strong> не доступен.</div>
+    <div class="check-item --error">Трекер <strong><?= htmlspecialchars($tracker, ENT_QUOTES) ?></strong> не доступен<?= ! empty($result['error']) ? ': '.htmlspecialchars($result['error'], ENT_QUOTES) : '' ?>.</div>
     <?php
     } ?>
 <?php }

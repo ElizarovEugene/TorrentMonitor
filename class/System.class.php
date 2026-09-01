@@ -10,6 +10,10 @@ class Sys
     public static $lastCfCookies = '';
     public static $lastCfUserAgent = '';
 
+    // errno последнего curl_exec() в getUrlContent() — для классификации
+    // connectivity-ошибок вызывающим кодом без смены сигнатуры возврата
+    public static $lastCurlErrno = 0;
+
     //проверяем есть ли конфигурационный файл
     public static function checkConfigExist()
     {
@@ -327,6 +331,7 @@ class Sys
                 curl_setopt($ch, CURLOPT_VERBOSE, TRUE);
 
             $result   = curl_exec($ch);
+            Sys::$lastCurlErrno = curl_errno($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
             curl_close($ch);
 
@@ -357,6 +362,21 @@ class Sys
 
             return $result;
         }
+    }
+
+    // Классифицирует последнюю curl-ошибку getUrlContent(): различает недоступность прокси
+    // от недоступности трекера через рабочий прокси. NULL = не connectivity-ошибка
+    // (например неверные креды при HTTP 200) — вызывающий код сам решает что делать.
+    public static function classifyConnectionError($url)
+    {
+        $errno = Sys::$lastCurlErrno;
+        if ($errno == 0)
+            return NULL;
+        if (in_array($errno, array(5, 97)))
+            return 'proxy_unreachable';
+        if ($errno == 7 && !empty(Sys::getProxyOptions($url)))
+            return 'proxy_path_unreachable';
+        return 'tracker_unreachable';
     }
 
     public static function isCloudflarePage(string $body): bool

@@ -118,6 +118,7 @@ if (Sys::checkCurl())
 				            $pending[$key] = array(
 				                'row'   => $torrentsList[$i],
 				                'class' => $functionClass,
+				                'url'   => $requestParams['url'],
 				            );
 				        }
 				    }
@@ -154,8 +155,17 @@ if (Sys::checkCurl())
     {
         $row     = $info['row'];
         $class   = $info['class'];
+        $url     = $info['url'];
         $tracker = $row['tracker'];
-        $response = isset($responses[$key]) ? $responses[$key] : array('body' => '', 'http_code' => 0, 'error' => 'no response');
+        $response = isset($responses[$key]) ? $responses[$key] : array('body' => '', 'http_code' => 0, 'error' => 'no response', 'errno' => 0);
+
+        if ( ! empty($response['error']))
+        {
+            Sys::$lastCurlErrno = $response['errno'];
+            $connErr = Sys::classifyConnectionError($url);
+            if ($connErr !== NULL)
+                Errors::setWarnings($tracker, $connErr, $row['id']);
+        }
 
         $time_start = microtime(true);
         try {
