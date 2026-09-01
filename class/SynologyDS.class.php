@@ -70,7 +70,7 @@ class SynologyDS
         return FALSE;
     }
 
-    private static function _find_id($sid)
+    private static function _find_id($sid, $url)
     {
         $list = SynologyDS::_list_downloads($sid);
         if ($list === NULL)
@@ -79,7 +79,8 @@ class SynologyDS
         $id = NULL;
         foreach ($list->data->tasks as $task)
         {
-            $id = $task->id;
+            if ($task->additional->detail->uri == $url)
+                $id = $task->id;
         }
         return $id;
     }
@@ -159,7 +160,13 @@ class SynologyDS
                     }
                     else
                     {
-                        $hashNew = SynologyDS::_find_id($sid);
+                        $hashNew = NULL;
+                        for ($attempt = 0; $attempt < 3 && $hashNew === NULL; $attempt++)
+                        {
+                            if ($attempt > 0)
+                                sleep(1);
+                            $hashNew = SynologyDS::_find_id($sid, $file);
+                        }
                         if ($hashNew)
                         {
                             Database::updateHash($id, $hashNew);
