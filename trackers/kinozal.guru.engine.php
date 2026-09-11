@@ -4,6 +4,8 @@ class kinozalguru
 	protected static $sess_cookie;
 	protected static $exucution;
 	protected static $warning;
+	protected static $cf_cookies = '';
+	protected static $cf_userAgent = '';
 
 	//проверяем cookie
 	public static function checkCookie($sess_cookie)
@@ -200,55 +202,58 @@ class kinozalguru
 				//если даты не совпадают, перекачиваем торрент
 				if ($date > $timestamp)
 				{
-					//сохраняем торрент в файл
+					$dlCookie = !empty(kinozalguru::$cf_cookies)
+						? kinozalguru::$cf_cookies
+						: kinozalguru::$sess_cookie;
                     $torrent = Sys::getUrlContent(
                     	array(
                     		'type'           => 'GET',
                     		'returntransfer' => 1,
                     		'url'            => 'https://kinozal.guru/download.php?id='.$torrent_id,
-                    		'cookie'         => kinozalguru::$sess_cookie,
-                    		'sendHeader'     => array('Host' => 'kinozal.guru', 'Content-length' => strlen(kinozalguru::$sess_cookie)),
+                    		'cookie'         => $dlCookie,
+                    		'sendHeader'     => array('Host' => 'kinozal.guru', 'Content-length' => strlen($dlCookie)),
                     		'referer'        => 'https://kinozal.guru/details.php?id='.$torrent_id,
+                    		'useragent'      => kinozalguru::$cf_userAgent,
                     	)
                     );
 					if (preg_match('/<a href=\'\/pay_mode\.php\#tcounter\' class=sbab>/', $torrent))
 					{
-        				//устанавливаем варнинг
-        				if (kinozalguru::$warning == NULL)
-        				{
-        					kinozalguru::$warning = TRUE;
-        					Errors::setWarnings($tracker, 'max_torrent');
-        				}
-        				//останавливаем процесс выполнения
-        				kinozalguru::$exucution = FALSE;
+    				//устанавливаем варнинг
+    				if (kinozalguru::$warning == NULL)
+    				{
+    					kinozalguru::$warning = TRUE;
+    					Errors::setWarnings($tracker, 'max_torrent');
+    				}
+    				//останавливаем процесс выполнения
+    				kinozalguru::$exucution = FALSE;
 					}
 					else
 					{
                         if (Sys::checkTorrentFile($torrent))
                         {
-        					if ($auto_update)
-    						    $name = Sys::parseHeader($tracker, $titlearray[1]);
+    					if ($auto_update)
+    					    $name = Sys::parseHeader($tracker, $titlearray[1]);
 
-        					$message = $name.' обновлён.';
-        					$saved = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
+    					$message = $name.' обновлён.';
+    					$saved = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
 
-        					if ($saved)
-        					{
-        					    if ($auto_update)
-        					        //обновляем заголовок торрента в базе
-        					        $return[$id]['name'] = $name;
-        					    //обновляем время регистрации торрента в базе
-        					    $return[$id]['timestamp'] = $date;
-							    //сбрасываем варнинг
-							    Database::clearWarnings($tracker);
-        					    $return[$id]['error'] = 0;
-        					}
-        					else
-        					    Errors::setWarnings($tracker, 'save_file_fail', $id);
-        				}
-        				else
-                            Errors::setWarnings($tracker, 'torrent_file_fail', $id);
+    					if ($saved)
+    					{
+    					    if ($auto_update)
+    					        //обновляем заголовок торрента в базе
+    					        $return[$id]['name'] = $name;
+    					    //обновляем время регистрации торрента в базе
+    					    $return[$id]['timestamp'] = $date;
+						    //сбрасываем варнинг
+						    Database::clearWarnings($tracker);
+    					    $return[$id]['error'] = 0;
+    					}
+    					else
+    					    Errors::setWarnings($tracker, 'save_file_fail', $id);
     				}
+    				else
+                        Errors::setWarnings($tracker, 'torrent_file_fail', $id);
+				}
 				}
 				$return[$id]['error'] = 0;
 			}
@@ -323,7 +328,33 @@ class kinozalguru
 		extract($params);
 		$return = NULL;
 
-		$page = iconv('windows-1251', 'utf-8//IGNORE', $page);
+		// curl_multi не поддерживает Byparr-fallback — обрабатываем CF-страницу здесь
+		if (!empty($page) && Sys::isCloudflarePage($page))
+		{
+			$url      = 'https://kinozal.guru/details.php?id='.$torrent_id;
+			$fsResult = Sys::getViaFlareSolverr($url, kinozalguru::$sess_cookie);
+			if ($fsResult !== null)
+			{
+				$page = $fsResult['body']; // FlareSolverr возвращает UTF-8 — iconv не нужен
+				if (!empty($fsResult['cookies']))
+					kinozalguru::$cf_cookies = $fsResult['cookies'];
+				if (!empty($fsResult['userAgent']))
+					kinozalguru::$cf_userAgent = $fsResult['userAgent'];
+			}
+			else
+			{
+				if (kinozalguru::$warning == NULL)
+				{
+					kinozalguru::$warning = TRUE;
+					Errors::setWarnings($tracker, 'cant_get_forum_page', $id);
+				}
+				kinozalguru::$exucution = FALSE;
+				kinozalguru::$warning = NULL;
+				return NULL;
+			}
+		}
+		else
+			$page = mb_check_encoding($page, 'UTF-8') ? $page : iconv('windows-1251', 'utf-8//IGNORE', $page);
 
 		if ( ! empty($page))
 		{
