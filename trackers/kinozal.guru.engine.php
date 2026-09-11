@@ -354,7 +354,7 @@ class kinozalguru
 
 			$sizes = kinozalguru::readSizes();
 			$storedSize = isset($sizes[$tracker][$torrent_id]) ? $sizes[$tracker][$torrent_id] : NULL;
-			$isNewTopic = empty($timestamp) || $timestamp == '2000-01-01 00:00:00';
+			$isNewTopic = empty($timestamp) || $timestamp == '2000-01-01 00:00:00' || $timestamp == '0000-00-00 00:00:00';
 
 			if ($isNewTopic)
 				//тема новая (в т.ч. сброшена кнопкой "сброс" в UI - timestamp/hash очищены) -
