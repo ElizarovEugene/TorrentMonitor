@@ -143,9 +143,9 @@ class kinozalme
 				//если подходят - получаем куки
 				// getUrlContent мог решить CF через FlareSolverr — куки хранятся в Sys::$lastCfCookies
 				elseif (preg_match_all('/Set-Cookie: (.+);/iU', $page, $array)
-					|| (!empty(Sys::$lastCfCookies) && preg_match('/bb_session=/', Sys::$lastCfCookies)))
+					|| (!empty(Sys::$lastCfCookies) && preg_match('/uid=/', Sys::$lastCfCookies)))
 				{
-					if (!empty(Sys::$lastCfCookies) && preg_match('/bb_session=/', Sys::$lastCfCookies))
+					if (!empty(Sys::$lastCfCookies) && preg_match('/uid=/', Sys::$lastCfCookies))
 					{
 						kinozalme::$sess_cookie  = Sys::$lastCfCookies;
 						kinozalme::$cf_cookies   = Sys::$lastCfCookies;

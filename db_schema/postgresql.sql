@@ -21,7 +21,7 @@ CREATE TABLE "credentials" (
   "tracker" varchar(30) DEFAULT NULL,
   "log" varchar(30) DEFAULT NULL,
   "pass" varchar(100) DEFAULT NULL,
-  "cookie" varchar(255) DEFAULT NULL,
+  "cookie" text DEFAULT NULL,
   "passkey" varchar(255) DEFAULT NULL,
   "type" varchar(32) DEFAULT NULL,
   "necessarily" INTEGER NOT NULL DEFAULT '1'
