@@ -253,7 +253,7 @@ class kinozalme
 	}
 
 	//получаем имя темы из info.name .torrent-файла (details.php недоступен за CF).
-	//используется при добавлении темы по URL (System::getHeader)
+	//используется при добавлении темы по URL (Sys::getHeader)
 	public static function fetchName($torrent_id)
 	{
 		$tracker = 'kinozal.me';
