@@ -22,7 +22,7 @@ TorrentMonitor работает с трекерами двух типов:
 | booktracker.org | тема форума | ✔ | книги |
 | casstudio.tk | тема форума | — | сериалы |
 | hamsterstudio.org | RSS-сериалы | — | качество SD/720p/1080p |
-| kinozal.tv / kinozal.me / kinozal.guru | тема форума | — | три зеркала одного трекера — выбирайте рабочее для вашего провайдера |
+| kinozal.tv / kinozal.me / kinozal.guru | тема форума | — | три зеркала одного трекера — выбирайте рабочее для вашего провайдера; вход по логину/паролю закрыт Cloudflare — в **Учётных данных** вставьте cookie `uid` и `pass` из браузера после ручной авторизации |
 | lostfilm.tv | RSS-сериалы | — | работает через зеркало lostfilm.download; см. примечание о качестве ниже |
 | lostfilm-mirror | RSS-сериалы | — | вариант lostfilm через настраиваемое зеркало (задаётся в `config.xml`, см. [Прокси и зеркала](Proxy-and-Mirrors)) |
 | newstudio.tv | RSS-сериалы | — | качество SD/720p/1080p |
