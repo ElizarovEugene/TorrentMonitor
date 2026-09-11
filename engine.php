@@ -48,7 +48,7 @@ if (Sys::checkCurl())
     $credentialSet = array();
     foreach ($allCredentials as $cred)
     {
-        if ( ! empty($cred['login']) && ! empty($cred['password']))
+        if (( ! empty($cred['login']) && ! empty($cred['password'])) || ! empty($cred['cookie']))
             $credentialSet[$cred['tracker']] = TRUE;
     }
 
