@@ -334,7 +334,7 @@ class Sys
             Sys::$lastCfUserAgent = '';
 
             $viaFlareSolverr = false;
-            if (($httpCode == 403 || $httpCode == 503) && !empty($result) && Sys::isCloudflarePage($result))
+            if (($httpCode == 403 || $httpCode == 503) && (empty($result) || Sys::isCloudflarePage($result)))
             {
                 $existingCookie = isset($param['cookie']) ? $param['cookie'] : '';
                 // сохраняем исходный метод запроса — dl.php отдаёт файл только на POST,
@@ -363,6 +363,8 @@ class Sys
     {
         return strpos($body, 'cf-browser-verification') !== false
             || strpos($body, 'Just a moment') !== false
+            || strpos($body, 'challenges.cloudflare.com') !== false
+            || strpos($body, 'cf-mitigated: challenge') !== false
             || (stripos($body, 'cloudflare') !== false
                 && (strpos($body, 'Checking your browser') !== false
                     || strpos($body, 'DDoS protection') !== false));
