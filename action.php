@@ -473,7 +473,7 @@ if (isset($_POST['action']))
     	    $_POST['passkey'] = '';
 		Database::setCredentials($_POST['id'], $_POST['log'], $_POST['pass'], $_POST['passkey']);
 		if ( ! empty($_POST['cookie']) && ! empty($_POST['tracker']))
-		    Database::setCookie($_POST['tracker'], $_POST['cookie']);
+		    Database::setCookie($_POST['tracker'], trim($_POST['cookie']));
     	$return['error'] = FALSE;
         $return['msg'] = 'Данные для трекера обновлены.';
         echo json_encode($return);

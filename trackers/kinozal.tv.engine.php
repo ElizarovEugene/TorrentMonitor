@@ -34,67 +34,15 @@ class kinozaltv
 			return TRUE;
 	}
 
-	//функция преобразования даты
-	private static function dateStringToNum($data)
+	//функция преобразования даты (эпоха creation date из .torrent -> отображаемая строка)
+	private static function dateNumToString($timestamp)
 	{
-	    if (strstr($data, 'сегодня') || strstr($data, 'вчера') || strstr($data, 'сейчас'))
-	    {
-	        $pieces = explode(' ', $data);
-	        if ($pieces[0] == 'вчера')
-	            $timestamp = strtotime('-1 day');
-	        else
-	            $timestamp = strtotime('now');
-	        $date = date('Y-m-d', $timestamp);
-	        if (strstr($data, 'сейчас'))
-	            $time = date('H:i').':00';
-            else
-	            $time = $pieces[2].':00';
-	        $dateTime = $date.' '.$time;
+		$day   = date('d', $timestamp);
+		$month = Sys::dateNumToString(date('m', $timestamp));
+		$year  = date('Y', $timestamp);
+		$time  = date('H:i', $timestamp);
 
-	        return $dateTime;
-	    }
-	    elseif (preg_match('/\d{1,2} \D* \d{4} в \d{2}:\d{2}/', $data))
-	    {
-			$pieces = explode(' ', $data);
-			$month = Sys::dateStringToNum(substr($pieces[1], 0, 6));
-			if (strlen($pieces[0]) == 1)
-			    $pieces[0] = '0'.$pieces[0];
-			$date = $pieces[2].'-'.$month.'-'.$pieces[0];
-			$time = $pieces[4].':00';
-			$dateTime = $date.' '.$time;
-
-			return $dateTime;
-	    }
-	}
-
-	//функция преобразования даты
-	private static function dateNumToString($data)
-	{
-	    if (strstr($data, 'сегодня') || strstr($data, 'вчера'))
-	    {
-	        $pieces = explode(' ', $data);
-	        if ($pieces[0] == 'вчера')
-	            $timestamp = strtotime('-1 day');
-	        else
-	            $timestamp = strtotime('now');
-	        $day = date('d', $timestamp);
-			$month = Sys::dateNumToString(date('m', $timestamp));
-			$year = date('Y', $timestamp);
-	        $dateTime = $day.' '.$month.' '.$year.' в '.$pieces[2];
-	        return $dateTime;
-	    }
-	    elseif (strstr($data, 'сейчас'))
-	    {
-	        $timestamp = strtotime('now');
-	        $day = date('d', $timestamp);
-			$month = Sys::dateNumToString(date('m', $timestamp));
-			$year = date('Y', $timestamp);
-			$time = date('H:i').':00';
-	        $dateTime = $day.' '.$month.' '.$year.' в '.$time;
-	        return $dateTime;
-        }
-	   	else
-			return $data;
+		return $day.' '.$month.' '.$year.' в '.$time;
 	}
 
 	//функция получения кук
@@ -184,98 +132,161 @@ class kinozaltv
 		}
 	}
 
-    public static function work($titlearray, $array, $id, $tracker, $name, $torrent_id, $timestamp, $hash, $auto_update, &$return)
-    {
-		//проверяем удалось ли получить дату со страницы
-		if (isset($array[1]))
-		{
-			//если дата не равна ничему
-			if ( ! empty($array[1]))
-			{
-				//сбрасываем варнинг
-				Database::clearWarnings($tracker);
-				//приводим дату к общему виду
-				$date = kinozaltv::dateStringToNum($array[1]);
-				$date_str = kinozaltv::dateNumToString($array[1]);
-				//если даты не совпадают, перекачиваем торрент
-				if ($date > $timestamp)
-				{
-					//сохраняем торрент в файл
-                    $torrent = Sys::getUrlContent(
-                    	array(
-                    		'type'           => 'GET',
-                    		'returntransfer' => 1,
-                    		'url'            => 'https://kinozal.tv/download.php?id='.$torrent_id,
-                    		'cookie'         => kinozaltv::$sess_cookie,
-                    		'sendHeader'     => array('Host' => 'kinozal.tv', 'Content-length' => strlen(kinozaltv::$sess_cookie)),
-                    		'referer'        => 'https://kinozal.tv/details.php?id='.$torrent_id,
-                    	)
-                    );
-					if (preg_match('/<a href=\'\/pay_mode\.php\#tcounter\' class=sbab>/', $torrent))
-					{
-        				//устанавливаем варнинг
-        				if (kinozaltv::$warning == NULL)
-        				{
-        					kinozaltv::$warning = TRUE;
-        					Errors::setWarnings($tracker, 'max_torrent');
-        				}
-        				//останавливаем процесс выполнения
-        				kinozaltv::$exucution = FALSE;
-					}
-					else
-					{
-                        if (Sys::checkTorrentFile($torrent))
-                        {
-        					if ($auto_update)
-        					    $name = Sys::parseHeader($tracker, $titlearray[1]);
+	//путь к файлу с размерами .torrent файлов (без изменения схемы БД)
+	private static function sizesFilePath()
+	{
+		return dirname(__FILE__).'/../torrents/.sizes.json';
+	}
 
-        					$message = $name.' обновлён.';
-        					$saved = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
+	//читаем сохранённые размеры .torrent файлов всех kinozal-движков
+	private static function readSizes()
+	{
+		$path = kinozaltv::sizesFilePath();
+		if ( ! file_exists($path))
+			return array();
 
-        					if ($saved)
-        					{
-        					    if ($auto_update)
-        					        //обновляем заголовок торрента в базе
-        					        $return[$id]['name'] = $name;
-        					    //обновляем время регистрации торрента в базе
-        					    $return[$id]['timestamp'] = $date;
-        					    $return[$id]['error'] = 0;
-        					}
-        					else
-        					    Errors::setWarnings($tracker, 'save_file_fail', $id);
-        				}
-        				else
-                            Errors::setWarnings($tracker, 'torrent_file_fail', $id);
-    				}
-				}
-				$return[$id]['error'] = 0;
-			}
-			else
-			{
-				//устанавливаем варнинг
-				if (kinozaltv::$warning == NULL)
-				{
-					kinozaltv::$warning = TRUE;
-					Errors::setWarnings($tracker, 'cant_find_date', $id);
-				}
-				//останавливаем процесс выполнения, т.к. не может работать без кук
-				kinozaltv::$exucution = FALSE;
-			}
-		}
-		else
+		$json = @file_get_contents($path);
+		if ($json === FALSE)
+			return array();
+
+		$data = json_decode($json, TRUE);
+		return is_array($data) ? $data : array();
+	}
+
+	//сохраняем размер .torrent файла темы (атомарно, tmp + rename)
+	private static function writeSize($tracker, $torrent_id, $size)
+	{
+		$path = kinozaltv::sizesFilePath();
+		$data = kinozaltv::readSizes();
+		if ( ! isset($data[$tracker]))
+			$data[$tracker] = array();
+		$data[$tracker][$torrent_id] = (int) $size;
+
+		//уникальный tmp-файл (несколько процессов ТМ могут писать параллельно) + LOCK_EX
+		$tmp = $path.'.'.getmypid().'.tmp';
+		if (file_put_contents($tmp, json_encode($data), LOCK_EX) !== FALSE)
+			rename($tmp, $path);
+	}
+
+	//дата создания раздачи из bencode .torrent-файла (13:creation datei<epoch>e)
+	private static function torrentCreationDate($torrent)
+	{
+		if (preg_match('/13:creation datei(\d+)e/', $torrent, $m))
+			return (int) $m[1];
+
+		return NULL;
+	}
+
+	//имя раздачи (info.name) из bencode .torrent-файла; ищем ТОЛЬКО после первого 4:infod
+	private static function torrentInfoName($torrent)
+	{
+		$infoPos = strpos($torrent, '4:infod');
+		if ($infoPos === FALSE)
+			return NULL;
+
+		if ( ! preg_match('/4:name(\d+):/', $torrent, $m, PREG_OFFSET_CAPTURE, $infoPos))
+			return NULL;
+
+		$len       = (int) $m[1][0];
+		$nameStart = $m[0][1] + strlen($m[0][0]);
+		$name      = substr($torrent, $nameStart, $len);
+
+		return mb_check_encoding($name, 'UTF-8') ? $name : iconv('windows-1251', 'utf-8//IGNORE', $name);
+	}
+
+	//скачиваем и сохраняем обновлённый .torrent (вызывается только когда HEAD-проверка
+	//в parse() определила, что раздача обновилась либо тема новая)
+	public static function work($id, $tracker, $name, $torrent_id, $hash, &$return)
+	{
+		//сохраняем торрент в файл
+        $torrent = Sys::getUrlContent(
+        	array(
+        		'type'           => 'GET',
+        		'returntransfer' => 1,
+        		'url'            => 'https://kinozal.tv/download.php?id='.$torrent_id,
+        		'cookie'         => kinozaltv::$sess_cookie,
+        		'sendHeader'     => array('Host' => 'kinozal.tv', 'Content-length' => strlen(kinozaltv::$sess_cookie)),
+        		'referer'        => 'https://kinozal.tv/details.php?id='.$torrent_id,
+        	)
+        );
+
+		if (preg_match('/<a href=\'\/pay_mode\.php\#tcounter\' class=sbab>/', $torrent))
 		{
 			//устанавливаем варнинг
 			if (kinozaltv::$warning == NULL)
 			{
 				kinozaltv::$warning = TRUE;
-				Errors::setWarnings($tracker, 'cant_find_date', $id);
+				Errors::setWarnings($tracker, 'max_torrent');
 			}
-			//останавливаем процесс выполнения, т.к. не может работать без кук
+			//останавливаем процесс выполнения
 			kinozaltv::$exucution = FALSE;
 		}
-    }
+		else
+		{
+            if (Sys::checkTorrentFile($torrent))
+            {
+            	//дата создания раздачи - из bencode .torrent-файла, нет ключа - берём текущее время
+            	$creationDate = kinozaltv::torrentCreationDate($torrent);
+            	$timestamp    = $creationDate !== NULL ? $creationDate : time();
+            	$date         = date('Y-m-d H:i:s', $timestamp);
+            	$date_str     = kinozaltv::dateNumToString($timestamp);
 
-	//формируем параметры "проверочного" запроса для curl_multi (резолв куки последовательный, как и раньше)
+				$message = $name.' обновлён.';
+				$saved = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str, $name);
+
+				if ($saved)
+				{
+				    //обновляем время регистрации торрента в базе
+				    $return[$id]['timestamp'] = $date;
+				    $return[$id]['error'] = 0;
+				    //запоминаем размер файла для последующего HEAD-сравнения
+				    kinozaltv::writeSize($tracker, $torrent_id, strlen($torrent));
+				}
+				else
+				    Errors::setWarnings($tracker, 'save_file_fail', $id);
+    		}
+    		else
+                Errors::setWarnings($tracker, 'torrent_file_fail', $id);
+		}
+	}
+
+	//получаем имя темы из info.name .torrent-файла (details.php недоступен за CF).
+	//используется при добавлении темы по URL (Sys::getHeader)
+	public static function fetchName($torrent_id)
+	{
+		$tracker = 'kinozal.tv';
+		$cookie = Database::getCookie($tracker);
+		if (kinozaltv::checkCookie($cookie))
+		{
+			kinozaltv::$sess_cookie = $cookie;
+			//запускам процесс выполнения
+			kinozaltv::$exucution = TRUE;
+		}
+		else
+			kinozaltv::getCookie($tracker);
+
+		if ( ! kinozaltv::$exucution)
+			return NULL;
+
+        $torrent = Sys::getUrlContent(
+        	array(
+        		'type'           => 'GET',
+        		'returntransfer' => 1,
+        		'url'            => 'https://kinozal.tv/download.php?id='.$torrent_id,
+        		'cookie'         => kinozaltv::$sess_cookie,
+        		'sendHeader'     => array('Host' => 'kinozal.tv', 'Content-length' => strlen(kinozaltv::$sess_cookie)),
+        		'referer'        => 'https://kinozal.tv/details.php?id='.$torrent_id,
+        	)
+        );
+
+		if ( ! Sys::checkTorrentFile($torrent))
+			return NULL;
+
+		return kinozaltv::torrentInfoName($torrent);
+	}
+
+	//формируем параметры "проверочного" запроса для curl_multi (резолв куки последовательный, как и раньше).
+	//проверяем download.php вместо details.php (последний за интерактивным Cloudflare-челленджем)
 	public static function getRequestParams($params)
 	{
 		extract($params);
@@ -295,19 +306,18 @@ class kinozaltv
 			return array('url' => NULL);
 		}
 
-		$url = 'https://kinozal.tv/details.php?id='.$torrent_id;
+		$url = 'https://kinozal.tv/download.php?id='.$torrent_id;
 
+		//HEAD-запрос: интересует только код ответа и заголовки (content-type/content-length).
+		//FOLLOWLOCATION - download.php может редиректить (переезд зеркала/логин слетел),
+		//иначе редирект попадёт в ветку 403/503 с неверным варнингом
 		$options = array(
-			CURLOPT_COOKIE => kinozaltv::$sess_cookie,
+			CURLOPT_NOBODY         => 1,
+			CURLOPT_HEADER         => 1,
+			CURLOPT_FOLLOWLOCATION => 1,
+			CURLOPT_COOKIE         => kinozaltv::$sess_cookie,
+			CURLOPT_REFERER        => 'https://kinozal.tv/',
 		);
-
-		if (Sys::checkCurlVersion() == 'old')
-		{
-			$header = array();
-			foreach (array('Host' => 'kinozal.tv', 'Content-length' => strlen(kinozaltv::$sess_cookie)) as $k => $v)
-				$header[] = $k.': '.$v."\r\n";
-			$options[CURLOPT_HTTPHEADER] = $header;
-		}
 
 		return array(
 			'url'     => $url,
@@ -315,37 +325,83 @@ class kinozaltv
 		);
 	}
 
-	//разбираем полученную страницу, возвращаем изменения для batchUpdateTorrents или null
+	//разбираем HEAD-ответ download.php, возвращаем изменения для batchUpdateTorrents или null
 	public static function parse($params, $page)
 	{
 		extract($params);
 		$return = NULL;
 
-		$page = iconv('windows-1251', 'utf-8//IGNORE', $page);
+		//если уже упёрлись в дневной лимит скачиваний или слетел логин - остальные темы в этом
+		//цикле не гоняем (запросы уже выполнены curl_multi, но дальнейшую обработку пропускаем)
+		if ( ! kinozaltv::$exucution)
+			return NULL;
 
-		if ( ! empty($page))
+		//последняя status-line ответа (если запрос шёл через прокси - их может быть несколько)
+		preg_match_all('/^HTTP\/\S+ (\d{3})/m', $page, $codeMatches);
+		$code = ! empty($codeMatches[1]) ? (int) end($codeMatches[1]) : 0;
+
+		preg_match('/^content-type:\s*(.+)$/mi', $page, $ctMatch);
+		$contentType = isset($ctMatch[1]) ? trim($ctMatch[1]) : '';
+		preg_match('/^content-length:\s*(\d+)/mi', $page, $clMatch);
+		$contentLength = isset($clMatch[1]) ? (int) $clMatch[1] : NULL;
+
+		if ($code == 200 && stripos($contentType, 'application/x-bittorrent') !== FALSE)
 		{
-			preg_match('/(<title>.*<\/title>)/', $page, $titlearray);
-			//ищем на странице дату регистрации торрента
-			if (preg_match('/<li>Обновлен<span class=\"floatright green n\">(.*)<\/span><\/li>/', $page, $array))
-				kinozaltv::work($titlearray, $array, $id, $tracker, $name, $torrent_id, $timestamp, $hash, $auto_update, $return);
-			elseif (preg_match('/<li>Залит<span class=\"floatright green n\">(.*)<\/span><\/li>/', $page, $array))
-			    kinozaltv::work($titlearray, $array, $id, $tracker, $name, $torrent_id, $timestamp, $hash, $auto_update, $return);
-			else
+			//download.php отдал .torrent - доступ и логин рабочие
+			Database::clearWarnings($tracker);
+
+			$sizes = kinozaltv::readSizes();
+			$storedSize = isset($sizes[$tracker][$torrent_id]) ? $sizes[$tracker][$torrent_id] : NULL;
+			$isNewTopic = empty($timestamp) || $timestamp == '2000-01-01 00:00:00' || $timestamp == '0000-00-00 00:00:00';
+
+			if ($isNewTopic)
+				//тема новая (в т.ч. сброшена кнопкой "сброс" в UI - timestamp/hash очищены) -
+				//скачиваем торрент независимо от сохранённого размера
+				kinozaltv::work($id, $tracker, $name, $torrent_id, $hash, $return);
+			elseif ($storedSize === NULL)
 			{
-				//устанавливаем варнинг
-				if (kinozaltv::$warning == NULL)
-				{
-					kinozaltv::$warning = TRUE;
-					Errors::setWarnings($tracker, 'cant_find_date', $id);
-				}
-				//останавливаем процесс выполнения, т.к. не может работать без даты
-				kinozaltv::$exucution = FALSE;
+				//размер ранее не сохранялся (обновление ТМ на этой версии), но тема не новая -
+				//запоминаем текущий размер без скачивания, иначе первый цикл после апгрейда
+				//потратит дневной лимит скачиваний на все уже добавленные темы
+				if ($contentLength !== NULL)
+					kinozaltv::writeSize($tracker, $torrent_id, $contentLength);
+				$return[$id]['error'] = 0;
+			}
+			elseif ($contentLength !== NULL && $storedSize == $contentLength)
+				//размер не изменился - раздача не обновлялась
+				$return[$id]['error'] = 0;
+			else
+				//размер изменился - скачиваем торрент
+				kinozaltv::work($id, $tracker, $name, $torrent_id, $hash, $return);
+		}
+		elseif ($code == 200)
+		{
+			//html вместо .torrent - обычно дневной лимит скачиваний ИЛИ протухшая cookie;
+			//используем max_torrent как ближайший существующий варнинг
+			if (kinozaltv::$warning == NULL)
+			{
+				kinozaltv::$warning = TRUE;
+				Errors::setWarnings($tracker, 'max_torrent');
+			}
+			//останавливаем процесс выполнения
+			kinozaltv::$exucution = FALSE;
+		}
+		elseif ($code == 404)
+		{
+			//раздача не найдена
+			if (kinozaltv::$warning == NULL)
+			{
+				kinozaltv::$warning = TRUE;
+				Errors::setWarnings($tracker, 'cant_find_date', $id);
 			}
 		}
 		else
 		{
-			//устанавливаем варнинг
+			//403/503/пустой ответ - интерактивный Cloudflare-челлендж или сбой.
+			//FlareSolverr здесь не дёргается: у HEAD-ответа в заголовках есть
+			//cloudflare-упоминания (server: cloudflare, cf-ray), но isCloudflarePage()
+			//требует ЕЩЁ текст challenge-страницы ("Checking your browser"/"DDoS protection"),
+			//которого в заголовках нет - фолбэк не сработает, пока эта проверка не ослаблена
 			if (kinozaltv::$warning == NULL)
 			{
 				kinozaltv::$warning = TRUE;

@@ -549,7 +549,7 @@ class Sys
         $tracker = $Purl['host'];
         $tracker = preg_replace('/www\./', '', $tracker);
 
-        if ($tracker == 'rustorka.com'  || $tracker == 'booktracker.org' || $tracker == 'kinozal.guru')
+        if ($tracker == 'rustorka.com'  || $tracker == 'booktracker.org' || $tracker == 'kinozal.guru' || $tracker == 'kinozal.tv' || $tracker == 'kinozal.me')
         {
             $dir = str_replace('class', '', dirname(__FILE__));
             $engineFile = $dir.'trackers/'.$tracker.'.engine.php';
@@ -564,6 +564,23 @@ class Sys
 
                 if ($tracker == 'kinozal.guru')
                     $functionClass = 'kinozalguru';
+                elseif ($tracker == 'kinozal.tv')
+                    $functionClass = 'kinozaltv';
+                elseif ($tracker == 'kinozal.me')
+                    $functionClass = 'kinozalme';
+            }
+
+            //kinozal.tv/.me: details.php недоступен за интерактивным Cloudflare-челленджем -
+            //имя темы берём из info.name самого .torrent файла (download.php открыт напрямую)
+            if ($tracker == 'kinozal.tv' || $tracker == 'kinozal.me')
+            {
+                parse_str((string) parse_url($url, PHP_URL_QUERY), $queryParams);
+                $torrentId = isset($queryParams['id']) ? $queryParams['id'] : NULL;
+                $name = $torrentId !== NULL ? call_user_func($functionClass.'::fetchName', $torrentId) : NULL;
+                if (empty($name))
+                    $name = 'kinozal #'.$torrentId;
+
+                return $name;
             }
 
             $cookie = Database::getCookie($tracker);
@@ -807,7 +824,7 @@ class Sys
         {
             while (false !== ($file = readdir($handle)))
         	{
-                if ($file != '.' && $file != '..' && $file != '.htaccess')
+                if ($file != '.' && $file != '..' && substr($file, 0, 1) != '.')
                    $files[filemtime($dir.$file)] = $file;
             }
             closedir($handle);

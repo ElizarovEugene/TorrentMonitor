@@ -13,7 +13,7 @@ $trackers = Database::getTrackersList();
     <div class="top-bar__title"><svg><use href="assets/img/sprite.svg#profile" /></svg> Учётные данные</div>
 </div>
 
-<div x-data='credentials(<?= json_encode($credentials, JSON_NUMERIC_CHECK) ?>)'>
+<div x-data='{ ...credentials(<?= json_encode($credentials, JSON_NUMERIC_CHECK) ?>), manualCookieTrackers: ["nnmclub.to","kinozal.tv","kinozal.me","kinozal.guru"] }'>
 
     <label class="row">
         <div class="col --2:lg mb-1">Трекер:</div>
@@ -35,13 +35,13 @@ $trackers = Database::getTrackersList();
             <label class="row" x-show="tracker.tracker != 'nnmclub.to'">
                 <div class="col --2:lg mb-1">Логин:</div>
                 <div class="col --5:lg mb-2">
-                    <input type="text" name="log" x-model="tracker.log" :required="tracker.tracker != 'nnmclub.to'">
+                    <input type="text" name="log" x-model="tracker.log" :required="!manualCookieTrackers.includes(tracker.tracker)">
                 </div>
             </label>
             <label class="row" x-show="tracker.tracker != 'nnmclub.to'">
                 <div class="col --2:lg mb-1">Пароль:</div>
                 <div class="col --5:lg  mb-2">
-                    <input type="password" name="pass" x-model="tracker.pass" :required="tracker.tracker != 'nnmclub.to'">
+                    <input type="password" name="pass" x-model="tracker.pass" :required="!manualCookieTrackers.includes(tracker.tracker)">
                 </div>
             </label>
 
@@ -61,6 +61,18 @@ $trackers = Database::getTrackersList();
                         <div class="col --5:lg mb-2">
                             <textarea name="cookie" x-model="tracker.cookie" rows="3" style="font-size:11px;font-family:monospace" placeholder="phpbb2mysql_4_data=...; phpbb2mysql_4_sid=..."></textarea>
                             <div style="font-size:11px;color:var(--color-muted,#888);margin-top:4px">Вставьте куки из браузера после ручной авторизации на nnm-club.to</div>
+                        </div>
+                    </label>
+                </div>
+            </template>
+
+            <template x-if="['kinozal.tv','kinozal.me','kinozal.guru'].includes(tracker.tracker)">
+                <div>
+                    <label class="row">
+                        <div class="col --2:lg mb-1">Cookie</div>
+                        <div class="col --5:lg mb-2">
+                            <textarea name="cookie" x-model="tracker.cookie" rows="3" style="font-size:11px;font-family:monospace" placeholder="uid=...; pass=..."></textarea>
+                            <div style="font-size:11px;color:var(--color-muted,#888);margin-top:4px">Вставьте куки uid и pass из браузера после ручной авторизации на Кинозале — вход через takelogin.php закрыт Cloudflare, при заполненной cookie он не выполняется</div>
                         </div>
                     </label>
                 </div>
