@@ -258,7 +258,7 @@ if (isset($_POST['action']))
 			$class = explode('.', $tracker);
 			$class = $class[0];
 			$class = str_replace('-', '', $class);
-			Database::updateSerial($_POST['id'], $_POST['name'], $_POST['path'], $_POST['hd'], Sys::strBoolToInt($_POST['reset']), $_POST['script'], Sys::strBoolToInt($_POST['pause']));
+			Database::updateSerial($_POST['id'], $_POST['name'], $_POST['path'], $_POST['hd'], Sys::strBoolToInt($_POST['reset']), $_POST['script'], Sys::strBoolToInt($_POST['pause']), $_POST['category'] ?? '');
 			$return['error'] = FALSE;
             $return['msg'] = 'Сериал обновлён.';
         }

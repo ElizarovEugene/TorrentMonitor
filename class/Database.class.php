@@ -832,18 +832,19 @@ class Database
             return FALSE;
     }
 
-    public static function updateSerial($id, $name, $path, $hd, $reset, $script, $pause)
+    public static function updateSerial($id, $name, $path, $hd, $reset, $script, $pause, $category = '')
     {
         if ($reset)
-            $stmt = self::newStatement("UPDATE `torrent` SET `name` = :name, `path` = :path, `hd` = :hd, `ep` = '', `timestamp` = '2000-01-01 00:00:00', `hash` = '', `script` = :script, `pause` = :pause WHERE `id` = :id");
+            $stmt = self::newStatement("UPDATE `torrent` SET `name` = :name, `path` = :path, `hd` = :hd, `ep` = '', `timestamp` = '2000-01-01 00:00:00', `hash` = '', `script` = :script, `pause` = :pause, `category` = :category WHERE `id` = :id");
         else
-            $stmt = self::newStatement("UPDATE `torrent` SET `name` = :name, `path` = :path, `hd` = :hd, `script` = :script, `pause` = :pause WHERE `id` = :id");
+            $stmt = self::newStatement("UPDATE `torrent` SET `name` = :name, `path` = :path, `hd` = :hd, `script` = :script, `pause` = :pause, `category` = :category WHERE `id` = :id");
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':path', $path);
         $stmt->bindParam(':script', $script);
         $stmt->bindParam(':hd', $hd);
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':pause', $pause);
+        $stmt->bindParam(':category', $category);
         if ($stmt->execute())
             return TRUE;
         else
