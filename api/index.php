@@ -29,6 +29,29 @@ function get_token()
     return $_GET['token'] ?? '';
 }
 
+function php_cli_binary()
+{
+    $configured = Config::read('php.cli');
+    if ( ! empty($configured))
+        return is_executable($configured) ? $configured : null;
+
+    if (PHP_SAPI === 'cli')
+        return PHP_BINARY;
+
+    $candidates = [
+        PHP_BINDIR . '/php' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION,
+        PHP_BINDIR . '/php' . PHP_MAJOR_VERSION . PHP_MINOR_VERSION,
+        PHP_BINDIR . '/php',
+        '/usr/bin/php',
+    ];
+
+    foreach ($candidates as $candidate)
+        if (is_executable($candidate))
+            return $candidate;
+
+    return null;
+}
+
 function parse_tracker_url($rawUrl)
 {
     $url = parse_url($rawUrl);
@@ -266,7 +289,14 @@ elseif ($resource === 'run' && $httpMethod === 'POST')
     if (!$engineFile || !file_exists($engineFile))
         api_respond(false, 'engine.php не найден.', null, 500);
 
-    exec(PHP_BINARY . ' ' . escapeshellarg($engineFile) . ' > /dev/null 2>&1 &');
+    if ( ! function_exists('exec'))
+        api_respond(false, 'Функция exec отключена в PHP, движок запустить нельзя.', null, 500);
+
+    $php = php_cli_binary();
+    if ($php === null)
+        api_respond(false, 'CLI-интерпретатор PHP не найден. Укажите путь в config.php: Config::write(\'php.cli\', \'/usr/bin/php8.3\');', null, 500);
+
+    exec(escapeshellarg($php) . ' ' . escapeshellarg($engineFile) . ' > /dev/null 2>&1 &');
     api_respond(true, 'Движок запущен.', null, 202);
 }
 
