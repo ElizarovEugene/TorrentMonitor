@@ -353,13 +353,13 @@ class Database
 
     public static function checkTrackersCredentialsExist($tracker)
     {
-        $stmt = self::newStatement("SELECT `log`, `pass` FROM `credentials` WHERE `tracker` = :tracker");
+        $stmt = self::newStatement("SELECT `log`, `pass`, `cookie` FROM `credentials` WHERE `tracker` = :tracker");
         $stmt->bindParam(':tracker', $tracker);
         if ($stmt->execute())
         {
             foreach ($stmt as $row)
             {
-                if ( ! empty($row['log']) && ! empty($row['pass']))
+                if (( ! empty($row['log']) && ! empty($row['pass'])) || ! empty($row['cookie']))
                     return TRUE;
                 else
                     return FALSE;

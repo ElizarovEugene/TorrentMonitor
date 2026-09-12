@@ -139,9 +139,20 @@ class kinozalme
 					kinozalme::$exucution = FALSE;
 				}
 				//если подходят - получаем куки
-				elseif (preg_match_all('/Set-Cookie: (.+);/iU', $page, $array))
+				// getUrlContent мог решить CF через FlareSolverr — куки хранятся в Sys::$lastCfCookies
+				elseif (preg_match_all('/Set-Cookie: (.+);/iU', $page, $array)
+					|| (!empty(Sys::$lastCfCookies) && preg_match('/uid=/', Sys::$lastCfCookies)))
 				{
-					kinozalme::$sess_cookie = $array[1][0].'; '.$array[1][1].';';
+					if (!empty(Sys::$lastCfCookies) && preg_match('/uid=/', Sys::$lastCfCookies))
+					{
+						kinozalme::$sess_cookie  = Sys::$lastCfCookies;
+						kinozalme::$cf_cookies   = Sys::$lastCfCookies;
+						kinozalme::$cf_userAgent = Sys::$lastCfUserAgent;
+					}
+					else
+					{
+						kinozalme::$sess_cookie = $array[1][0].'; '.$array[1][1].';';
+					}
 					Database::setCookie($tracker, kinozalme::$sess_cookie);
 					//запускам процесс выполнения, т.к. не может работать без кук
 					kinozalme::$exucution = TRUE;

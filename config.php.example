@@ -23,4 +23,9 @@ Config::extended();
 #Для SQLite:
 #Config::write('db.type', 'sqlite');
 #Config::write('db.basename', '/var/www/htdocs/TorrentMonitor/torrentmonitor.sqlite'); #Указывайте _абсолютный_ путь до файла БД (расширение рекомендуется использовать .sqlite)
+
+#Путь к CLI-интерпретатору PHP для POST /api/run.
+#Нужен, если интерпретатор не находится автоматически: нестандартная сборка,
+#open_basedir, несколько версий PHP на сервере.
+#Config::write('php.cli', '/usr/bin/php8.3');
 ?>
