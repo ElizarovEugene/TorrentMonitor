@@ -48,10 +48,8 @@ INSERT INTO credentials VALUES (21,'riperam.org','','','', '','forum',1);
 INSERT INTO credentials VALUES (22,'kinozal.tv','','','', '','forum',1);
 INSERT INTO credentials VALUES (23,'kinozal.guru','','','', '','forum',1);
 
-CREATE SEQUENCE "auto_id_news" START 22;
-
 CREATE TABLE "news" (
-  "id" INTEGER  PRIMARY KEY NOT NULL DEFAULT nextval('auto_id_news'),
+  "id" VARCHAR(100) PRIMARY KEY NOT NULL,
   "text" TEXT NOT NULL,
   "new" INTEGER NOT NULL DEFAULT '1'
 );

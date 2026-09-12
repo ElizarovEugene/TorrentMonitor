@@ -60,7 +60,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `news`;
 
 CREATE TABLE `news` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id` varchar(100) NOT NULL,
   `text` text,
   `new` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)

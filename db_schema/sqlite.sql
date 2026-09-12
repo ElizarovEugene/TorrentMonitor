@@ -44,7 +44,7 @@ INSERT INTO "credentials" VALUES (22,'kinozal.tv','','','', '','forum',1);
 INSERT INTO "credentials" VALUES (23,'kinozal.guru','','','', '','forum',1);
 
 CREATE TABLE `news` (
-  `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  `id` TEXT PRIMARY KEY NOT NULL,
   `text` TEXT,
   `new` INTEGER NOT NULL DEFAULT '1'
 );

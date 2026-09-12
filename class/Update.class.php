@@ -212,16 +212,28 @@ class Update {
             {
                 $changelog = Sys::getChangelog(Update::$updVersion);
                 $msg = 'Обновление до версии: ' . Update::$updVersion . ' выполнено успешно.' . "\r\n" . '<br />';
-                $notifyMsg = 'Обновление до версии: ' . Update::$updVersion . ' выполнено успешно.';
-                if ( ! empty($changelog))
-                    $notifyMsg .= "\n\n" . $changelog;
                 echo $msg;
                 $serverAddress = Database::getSetting('serverAddress');
                 Database::clearWarnings('system');
                 Database::setUpdateNotification(0);
                 $newsId = 'updated_' . Update::$updVersion;
                 if ( ! Database::checkNewsExist($newsId))
-                    Database::insertNews($newsId, $notifyMsg);
+                {
+                    if ( ! empty($changelog))
+                    {
+                        $lines = explode("\n", $changelog);
+                        $htmlLines = [];
+                        foreach ($lines as $i => $line)
+                            $htmlLines[] = ($i === 0) ? '<b>' . htmlspecialchars($line) . '</b>' : htmlspecialchars($line);
+                        $newsHtml = implode('<br />', $htmlLines);
+                    }
+                    else
+                        $newsHtml = '<b>Обновление до версии ' . htmlspecialchars(Update::$updVersion) . ' выполнено успешно.</b>';
+                    Database::insertNews($newsId, $newsHtml);
+                }
+                $notifyMsg = 'Обновление до версии: ' . Update::$updVersion . ' выполнено успешно.';
+                if ( ! empty($changelog))
+                    $notifyMsg .= "\n\n" . $changelog;
                 if (Update::$isCLI)
                     Notification::sendNotification('news', date('r'), 0, $notifyMsg, 0);
                 else
