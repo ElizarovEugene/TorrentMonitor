@@ -334,16 +334,14 @@ class kinozalme
 		extract($params);
 		$return = NULL;
 
-		$page = iconv('windows-1251', 'utf-8//IGNORE', $page);
+		$page = mb_check_encoding($page, 'UTF-8') ? $page : iconv('windows-1251', 'utf-8//IGNORE', $page);
 
 		if ( ! empty($page))
 		{
 			preg_match('/(<title>.*<\/title>)/', $page, $titlearray);
 			//ищем на странице дату регистрации торрента
-			if (preg_match('/<li>Обновлен<span class=\"floatright green n\">(.*)<\/span><\/li>/', $page, $array))
+			if (preg_match('/<li>(?:Обновлен|Залит)<span class=\"floatright green n\">(.*)<\/span><\/li>/', $page, $array))
 				kinozalme::work($titlearray, $array, $id, $tracker, $name, $torrent_id, $timestamp, $hash, $auto_update, $return);
-			elseif (preg_match('/<li>Залит<span class=\"floatright green n\">(.*)<\/span><\/li>/', $page, $array))
-			    kinozalme::work($titlearray, $array, $id, $tracker, $name, $torrent_id, $timestamp, $hash, $auto_update, $return);
 			else
 			{
 				//устанавливаем варнинг
