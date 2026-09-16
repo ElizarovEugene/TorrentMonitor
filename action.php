@@ -108,7 +108,7 @@ if (isset($_POST['action']))
     				$threme = $array[0];
     			}
 
-    			if (is_array(Database::getCredentials($tracker)))
+    			if (Database::checkTrackersCredentialsExist($tracker))
     			{
     				$engineFile = $dir.'/trackers/'.$tracker.'.engine.php';
     				if (file_exists($engineFile))
@@ -203,7 +203,7 @@ if (isset($_POST['action']))
 	{
 
 		$tracker = $_POST['tracker'];
-		if (is_array(Database::getCredentials($tracker)))
+		if (Database::checkTrackersCredentialsExist($tracker))
 		{
 			$engineFile = $dir.'/trackers/'.$tracker.'.engine.php';
 			if (file_exists($engineFile))
@@ -297,7 +297,7 @@ if (isset($_POST['action']))
     				$threme = $array[0];
     			}
 
-    			if (is_array(Database::getCredentials($tracker)))
+    			if (Database::checkTrackersCredentialsExist($tracker))
     			{
     				$engineFile = $dir.'/trackers/'.$tracker.'.engine.php';
     				if (file_exists($engineFile))
@@ -370,7 +370,7 @@ if (isset($_POST['action']))
 	if ($_POST['action'] == 'user_add')
 	{
 		$tracker = $_POST['tracker'];
-		if (is_array(Database::getCredentials($tracker)))
+		if (Database::checkTrackersCredentialsExist($tracker))
 		{
 			$engineFile = $dir.'/trackers/'.$tracker.'.search.php';
 			if (file_exists($engineFile))
