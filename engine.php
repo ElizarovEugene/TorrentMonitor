@@ -176,6 +176,11 @@ if (Sys::checkCurl())
 
         if ( ! empty($result))
             $pendingUpdates = $pendingUpdates + $result;
+
+        if (!empty($response['cf_cookies']))
+            Database::setCookie($tracker, $response['cf_cookies']);
+        if (!empty($response['cf_useragent']))
+            Database::setCfUserAgent($response['cf_useragent']);
     }
 
     if ( ! empty($pendingUpdates))

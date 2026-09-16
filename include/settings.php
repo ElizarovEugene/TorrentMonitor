@@ -368,10 +368,10 @@ if (file_exists($config))
         </label>
 
         <label class="row">
-            <div class="col --2:lg mb-1">FlareSolverr / Byparr URL:</div>
+            <div class="col --2:lg mb-1">FlareSolverr URL:</div>
             <div class="col --5:lg mb-2">
-                <input type="url" name="flaresolverrUrl" x-model="options.flaresolverrUrl" placeholder="http://byparr:8191">
-                <div class="form-help">Адрес Byparr/FlareSolverr для обхода Cloudflare. Оставьте пустым, если не используется.</div>
+                <input type="url" name="flaresolverrUrl" x-model="options.flaresolverrUrl" placeholder="http://flaresolverr:8191">
+                <div class="form-help">Адрес FlareSolverr для обхода Cloudflare. Оставьте пустым, если не используется.</div>
             </div>
         </label>
 

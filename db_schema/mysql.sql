@@ -142,7 +142,8 @@ VALUES
 	(40,'userAgent','Mozilla/5.0 (X11; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0'),
 	(41,'flaresolverrUrl',''),
 	(42,'ApiKey',''),
-	(43,'qbitCategory','');
+	(43,'qbitCategory',''),
+	(44,'cf_userAgent','');
 
 UNLOCK TABLES;
 

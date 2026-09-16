@@ -13,7 +13,7 @@ class CurlMultiFetcher
     {
         $this->cfFallback = $cfFallback;
         $this->defaultOptions = array(
-            CURLOPT_USERAGENT         => Database::getSetting('userAgent'),
+            CURLOPT_USERAGENT         => Database::getCfUserAgent() ?: Database::getSetting('userAgent'),
             CURLOPT_TIMEOUT           => Database::getSetting('httpTimeout'),
             CURLOPT_RETURNTRANSFER    => 1,
             CURLOPT_DNS_CACHE_TIMEOUT => 0,
@@ -101,14 +101,21 @@ class CurlMultiFetcher
                 // в rutracker.org.engine.php::parse() (сохраняет cf_clearance/UA для dl.php).
                 // Если фолбэк отработает здесь, parse() получит уже решённую (или пустую)
                 // страницу и никогда не увидит CF-challenge — cf_cookies/cf_userAgent не сохранятся.
+                $fsCookies   = '';
+                $fsUserAgent = '';
                 if ($this->cfFallback && ($httpCode == 403 || $httpCode == 503) && !empty($body) && Sys::isCloudflarePage($body) && strpos($meta['url'], 'rutracker.org') === false)
                 {
-                    $fsResult = Sys::getViaFlareSolverr($meta['url'], $meta['cookie']);
+                    // Убираем протухший cf_clearance, чтобы FlareSolverr получил чистую сессию
+                    // и не получил от CF эскалацию до Managed Challenge
+                    $cookieForFs = preg_replace('/(?:^|;\s*)cf_clearance=[^;]*/i', '', $meta['cookie']);
+                    $fsResult = Sys::getViaFlareSolverr($meta['url'], $cookieForFs);
                     if ($fsResult !== null)
                     {
-                        $body     = $fsResult['body'];
-                        $httpCode = $fsResult['status'];
-                        $error    = '';
+                        $body        = $fsResult['body'];
+                        $httpCode    = $fsResult['status'];
+                        $error       = '';
+                        $fsCookies   = isset($fsResult['cookies'])   ? $fsResult['cookies']   : '';
+                        $fsUserAgent = isset($fsResult['userAgent']) ? $fsResult['userAgent'] : '';
                     }
                     else
                     {
@@ -122,9 +129,11 @@ class CurlMultiFetcher
                 foreach ($this->aliases[$key] as $id)
                 {
                     $results[$id] = array(
-                        'body'      => $body,
-                        'http_code' => $httpCode,
-                        'error'     => $error,
+                        'body'         => $body,
+                        'http_code'    => $httpCode,
+                        'error'        => $error,
+                        'cf_cookies'   => $fsCookies,
+                        'cf_useragent' => $fsUserAgent,
                     );
                 }
 

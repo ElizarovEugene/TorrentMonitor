@@ -1167,6 +1167,17 @@ class Database
             return FALSE;
     }
 
+    public static function getCfUserAgent()
+    {
+        $val = self::getSetting('cf_userAgent');
+        return $val !== null ? $val : '';
+    }
+
+    public static function setCfUserAgent($useragent)
+    {
+        return self::updateSettings('cf_userAgent', $useragent);
+    }
+
     public static function saveToTemp($id, $name, $path, $tracker, $date)
     {
         if (Database::getDbType() == 'pgsql') {

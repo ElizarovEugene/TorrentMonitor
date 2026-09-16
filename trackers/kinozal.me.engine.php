@@ -4,6 +4,8 @@ class kinozalme
 	protected static $sess_cookie;
 	protected static $exucution;
 	protected static $warning;
+	public static $cf_cookies   = '';
+	public static $cf_userAgent = '';
 
 	//проверяем cookie
 	public static function checkCookie($sess_cookie)
@@ -293,6 +295,9 @@ class kinozalme
 	{
 		extract($params);
 		$cookie = Database::getCookie($tracker);
+		$cfUa = Database::getCfUserAgent();
+		if (!empty($cfUa))
+			kinozalme::$cf_userAgent = $cfUa;
 		if (kinozalme::checkCookie($cookie))
 		{
 			kinozalme::$sess_cookie = $cookie;
@@ -313,6 +318,8 @@ class kinozalme
 		$options = array(
 			CURLOPT_COOKIE => kinozalme::$sess_cookie,
 		);
+		if (!empty(kinozalme::$cf_userAgent))
+			$options[CURLOPT_USERAGENT] = kinozalme::$cf_userAgent;
 
 		if (Sys::checkCurlVersion() == 'old')
 		{

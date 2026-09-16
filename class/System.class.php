@@ -274,7 +274,7 @@ class Sys
 
             // если передан UA браузера, решившего Cloudflare-challenge — используем его,
             // иначе cf_clearance не совпадёт с фингерпринтом и Cloudflare сбросит куку
-            curl_setopt($ch, CURLOPT_USERAGENT, !empty($param['useragent']) ? $param['useragent'] : Database::getSetting('userAgent'));
+            curl_setopt($ch, CURLOPT_USERAGENT, !empty($param['useragent']) ? $param['useragent'] : (Database::getCfUserAgent() ?: Database::getSetting('userAgent')));
             if (isset($param['follow']))
                 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
 
