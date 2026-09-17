@@ -347,7 +347,8 @@ class kinozalguru
 		{
 			preg_match('/(<title>.*<\/title>)/', $page, $titlearray);
 			//ищем на странице дату регистрации торрента
-			if (preg_match('/<li>(?:Обновлен|Залит)<span class=\"floatright green n\">(.*)<\/span><\/li>/', $page, $array))
+			if (preg_match('/<li>Обновлен<span class="floatright green n">(.*)<\/span><\/li>/', $page, $array)
+				|| preg_match('/<li>Залит<span class="floatright green n">(.*)<\/span><\/li>/', $page, $array))
 				kinozalguru::work($titlearray, $array, $id, $tracker, $name, $torrent_id, $timestamp, $hash, $auto_update, $return);
 			else
 			{

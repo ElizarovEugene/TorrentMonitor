@@ -49,7 +49,14 @@ class Update {
             $xml_page = @simplexml_load_string($page);
             $ROOTPATH = str_replace('class', '', dirname(__FILE__));
             $dbType = Config::read('db.type');
-            
+
+            if ($xml_page === false || !isset($xml_page->update))
+            {
+                Errors::setWarnings('system', 'update_fail');
+                echo 'Не удалось загрузить update.xml' . "\r\n" . '<br />';
+                return;
+            }
+
             $count = is_countable($xml_page->update) ? count($xml_page->update) - 1 : 0;
             
             $version = json_decode(file_get_contents($ROOTPATH.'version.txt'));

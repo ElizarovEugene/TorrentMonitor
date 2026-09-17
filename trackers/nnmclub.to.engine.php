@@ -65,6 +65,18 @@ class nnmclub
 			$login = iconv('utf-8', 'windows-1251', $credentials['login']);
 			$password = $credentials['password'];
 
+			// cookie-only режим: логин/пароль не заданы, обновить автоматически нельзя
+			if (empty($login) && empty($password))
+			{
+				if (nnmclub::$warning == NULL)
+				{
+					nnmclub::$warning = TRUE;
+					Errors::setWarnings($tracker, 'credential_miss');
+				}
+				nnmclub::$exucution = FALSE;
+				return;
+			}
+
 			//авторизовываемся на трекере
 			$page = Sys::getUrlContent(
             	array(

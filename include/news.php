@@ -19,7 +19,7 @@ if ($news != NULL && is_array($news) && count($news) > 0)
     {
 ?>
 <div x-data="news" class="content col --8:xl news-item<?= ($news[$i]['new']) ? ' news-item--new' : '' ?>" id="<?php echo $news[$i]['id']?>"
-    @click="markRead($el, <?= $news[$i]['id'] ?>)"
+    @click="markRead($el, '<?= $news[$i]['id'] ?>')"
 >
 <?php echo $news[$i]['text']?>
 </div>
