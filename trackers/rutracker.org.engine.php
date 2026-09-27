@@ -208,7 +208,7 @@ class rutracker
 					if ( ! empty($array[1]))
 					{
 						//сбрасываем варнинг
-						Database::clearWarnings($tracker);
+						Database::clearWarnings($tracker, $id);
 						//приводим дату к общему виду
 						$date = rutracker::dateStringToNum($array[1]);
 						$date_str = rutracker::dateNumToString($array[1]);
@@ -250,7 +250,7 @@ class rutracker
 								    //обновляем время регистрации торрента в базе
 								    $return[$id]['timestamp'] = $date;
 								    //сбрасываем варнинг
-								    Database::clearWarnings($tracker);
+								    Database::clearWarnings($tracker, $id);
 								    $return[$id]['closed'] = 0;
 								}
 								else
