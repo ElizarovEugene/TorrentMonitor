@@ -1130,10 +1130,19 @@ class Database
     }
 
 
-    public static function clearWarnings($tracker)
+    public static function clearWarnings($tracker, $id = NULL)
     {
-        $stmt = self::newStatement("DELETE FROM `warning` WHERE `where` = :tracker");
-        $stmt->bindParam(':tracker', $tracker);
+        if ($id !== NULL)
+        {
+            $stmt = self::newStatement("DELETE FROM `warning` WHERE `where` = :tracker AND `t_id` = :id");
+            $stmt->bindParam(':tracker', $tracker);
+            $stmt->bindParam(':id', $id);
+        }
+        else
+        {
+            $stmt = self::newStatement("DELETE FROM `warning` WHERE `where` = :tracker");
+            $stmt->bindParam(':tracker', $tracker);
+        }
         if ($stmt->execute())
             return TRUE;
         else
